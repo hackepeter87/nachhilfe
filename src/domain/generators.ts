@@ -150,7 +150,7 @@ function multiplication(seed: number, difficulty: Difficulty, focus?: string): E
   const rows = difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]
   const focusedRow = focus?.startsWith('times-') ? Number(focus.slice(6)) : undefined
   const first = focusedRow && rows.includes(focusedRow) ? focusedRow : pick(random, rows)
-  const second = integer(random, 2, difficulty === 1 ? Math.floor(50 / first) : 10)
+  const second = integer(random, 2, difficulty === 1 ? Math.min(10, Math.floor(50 / first)) : 10)
   const answer = first * second
   const values = { first, second, answer, sumExpression: Array.from({ length: first }, () => second).join(' + ') }
   return withMetadata({
@@ -169,7 +169,7 @@ function division(seed: number, difficulty: Difficulty, focus?: string): Exercis
   const rows = difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]
   const focusedDivisor = focus?.startsWith('division-by-') ? Number(focus.slice(12)) : undefined
   const divisor = focusedDivisor && rows.includes(focusedDivisor) ? focusedDivisor : pick(random, rows)
-  const quotient = integer(random, 2, difficulty === 1 ? Math.floor(50 / divisor) : 10)
+  const quotient = integer(random, 2, difficulty === 1 ? Math.min(10, Math.floor(50 / divisor)) : 10)
   const dividend = divisor * quotient
   const values = { dividend, divisor, quotient }
   return withMetadata({

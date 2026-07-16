@@ -53,7 +53,7 @@ describe('App-Ablauf', () => {
     expect(screen.getByText('nrw-klasse3-foerderkern 0.4.0')).not.toBeVisible()
     await user.click(screen.getByLabelText('Versionsinformationen öffnen'))
     expect(screen.getByText('nrw-klasse3-foerderkern 0.4.0')).toBeVisible()
-    expect(screen.getByText('0.5.0')).toBeVisible()
+    expect(screen.getByText('0.5.1')).toBeVisible()
     expect(screen.getByText('ready-for-review')).toBeVisible()
   })
 

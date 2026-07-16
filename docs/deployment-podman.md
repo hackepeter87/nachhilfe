@@ -10,7 +10,7 @@ Der Workflow `.github/workflows/publish-container.yml` veröffentlicht nach:
 ghcr.io/hackepeter87/nachhilfe
 ```
 
-Ein Git-Tag wie `v0.5.0` erzeugt die Image-Tags `0.5.0`, `sha-<kurzsha>` und `latest`. Eine manuelle Ausführung über `workflow_dispatch` erzeugt nur das nachvollziehbare SHA-Tag. Normale Pushes auf `main` veröffentlichen kein Image.
+Ein Git-Tag wie `v0.5.1` erzeugt die Image-Tags `0.5.1`, `sha-<kurzsha>` und `latest`. Eine manuelle Ausführung über `workflow_dispatch` erzeugt nur das nachvollziehbare SHA-Tag. Normale Pushes auf `main` veröffentlichen kein Image.
 
 Der Workflow setzt die OCI-Labels für Quelle, Revision, Version, Erstellungszeit, Lizenz, Titel und Beschreibung. Die dynamischen Werte kommen aus Git-Referenz und Build-Metadaten; im Dockerfile ist deshalb keine konkrete App-Version doppelt hinterlegt.
 
@@ -35,12 +35,12 @@ Siehe auch die [offizielle Podman-Compose-Dokumentation](https://docs.podman.io/
 
 ## GHCR-Paket sichtbar machen
 
-Das erste erfolgreiche Publish legt das Paket in GitHub Container Registry an. Für einen öffentlichen DMZ-Pull muss in den GitHub-Paketeinstellungen die Sichtbarkeit auf **Public** gesetzt sein. Diese Einstellung wird nicht durch den Workflow erzwungen. Das Paket `hackepeter87/nachhilfe` wurde für Version 0.5.0 als **Public** zurückgelesen.
+Das erste erfolgreiche Publish legt das Paket in GitHub Container Registry an. Für einen öffentlichen DMZ-Pull muss in den GitHub-Paketeinstellungen die Sichtbarkeit auf **Public** gesetzt sein. Diese Einstellung wird nicht durch den Workflow erzwungen. Das Paket `hackepeter87/nachhilfe` wurde als **Public** zurückgelesen.
 
 Ein öffentliches Paket kann ohne Anmeldung geladen werden:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.5.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.5.1
 ```
 
 Solange das Paket privat ist, erfolgt die Anmeldung mit einem technisch geeigneten GitHub-Token mit `read:packages`. Tokens gehören weder in die Compose-Datei noch in das Repository:

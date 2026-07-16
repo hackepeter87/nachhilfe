@@ -125,7 +125,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Multi-Arch-Release-Images für `linux/amd64` und `linux/arm64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.5.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.5.1
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -166,6 +166,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Schwierigkeit steuert zusätzlich Zahlenraum, Denkschritte und Hilfsdarstellung. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.5.0
+## Release-Stand 0.5.1
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.5.0 verbindet Katalog, Lernstand und UI über Lernphasen und strukturierte Remediation, führt Stellenwert und Runden auf höheren Stufen mehrschrittig und ergänzt Sachrechnen um gleichmäßiges Verteilen. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.5.1 stellt Punktgruppen beim Einmaleins und bei Divisionen vollständig und ohne würfelartige Mehrdeutigkeit dar. Die didaktischen Erweiterungen aus 0.5.0 bleiben unverändert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

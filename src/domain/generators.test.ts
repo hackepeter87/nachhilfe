@@ -57,6 +57,35 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
+  it('hält Faktoren, Divisoren und Quotienten im kleinen Einmaleins und bildet Gruppen exakt ab', () => {
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const multiplication = generateExercise('multiplication', seed, difficulty)
+        const first = Number(multiplication.variant.values.first)
+        const second = Number(multiplication.variant.values.second)
+        expect(first).toBeGreaterThanOrEqual(2)
+        expect(first).toBeLessThanOrEqual(10)
+        expect(second).toBeGreaterThanOrEqual(2)
+        expect(second).toBeLessThanOrEqual(10)
+        expect(first * second).toBe(Number(multiplication.correctAnswer))
+        if (difficulty < 3) expect(multiplication.representation?.values).toMatchObject({ groups: first, size: second })
+        else expect(multiplication.representation).toBeUndefined()
+
+        const division = generateExercise('division', seed, difficulty)
+        const dividend = Number(division.variant.values.dividend)
+        const divisor = Number(division.variant.values.divisor)
+        const quotient = Number(division.variant.values.quotient)
+        expect(divisor).toBeGreaterThanOrEqual(2)
+        expect(divisor).toBeLessThanOrEqual(10)
+        expect(quotient).toBeGreaterThanOrEqual(2)
+        expect(quotient).toBeLessThanOrEqual(10)
+        expect(divisor * quotient).toBe(dividend)
+        if (difficulty < 3) expect(division.representation?.values).toMatchObject({ groups: quotient, size: divisor })
+        else expect(division.representation).toBeUndefined()
+      }
+    }
+  })
+
   it.each([
     ['neighbor-tens', 10],
     ['neighbor-hundreds', 100]

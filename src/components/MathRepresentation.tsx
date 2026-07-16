@@ -1,4 +1,7 @@
+import type { CSSProperties } from 'react'
 import type { ExerciseRepresentation } from '../domain'
+
+const isValidGroupValue = (value: number) => Number.isInteger(value) && value >= 1 && value <= 10
 
 export function MathRepresentation({ representation }: { representation: ExerciseRepresentation }) {
   const values = representation.values
@@ -57,10 +60,25 @@ export function MathRepresentation({ representation }: { representation: Exercis
   if (representation.kind === 'groups') {
     const groups = Number(values.groups)
     const size = Number(values.size)
+    if (!isValidGroupValue(groups) || !isValidGroupValue(size)) {
+      return (
+        <div className="math-visual math-visual--error" role="alert">
+          Das Gruppenbild enthält ungültige Mengenangaben.
+        </div>
+      )
+    }
+    const pointColumns = size <= 5 ? size : 5
     return (
-      <div className="math-visual groups-visual" role="img" aria-label={representation.label}>
-        {Array.from({ length: Math.min(groups, 10) }, (_, group) => (
-          <span className="visual-group" key={group}>{Array.from({ length: Math.min(size, 10) }, (_, item) => <i key={item} />)}</span>
+      <div className="math-visual groups-visual" role="img" aria-label={`${groups} Gruppen mit je ${size} Punkten. ${representation.label}`}>
+        {Array.from({ length: groups }, (_, group) => (
+          <span
+            aria-hidden="true"
+            className="visual-group"
+            key={group}
+            style={{ '--point-columns': pointColumns } as CSSProperties}
+          >
+            {Array.from({ length: size }, (_, item) => <i key={item} />)}
+          </span>
         ))}
       </div>
     )

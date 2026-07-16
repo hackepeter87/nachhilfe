@@ -591,9 +591,22 @@ p {
 .bar-segments span + span { background: #ffe5d7; }
 .bar-model-visual > strong { display: block; text-align: center; }
 
-.groups-visual { display: flex; flex-wrap: wrap; gap: 8px; }
-.visual-group { display: flex; flex-wrap: wrap; gap: 3px; width: 44px; min-height: 32px; padding: 5px; border: 1px solid #87a792; background: #fff; }
-.visual-group i { width: 7px; height: 7px; border-radius: 50%; background: #df6b3d; }
+.groups-visual { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.visual-group {
+  display: grid;
+  grid-template-columns: repeat(var(--point-columns), 8px);
+  grid-auto-rows: 8px;
+  place-content: center;
+  gap: 4px;
+  min-width: 48px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 2px solid #78a88d;
+  border-radius: 999px;
+  background: #f6fff9;
+}
+.visual-group i { width: 8px; height: 8px; border-radius: 50%; background: #c84f2c; }
+.math-visual--error { border-color: var(--coral); color: #8d2f20; background: var(--coral-soft); font-weight: 800; }
 
 .number-row {
   display: grid;

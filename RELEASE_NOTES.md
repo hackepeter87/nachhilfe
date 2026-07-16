@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Punktgruppen-Hotfix 0.5.1
+
+- Faktoren, Divisoren und Quotienten bleiben im kleinen Einmaleins zwischen 2 und 10; die bestehenden Produkthöchstwerte der Schwierigkeitsstufen bleiben erhalten.
+- Gruppenbilder stellen jede Gruppe und jeden Punkt vollständig dar. Es gibt kein stilles Abschneiden mehr.
+- Ovale Mengenfelder ersetzen die würfelartig wirkenden Punktkästchen; die zugängliche Beschreibung nennt Gruppenanzahl und Gruppengröße.
+- Ungültige Gruppendaten werden sichtbar abgelehnt, statt eine mathematisch falsche Darstellung zu erzeugen.
+
+Der fachliche Katalog bleibt unverändert bei Version 0.4.0 und Schema 4. Eine Freigabe durch eine Lehrkraft und ein Test auf einem echten iPhone sind weiterhin nicht dokumentiert.
+
+Erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 140 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und drei Playwright-Szenarien jeweils gegen Vite Preview und den Container. Der neue mobile Test prüft die vollständige Punktzahl bei `375 x 812` und erzeugt ein Screenshot-Artefakt; Landscape bleibt ohne horizontales Overflow. Das lokale OCI-Image `mathe-reise:0.5.1` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Podman war nicht installiert und wurde nicht als ausgeführt behauptet.
+
 ## Didaktische Qualitätsoffensive 0.5.0
 
 - Katalogschema 4 führt die einheitlichen Status `draft`, `ready-for-review`, `active` und `disabled`, sechs Lernphasen, Erfolgskriterien und strukturierte Remediation ein.

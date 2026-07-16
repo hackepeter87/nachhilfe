@@ -81,7 +81,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
     catalogId: 'nrw-klasse3-foerderkern',
     catalogVersion: '0.4.0',
     schemaVersion: 4,
-    appVersion: '0.5.0'
+    appVersion: '0.5.1'
   })
 
   await page.reload()
@@ -113,4 +113,36 @@ test('Landscape bleibt vollständig bedienbar und ohne horizontales Overflow', a
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await expect(page.locator('.exercise-panel')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (['addition', 'subtraction', 'division'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Punkt')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  const groupsVisual = page.locator('.groups-visual')
+  await expect(groupsVisual).toBeVisible()
+  const counts = await groupsVisual.evaluate((element) => {
+    const groups = [...element.querySelectorAll('.visual-group')]
+    return {
+      groups: groups.length,
+      pointsPerGroup: groups.map((group) => group.querySelectorAll('i').length),
+      totalPoints: element.querySelectorAll('.visual-group i').length
+    }
+  })
+  expect(counts.groups).toBeGreaterThanOrEqual(2)
+  expect(counts.groups).toBeLessThanOrEqual(10)
+  expect(new Set(counts.pointsPerGroup).size).toBe(1)
+  expect(counts.pointsPerGroup[0]).toBeGreaterThanOrEqual(2)
+  expect(counts.pointsPerGroup[0]).toBeLessThanOrEqual(10)
+  expect(counts.totalPoints).toBe(counts.groups * counts.pointsPerGroup[0]!)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('punktgruppen-375x812.png'), fullPage: true })
 })
