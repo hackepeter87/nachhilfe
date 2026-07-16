@@ -11,6 +11,14 @@
 *.sln.docstates
 *.env
 
+# Node.js, Vite and test output
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
