@@ -1,5 +1,19 @@
 # Mathe-Reise
 
+## Katalog-Releases 0.3.0
+
+- Schema- und Inhaltsversion sind als `schemaVersion: 2` und `catalogVersion: 0.2.0` getrennt; Katalog-ID, Veröffentlichungsdatum und Freigabestatus werden validiert.
+- Eine zentrale fachliche Quelldatei erzeugt den öffentlichen Katalog und den eingebetteten Fallback deterministisch. Abweichungen und `draft`-Kataloge stoppen den Produktionsbuild.
+- Sitzungspläne und abgeschlossene Sitzungen speichern App-, Katalog- und Schemaversion. Alte Sitzungen bleiben lesbar und werden ohne unbelegte Versionsannahme als `unknown` gekennzeichnet.
+- Eine laufende Runde bleibt an ihren Katalog-Snapshot gebunden. Ein wartendes PWA-Update kann erst nach der Runde auf der Startseite aktiviert werden.
+- Die technische Versionsanzeige nennt App-Version, Katalog-ID, Katalogversion, Schema und Status, ohne den Kinderbereich damit zu belasten.
+- Die PR-Vorlage und `docs/catalog-management.md` beschreiben Versionsregeln, didaktische Prüfung, Release, Cache-Verhalten und verlustfreien Container-Rollback.
+- Ein unabhängiger Remote-Katalogkanal bleibt bewusst offen und ist in GitHub Issue #38 beschrieben.
+
+Der Katalogstatus ist `review`. Eine fachliche Freigabe durch eine Lehrkraft und ein Test auf einem echten iPhone wurden nicht durchgeführt.
+
+Lokal erfolgreich ausgeführt wurden Katalogabgleich, Typecheck, Lint, 107 Unit-/Komponententests in 9 Dateien, Produktionsbuild, 2 Playwright-Szenarien gegen Vite Preview sowie gegen den Container und der Docker-Build mit den Tags `mathe-reise:0.3.0` und `mathe-reise:local`. Das Image läuft als UID 101, trägt das OCI-Versionslabel `0.3.0`, meldet `healthy` und liefert Katalog, Manifest und Service Worker mit den vorgesehenen MIME- und Cache-Headern aus.
+
 ## Didaktische Vertiefung 0.2.0
 
 - Alle 16 produktiven Kompetenzen besitzen dokumentierte Vorkenntnisse, drei konkrete Stufen, Hilfen, Remediation, Transfer und Ausbaugrenzen.

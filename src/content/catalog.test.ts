@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { mirrorGrid } from '../domain/generators'
 import { SKILL_IDS } from '../domain/types'
-import publicCatalogJson from '../../public/content/task-catalog.v1.json?raw'
-import fallbackCatalogJson from './task-catalog.fallback.v1.json?raw'
+import sourceCatalogJson from '../../content/catalogs/nrw-klasse3-foerderkern/catalog.json?raw'
+import publicCatalogJson from '../../public/content/task-catalog.json?raw'
+import fallbackCatalogJson from './task-catalog.fallback.json?raw'
 import {
   FALLBACK_TASK_CATALOG,
   loadTaskCatalog,
@@ -23,12 +24,28 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).version).toBe(1)
+    expect((catalog as TaskCatalog).schemaVersion).toBe(2)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.2.0')
+    expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
+    expect((catalog as TaskCatalog).status).toBe('review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
   })
 
   it('hält öffentlichen Katalog und eingebauten Fallback auf demselben geprüften Stand', () => {
+    expect(publicCatalogJson).toBe(sourceCatalogJson)
+    expect(fallbackCatalogJson).toBe(sourceCatalogJson)
     expect(JSON.parse(fallbackCatalogJson)).toEqual(readPublicCatalog())
+  })
+
+  it.each([
+    ['schemaVersion', 3],
+    ['catalogVersion', 'keine-version'],
+    ['catalogId', ''],
+    ['status', 'published']
+  ])('lehnt ungültige Katalogmetadaten %s ab', (field, value) => {
+    const catalog = structuredClone(readPublicCatalog()) as unknown as Record<string, unknown>
+    catalog[field] = value
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('kennt ausschließlich alle produktiven Skill-IDs', () => {
@@ -84,9 +101,21 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
+  it('lehnt unbekannte Platzhalter ab und lädt draft nicht produktiv', () => {
+    const placeholderCatalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    placeholderCatalog.skills[0]!.prompt = 'Unbekannt {secret}'
+    expect(validateTaskCatalog(placeholderCatalog)).toBe(false)
+
+    const draftCatalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    draftCatalog.status = 'draft'
+    expect(validateTaskCatalog(draftCatalog)).toBe(true)
+    expect(resolveTaskCatalog(draftCatalog, false)).toBe(FALLBACK_TASK_CATALOG)
+    expect(resolveTaskCatalog(draftCatalog, true)).toBe(draftCatalog)
+  })
+
   it('verwendet bei ungültigem oder nicht ladbarem Katalog den geprüften Fallback', async () => {
-    expect(resolveTaskCatalog({ version: 999 })).toBe(FALLBACK_TASK_CATALOG)
-    await expect(loadTaskCatalog(async () => ({ ok: true, json: async () => ({ version: 999 }) }))).resolves.toBe(FALLBACK_TASK_CATALOG)
+    expect(resolveTaskCatalog({ schemaVersion: 999 })).toBe(FALLBACK_TASK_CATALOG)
+    await expect(loadTaskCatalog(async () => ({ ok: true, json: async () => ({ schemaVersion: 999 }) }))).resolves.toBe(FALLBACK_TASK_CATALOG)
     await expect(loadTaskCatalog(async () => { throw new Error('offline') })).resolves.toBe(FALLBACK_TASK_CATALOG)
   })
 })

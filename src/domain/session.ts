@@ -1,7 +1,9 @@
 import { generateExercise } from './generators'
 import { dailySeed, seededRandom } from './random'
 import { selectionWeight, subskillWeight } from './progress'
-import type { Difficulty, Exercise, ProgressMap, SessionPlan, SkillId } from './types'
+import { getActiveCatalogMetadata } from '../content/catalog'
+import { APP_VERSION } from '../version'
+import type { Difficulty, Exercise, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId } from './types'
 
 const FOCUS_SKILLS: SkillId[] = [
   'place-value',
@@ -77,7 +79,21 @@ function uniqueExercise(skillId: SkillId, seed: number, difficulty: Difficulty, 
   return exercise
 }
 
-export function createSessionPlan(progress: ProgressMap, seed = dailySeed() + Date.now() % 10_000): SessionPlan {
+export function currentSessionReleaseMetadata(): SessionReleaseMetadata {
+  const catalog = getActiveCatalogMetadata()
+  return {
+    catalogId: catalog.catalogId,
+    catalogVersion: catalog.catalogVersion,
+    schemaVersion: catalog.schemaVersion,
+    appVersion: APP_VERSION
+  }
+}
+
+export function createSessionPlan(
+  progress: ProgressMap,
+  seed = dailySeed() + Date.now() % 10_000,
+  releaseMetadata = currentSessionReleaseMetadata()
+): SessionPlan {
   const warmups = warmupSkills(progress, seed + 17)
   const focus = weightedSkills(progress, seed + 31, 3)
   const skills = [...warmups, ...focus, 'word-problem', 'symmetry'] as SkillId[]
@@ -91,6 +107,7 @@ export function createSessionPlan(progress: ProgressMap, seed = dailySeed() + Da
   return {
     id: `session-${seed}`,
     seed,
+    ...releaseMetadata,
     startedAt: new Date().toISOString(),
     exercises
   }

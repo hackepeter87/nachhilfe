@@ -1,6 +1,16 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createSkillProgress } from '../domain'
-import { databaseMetadata, loadAppData, saveProfile, saveSettings, saveSkillProgress, verifyProgressStorage, verifyStorage } from './db'
+import {
+  databaseMetadata,
+  LEGACY_SESSION_METADATA,
+  loadAppData,
+  saveCompletedSession,
+  saveProfile,
+  saveSettings,
+  saveSkillProgress,
+  verifyProgressStorage,
+  verifyStorage
+} from './db'
 
 function deleteDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -45,5 +55,64 @@ describe('IndexedDB-Speicherung', () => {
     expect(data.settings.installHelpDismissed).toBe(true)
     expect(data.progress['round-tens']?.mastery).toBe(47)
     expect(data.progress['round-tens']?.subskills['round-tens-midpoint']?.recentErrors).toBe(1)
+  })
+
+  it('speichert den fachlichen Releasekontext einer abgeschlossenen Sitzung', async () => {
+    await saveCompletedSession({
+      id: 'session-current',
+      catalogId: 'nrw-klasse3-foerderkern',
+      catalogVersion: '0.2.0',
+      schemaVersion: 2,
+      appVersion: '0.3.0',
+      startedAt: '2026-07-16T09:00:00.000Z',
+      completedAt: '2026-07-16T09:10:00.000Z',
+      results: [],
+      selfAssessment: 'thinking'
+    })
+
+    const data = await loadAppData()
+    expect(data.sessions[0]).toMatchObject({
+      catalogId: 'nrw-klasse3-foerderkern',
+      catalogVersion: '0.2.0',
+      schemaVersion: 2,
+      appVersion: '0.3.0'
+    })
+  })
+
+  it('migriert eine alte Sitzung verlustfrei mit unbekanntem Releasekontext', async () => {
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open(databaseMetadata.name, 1)
+      request.onupgradeneeded = () => {
+        const database = request.result
+        database.createObjectStore(databaseMetadata.stores.profile, { keyPath: 'id' })
+        database.createObjectStore(databaseMetadata.stores.settings, { keyPath: 'key' })
+        database.createObjectStore(databaseMetadata.stores.progress, { keyPath: 'skillId' })
+        const sessions = database.createObjectStore(databaseMetadata.stores.sessions, { keyPath: 'id' })
+        sessions.put({
+          id: 'session-legacy',
+          startedAt: '2026-07-01T09:00:00.000Z',
+          completedAt: '2026-07-01T09:10:00.000Z',
+          results: [{ exerciseId: 'old-1', skillId: 'addition' }],
+          selfAssessment: 'hint'
+        })
+      }
+      request.onsuccess = () => {
+        request.result.close()
+        resolve()
+      }
+      request.onerror = () => reject(request.error)
+    })
+
+    const data = await loadAppData()
+    expect(data.sessions).toHaveLength(1)
+    expect(data.sessions[0]).toMatchObject({
+      id: 'session-legacy',
+      ...LEGACY_SESSION_METADATA,
+      selfAssessment: 'hint'
+    })
+    expect(data.sessions[0]?.results).toHaveLength(1)
+
+    const reopened = await loadAppData()
+    expect(reopened.sessions[0]).toMatchObject({ id: 'session-legacy', ...LEGACY_SESSION_METADATA })
   })
 })

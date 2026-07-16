@@ -1,12 +1,16 @@
 {
   "name": "mathe-reise",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "engines": {
     "node": ">=24"
   },
   "scripts": {
+    "catalog:validate": "node scripts/catalog.mjs validate",
+    "catalog:build": "node scripts/catalog.mjs build",
+    "catalog:check": "node scripts/catalog.mjs check",
+    "prebuild": "npm run catalog:check",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",

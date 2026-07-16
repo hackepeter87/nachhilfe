@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, Check, CircleHelp, Compass, Download, RefreshCw, ShieldCheck, Sparkles, Wifi, WifiOff } from 'lucide-react'
+import { BookOpen, Check, CircleHelp, Compass, Download, Info, RefreshCw, ShieldCheck, Sparkles, Wifi, WifiOff } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import {
   createRepetitionExercise,
@@ -17,6 +17,8 @@ import {
 import { ExerciseCard } from './components/ExerciseCard'
 import { loadAppData, saveCompletedSession, saveProfile, saveSettings, saveSkillProgress } from './storage/db'
 import { verifyOfflineReadiness } from './pwa/offlineReadiness'
+import { getActiveCatalogMetadata, type CatalogMetadata } from './content/catalog'
+import { APP_VERSION } from './version'
 
 type Screen = 'loading' | 'onboarding' | 'home' | 'session' | 'summary' | 'error'
 
@@ -85,16 +87,26 @@ interface HomeProps {
   sessions: CompletedSession[]
   offlineReady: boolean
   online: boolean
+  catalogMetadata: CatalogMetadata
+  updateAvailable: boolean
   onStart: () => void
   onShowInstall: () => void
+  onUpdate: () => void
 }
 
-function Home({ profile, progress, sessions, offlineReady, online, onStart, onShowInstall }: HomeProps) {
+function Home({ profile, progress, sessions, offlineReady, online, catalogMetadata, updateAvailable, onStart, onShowInstall, onUpdate }: HomeProps) {
   const practiced = Object.values(progress).filter(Boolean)
   const secure = practiced.filter((entry) => entry?.status === 'secure').length
   const mostImproved = [...practiced].sort((a, b) => (b?.mastery ?? 0) - (a?.mastery ?? 0))[0]
   return (
     <main className="home-page">
+      {updateAvailable && (
+        <div className="update-banner" role="status">
+          <RefreshCw aria-hidden="true" />
+          <span>Eine neue Version ist bereit.</span>
+          <button type="button" onClick={onUpdate}>Jetzt aktualisieren</button>
+        </div>
+      )}
       <header className="home-header">
         <div>
           <span className="eyebrow">Mathe-Reise</span>
@@ -138,6 +150,17 @@ function Home({ profile, progress, sessions, offlineReady, online, onStart, onSh
         <button className="icon-button" type="button" onClick={onShowInstall} aria-label="Installationshilfe öffnen" title="Installationshilfe">
           <CircleHelp aria-hidden="true" />
         </button>
+        <details className="version-details">
+          <summary className="icon-button" aria-label="Versionsinformationen öffnen" title="Versionsinformationen">
+            <Info aria-hidden="true" />
+          </summary>
+          <dl>
+            <div><dt>App</dt><dd>{APP_VERSION}</dd></div>
+            <div><dt>Katalog</dt><dd>{catalogMetadata.catalogId} {catalogMetadata.catalogVersion}</dd></div>
+            <div><dt>Schema</dt><dd>{catalogMetadata.schemaVersion}</dd></div>
+            <div><dt>Status</dt><dd>{catalogMetadata.status}</dd></div>
+          </dl>
+        </details>
       </footer>
     </main>
   )
@@ -178,6 +201,7 @@ export default function App() {
   const [online, setOnline] = useState(navigator.onLine)
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const updateServiceWorker = useRef<((reloadPage?: boolean) => Promise<void>) | null>(null)
+  const catalogMetadata = useMemo(() => getActiveCatalogMetadata(), [])
 
   useEffect(() => {
     loadAppData()
@@ -287,6 +311,10 @@ export default function App() {
     if (!session) return
     const completed: CompletedSession = {
       id: session.id,
+      catalogId: session.catalogId,
+      catalogVersion: session.catalogVersion,
+      schemaVersion: session.schemaVersion,
+      appVersion: session.appVersion,
       startedAt: session.startedAt,
       completedAt: new Date().toISOString(),
       results,
@@ -302,18 +330,24 @@ export default function App() {
   if (screen === 'error') return <main className="page error-page"><ShieldCheck aria-hidden="true" /><h1>Das hat gerade nicht geklappt.</h1><p>Bitte lade die App neu. Deine bisherigen Aufgaben bleiben gespeichert.</p></main>
   if (showInstallHelp) return <InstallHelp onDismiss={dismissInstallHelp} />
   if (screen === 'onboarding') return <Onboarding onComplete={completeOnboarding} />
-  if (screen === 'home' && profile) return <Home profile={profile} progress={progress} sessions={sessions} offlineReady={offlineReady} online={online} onStart={startRound} onShowInstall={() => setShowInstallHelp(true)} />
+  if (screen === 'home' && profile) return (
+    <Home
+      profile={profile}
+      progress={progress}
+      sessions={sessions}
+      offlineReady={offlineReady}
+      online={online}
+      catalogMetadata={catalogMetadata}
+      updateAvailable={updateAvailable}
+      onStart={startRound}
+      onShowInstall={() => setShowInstallHelp(true)}
+      onUpdate={() => { void updateServiceWorker.current?.(true) }}
+    />
+  )
   if (screen === 'summary') return <Summary results={results} onFinish={finishRound} />
 
   return (
     <main className="session-page">
-      {updateAvailable && (
-        <div className="update-banner" role="status">
-          <RefreshCw aria-hidden="true" />
-          <span>Eine neue Version ist bereit.</span>
-          <button type="button" onClick={() => updateServiceWorker.current?.(true)}>Jetzt aktualisieren</button>
-        </div>
-      )}
       <header className="session-header">
         <button className="brand-button" type="button" onClick={() => setScreen('home')} aria-label="Runde verlassen und zur Startseite">
           <Compass aria-hidden="true" />

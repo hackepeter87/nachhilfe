@@ -1,13 +1,19 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { databaseMetadata } from './storage/db'
 
+const pwa = vi.hoisted(() => ({
+  onNeedRefresh: undefined as (() => void) | undefined,
+  update: vi.fn(async () => undefined)
+}))
+
 vi.mock('virtual:pwa-register', () => ({
-  registerSW: ({ onRegisteredSW }: { onRegisteredSW?: () => void }) => {
+  registerSW: ({ onRegisteredSW, onNeedRefresh }: { onRegisteredSW?: () => void; onNeedRefresh?: () => void }) => {
+    pwa.onNeedRefresh = onNeedRefresh
     onRegisteredSW?.()
-    return vi.fn(async () => undefined)
+    return pwa.update
   }
 }))
 
@@ -22,6 +28,8 @@ function deleteDatabase(): Promise<void> {
 describe('App-Ablauf', () => {
   beforeEach(async () => {
     await deleteDatabase()
+    pwa.onNeedRefresh = undefined
+    pwa.update.mockClear()
   })
 
   it('führt vom Installationshinweis über Onboarding zur Startseite', async () => {
@@ -34,5 +42,35 @@ describe('App-Ablauf', () => {
     expect(await screen.findByText('Hallo, Nova!')).toBeVisible()
     expect(screen.getByRole('button', { name: /mathe-runde starten/i })).toBeEnabled()
     await waitFor(() => expect(screen.getByText(/Offline (bereit|wird vorbereitet)/)).toBeVisible())
+  })
+
+  it('zeigt technische Versionen nur auf Abruf', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Weiter zur Mathe-Reise' }))
+    await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
+
+    expect(screen.queryByText('nrw-klasse3-foerderkern 0.2.0')).not.toBeVisible()
+    await user.click(screen.getByLabelText('Versionsinformationen öffnen'))
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.2.0')).toBeVisible()
+    expect(screen.getByText('0.3.0')).toBeVisible()
+    expect(screen.getByText('review')).toBeVisible()
+  })
+
+  it('aktiviert ein PWA-Update nicht während einer laufenden Runde', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Weiter zur Mathe-Reise' }))
+    await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
+    await user.click(screen.getByRole('button', { name: /mathe-runde starten/i }))
+
+    act(() => pwa.onNeedRefresh?.())
+    expect(screen.queryByText('Eine neue Version ist bereit.')).not.toBeInTheDocument()
+    expect(pwa.update).not.toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: 'Runde verlassen und zur Startseite' }))
+    expect(screen.getByText('Eine neue Version ist bereit.')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Jetzt aktualisieren' }))
+    expect(pwa.update).toHaveBeenCalledWith(true)
   })
 })

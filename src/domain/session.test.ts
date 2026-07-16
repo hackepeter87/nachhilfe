@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createRepetitionExercise, createSessionPlan } from './session'
 import { createSkillProgress } from './progress'
+import { FALLBACK_TASK_CATALOG, getTaskCatalog, setTaskCatalog } from '../content/catalog'
 
 describe('Sitzungsplanung', () => {
   it('erstellt sieben Aufgaben mit Grundlagen, Transfer und Symmetrie', () => {
@@ -10,6 +11,34 @@ describe('Sitzungsplanung', () => {
     expect(session.exercises.at(-2)?.skillId).toBe('word-problem')
     expect(session.exercises.at(-1)?.skillId).toBe('symmetry')
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
+    expect(session).toMatchObject({
+      catalogId: 'nrw-klasse3-foerderkern',
+      catalogVersion: '0.2.0',
+      schemaVersion: 2,
+      appVersion: '0.3.0'
+    })
+  })
+
+  it('bindet eine laufende Runde unveränderlich an ihren Releasekontext', () => {
+    const originalCatalog = getTaskCatalog()
+    try {
+      const currentCatalog = structuredClone(FALLBACK_TASK_CATALOG)
+      setTaskCatalog(currentCatalog)
+      const runningSession = createSessionPlan({}, 321)
+      const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
+
+      const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
+      nextCatalog.catalogVersion = '0.2.1'
+      nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
+      setTaskCatalog(nextCatalog)
+      const nextSession = createSessionPlan({}, 322)
+
+      expect(runningSession.catalogVersion).toBe('0.2.0')
+      expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
+      expect(nextSession.catalogVersion).toBe('0.2.1')
+    } finally {
+      setTaskCatalog(originalCatalog)
+    }
   })
 
   it('berücksichtigt schwache Grundrechenarten und Unterkompetenzen häufiger', () => {
