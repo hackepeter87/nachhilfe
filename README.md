@@ -119,6 +119,17 @@ podman run --rm -p 8080:8080 mathe-reise:local
 
 Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle wurden daher nicht ausgeführt.
 
+## GHCR und Podman Compose
+
+Versionierte Release-Images werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
+
+```bash
+podman pull ghcr.io/hackepeter87/nachhilfe:0.3.0
+podman compose -f deploy/compose.yaml up -d
+```
+
+Voraussetzungen, GHCR-Sichtbarkeit, Read-only-Rootfs, Start, Update, Rollback, Reverse Proxy und PWA-Cache-Verhalten stehen in [docs/deployment-podman.md](docs/deployment-podman.md).
+
 ## Reverse Proxy und Caching
 
 Der Reverse Proxy muss HTTPS terminieren, WebSocket-Unterstützung ist nicht erforderlich. Die Anwendung wird am URL-Pfad `/` erwartet. Weitergeleitete Requests gehen an Container-Port `8080`; `/healthz` kann für Bereitschaftsprüfungen verwendet werden.
@@ -130,6 +141,8 @@ Die mitgelieferte Nginx-Konfiguration setzt folgende Regeln:
 - `/manifest.webmanifest` und `/index.html`: keine dauerhafte Speicherung, immer neu validieren
 - `/content/task-catalog.json`: JSON-MIME-Typ und kontrollierte Revalidierung
 - Andere Routen: SPA-Fallback und Revalidierung
+
+Zusätzlich werden `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` und `X-Frame-Options: DENY` auf allen Antworten gesetzt.
 
 Diese Regeln sollten bei einem anderen statischen Host oder vorgeschalteten CDN beibehalten werden. Insbesondere darf `sw.js` niemals mit einer langfristigen Immutable-Regel ausgeliefert werden.
 
