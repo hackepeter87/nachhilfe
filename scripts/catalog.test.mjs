@@ -27,13 +27,27 @@ afterEach(() => {
 })
 
 describe('Katalog-Buildpipeline', () => {
+  it('enthält vollständige didaktische Themenpfade', () => {
+    const root = path.resolve(path.dirname(catalogPaths.source), '../../..')
+    const directory = path.join(root, 'docs/didactics')
+    const files = [
+      'addition.md', 'subtraction.md', 'multiplication.md', 'division.md', 'place-value.md',
+      'decompose-compose.md', 'neighbor-numbers.md', 'rounding.md', 'word-problems.md', 'symmetry.md',
+      'addition-subtraction-1000.md', 'money.md', 'lengths.md', 'spatial-reasoning.md'
+    ]
+    for (const file of files) {
+      const text = fs.readFileSync(path.join(directory, file), 'utf8')
+      for (let section = 1; section <= 17; section += 1) expect(text).toContain(`## ${section}.`)
+    }
+    expect(fs.readFileSync(path.join(directory, 'teacher-review-package.md'), 'utf8')).toContain('## Fragen für die Gesamtbeurteilung')
+  })
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 2,
-      catalogVersion: '0.2.0',
+      schemaVersion: 4,
+      catalogVersion: '0.4.0',
       catalogId: 'nrw-klasse3-foerderkern',
-      status: 'review'
+      status: 'ready-for-review'
     })
   })
 
@@ -56,6 +70,22 @@ describe('Katalog-Buildpipeline', () => {
     const placeholder = sourceCatalog()
     placeholder.skills[0].prompt = 'Unbekannt: {secret}'
     expect(() => parseAndValidateCatalog(JSON.stringify(placeholder))).toThrow('unbekannten Platzhalter')
+  })
+
+  it('lehnt widersprüchliche Mengenbeziehungen und Plausibilitätsoptionen ab', () => {
+    const wrongOperation = sourceCatalog()
+    wrongOperation.wordProblems[0].operation = '−'
+    expect(() => parseAndValidateCatalog(JSON.stringify(wrongOperation))).toThrow('passt nicht zur Mengenbeziehung')
+
+    const ambiguousPlausibility = sourceCatalog()
+    ambiguousPlausibility.wordProblems[0].plausibility.options[1].correct = true
+    expect(() => parseAndValidateCatalog(JSON.stringify(ambiguousPlausibility))).toThrow('genau eine richtige Antwort')
+  })
+
+  it('lehnt gekachelte oder unvollständige Symmetrievorlagen ab', () => {
+    const catalog = sourceCatalog()
+    catalog.symmetry.templates[0].shiftGrid = catalog.symmetry.templates[0].wrongAxisGrid
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('keine drei geprüften Antwortvarianten')
   })
 
   it('erzeugt beide Artefakte deterministisch aus einer Quelle', () => {

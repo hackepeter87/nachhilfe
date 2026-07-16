@@ -1,4 +1,4 @@
-import type { AttemptResult, Difficulty, LearningStatus, SkillId, SkillProgress } from './types'
+import type { AttemptResult, Difficulty, LearningPhase, LearningStatus, SkillId, SkillProgress } from './types'
 
 export const LEARNING_RULES = {
   initialMastery: 35,
@@ -19,6 +19,7 @@ export function createSkillProgress(skillId: SkillId): SkillProgress {
     hintsUsed: 0,
     lastPracticedAt: null,
     difficulty: 1,
+    learningPhase: 'activate',
     mastery: LEARNING_RULES.initialMastery,
     recentErrors: 0,
     correctStreak: 0,
@@ -26,6 +27,26 @@ export function createSkillProgress(skillId: SkillId): SkillProgress {
     status: 'not_started',
     subskills: {}
   }
+}
+
+export function learningPhaseFor(attempts: number, mastery: number, difficulty: Difficulty, status: LearningStatus): LearningPhase {
+  if (attempts === 0) return 'activate'
+  if (mastery < 45) return 'understand'
+  if (difficulty === 1) return 'guided-practice'
+  if (difficulty === 2) return 'independent-practice'
+  return status === 'secure' ? 'automate' : 'independent-practice'
+}
+
+export type RepetitionState = 'new' | 'building' | 'review' | 'secure' | 'overdue'
+
+export function repetitionState(progress: SkillProgress | undefined, now = new Date()): RepetitionState {
+  if (!progress || progress.attempts === 0) return 'new'
+  const daysSincePractice = progress.lastPracticedAt
+    ? Math.max(0, (now.getTime() - new Date(progress.lastPracticedAt).getTime()) / 86_400_000)
+    : 14
+  if (daysSincePractice >= 14) return 'overdue'
+  if (progress.status === 'secure') return daysSincePractice >= 7 ? 'review' : 'secure'
+  return daysSincePractice >= 3 ? 'review' : 'building'
 }
 
 function statusFor(attempts: number, mastery: number): LearningStatus {
@@ -70,18 +91,21 @@ export function updateSkillProgress(current: SkillProgress | undefined, result: 
       }
     : previousSubskills
 
+  const difficulty = nextDifficulty(previous.difficulty, correctStreak, result.correct)
+  const status = statusFor(attempts, mastery)
   return {
     ...previous,
     attempts,
     correctAnswers: previous.correctAnswers + (result.correct ? 1 : 0),
     hintsUsed: previous.hintsUsed + result.hintsUsed,
     lastPracticedAt: result.completedAt,
-    difficulty: nextDifficulty(previous.difficulty, correctStreak, result.correct),
+    difficulty,
+    learningPhase: learningPhaseFor(attempts, mastery, difficulty, status),
     mastery,
     recentErrors: result.correct ? Math.max(0, previous.recentErrors - 1) : Math.min(3, previous.recentErrors + 1),
     correctStreak,
     lastVariantKey: result.variantKey,
-    status: statusFor(attempts, mastery),
+    status,
     subskills
   }
 }
@@ -100,5 +124,7 @@ export function selectionWeight(progress: SkillProgress | undefined, now = new D
   const daysSincePractice = progress.lastPracticedAt
     ? Math.max(0, (now.getTime() - new Date(progress.lastPracticedAt).getTime()) / 86_400_000)
     : 14
-  return Math.max(10, 110 - progress.mastery + progress.recentErrors * 24 + Math.min(30, daysSincePractice * 3))
+  const state = repetitionState(progress, now)
+  const spacingBoost = state === 'overdue' ? 24 : state === 'review' ? 12 : 0
+  return Math.max(10, 110 - progress.mastery + progress.recentErrors * 24 + Math.min(30, daysSincePractice * 3) + spacingBoost)
 }

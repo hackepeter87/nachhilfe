@@ -24,10 +24,10 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(2)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.2.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(4)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.4.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
-    expect((catalog as TaskCatalog).status).toBe('review')
+    expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
   })
 
@@ -38,9 +38,10 @@ describe('versionierter Aufgabenkatalog', () => {
   })
 
   it.each([
-    ['schemaVersion', 3],
+    ['schemaVersion', 5],
     ['catalogVersion', 'keine-version'],
     ['catalogId', ''],
+    ['status', 'review'],
     ['status', 'published']
   ])('lehnt ungültige Katalogmetadaten %s ab', (field, value) => {
     const catalog = structuredClone(readPublicCatalog()) as unknown as Record<string, unknown>
@@ -61,14 +62,33 @@ describe('versionierter Aufgabenkatalog', () => {
       expect(skill.supportGoal.length).toBeGreaterThan(0)
       expect(skill.misconceptions.length).toBeGreaterThan(0)
       expect(skill.hints).toHaveLength(2)
-      expect(skill.processCompetencies.length).toBeGreaterThan(0)
       expect(skill.difficultyLevels.map((level) => level.level)).toEqual([1, 2, 3])
       expect(skill.representations.length).toBeGreaterThan(0)
       expect(skill.workedExample.length).toBeGreaterThan(0)
-      expect(skill.remediation.length).toBeGreaterThan(0)
+      expect(skill.remediation.strategy.length).toBeGreaterThan(0)
+      expect(skill.learningPhases).toHaveLength(6)
+      expect(skill.successCriteria.length).toBeGreaterThan(0)
       expect(skill.transferPrompt.length).toBeGreaterThan(0)
       expect(skill.releaseStatus).toBe('active')
     })
+  })
+
+  it('klassifiziert didaktische Felder nach ihrer tatsächlichen Verwendung', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    expect(catalog.fieldUsage).toMatchObject({
+      difficultyLevels: 'runtime',
+      successFeedback: 'runtime',
+      errorFeedback: 'runtime',
+      workedExample: 'review',
+      processCompetencies: 'review',
+      transferPrompt: 'planned'
+    })
+  })
+
+  it('behauptet im Erfolgsfeedback keine unbeobachtete Rechenstrategie', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const forbidden = /passend zerlegt|stellenweise gerechnet|richtige Strategie|über den nächsten|passenden .*weg/i
+    catalog.skills.forEach((skill) => expect(skill.successFeedback).not.toMatch(forbidden))
   })
 
   it('beschreibt eindeutig lösbare Sachaufgaben', () => {
@@ -76,7 +96,7 @@ describe('versionierter Aufgabenkatalog', () => {
     catalog.wordProblems.forEach((template) => {
       for (let first = template.firstRange.min; first <= template.firstRange.max; first += 1) {
         for (let second = template.secondRange.min; second <= template.secondRange.max; second += 1) {
-          const result = template.operation === '+' ? first + second : template.operation === '−' ? first - second : first * second
+          const result = template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
           expect(result).toBeGreaterThanOrEqual(0)
           const answer = renderCatalogText(template.answer, { first, second, result })
           expect(answer).toContain(String(result))
@@ -91,8 +111,29 @@ describe('versionierter Aufgabenkatalog', () => {
     catalog.symmetry.templates.forEach((template) => {
       const mirror = mirrorGrid(template.grid)
       const flip = [...template.grid].reverse().map((row) => [...row])
-      expect(new Set([template.grid, mirror, flip].map((grid) => JSON.stringify(grid))).size).toBe(3)
+      const correct = template.axis === 'vertical' ? mirror : flip
+      expect(template.grid).toHaveLength(template.difficulty + 2)
+      expect(new Set([correct, template.shiftGrid, template.wrongAxisGrid].map((grid) => JSON.stringify(grid))).size).toBe(3)
     })
+  })
+
+  it('ordnet Sachaufgaben einer Mengenbeziehung und vorlagenspezifischen Fragen zu', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const operationByRelationship = { join: '+', combine: '+', separate: '−', compare: '−', complement: '−', 'equal-groups': '·', sharing: ':' }
+    catalog.wordProblems.forEach((template) => {
+      expect(template.operation).toBe(operationByRelationship[template.relationship as keyof typeof operationByRelationship])
+      expect(new Set([template.question, ...template.questionDistractors]).size).toBe(3)
+      expect(new Set([template.relationshipLabel, ...template.relationshipDistractors]).size).toBe(3)
+      expect(template.plausibility.options.filter((option) => option.correct)).toHaveLength(1)
+    })
+  })
+
+  it('hält alle Laufzeitkompetenzen aktiv und vorbereitete Themen unsichtbar', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    expect(catalog.skills.every((skill) => skill.releaseStatus === 'active')).toBe(true)
+    expect(catalog.skills.every((skill) => skill.learningPhases.some((phase) => phase.releaseStatus === 'active'))).toBe(true)
+    expect(catalog.preparedTopics.map((topic) => topic.id).sort()).toEqual(['lengths', 'money', 'spatial-reasoning'])
+    expect(catalog.preparedTopics.every((topic) => topic.releaseStatus === 'disabled')).toBe(true)
   })
 
   it('lehnt einen unbekannten Skill und unvollständige Inhalte ab', () => {

@@ -76,19 +76,20 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - Katalogversion und Zahlenraum `0..1000`
 - alle Kompetenz-IDs, Anzeigenamen und Lehrplanbereiche
 - Förderziele, Prozesskompetenzen, Vorkenntnisse und typische Fehlvorstellungen
-- drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
-- zwei Hilfestufen, gearbeitetes Beispiel, Erklärung, Remediation und Transferimpuls
+- sechs Lernphasen, drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
+- zwei Hinweise, gearbeitetes Beispiel, Erklärung, strukturierte Remediation und Transferimpuls
+- überprüfbare Erfolgskriterien sowie deaktivierte Vorbereitungen für Geld, Längen und Raumvorstellung
 - kompetenzbezogene Erfolgs- und Fehlertexte sowie Release-Status
-- strukturierte Sachaufgabenvorlagen mit Beziehung, Frage, Modell, unwichtiger Angabe und beziehungsspezifischen Hilfen
-- Raster- und Beschriftungsvorlagen für Symmetrieaufgaben
+- strukturierte Sachaufgabenvorlagen mit Mengenbeziehung, vorlagenspezifischen Fragen, Modell, unwichtiger Angabe und Plausibilitätsprüfung
+- explizite 3x3-, 4x4- und 5x5-Vorlagen für Symmetrieaufgaben
 
-Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Freigabestatus `draft`, `review` oder `approved`. Der aktuelle Status ist `review`; eine Freigabe durch eine Lehrkraft ist nicht dokumentiert.
+Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Status `draft`, `ready-for-review`, `active` oder `disabled`. Der Gesamtkatalog steht auf `ready-for-review`; technisch, mathematisch und intern didaktisch geprüfte Laufzeitkompetenzen stehen auf `active`. Das ist keine dokumentierte Freigabe durch eine Lehrkraft.
 
 Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtraktion, Multiplikation/Division, Stellenwertberechnung, Nachbarzahlen, Rundung, Spiegelung, Distraktorprüfung, Lösungsprüfung, Sitzungsplanung und Adaptivität stehen weiterhin unter `src/domain/`. Der JSON-Katalog enthält keine ausführbare Logik.
 
 Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Metadaten, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App den gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
 
-Der Produktionsbuild scheitert bei einem ungültigen Katalog, einem `draft`-Status oder abweichenden Artefakten. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Die fachliche Progression steht in [docs/didaktische-progression.md](docs/didaktische-progression.md); neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
+Der Produktionsbuild scheitert bei einem ungültigen Katalog, `draft`/`disabled` als Gesamtstatus oder abweichenden Artefakten. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Das aktuelle Gesamtmodell und alle Kompetenzwege stehen unter [docs/didactics/](docs/didactics/README.md); die tatsächliche Runtime-Wirkung ist in [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) abgeglichen. Neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
 
 ## Container
 
@@ -121,10 +122,10 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 
 ## GHCR und Podman Compose
 
-Versionierte Release-Images werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
+Versionierte Multi-Arch-Release-Images für `linux/amd64` und `linux/arm64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.3.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.5.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -165,6 +166,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Schwierigkeit steuert zusätzlich Zahlenraum, Denkschritte und Hilfsdarstellung. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.3.0
+## Release-Stand 0.5.0
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.3.0 ergänzt reproduzierbare Katalog-Releases, Sitzungsmetadaten und ein kontrolliertes PWA-Updateverhalten. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.5.0 verbindet Katalog, Lernstand und UI über Lernphasen und strukturierte Remediation, führt Stellenwert und Runden auf höheren Stufen mehrschrittig und ergänzt Sachrechnen um gleichmäßiges Verteilen. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

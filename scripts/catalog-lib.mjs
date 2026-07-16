@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 2
+export const CATALOG_SCHEMA_VERSION = 4
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -15,7 +15,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'answer', 'answerSentence', 'axis', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
-  'sumExpression', 'target', 'tens', 'tensValue', 'upper', 'upperDistance'
+  'sumExpression', 'target', 'tens', 'tensValue', 'total', 'upper', 'upperDistance'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -55,7 +55,7 @@ function validateMetadata(catalog) {
   if (!isText(catalog.releasedAt) || !/^\d{4}-\d{2}-\d{2}$/.test(catalog.releasedAt) || Number.isNaN(Date.parse(`${catalog.releasedAt}T00:00:00Z`))) {
     fail('releasedAt muss ein gültiges ISO-Datum YYYY-MM-DD sein')
   }
-  if (!['draft', 'review', 'approved'].includes(catalog.status)) fail('status muss draft, review oder approved sein')
+  if (!['draft', 'ready-for-review', 'active', 'disabled'].includes(catalog.status)) fail('status muss draft, ready-for-review, active oder disabled sein')
 }
 
 function validatePlaceholders(value, pathLabel = 'catalog') {
@@ -77,19 +77,35 @@ function validatePlaceholders(value, pathLabel = 'catalog') {
 function validateSkill(skill, numberRange) {
   if (!isRecord(skill) || !SKILL_IDS.includes(skill.id)) fail(`unbekannte Kompetenz ${String(skill?.id)}`)
   const context = `skills.${skill.id}`
-  for (const field of ['label', 'curriculumArea', 'supportGoal', 'workedExample', 'prompt', 'successFeedback', 'errorFeedback', 'explanation', 'remediation', 'transferPrompt']) {
+  for (const field of ['label', 'curriculumArea', 'supportGoal', 'workedExample', 'prompt', 'successFeedback', 'errorFeedback', 'explanation', 'transferPrompt']) {
     requireText(skill, field, context)
   }
-  for (const field of ['processCompetencies', 'representations', 'misconceptions']) {
+  if (!Array.isArray(skill.processCompetencies) || !skill.processCompetencies.every((competency) =>
+    isRecord(competency) && ['problem-solving', 'modelling', 'reasoning', 'representing', 'communicating'].includes(competency.id) && isText(competency.elicitedBy)
+  )) fail(`${context}.processCompetencies ist ungültig`)
+  for (const field of ['representations', 'misconceptions']) {
     if (!Array.isArray(skill[field]) || skill[field].length === 0 || !skill[field].every(isText)) fail(`${context}.${field} ist unvollständig`)
   }
   if (!Array.isArray(skill.prerequisites) || !skill.prerequisites.every(isText)) fail(`${context}.prerequisites ist ungültig`)
+  const phases = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+  const statuses = ['draft', 'ready-for-review', 'active', 'disabled']
+  if (!Array.isArray(skill.learningPhases) || skill.learningPhases.length !== phases.length ||
+    !skill.learningPhases.every((phase) => isRecord(phase) && phases.includes(phase.id) && isText(phase.goal) &&
+      Array.isArray(phase.exerciseTypes) && phase.exerciseTypes.length > 0 && phase.exerciseTypes.every(isText) && statuses.includes(phase.releaseStatus))) {
+    fail(`${context}.learningPhases ist unvollständig`)
+  }
+  requireUnique(skill.learningPhases.map((phase) => phase.id), `${context}.learningPhases`)
   if (!Array.isArray(skill.hints) || skill.hints.length !== 2 || !skill.hints.every(isText)) fail(`${context}.hints muss zwei Texte enthalten`)
-  if (!['active', 'planned'].includes(skill.releaseStatus)) fail(`${context}.releaseStatus ist ungültig`)
+  if (!statuses.includes(skill.releaseStatus)) fail(`${context}.releaseStatus ist ungültig`)
+  if (!Array.isArray(skill.successCriteria) || skill.successCriteria.length === 0 || !skill.successCriteria.every(isText)) fail(`${context}.successCriteria ist unvollständig`)
+  if (!isRecord(skill.remediation) || !isText(skill.remediation.strategy) || !isText(skill.remediation.foundationStrategy) ||
+    !isText(skill.remediation.representation) || typeof skill.remediation.keepSubskill !== 'boolean') fail(`${context}.remediation ist ungültig`)
   if (!Array.isArray(skill.difficultyLevels) || skill.difficultyLevels.length !== 3) fail(`${context}.difficultyLevels muss drei Stufen enthalten`)
   skill.difficultyLevels.forEach((level, index) => {
+    const requirements = level.requirements
+    const requirementFields = ['requiresNeighborIdentification', 'requiresRepresentationChoice', 'requiresOperationChoice', 'requiresJustification', 'requiresMultiStepCalculation']
     if (!isRecord(level) || level.level !== index + 1 || !isText(level.description) || !isText(level.numberRange) ||
-      !['always', 'hint', 'none'].includes(level.representation) || !Number.isInteger(level.cognitiveSteps) || level.cognitiveSteps < 1) {
+      !['always', 'hint', 'none'].includes(level.representation) || !phases.includes(level.learningPhase) || !isRecord(requirements) || !requirementFields.every((field) => typeof requirements[field] === 'boolean')) {
       fail(`${context}.difficultyLevels[${index}] ist ungültig`)
     }
   })
@@ -105,9 +121,11 @@ function validateSkill(skill, numberRange) {
 function validateWordProblem(template, numberRange) {
   if (!isRecord(template)) fail('Sachaufgabenvorlage ist kein Objekt')
   const context = `wordProblems.${String(template.id)}`
-  for (const field of ['id', 'story', 'question', 'relevant', 'answer', 'operationHint', 'operationError']) requireText(template, field, context)
+  for (const field of ['id', 'story', 'question', 'relationshipLabel', 'relevant', 'answer', 'operationHint', 'operationError']) requireText(template, field, context)
   if (!['join', 'separate', 'combine', 'compare', 'complement', 'equal-groups', 'sharing'].includes(template.relationship)) fail(`${context}.relationship ist ungültig`)
-  if (!['+', '−', '·'].includes(template.operation)) fail(`${context}.operation ist ungültig`)
+  if (!['+', '−', '·', ':'].includes(template.operation)) fail(`${context}.operation ist ungültig`)
+  const expectedOperation = { join: '+', combine: '+', separate: '−', compare: '−', complement: '−', 'equal-groups': '·', sharing: ':' }[template.relationship]
+  if (expectedOperation !== template.operation) fail(`${context}.operation passt nicht zur Mengenbeziehung`)
   if (![1, 2, 3].includes(template.minDifficulty)) fail(`${context}.minDifficulty ist ungültig`)
   if (!['bar-model', 'groups'].includes(template.representation)) fail(`${context}.representation ist ungültig`)
   for (const field of ['firstRange', 'secondRange']) {
@@ -116,13 +134,25 @@ function validateWordProblem(template, numberRange) {
       fail(`${context}.${field} ist ungültig`)
     }
   }
-  if (!template.story.includes('{first}') || !template.story.includes('{second}') || !template.answer.includes('{result}')) fail(`${context} enthält nicht alle benötigten Platzhalter`)
+  if (!template.story.includes('{first}') || !template.answer.includes('{result}') ||
+    (template.relationship === 'sharing' ? !template.story.includes('{total}') : !template.story.includes('{second}'))) fail(`${context} enthält nicht alle benötigten Platzhalter`)
+  for (const field of ['questionDistractors', 'relationshipDistractors']) {
+    if (!Array.isArray(template[field]) || template[field].length !== 2 || !template[field].every(isText)) fail(`${context}.${field} ist ungültig`)
+  }
+  requireUnique([template.question, ...template.questionDistractors], `${context} Fragen`)
+  requireUnique([template.relationshipLabel, ...template.relationshipDistractors], `${context} Mengenbeziehungen`)
+  if (!isRecord(template.plausibility) || !isText(template.plausibility.prompt) || !Array.isArray(template.plausibility.options) || template.plausibility.options.length !== 3) {
+    fail(`${context}.plausibility ist ungültig`)
+  }
+  if (!template.plausibility.options.every((option) => isRecord(option) && isText(option.label) && typeof option.correct === 'boolean')) fail(`${context}.plausibility.options ist ungültig`)
+  requireUnique(template.plausibility.options.map((option) => option.label), `${context} Plausibilitätsoptionen`)
+  if (template.plausibility.options.filter((option) => option.correct).length !== 1) fail(`${context}.plausibility braucht genau eine richtige Antwort`)
   const firstMin = template.firstRange.min
   const firstMax = template.firstRange.max
   const secondMin = template.secondRange.min
   const secondMax = template.secondRange.max
-  const minResult = template.operation === '+' ? firstMin + secondMin : template.operation === '−' ? firstMin - secondMax : firstMin * secondMin
-  const maxResult = template.operation === '+' ? firstMax + secondMax : template.operation === '−' ? firstMax - secondMin : firstMax * secondMax
+  const minResult = template.operation === '+' ? firstMin + secondMin : template.operation === '−' ? firstMin - secondMax : template.operation === ':' ? secondMin : firstMin * secondMin
+  const maxResult = template.operation === '+' ? firstMax + secondMax : template.operation === '−' ? firstMax - secondMin : template.operation === ':' ? secondMax : firstMax * secondMax
   if (minResult < numberRange.min || maxResult > numberRange.max) fail(`${context} erzeugt Ergebnisse außerhalb des Zahlenraums`)
 }
 
@@ -135,8 +165,10 @@ function validateSymmetry(symmetry) {
   const ids = symmetry.templates.map((template) => template.id)
   requireUnique(ids, 'symmetry.templates IDs')
   symmetry.templates.forEach((template) => {
-    if (!isRecord(template) || !isText(template.id) || !Array.isArray(template.grid) || template.grid.length !== 4 ||
-      !template.grid.every((row) => Array.isArray(row) && row.length === 4 && row.every((cell) => cell === 0 || cell === 1))) {
+    const size = template.difficulty + 2
+    const isGrid = (grid) => Array.isArray(grid) && grid.length === size && grid.every((row) => Array.isArray(row) && row.length === size && row.every((cell) => cell === 0 || cell === 1))
+    if (!isRecord(template) || !isText(template.id) || ![1, 2, 3].includes(template.difficulty) || !['vertical', 'horizontal'].includes(template.axis) ||
+      !isGrid(template.grid) || !isGrid(template.shiftGrid) || !isGrid(template.wrongAxisGrid)) {
       fail(`Symmetrievorlage ${String(template?.id)} ist ungültig`)
     }
     const mirror = template.grid.map((row) => [...row].reverse())
@@ -144,12 +176,20 @@ function validateSymmetry(symmetry) {
     if (new Set([template.grid, mirror, flip].map((variant) => JSON.stringify(variant))).size !== 3) {
       fail(`Symmetrievorlage ${template.id} hat keine eindeutigen Varianten`)
     }
+    const correct = template.axis === 'vertical' ? mirror : flip
+    const wrongAxis = template.axis === 'vertical' ? flip : mirror
+    if (JSON.stringify(wrongAxis) !== JSON.stringify(template.wrongAxisGrid) ||
+      new Set([correct, template.shiftGrid, template.wrongAxisGrid].map((variant) => JSON.stringify(variant))).size !== 3) {
+      fail(`Symmetrievorlage ${template.id} hat keine drei geprüften Antwortvarianten`)
+    }
   })
 }
 
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
+  const usageFields = ['workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
+  if (!isRecord(catalog.fieldUsage) || !usageFields.every((field) => ['runtime', 'review', 'planned'].includes(catalog.fieldUsage[field]))) fail('fieldUsage ist unvollständig')
   const numberRange = catalog.numberRange
   if (!isRecord(numberRange) || numberRange.min !== 0 || numberRange.max !== 1000) fail('numberRange muss 0 bis 1000 sein')
   if (!Array.isArray(catalog.skills) || catalog.skills.length !== SKILL_IDS.length) fail('Kompetenzliste ist unvollständig')
@@ -157,15 +197,30 @@ export function validateCatalog(catalog) {
   requireUnique(skillIds, 'Kompetenz-IDs')
   if (!SKILL_IDS.every((id) => skillIds.includes(id))) fail('mindestens eine bekannte Kompetenz fehlt')
   catalog.skills.forEach((skill) => validateSkill(skill, numberRange))
+  if (!Array.isArray(catalog.preparedTopics) || catalog.preparedTopics.length !== 3) fail('preparedTopics muss drei deaktivierte Themen enthalten')
+  requireUnique(catalog.preparedTopics.map((topic) => topic.id), 'preparedTopics IDs')
+  for (const topic of catalog.preparedTopics) {
+    if (!isRecord(topic) || !['money', 'lengths', 'spatial-reasoning'].includes(topic.id) || topic.releaseStatus !== 'disabled') fail('preparedTopics enthält ein ungültiges oder aktives Thema')
+    for (const field of ['label', 'curriculumArea', 'supportGoal', 'remediation']) requireText(topic, field, `preparedTopics.${topic.id}`)
+    for (const field of ['prerequisites', 'representations', 'misconceptions', 'progression']) {
+      if (!Array.isArray(topic[field]) || topic[field].length === 0 || !topic[field].every(isText)) fail(`preparedTopics.${topic.id}.${field} ist unvollständig`)
+    }
+  }
+  if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding)) fail('strategySteps fehlt')
+  for (const field of ['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess']) requireText(catalog.strategySteps.placeValue, field, 'strategySteps.placeValue')
+  for (const field of ['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper']) requireText(catalog.strategySteps.rounding, field, 'strategySteps.rounding')
   if (!Array.isArray(catalog.wordProblems) || catalog.wordProblems.length === 0) fail('wordProblems fehlt')
   requireUnique(catalog.wordProblems.map((template) => template.id), 'Sachaufgaben-IDs')
   catalog.wordProblems.forEach((template) => validateWordProblem(template, numberRange))
   if (!isRecord(catalog.wordProblemSteps)) fail('wordProblemSteps fehlt')
+  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'relationshipPrompt', 'relationshipError', 'relationshipSuccess', 'operationPrompt', 'operationSuccess', 'representationPrompt', 'representationError', 'representationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
+    requireText(catalog.wordProblemSteps, field, 'wordProblemSteps')
+  }
   const operationOptions = catalog.wordProblemSteps.operationOptions
-  if (!Array.isArray(operationOptions) || operationOptions.length !== 3) fail('operationOptions muss drei Optionen enthalten')
+  if (!Array.isArray(operationOptions) || operationOptions.length !== 4) fail('operationOptions muss vier Optionen enthalten')
   requireUnique(operationOptions.map((option) => option.value), 'operationOptions Werte')
   requireUnique(operationOptions.map((option) => option.label), 'operationOptions Beschriftungen')
-  for (const field of ['questionDistractors', 'relevantDistractors']) {
+  for (const field of ['relevantDistractors']) {
     const values = catalog.wordProblemSteps[field]
     if (!Array.isArray(values) || values.length !== 2 || !values.every(isText)) fail(`wordProblemSteps.${field} ist ungültig`)
     requireUnique(values, `wordProblemSteps.${field}`)
@@ -201,7 +256,7 @@ export function buildCatalogArtifacts(paths = catalogPaths) {
 
 export function checkCatalogArtifacts(paths = catalogPaths) {
   const sourceCatalog = parseAndValidateCatalog(fs.readFileSync(paths.source, 'utf8'))
-  if (sourceCatalog.status === 'draft') fail('draft darf nicht als Produktionsartefakt gebaut werden')
+  if (['draft', 'disabled'].includes(sourceCatalog.status)) fail(`${sourceCatalog.status} darf nicht als Produktionsartefakt gebaut werden`)
   const source = canonicalCatalog(sourceCatalog)
   for (const [name, artifactPath] of [['öffentlicher Katalog', paths.publicArtifact], ['Fallback-Katalog', paths.fallbackArtifact]]) {
     if (!fs.existsSync(artifactPath)) fail(`${name} fehlt; npm run catalog:build ausführen`)

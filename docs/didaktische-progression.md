@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung.
+Stand: Katalogversion 0.4.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -17,7 +17,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Mengen bis 10, Zahlzerlegungen und Weiterzählen.
 - **Stufe 1:** Summen bis 10 mit sichtbarem Rechenstrich; einfachste Übung ist Addieren ohne Zehnerübergang.
 - **Stufe 2:** Zehnerübergang durch Ergänzen bis 10; Darstellung erst auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** Zehnerübergang ohne sichtbares Material und Nutzung von Nachbaraufgaben.
+- **Stufe 3 / MVP-Ziel:** Zehnerübergang bis 20 ohne sichtbares Material.
 - **Erhöhen / Zurückstufen:** zwei sichere Lösungen ohne Hilfe / Fehler oder wiederholter Hilfebedarf.
 - **Hilfe / Transfer:** Summand in „bis 10“ und Rest zerlegen / einen zweiten passenden Zerlegungsweg nennen.
 - **Später:** Verdoppeln und Fast-Verdoppeln als eigene Strategieentscheidung.
@@ -27,7 +27,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Rückwärtszählen, Ergänzen bis 10 und Zahlzerlegungen.
 - **Stufe 1:** Abziehen ohne Zehnerübergang mit Rechenstrich.
 - **Stufe 2:** in zwei Schritten bis 10 und weiter; Rechenstrich auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** zwischen Abziehen und Ergänzen als Strategie wechseln.
+- **Stufe 3 / MVP-Ziel:** Zehnerübergang bis 20 ohne sichtbares Material.
 - **Erhöhen / Zurückstufen:** zwei sichere Lösungen ohne Hilfe / negatives Fehlmuster oder Hilfebedarf.
 - **Hilfe / Transfer:** Subtrahend am Zehner zerlegen / Aufgabe als Ergänzungsfrage formulieren.
 - **Später:** systematischer Vergleich mehrerer Rechenwege.
@@ -37,7 +37,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** gleich große Gruppen, wiederholte Addition und Tauschaufgabe.
 - **Stufe 1:** 2er-, 5er- und 10er-Reihe mit Gruppenbild.
 - **Stufe 2:** 3er-, 4er- und 6er-Reihe; Gruppenbild auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** 7er-, 8er- und 9er-Reihe über Nachbar- oder Tauschaufgabe.
+- **Stufe 3 / MVP-Ziel:** 6er-, 7er-, 8er- und 9er-Reihe ohne sichtbares Gruppenbild.
 - **Erhöhen / Zurückstufen:** sichere Reihe ohne Hilfe / Fehler in der konkreten Reihe.
 - **Hilfe / Transfer:** wiederholte Addition zeigen / Tausch- oder Nachbaraufgabe angeben.
 - **Später:** flexible Strategieauswahl je Aufgabe statt nur je Reihe.
@@ -59,7 +59,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Bündelung in Einer, Zehner und Hunderter.
 - **Stufe 1:** alle Ziffern ungleich null; Stellenwerttafel sichtbar und Stelle markiert.
 - **Stufe 2:** eine Null als Platzhalter; Tafel erst auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** keine Hervorhebung und ähnliche, aus Stellenwertfehlern abgeleitete Optionen.
+- **Stufe 3 / MVP-Ziel:** eine oder zwei Nullstellen werden ohne Tafel gezielt abgefragt.
 - **Erhöhen / Zurückstufen:** Stellenwert sicher von Ziffer unterscheiden / Ziffernwert statt Stellenwert wählen.
 - **Hilfe / Transfer:** Zahl in H/Z/E legen / Stellenwert einer Ziffer in einer neuen Zahl erklären.
 - **Später:** Wechsel zwischen Material, Zahlwort und Ziffernschreibweise.
@@ -69,7 +69,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Stellenwerttafel und additive Zerlegung.
 - **Stufe 1:** alle Stellen besetzt; Tafel sichtbar.
 - **Stufe 2:** eine Null als Platzhalter; Tafel auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** ähnliche Zerlegungen mit vertauschten Stellenwerten unterscheiden.
+- **Stufe 3 / MVP-Ziel:** eine Zahl mit zwei Nullstellen von ähnlichen Zerlegungen unterscheiden.
 - **Erhöhen / Zurückstufen:** sichere Auswahl ohne Hilfe / Ziffern ohne Stellenwert verwenden.
 - **Hilfe / Transfer:** jede Ziffer einer Spalte zuordnen / dieselbe Zahl auf eine zweite Weise zerlegen.
 - **Später:** flexible Zerlegungen für Rechenstrategien.
@@ -79,7 +79,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** H/Z/E lesen und Null als Platzhalter verstehen.
 - **Stufe 1:** alle Stellen besetzt; Tafel sichtbar.
 - **Stufe 2:** eine leere Stelle; Tafel auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** gemischte Stellenwertangaben ohne sichtbare Tafel.
+- **Stufe 3 / MVP-Ziel:** eine Zahl mit zwei Nullstellen ohne sichtbare Tafel zusammensetzen.
 - **Erhöhen / Zurückstufen:** korrekte Stellenfolge / ausgelassene Null oder vertauschte Stellen.
 - **Hilfe / Transfer:** H/Z/E in drei Spalten sortieren / Zahl in Materialdarstellung zurückübersetzen.
 - **Später:** Zahlwörter und nicht-kanonische Bündelungen.
@@ -89,7 +89,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Zehnerzahlen und Ordnung am Zahlenstrahl.
 - **Stufe 1:** Zahl deutlich in der Mitte; Zahlenstrahl sichtbar.
 - **Stufe 2:** Zahl nahe an einem Zehner; Strahl auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** Einordnung ohne Strahl und Verbindung zur Rundung.
+- **Stufe 3 / MVP-Ziel:** beliebige Einordnung ohne sichtbaren Zahlenstrahl.
 - **Erhöhen / Zurückstufen:** beide direkten Nachbarn sicher / Intervall um eine Stelle verschoben.
 - **Hilfe / Transfer:** Ausschnitt am Zahlenstrahl / näheren Nachbarzehner begründen.
 - **Später:** offene Zahlenstrahleinträge.
@@ -99,7 +99,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Hunderterzahlen und Ordnung bis 1000.
 - **Stufe 1:** Zahl deutlich zwischen zwei Hundertern; Strahl sichtbar.
 - **Stufe 2:** Zahl nahe an einer Grenze; Strahl auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** Einordnung ohne Strahl und Verbindung zur Rundung.
+- **Stufe 3 / MVP-Ziel:** beliebige Einordnung einschließlich 900 bis 999 ohne sichtbaren Zahlenstrahl.
 - **Erhöhen / Zurückstufen:** beide Nachbarn sicher / Hunderterintervall verwechselt.
 - **Hilfe / Transfer:** Hunderterausschnitt markieren / näheren Hunderter begründen.
 - **Später:** Zahlenstrahl mit frei gewählter Skalierung.
@@ -109,7 +109,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Nachbarzehner und Abstände vergleichen.
 - **Stufe 1:** beide Nachbarn und Abstände sichtbar.
 - **Stufe 2:** Zahlenstrahl nur auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** selbstständig runden; Halbpunkte werden nach Grundschulregel aufgerundet.
+- **Stufe 3 / MVP-Ziel:** selbstständig runden; Halbpunkte werden nach Grundschulregel aufgerundet. Eine Begründung wird noch nicht abgefragt.
 - **Erhöhen / Zurückstufen:** sichere Abstandsentscheidung / immer auf- oder immer abrunden.
 - **Hilfe / Transfer:** beide Abstände berechnen / Rundung mit Nachbarzahlen begründen.
 - **Später:** Ergebnis in einem Sachzusammenhang bewerten.
@@ -119,7 +119,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Nachbarhunderter und Abstände vergleichen.
 - **Stufe 1:** beide Nachbarn und Abstände sichtbar.
 - **Stufe 2:** Zahlenstrahl nur auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** selbstständig runden, einschließlich 950 auf 1000.
+- **Stufe 3 / MVP-Ziel:** selbstständig runden, einschließlich 950 auf 1000. Eine Begründung wird noch nicht abgefragt.
 - **Erhöhen / Zurückstufen:** sichere Abstandsentscheidung / auf Zehner statt Hunderter runden.
 - **Hilfe / Transfer:** Abstände zu beiden Hundertern / sinnvolle Genauigkeit begründen.
 - **Später:** Überschlag bei Rechnungen.
@@ -139,7 +139,7 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 - **Vorkenntnisse:** Stellenwertzerlegung und Subtraktion bis 20.
 - **Stufe 1:** volle Hunderter ohne Entbündeln; Material sichtbar.
 - **Stufe 2:** Zehner aus gemischter Zahl ohne Entbündeln; Hilfe auf Abruf.
-- **Stufe 3 / MVP-Ziel:** Zehner von vollem Hunderter über Rechenstrich und Ergänzung.
+- **Stufe 3 / MVP-Ziel:** Zehner von einem vollen Hunderter durch zwei sichtbare Rückwärtssprünge abziehen.
 - **Erhöhen / Zurückstufen:** Stellen getrennt behandeln / Stellenwert vertauschen oder Ergebnis negativ machen.
 - **Hilfe / Transfer:** nur die betroffene Stelle verändern / Aufgabe als Ergänzung kontrollieren.
 - **Später:** mehrere Entbündelungen und schriftliche Darstellung.
@@ -148,8 +148,8 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 
 - **Vorkenntnisse:** Abstände am Zahlenstrahl und Ergänzen bis 20.
 - **Stufe 1:** bis zum nächsten Zehner mit sichtbarem Sprung.
-- **Stufe 2:** bis zum nächsten Hunderter; Strahl auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** Weg in kleinen Sprung und volle Zehner zerlegen.
+- **Stufe 2:** bis zum nächsten Hunderter über den nächsten Zehner; beide Sprünge auf Hilfe.
+- **Stufe 3 / MVP-Ziel:** denselben Ergänzungsbereich ohne sichtbaren Rechenstrich bearbeiten.
 - **Erhöhen / Zurückstufen:** Ergänzungsweg sicher / Differenz mit Zielzahl verwechseln.
 - **Hilfe / Transfer:** Zwischenziel am nächsten Zehner / Ergebnis mit Subtraktion prüfen.
 - **Später:** Ergänzen über mehrere Hunderter und Geldbeträge.
@@ -159,9 +159,9 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 ### Geführte Sachaufgaben
 
 - **Vorkenntnisse:** Grundrechenarten, Mengenbeziehungen und kurze Texte sinnverstehend lesen.
-- **Stufe 1:** Hinzufügen oder Wegnehmen mit zwei Angaben und sichtbarem Balkenmodell.
-- **Stufe 2:** Frage sowie Darstellung auswählen; Beziehungen Zusammenfassen, Vergleichen und Ergänzen kommen hinzu.
-- **Stufe 3 / MVP-Ziel:** unwichtige Angabe, gleich große Gruppen und Plausibilitätsprüfung.
+- **Stufe 1:** wichtige Angaben, Mengenbeziehung, Rechenart, Ergebnis und Antwortsatz mit sichtbarer Darstellung auswählen.
+- **Stufe 2:** zusätzlich Frage und Darstellung auswählen; Zusammenfassen, Vergleichen und Ergänzen kommen hinzu.
+- **Stufe 3 / MVP-Ziel:** unwichtige Angabe, gleich große Gruppen und vorlagenspezifische Plausibilitätsprüfung.
 - **Erhöhen / Zurückstufen:** Handlung, Rechnung und Antwort konsistent / Frage, Beziehung oder relevante Angaben verwechseln.
 - **Hilfe / Transfer:** beziehungsspezifischer Hinweis und passendes Modell / Geschichte mit anderer Darstellung erklären.
 - **Später:** Verteilen, mehrstufige Situationen, Geld und Längen nach eigener fachlicher Abnahme.
@@ -169,9 +169,9 @@ Stand: Version 0.2.0. Die Stufen beschreiben die produktive Heuristik von Mathe-
 ### Symmetrie
 
 - **Vorkenntnisse:** Raster lesen, links/rechts sowie oben/unten unterscheiden.
-- **Stufe 1:** 3×3-Raster und deutlich unterscheidbare Varianten.
-- **Stufe 2:** 4×4-Raster mit plausibler Verschiebung.
-- **Stufe 3 / MVP-Ziel:** 5×5-Raster und wechselnde senkrechte oder waagerechte Achse.
+- **Stufe 1:** explizit geprüfte 3×3-Raster und deutlich unterscheidbare Varianten.
+- **Stufe 2:** explizit geprüfte 4×4-Raster mit plausibler Verschiebung.
+- **Stufe 3 / MVP-Ziel:** eigene, nicht gekachelte 5×5-Raster und wechselnde senkrechte oder waagerechte Achse.
 - **Erhöhen / Zurückstufen:** Abstände zur Achse sicher erhalten / Verschiebung oder falsche Achse wählen.
 - **Hilfe / Transfer:** Reihe oder Spalte einzeln spiegeln / Lageänderung eines Feldes beschreiben.
 - **Später:** fehlende Hälfte ergänzen; Diagonalachsen erst nach eigenständiger Prüfung.

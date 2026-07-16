@@ -2,6 +2,7 @@ import type { ExerciseRepresentation } from '../domain'
 
 export function MathRepresentation({ representation }: { representation: ExerciseRepresentation }) {
   const values = representation.values
+  const textValue = (value: typeof values[string]) => Array.isArray(value) ? '' : value
 
   if (representation.kind === 'place-value') {
     return (
@@ -9,7 +10,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
         {(['hundreds', 'tens', 'ones'] as const).map((key) => (
           <div className={values.highlight === key ? 'place-column place-column--highlight' : 'place-column'} key={key}>
             <span>{key === 'hundreds' ? 'H' : key === 'tens' ? 'Z' : 'E'}</span>
-            <strong>{values[key]}</strong>
+            <strong>{textValue(values[key])}</strong>
           </div>
         ))}
       </div>
@@ -19,17 +20,36 @@ export function MathRepresentation({ representation }: { representation: Exercis
   if (representation.kind === 'number-line') {
     const start = Number(values.start)
     const end = Number(values.end)
+    const jumps = Array.isArray(values.jumps) ? values.jumps : []
+    const scaleStart = Math.min(start, end, ...jumps.flatMap((jump) => [jump.from, jump.to]))
+    const scaleEnd = Math.max(start, end, ...jumps.flatMap((jump) => [jump.from, jump.to]))
     const marker = Number(values.marker ?? values.target ?? end)
-    const position = end === start ? 0 : Math.max(0, Math.min(100, ((marker - start) / (end - start)) * 100))
+    const positionFor = (value: number) => scaleEnd === scaleStart ? 0 : ((value - scaleStart) / (scaleEnd - scaleStart)) * 100
+    const position = Math.max(0, Math.min(100, positionFor(marker)))
     return (
       <div className="math-visual number-line-visual" role="img" aria-label={representation.label}>
-        <div className="number-line-track"><span className="number-line-marker" style={{ left: `${position}%` }} /></div>
-        <div className="number-line-labels">
-          <span>{start}</span>
-          {marker !== start && marker !== end && <strong>{marker}</strong>}
-          <span>{end}</span>
+        <div className="number-line-track">
+          <span className="number-line-marker" style={{ left: `${position}%` }} />
+          {jumps.map((jump, index) => {
+            const from = positionFor(jump.from)
+            const to = positionFor(jump.to)
+            return (
+              <span
+                aria-label={`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`}
+                className={jump.to < jump.from ? 'number-line-jump number-line-jump--backward' : 'number-line-jump'}
+                key={`${jump.from}-${jump.to}-${index}`}
+                style={{ left: `${Math.min(from, to)}%`, width: `${Math.abs(to - from)}%` }}
+              >
+                {jump.label}
+              </span>
+            )
+          })}
         </div>
-        {values.step && <p>Schrittweite: {values.step}</p>}
+        <div className="number-line-labels">
+          <span>{scaleStart}</span>
+          {marker !== scaleStart && marker !== scaleEnd && <strong>{marker}</strong>}
+          <span>{scaleEnd}</span>
+        </div>
       </div>
     )
   }
@@ -49,10 +69,10 @@ export function MathRepresentation({ representation }: { representation: Exercis
   return (
     <div className="math-visual bar-model-visual" role="img" aria-label={representation.label}>
       <div className="bar-segments">
-        <span>{values.firstLabel ?? values.first}</span>
-        <span>{values.secondLabel ?? values.second}</span>
+        <span>{textValue(values.firstLabel ?? values.first)}</span>
+        <span>{textValue(values.secondLabel ?? values.second)}</span>
       </div>
-      <strong>{values.question ?? `Gesucht: ${values.total ?? '?'}`}</strong>
+      <strong>{textValue(values.question) || `Gesucht: ${textValue(values.total) || '?'}`}</strong>
     </div>
   )
 }

@@ -31,7 +31,7 @@ describe('ExerciseCard', () => {
       fireEvent.submit(input.closest('form')!)
     }
     expect(screen.getByText('Wir lösen es gemeinsam.')).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Mit Hilfe weiter' }))
+    await user.click(screen.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: false }))
   })
 
@@ -46,6 +46,18 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('führt eine mehrschrittige Strategieaufgabe vollständig aus', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('round-tens', 88, 3)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    for (const step of exercise.steps ?? []) {
+      await user.click(screen.getByRole('button', { name: step.correctAnswer }))
+    }
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
+
   it('blendet eine Hilfe-Darstellung erst mit dem Tipp ein', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('place-value', 42, 2)
@@ -53,5 +65,19 @@ describe('ExerciseCard', () => {
     expect(screen.queryByRole('img', { name: 'Stellenwerttafel' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /tipp/i }))
     expect(screen.getByRole('img', { name: 'Stellenwerttafel' })).toBeVisible()
+  })
+
+  it('zeigt mathematische Teilsprünge erst mit der Zahlenstrahl-Hilfe', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('addition-1000', 42, 2)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    expect(screen.queryByRole('img', { name: 'Rechenweg in Teilschritten' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /tipp/i }))
+    const representation = screen.getByRole('img', { name: 'Rechenweg in Teilschritten' })
+    expect(representation).toBeVisible()
+    const jumps = exercise.representation?.values.jumps
+    expect(Array.isArray(jumps)).toBe(true)
+    if (!Array.isArray(jumps)) throw new Error('Sprünge fehlen')
+    jumps.forEach((jump) => expect(screen.getByLabelText(`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`)).toBeVisible())
   })
 })

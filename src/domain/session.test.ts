@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { createRepetitionExercise, createSessionPlan } from './session'
+import { createRemediationExercise, createRepetitionExercise, createSessionPlan } from './session'
 import { createSkillProgress } from './progress'
+import { generateExercise } from './generators'
 import { FALLBACK_TASK_CATALOG, getTaskCatalog, setTaskCatalog } from '../content/catalog'
 
 describe('Sitzungsplanung', () => {
@@ -13,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.2.0',
-      schemaVersion: 2,
-      appVersion: '0.3.0'
+      catalogVersion: '0.4.0',
+      schemaVersion: 4,
+      appVersion: '0.5.0'
     })
   })
 
@@ -28,14 +29,31 @@ describe('Sitzungsplanung', () => {
       const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
 
       const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
-      nextCatalog.catalogVersion = '0.2.1'
+      nextCatalog.catalogVersion = '0.4.1'
       nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.2.0')
+      expect(runningSession.catalogVersion).toBe('0.4.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
-      expect(nextSession.catalogVersion).toBe('0.2.1')
+      expect(nextSession.catalogVersion).toBe('0.4.1')
+    } finally {
+      setTaskCatalog(originalCatalog)
+    }
+  })
+
+  it('plant keine als ready-for-review oder disabled markierte Kompetenz ein', () => {
+    const originalCatalog = getTaskCatalog()
+    try {
+      const catalog = structuredClone(FALLBACK_TASK_CATALOG)
+      catalog.skills.find((skill) => skill.id === 'round-tens')!.releaseStatus = 'disabled'
+      catalog.skills.find((skill) => skill.id === 'place-value')!.releaseStatus = 'ready-for-review'
+      setTaskCatalog(catalog)
+      for (let seed = 1; seed <= 100; seed += 1) {
+        const skills = createSessionPlan({}, seed).exercises.map((exercise) => exercise.skillId)
+        expect(skills).not.toContain('round-tens')
+        expect(skills).not.toContain('place-value')
+      }
     } finally {
       setTaskCatalog(originalCatalog)
     }
@@ -84,6 +102,14 @@ describe('Sitzungsplanung', () => {
     const original = session.exercises[2]!
     const repetition = createRepetitionExercise(original.skillId, 900, 3, original.variant.key)
     expect(repetition.difficulty).toBe(2)
+    expect(repetition.variant.key).not.toBe(original.variant.key)
+  })
+
+  it('wendet die kataloggesteuerte Remediation auf dieselbe Unterkompetenz an', () => {
+    const original = generateExercise('addition', 901, 3, 'addition-bridge-10')
+    const repetition = createRemediationExercise(original, 902)
+    expect(repetition.difficulty).toBe(2)
+    expect(repetition.subskillId).toBe(original.subskillId)
     expect(repetition.variant.key).not.toBe(original.variant.key)
   })
 })

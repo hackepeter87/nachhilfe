@@ -1,5 +1,35 @@
 # Mathe-Reise
 
+## Didaktische Qualitätsoffensive 0.5.0
+
+- Katalogschema 4 führt die einheitlichen Status `draft`, `ready-for-review`, `active` und `disabled`, sechs Lernphasen, Erfolgskriterien und strukturierte Remediation ein.
+- Der Lernstand speichert die aktuelle Lernphase; neue, im Aufbau befindliche, fällige, sichere und lange nicht geprüfte Inhalte werden als nachvollziehbare Wiederholungszustände abgeleitet.
+- Nach zwei Fehlern folgen konkrete Erklärung und eine leichtere verwandte beziehungsweise grundlegende Folgeaufgabe.
+- Stellenwert Stufe 3 trennt Ziffer und Stellenwert in zwei prüfbare Schritte. Runden Stufe 2 bestimmt Nachbarzahlen und Ergebnis; Stufe 3 ergänzt eine Abstandsbegründung einschließlich Halbpunkt.
+- Sachrechnen ergänzt gleichmäßiges Verteilen als Division ohne Rest und führt nun über sieben Mengenbeziehungen.
+- Geld, Längen und Raumvorstellung sind methodisch im Katalog und in der Dokumentation vorbereitet, bleiben aber `disabled` und unsichtbar.
+- Das didaktische Gesamtmodell, 14 Themenpfade und ein einziges Lehrkraft-Review-Paket liegen unter `docs/didactics/`.
+
+Der Gesamtkatalog steht auf `ready-for-review`, alle tatsächlich produktiven Kompetenzen auf `active`. Das bedeutet interne technische, mathematische und didaktische Konsistenz, nicht die Freigabe durch eine Lehrkraft. Ein echter iPhone-Test wurde nicht durchgeführt.
+
+Erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 129 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration sowie zwei Playwright-Szenarien gegen Vite Preview und gegen den Container. Die vollständige Runde lief bei `375 x 812` nach Reload und Offline-Neustart bis zum Abschluss; Landscape `812 x 375` blieb ohne horizontales Overflow. Das OCI-Image läuft als UID 101 mit Read-only-Rootfs, nur `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Es ist öffentlich als Multi-Arch-Image für `linux/amd64` und `linux/arm64` unter `ghcr.io/hackepeter87/nachhilfe:0.5.0` und `latest` mit Manifest-Digest `sha256:0d820f63d1c6c3002c03219e2e8376dddc9e1bae4f580bd127dce4a95483e745` veröffentlicht; beide Plattformvarianten wurden unter den Read-only-Sicherheitsbedingungen gestartet und meldeten `healthy`. Das Revisionslabel `workspace-dirty-2eefd15` kennzeichnet transparent, dass das direkt veröffentlichte Image aus dem noch nicht committen Arbeitsbaum gebaut wurde. Podman war nicht installiert und wurde nicht als ausgeführt behauptet.
+
+## Didaktische Katalogkonsistenz 0.4.0
+
+- Katalogschema 3 klassifiziert didaktische Felder als `runtime`, `review` oder `planned`; abstrakte `cognitiveSteps` wurden durch konkrete Anforderungen ersetzt.
+- Erfolgsfeedback bestätigt nur beobachtbare Ergebnisse oder Auswahlen. Nicht abgefragte Zerlegungs-, Ergänzungs- oder Stellenwertstrategien werden nicht mehr gelobt.
+- Sachaufgaben führen über die Mengenbeziehung zur Rechenart. Jede Vorlage besitzt eigene mathematische Alternativfragen und eine situationsbezogene Plausibilitätsprüfung mit genau einer richtigen Aussage.
+- Wertebereiche von Addition, Einmaleins, Division, Stellenwert, Nachbarhundertern und Rundung wurden mit den Generatoren synchronisiert.
+- Stellenwert, Zerlegen und Zusammensetzen fragen Nullstellen als Platzhalter auf den höheren Stufen tatsächlich ab.
+- Symmetrie verwendet explizite, validierte 3x3-, 4x4- und 5x5-Vorlagen statt periodisch vergrößerter Raster.
+- Rechenstriche können echte, lückenlose Vorwärts- und Rückwärtssprünge mit mathematisch geprüften Beschriftungen darstellen.
+- Der neue Runtime-Abgleich dokumentiert für alle produktiven Typen Interaktion, beobachtbare Lernhandlung, Stufen und Grenzen.
+- Browser-Favicon, Apple-Touch-Icon sowie PWA-Icons wurden aus einer vollflächigen Mastergrafik ohne schwarze Eckartefakte neu erzeugt.
+
+Der Katalogstatus und alle technisch aktiven Kompetenzen stehen auf `review`. Eine Freigabe durch eine Lehrkraft und ein Test auf einem echten iPhone wurden nicht durchgeführt.
+
+Erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 120 Unit-/Komponententests, Produktionsbuild sowie zwei Playwright-Szenarien mit vollständiger Offline-Runde bei `375 x 812` und Landscape-Prüfung bei `812 x 375`. Das OCI-Image wurde als `mathe-reise:0.4.0` und `mathe-reise:local` gebaut. Es läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und mit `no-new-privileges`, meldet `healthy` und bestand dieselbe Offline-E2E-Suite. Katalog, Manifest, Service Worker und Icons wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen.
+
 ## GHCR- und Podman-Deployment 0.3.0
 
 - Ein eigener Workflow veröffentlicht Git-Tags `vX.Y.Z` nach `ghcr.io/hackepeter87/nachhilfe` und erzeugt SemVer-, SHA- sowie kontrollierte `latest`-Tags.

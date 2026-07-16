@@ -556,6 +556,32 @@ p {
 .number-line-track::before { left: 0; }
 .number-line-track::after { left: 100%; }
 .number-line-marker { background: #df6b3d; height: 24px; }
+.number-line-jump {
+  position: absolute;
+  bottom: 7px;
+  min-width: 24px;
+  border-top: 2px solid #2876a8;
+  color: #19577d;
+  font-size: .72rem;
+  font-weight: 800;
+  text-align: center;
+}
+.number-line-jump::after {
+  position: absolute;
+  top: -5px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid #2876a8;
+  border-right: 2px solid #2876a8;
+  transform: rotate(45deg);
+  content: '';
+}
+.number-line-jump--backward::after {
+  right: auto;
+  left: -1px;
+  transform: rotate(-135deg);
+}
 .number-line-labels { display: flex; justify-content: space-between; align-items: center; }
 .number-line-labels strong { color: #b94c24; }
 .number-line-visual p { margin: 10px 0 0; font-weight: 700; text-align: center; }

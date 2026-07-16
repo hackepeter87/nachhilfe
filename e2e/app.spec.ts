@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 async function finishCurrentRound(page: Page) {
   for (let action = 0; action < 80; action += 1) {
     if (await page.getByText('Etappe geschafft').isVisible().catch(() => false)) return
-    const continueWithHelp = page.getByRole('button', { name: 'Mit Hilfe weiter' })
+    const continueWithHelp = page.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ })
     if (await continueWithHelp.isVisible().catch(() => false)) {
       await continueWithHelp.click()
       continue
@@ -79,9 +79,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.2.0',
-    schemaVersion: 2,
-    appVersion: '0.3.0'
+    catalogVersion: '0.4.0',
+    schemaVersion: 4,
+    appVersion: '0.5.0'
   })
 
   await page.reload()

@@ -12,7 +12,9 @@ Diese Liste ist bei jedem neuen oder geänderten produktiven Katalogeintrag abzu
 ## Lernziel und Progression
 
 - [ ] Förderziel, Vorkenntnisse und Lehrplanbereich sind konkret benannt.
-- [ ] Jede Stufe verändert Zahlenraum, Denkschritte, Darstellung oder Selbstständigkeit tatsächlich.
+- [ ] Jede Stufe verändert Zahlenraum, Zahlenstruktur, Interaktion, Darstellung oder mathematische Anforderungen tatsächlich.
+- [ ] Alle sechs Lernphasen sind beschrieben; jede `active` Phase verweist auf einen vorhandenen Aufgabentyp.
+- [ ] Die fünf Anforderungsmerkmale der Stufe entsprechen dem realen Aufgabenablauf; nicht abgefragte Begründungen oder Strategiewahlen bleiben `false`.
 - [ ] Stufe 1 ist objektiv zugänglicher als Stufe 3 und bleibt eine echte Lernaufgabe.
 - [ ] Kriterien für Erhöhen, Zurückstufen und eine passende Transferidee sind dokumentiert.
 
@@ -26,7 +28,7 @@ Diese Liste ist bei jedem neuen oder geänderten produktiven Katalogeintrag abzu
 
 ## Antwortoptionen
 
-- [ ] Es gibt genau drei unterschiedliche, gleichartig dargestellte Optionen.
+- [ ] Es gibt drei oder vier unterschiedliche, gleichartig dargestellte Optionen.
 - [ ] Distraktoren stammen aus dokumentierten Fehlvorstellungen.
 - [ ] Keine Option ist außerhalb des Zahlenraums oder offensichtlich unsinnig.
 - [ ] Spiegelbilder, Verschiebungen und falsche Achsen sind visuell eindeutig verschieden.
@@ -37,9 +39,19 @@ Diese Liste ist bei jedem neuen oder geänderten produktiven Katalogeintrag abzu
 - [ ] Schwierigkeit entsteht aus Mathematik, nicht aus unnötiger Textlänge oder Sprachfallen.
 - [ ] Touch-Ziele, Raster, Darstellungen und Antwortsätze passen auf `375 x 812` sowie `812 x 375` ohne horizontales Overflow.
 - [ ] Feedback benennt die konkrete Leistung und vermeidet zufälliges Dauerlob.
+- [ ] Erfolgsfeedback bestätigt nur eine Eingabe oder Auswahl, die die App tatsächlich beobachtet hat.
+- [ ] Prozesskompetenzen nennen mit `elicitedBy`, wodurch der konkrete Ablauf sie anregt; pauschale Zuordnungen bleiben leer.
+
+## Sachaufgaben
+
+- [ ] Mengenbeziehung und Operation passen zusammen; die Zuordnung beruht nicht nur auf Schlüsselwörtern.
+- [ ] Die richtige Frage und beide Alternativfragen beziehen sich auf Mengen der konkreten Geschichte.
+- [ ] Jede Plausibilitätsprüfung ist situationsbezogen und besitzt genau eine richtige Aussage.
+- [ ] Die richtige Plausibilitätsaussage ist nicht über alle Vorlagen hinweg derselbe allgemeine Text.
 
 ## Abnahme
 
 - [ ] Katalog- und Fallback-Datei erfüllen dasselbe Schema.
 - [ ] Generator-, Komponenten- und relevante E2E-Tests sind ergänzt und grün.
-- [ ] Eine fachkundige Person hat neue produktive Inhalte inhaltlich geprüft; andernfalls ist dieser Restpunkt im Releasebericht ausdrücklich offen.
+- [ ] Der Katalogstatus entspricht `draft`, `ready-for-review`, `active` oder `disabled`; `active` wird nur bei übereinstimmendem Generator, UI und Tests verwendet.
+- [ ] Eine externe Lehrkraftfreigabe wird nur behauptet, wenn sie für die konkrete Version dokumentiert ist.

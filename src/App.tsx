@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, Check, CircleHelp, Compass, Download, Info, RefreshCw, ShieldCheck, Sparkles, Wifi, WifiOff } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import {
-  createRepetitionExercise,
+  createRemediationExercise,
   createSessionPlan,
   getSkillLabel,
   updateSkillProgress,
@@ -282,13 +282,7 @@ export default function App() {
 
     let nextExercises = session.exercises
     if (!result.correct && repeatCount < 3 && session.exercises.length < 10) {
-      const repetition = createRepetitionExercise(
-        result.skillId,
-        session.seed + session.exercises.length * 211,
-        currentExercise.difficulty,
-        result.variantKey,
-        result.subskillId
-      )
+      const repetition = createRemediationExercise(currentExercise, session.seed + session.exercises.length * 211)
       nextExercises = [
         ...session.exercises.slice(0, exerciseIndex + 1),
         repetition,

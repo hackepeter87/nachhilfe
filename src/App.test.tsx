@@ -50,11 +50,11 @@ describe('App-Ablauf', () => {
     await user.click(await screen.findByRole('button', { name: 'Weiter zur Mathe-Reise' }))
     await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
 
-    expect(screen.queryByText('nrw-klasse3-foerderkern 0.2.0')).not.toBeVisible()
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.4.0')).not.toBeVisible()
     await user.click(screen.getByLabelText('Versionsinformationen öffnen'))
-    expect(screen.getByText('nrw-klasse3-foerderkern 0.2.0')).toBeVisible()
-    expect(screen.getByText('0.3.0')).toBeVisible()
-    expect(screen.getByText('review')).toBeVisible()
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.4.0')).toBeVisible()
+    expect(screen.getByText('0.5.0')).toBeVisible()
+    expect(screen.getByText('ready-for-review')).toBeVisible()
   })
 
   it('aktiviert ein PWA-Update nicht während einer laufenden Runde', async () => {

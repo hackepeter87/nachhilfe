@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createRoundingExercise, generateExercise, isAnswerCorrect, mirrorGrid, roundToUnit } from './generators'
+import { getTaskCatalog } from '../content/catalog'
 import type { SkillId } from './types'
 
 const skills: SkillId[] = [
@@ -45,6 +46,17 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
+  it('hält die Stufenwerte für Einmaleins und Division ein', () => {
+    for (let seed = 1; seed <= 500; seed += 1) {
+      expect(Number(generateExercise('multiplication', seed, 1).correctAnswer)).toBeLessThanOrEqual(50)
+      expect(Number(generateExercise('division', seed, 1).variant.values.dividend)).toBeLessThanOrEqual(50)
+      expect(Number(generateExercise('multiplication', seed, 2).correctAnswer)).toBeLessThanOrEqual(60)
+      expect(Number(generateExercise('division', seed, 2).variant.values.dividend)).toBeLessThanOrEqual(60)
+      expect(Number(generateExercise('multiplication', seed, 3).correctAnswer)).toBeLessThanOrEqual(90)
+      expect(Number(generateExercise('division', seed, 3).variant.values.dividend)).toBeLessThanOrEqual(90)
+    }
+  })
+
   it.each([
     ['neighbor-tens', 10],
     ['neighbor-hundreds', 100]
@@ -60,13 +72,22 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
+  it('bezieht bei Nachbarhundertern auch Zahlen von 900 bis 999 ein', () => {
+    const generated = Array.from({ length: 1_000 }, (_, seed) => generateExercise('neighbor-hundreds', seed + 1, 3))
+    expect(generated.some((exercise) => Number(exercise.variant.values.number) >= 900)).toBe(true)
+    generated.filter((exercise) => Number(exercise.variant.values.number) >= 900).forEach((exercise) => {
+      expect(exercise.variant.values.lower).toBe(900)
+      expect(exercise.variant.values.upper).toBe(1000)
+    })
+  })
+
   it.each([
     ['round-tens', 10],
     ['round-hundreds', 100]
   ] as const)('rundet für %s einschließlich Grenzfällen korrekt', (skill, unit) => {
     let halfBoundarySeen = false
     for (let seed = 1; seed <= 2_000; seed += 1) {
-      const exercise = generateExercise(skill, seed)
+      const exercise = generateExercise(skill, seed, 2)
       const number = Number(exercise.variant.values.number)
       if (number % unit === unit / 2) halfBoundarySeen = true
       expect(Number(exercise.correctAnswer)).toBe(Math.round(number / unit) * unit)
@@ -124,6 +145,20 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
+  it('fragt Nullstellen als Ziffer und Stellenwert tatsächlich ab', () => {
+    for (const difficulty of [2, 3] as const) {
+      for (let seed = 1; seed <= 100; seed += 1) {
+        const exercise = generateExercise('place-value', seed, difficulty)
+        expect(exercise.variant.values.digit).toBe(0)
+        expect(exercise.correctAnswer).toBe('0')
+        expect(['Zehner', 'Einer']).toContain(exercise.variant.values.position)
+      }
+    }
+    const hardDecomposition = generateExercise('decompose', 8, 3)
+    expect(hardDecomposition.variant.values.tens).toBe(0)
+    expect(hardDecomposition.variant.values.ones).toBe(0)
+  })
+
   it('liefert für Symmetrie genau eine echte Spiegelung', () => {
     for (let seed = 1; seed <= 100; seed += 1) {
       const exercise = generateExercise('symmetry', seed)
@@ -140,17 +175,62 @@ describe('deterministische Aufgabengeneratoren', () => {
         const first = Number(exercise.variant.values.first)
         const second = Number(exercise.variant.values.second)
         const operation = exercise.variant.values.operation
-        const expected = operation === '+' ? first + second : operation === '−' ? first - second : first * second
+        const expected = operation === '+' ? first + second : operation === '−' ? first - second : operation === ':' ? second : first * second
         expect(Number(exercise.variant.values.result)).toBe(expected)
-        expect(exercise.steps).toHaveLength(difficulty === 1 ? 4 : difficulty === 2 ? 6 : 7)
+        expect(exercise.steps).toHaveLength(difficulty === 1 ? 5 : difficulty === 2 ? 7 : 8)
         expect(exercise.prompt).not.toMatch(/\{\w+\}/)
+        expect(exercise.steps?.some((step) => step.id === 'relationship')).toBe(true)
         exercise.steps?.forEach((step) => {
-          expect(step.options).toHaveLength(3)
-          expect(new Set(step.options.map((option) => option.value)).size).toBe(3)
+          expect(step.options.length).toBeGreaterThanOrEqual(3)
+          expect(step.options.length).toBeLessThanOrEqual(4)
+          expect(new Set(step.options.map((option) => option.value)).size).toBe(step.options.length)
           expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
         })
       }
     }
+  })
+
+  it('führt Stellenwert und Runden auf höheren Stufen über überprüfbare Strategischritte', () => {
+    const placeValue = generateExercise('place-value', 77, 3)
+    expect(placeValue.answerMode).toBe('guided-choice')
+    expect(placeValue.steps?.map((step) => step.id)).toEqual(['identify-digit', 'identify-value'])
+    expect(placeValue.learningPhase).toBe('transfer')
+
+    const easyRounding = generateExercise('round-tens', 77, 1)
+    const mediumRounding = generateExercise('round-tens', 77, 2)
+    const hardRounding = generateExercise('round-tens', 77, 3)
+    expect(easyRounding.steps).toBeUndefined()
+    expect(mediumRounding.steps?.map((step) => step.id)).toEqual(['neighbors', 'round-result'])
+    expect(hardRounding.steps?.map((step) => step.id)).toEqual(['neighbors', 'round-result', 'round-reason'])
+  })
+
+  it('liefert eine konkrete Remediation mit leichterer verwandter Aufgabe', () => {
+    const exercise = generateExercise('round-hundreds', 412, 3)
+    expect(exercise.remediation).toMatchObject({ helpLevel: 4, nextDifficulty: 2, keepSubskill: true })
+    expect(exercise.remediation.strategy.length).toBeGreaterThan(0)
+    expect(exercise.remediation.representation.length).toBeGreaterThan(0)
+  })
+
+  it('verwendet vorlagenspezifische Fragen und wechselnde Plausibilitätsaussagen', () => {
+    const templates = new Map(getTaskCatalog().wordProblems.map((template) => [template.id, template]))
+    const plausibilityAnswers = new Set<string>()
+    for (let seed = 1; seed <= 500; seed += 1) {
+      const exercise = generateExercise('word-problem', seed, 3)
+      const template = templates.get(String(exercise.variant.values.templateId))!
+      const questionStep = exercise.steps?.find((step) => step.id === 'question')
+      expect(questionStep).toBeDefined()
+      if (!questionStep) throw new Error('Frageschritt fehlt')
+      const expectedQuestions = [template.question, ...template.questionDistractors].map((question) =>
+        question.replaceAll('{first}', String(exercise.variant.values.first)).replaceAll('{second}', String(exercise.variant.values.second))
+      )
+      expect(new Set(questionStep.options.map((option) => option.value))).toEqual(new Set(expectedQuestions))
+      const plausibility = exercise.steps?.find((step) => step.id === 'plausibility')
+      expect(plausibility).toBeDefined()
+      if (!plausibility) throw new Error('Plausibilitätsschritt fehlt')
+      expect(plausibility.options.filter((option) => option.value === plausibility.correctAnswer)).toHaveLength(1)
+      plausibilityAnswers.add(plausibility.correctAnswer)
+    }
+    expect(plausibilityAnswers.size).toBeGreaterThan(2)
   })
 
   it('liefert für jede produktive Auswahlaufgabe drei eindeutige Optionen', () => {
@@ -175,8 +255,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     const easy = generateExercise(skill, 315, 1)
     const medium = generateExercise(skill, 315, 2)
     const hard = generateExercise(skill, 315, 3)
-    expect(easy.testMetadata.cognitiveSteps).toBeLessThan(medium.testMetadata.cognitiveSteps)
-    expect(medium.testMetadata.cognitiveSteps).toBeLessThan(hard.testMetadata.cognitiveSteps)
+    expect(new Set([easy.variant.key, medium.variant.key, hard.variant.key]).size).toBeGreaterThan(1)
     expect(easy.representation?.visibility).toBe('always')
     expect(medium.representation?.visibility).toBe('hint')
     expect(hard.representation).toBeUndefined()
@@ -221,6 +300,35 @@ describe('deterministische Aufgabengeneratoren', () => {
           expect(exercise.hints.join(' ')).not.toMatch(/\{\w+\}/)
           expect(exercise.explanation).not.toMatch(/\{\w+\}/)
         }
+      }
+    }
+  })
+
+  it('bildet Zahlenstrahlsprünge lückenlos und mathematisch korrekt ab', () => {
+    for (const skill of ['addition-1000', 'subtraction-1000', 'complement-1000'] as const) {
+      for (const difficulty of [1, 2] as const) {
+        for (let seed = 1; seed <= 200; seed += 1) {
+          const exercise = generateExercise(skill, seed, difficulty)
+          if (exercise.representation?.kind !== 'number-line') continue
+          const jumps = exercise.representation.values.jumps
+          expect(Array.isArray(jumps)).toBe(true)
+          if (!Array.isArray(jumps)) continue
+          jumps.forEach((jump, index) => {
+            if (index > 0) expect(jump.from).toBe(jumps[index - 1]!.to)
+            expect(jump.label).toBe(jump.to - jump.from > 0 ? `+${jump.to - jump.from}` : String(jump.to - jump.from))
+          })
+          expect(jumps.at(-1)?.to).toBe(Number(exercise.correctAnswer) + (skill === 'complement-1000' ? Number(exercise.variant.values.first) : 0))
+        }
+      }
+    }
+  })
+
+  it('verwendet ausschließlich explizite Symmetrievorlagen der jeweiligen Stufe', () => {
+    const templates = getTaskCatalog().symmetry.templates
+    for (const difficulty of [1, 2, 3] as const) {
+      const allowed = new Set(templates.filter((template) => template.difficulty === difficulty).map((template) => JSON.stringify(template.grid)))
+      for (let seed = 1; seed <= 100; seed += 1) {
+        expect(allowed.has(JSON.stringify(generateExercise('symmetry', seed, difficulty).sourceGrid))).toBe(true)
       }
     }
   })

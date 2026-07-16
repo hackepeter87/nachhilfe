@@ -4,6 +4,7 @@ import {
   databaseMetadata,
   LEGACY_SESSION_METADATA,
   loadAppData,
+  migrateSkillProgress,
   saveCompletedSession,
   saveProfile,
   saveSettings,
@@ -55,6 +56,12 @@ describe('IndexedDB-Speicherung', () => {
     expect(data.settings.installHelpDismissed).toBe(true)
     expect(data.progress['round-tens']?.mastery).toBe(47)
     expect(data.progress['round-tens']?.subskills['round-tens-midpoint']?.recentErrors).toBe(1)
+  })
+
+  it('ergänzt bei alten Lernständen eine ableitbare Lernphase', () => {
+    const legacy = createSkillProgress('place-value')
+    delete (legacy as Partial<typeof legacy>).learningPhase
+    expect(migrateSkillProgress(legacy).learningPhase).toBe('activate')
   })
 
   it('speichert den fachlichen Releasekontext einer abgeschlossenen Sitzung', async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createSkillProgress, LEARNING_RULES, selectionWeight, subskillWeight, updateSkillProgress } from './progress'
+import { createSkillProgress, LEARNING_RULES, repetitionState, selectionWeight, subskillWeight, updateSkillProgress } from './progress'
 import type { AttemptResult } from './types'
 
 function result(overrides: Partial<AttemptResult> = {}): AttemptResult {
@@ -61,5 +61,13 @@ describe('Lernstandsmodell', () => {
     expect(progress.subskills['times-7']?.recentErrors).toBe(1)
     expect(progress.subskills['times-8']?.mastery).toBeGreaterThan(progress.subskills['times-7']?.mastery ?? 0)
     expect(subskillWeight(progress, 'times-7')).toBeGreaterThan(subskillWeight(progress, 'times-8'))
+  })
+
+  it('führt Lernphasen nachvollziehbar fort und plant fällige Wiederholung', () => {
+    let progress = createSkillProgress('addition')
+    expect(progress.learningPhase).toBe('activate')
+    progress = updateSkillProgress(progress, result({ correct: false }))
+    expect(progress.learningPhase).toBe('understand')
+    expect(repetitionState(progress, new Date('2026-07-30T10:00:00.000Z'))).toBe('overdue')
   })
 })

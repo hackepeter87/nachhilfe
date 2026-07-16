@@ -109,7 +109,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         <MathRepresentation representation={exercise.representation} />
       )}
 
-      {exercise.answerMode === 'guided-word' && currentStep && answerState === 'answering' && (
+      {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice') && currentStep && answerState === 'answering' && (
         <div className="guided-step">
           <div className="step-dots" aria-label={`Schritt ${stepIndex + 1} von ${exercise.steps?.length}`}>
             {exercise.steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
@@ -174,8 +174,11 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
           <Lightbulb aria-hidden="true" />
           <div>
             <h3>Wir lösen es gemeinsam.</h3>
+            <p>{exercise.remediation.strategy}</p>
             <p>{exercise.explanation}</p>
-            <button className="primary-button" type="button" onClick={finish}>Mit Hilfe weiter</button>
+            <button className="primary-button" type="button" onClick={finish}>
+              {exercise.remediation.helpLevel === 5 ? 'Mit einer Grundlagenaufgabe weiter' : 'Mit einer leichteren Aufgabe weiter'}
+            </button>
           </div>
         </div>
       )}

@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 2,
-  "catalogVersion": "0.2.0",
+  "schemaVersion": 4,
+  "catalogVersion": "0.4.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-16",
-  "status": "review",
+  "status": "ready-for-review",
   "numberRange": {
     "min": 0,
     "max": 1000
@@ -32,9 +32,14 @@
         "maxValue": 20
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Zahlen bis 20 lesen",
@@ -47,31 +52,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Summen bis 10 mit sichtbaren Gruppen",
+          "description": "Summen bis 10 ohne Zehnerübergang; Rechenstrich sichtbar",
           "numberRange": "0 bis 10",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zehnerübergang durch Zerlegen auf Hilfe",
-          "numberRange": "0 bis 20",
+          "description": "Summen von 11 bis 18 mit Zehnerübergang; Rechenstrich auf Hilfe",
+          "numberRange": "11 bis 18",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Ergänzen und Nachbaraufgaben ohne sichtbares Material",
-          "numberRange": "0 bis 20",
+          "description": "Summen bis 20 mit Zehnerübergang ohne sichtbare Darstellung",
+          "numberRange": "11 bis 20",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "8 + 5: Erst 8 + 2 = 10, dann noch 3. Also 13.",
-      "successFeedback": "Du hast die Plusaufgabe passend zerlegt.",
-      "remediation": "Zurück zu Summen bis 10 mit zwei sichtbaren Gruppen.",
+      "successFeedback": "Das Ergebnis der Plusaufgabe stimmt.",
+      "remediation": {
+        "strategy": "Zurück zu Summen bis 10 mit zwei sichtbaren Gruppen.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Plusaufgaben“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Punktefelder",
+        "keepSubskill": true
+      },
       "transferPrompt": "Finde eine Tauschaufgabe mit demselben Ergebnis.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "addition:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "addition:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "addition:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "addition:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "addition:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "addition:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "subtraction",
@@ -96,9 +182,14 @@
         "maxValue": 20
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Zahlen bis 20 lesen",
@@ -111,31 +202,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Abziehen ohne Zehnerübergang mit Darstellung",
+          "description": "Subtraktion bis 10 ohne Zehnerübergang; Rechenstrich sichtbar",
           "numberRange": "0 bis 10",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zehnerübergang durch Zerlegen auf Hilfe",
-          "numberRange": "0 bis 20",
+          "description": "Subtraktion bis 16 mit Zehnerübergang; Rechenstrich auf Hilfe",
+          "numberRange": "0 bis 16",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Ergänzen als zweite Strategie ohne sichtbares Material",
+          "description": "Subtraktion bis 20 mit Zehnerübergang ohne sichtbare Darstellung",
           "numberRange": "0 bis 20",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "14 − 6: Erst 14 − 4 = 10, dann noch 2 weg. Also 8.",
-      "successFeedback": "Du hast den passenden Minusweg gefunden.",
-      "remediation": "Abziehen in zwei sichtbaren Schritten bis zur 10.",
+      "successFeedback": "Das Ergebnis der Minusaufgabe stimmt.",
+      "remediation": {
+        "strategy": "Abziehen in zwei sichtbaren Schritten bis zur 10.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Minusaufgaben“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Punktefelder",
+        "keepSubskill": true
+      },
       "transferPrompt": "Prüfe das Ergebnis mit der passenden Plusaufgabe.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "subtraction:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "subtraction:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "subtraction:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "subtraction:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "subtraction:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "subtraction:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "multiplication",
@@ -157,12 +329,17 @@
         "minLevel": 1,
         "maxLevel": 3,
         "minValue": 0,
-        "maxValue": 100
+        "maxValue": 90
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Gleich große Gruppen erkennen",
@@ -175,31 +352,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "2er-, 5er- und 10er-Reihe mit Gruppen",
+          "description": "2er-, 5er- und 10er-Reihe mit Gruppenbild",
           "numberRange": "Produkte bis 50",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "3er-, 4er- und 6er-Reihe mit Gruppen auf Hilfe",
+          "description": "3er-, 4er- und 6er-Reihe; Gruppenbild auf Hilfe",
           "numberRange": "Produkte bis 60",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "7er-, 8er- und 9er-Reihe über Nachbar- und Tauschaufgaben",
+          "description": "6er-, 7er-, 8er- und 9er-Reihe ohne sichtbares Gruppenbild",
           "numberRange": "Produkte bis 90",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "6 · 7: Nutze 5 · 7 = 35 und noch einmal 7. Das ergibt 42.",
-      "successFeedback": "Du hast die {first}er-Reihe über gleich große Gruppen gelöst.",
-      "remediation": "Zurück zu einer bekannten Nachbarreihe mit Gruppenbild.",
+      "successFeedback": "Das Ergebnis der Malaufgabe stimmt.",
+      "remediation": {
+        "strategy": "Zurück zu einer bekannten Nachbarreihe mit Gruppenbild.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Einmaleins“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Gruppenbild",
+        "keepSubskill": true
+      },
       "transferPrompt": "Nenne die Tauschaufgabe und eine passende Division.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "multiplication:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "multiplication:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "multiplication:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "multiplication:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "multiplication:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "multiplication:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "division",
@@ -221,12 +479,17 @@
         "minLevel": 1,
         "maxLevel": 3,
         "minValue": 0,
-        "maxValue": 100
+        "maxValue": 90
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Einmaleins als Gruppen verstehen",
@@ -239,31 +502,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Teilen durch 2, 5 oder 10 mit Gruppen",
+          "description": "Teilen durch 2, 5 oder 10 mit Gruppenbild",
           "numberRange": "Dividend bis 50",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Teilen durch 3, 4 oder 6 mit Hilfe",
+          "description": "Teilen durch 3, 4 oder 6; Gruppenbild auf Hilfe",
           "numberRange": "Dividend bis 60",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Divisionen zu 7er-, 8er- und 9er-Reihe als Umkehraufgabe",
+          "description": "Teilen durch 6, 7, 8 oder 9 ohne sichtbares Gruppenbild",
           "numberRange": "Dividend bis 90",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "42 : 6: Suche 6 · ? = 42. 6 · 7 = 42, also ist das Ergebnis 7.",
-      "successFeedback": "Du hast die Umkehraufgabe mit dem Teiler {divisor} genutzt.",
-      "remediation": "Die Menge wird noch einmal in sichtbare gleich große Gruppen gelegt.",
+      "successFeedback": "Das Ergebnis der Geteiltaufgabe stimmt.",
+      "remediation": {
+        "strategy": "Die Menge wird noch einmal in sichtbare gleich große Gruppen gelegt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Umkehraufgaben“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Gruppenbild",
+        "keepSubskill": true
+      },
       "transferPrompt": "Bilde aus den drei Zahlen eine weitere Mal- oder Geteiltaufgabe.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "division:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "division:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "division:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "division:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "division:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "division:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "place-value",
@@ -284,13 +628,18 @@
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
-        "minValue": 0,
-        "maxValue": 1000
+        "minValue": 100,
+        "maxValue": 999
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Hunderter, Zehner und Einer unterscheiden"
@@ -302,31 +651,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Alle Stellen ungleich null; Tafel sichtbar und Stelle markiert",
-          "numberRange": "0 bis 1000",
+          "description": "Dreistellige Zahl ohne Null; gefragte Stelle in der Tafel markiert",
+          "numberRange": "100 bis 999",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Eine Null als Platzhalter; Tafel erst auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Eine Null als Platzhalter wird gezielt abgefragt; Tafel auf Hilfe",
+          "numberRange": "100 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Ähnliche Optionen und keine Hervorhebung",
-          "numberRange": "0 bis 1000",
+          "description": "Eine oder zwei Nullstellen ohne Tafel: zuerst Ziffer, dann Stellenwert bestimmen",
+          "numberRange": "100 bis 999",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "In 472 steht die 7 bei den Zehnern. Ihr Wert ist 70.",
-      "successFeedback": "Du hast Ziffer und Stellenwert richtig unterschieden.",
-      "remediation": "Die Zahl wird mit Hundertern, Zehnern und Einern gelegt.",
+      "successFeedback": "Du hast den richtigen Stellenwert erkannt.",
+      "remediation": {
+        "strategy": "Die Zahl wird mit Hundertern, Zehnern und Einern gelegt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Stellenwerte“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Stellenwerttafel",
+        "keepSubskill": true
+      },
       "transferPrompt": "Welche Ziffer müsste sich ändern, damit die Zahl um 100 wächst?",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "place-value:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "place-value:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "place-value:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "place-value:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "place-value:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "place-value:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "decompose",
@@ -347,13 +777,18 @@
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
-        "minValue": 0,
-        "maxValue": 1000
+        "minValue": 100,
+        "maxValue": 999
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Stellenwerte bis 1000"
@@ -364,31 +799,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Keine Null; Tafel sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Dreistellige Zahl ohne Null; Stellenwerttafel sichtbar",
+          "numberRange": "100 bis 999",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Eine Null als Platzhalter; Tafel auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Eine Null als Platzhalter; Stellenwerttafel auf Hilfe",
+          "numberRange": "100 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Mehrere ähnliche Zerlegungen ohne Tafel",
-          "numberRange": "0 bis 1000",
+          "description": "Zahl mit zwei Nullstellen und ähnlichen Zerlegungen ohne Tafel",
+          "numberRange": "100 bis 999",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "406 = 400 + 0 + 6.",
-      "successFeedback": "Du hast jeder Ziffer ihren Stellenwert gegeben.",
-      "remediation": "Jede Ziffer wird zuerst in die passende Stelle gelegt.",
+      "successFeedback": "Du hast die passende Stellenwertzerlegung gewählt.",
+      "remediation": {
+        "strategy": "Jede Ziffer wird zuerst in die passende Stelle gelegt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Zahlen zerlegen“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Stellenwerttafel",
+        "keepSubskill": true
+      },
       "transferPrompt": "Baue aus derselben Zerlegung wieder die Zahl.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "decompose:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "decompose:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "decompose:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "decompose:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "decompose:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "decompose:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "compose",
@@ -409,13 +925,18 @@
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
-        "minValue": 0,
-        "maxValue": 1000
+        "minValue": 100,
+        "maxValue": 999
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Stellenwerte bis 1000"
@@ -426,31 +947,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Alle Stellen besetzt; Tafel sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Alle drei Stellen sind besetzt; Stellenwerttafel sichtbar",
+          "numberRange": "100 bis 999",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Eine leere Stelle; Tafel auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Eine Stelle ist mit Null besetzt; Stellenwerttafel auf Hilfe",
+          "numberRange": "100 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Zahl aus gemischten Stellenwertangaben ohne Tafel",
-          "numberRange": "0 bis 1000",
+          "description": "Zwei Stellen sind mit Null besetzt; Zahl ohne Tafel zusammensetzen",
+          "numberRange": "100 bis 999",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "4 Hunderter, 0 Zehner und 6 Einer ergeben 406.",
-      "successFeedback": "Du hast die Stellen in der richtigen Reihenfolge zusammengesetzt.",
-      "remediation": "Hunderter, Zehner und Einer werden in drei Spalten sortiert.",
+      "successFeedback": "Du hast die Zahl richtig zusammengesetzt.",
+      "remediation": {
+        "strategy": "Hunderter, Zehner und Einer werden in drei Spalten sortiert.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Zahlen bauen“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Stellenwerttafel",
+        "keepSubskill": true
+      },
       "transferPrompt": "Zerlege die gebaute Zahl wieder.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "compose:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "compose:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "compose:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "compose:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "compose:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "compose:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "neighbor-tens",
@@ -471,13 +1073,18 @@
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
-        "minValue": 0,
-        "maxValue": 1000
+        "minValue": 11,
+        "maxValue": 999
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Zehnerzahlen kennen"
@@ -488,31 +1095,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Zahl in der Mitte; Zahlenstrahl sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Zahl liegt mittig zwischen zwei Zehnern; Zahlenstrahl sichtbar",
+          "numberRange": "11 bis 999",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zahl nahe an einem Zehner; Zahlenstrahl auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Zahl liegt dicht an einem Zehner; Zahlenstrahl auf Hilfe",
+          "numberRange": "11 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Ohne Zahlenstrahl und mit anschließender Rundungsidee",
-          "numberRange": "0 bis 1000",
+          "description": "Beliebige Position zwischen zwei Zehnern ohne Zahlenstrahl",
+          "numberRange": "11 bis 999",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "64 liegt zwischen 60 und 70.",
       "successFeedback": "Du hast beide direkten Nachbarzehner gefunden.",
-      "remediation": "Die Zahl wird auf einem Abschnitt zwischen zwei Zehnern markiert.",
+      "remediation": {
+        "strategy": "Die Zahl wird auf einem Abschnitt zwischen zwei Zehnern markiert.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Nachbarzehner“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Zahlenstrahl",
+        "keepSubskill": true
+      },
       "transferPrompt": "Zu welchem Nachbarzehner liegt die Zahl näher?",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "neighbor-tens:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "neighbor-tens:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "neighbor-tens:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "neighbor-tens:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "neighbor-tens:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "neighbor-tens:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "neighbor-hundreds",
@@ -533,13 +1221,18 @@
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
-        "minValue": 0,
-        "maxValue": 1000
+        "minValue": 101,
+        "maxValue": 999
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Hunderterzahlen kennen"
@@ -550,31 +1243,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Zahl deutlich zwischen zwei Hundertern; Strahl sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Zahl liegt mittig zwischen zwei Hundertern; Zahlenstrahl sichtbar",
+          "numberRange": "101 bis 999",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zahl nahe an einem Hunderter; Strahl auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Zahl liegt dicht an einem Hunderter; Zahlenstrahl auf Hilfe",
+          "numberRange": "101 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Ohne Strahl und mit Rundungsidee",
-          "numberRange": "0 bis 1000",
+          "description": "Beliebige Position zwischen zwei Hundertern ohne Zahlenstrahl",
+          "numberRange": "101 bis 999",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "640 liegt zwischen 600 und 700.",
       "successFeedback": "Du hast beide direkten Nachbarhunderter gefunden.",
-      "remediation": "Die Zahl wird zwischen zwei Hundertern auf dem Zahlenstrahl markiert.",
+      "remediation": {
+        "strategy": "Die Zahl wird zwischen zwei Hundertern auf dem Zahlenstrahl markiert.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Nachbarhunderter“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Zahlenstrahl",
+        "keepSubskill": true
+      },
       "transferPrompt": "Zu welchem Nachbarhunderter liegt die Zahl näher?",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "neighbor-hundreds:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "neighbor-hundreds:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "neighbor-hundreds:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "neighbor-hundreds:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "neighbor-hundreds:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "neighbor-hundreds:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "round-tens",
@@ -600,9 +1374,14 @@
         "maxValue": 1000
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Nachbarzehner bestimmen",
@@ -614,31 +1393,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Nachbarzehner und Abstände sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Nachbarzehner und Abstände sind am Zahlenstrahl sichtbar",
+          "numberRange": "5 bis 995",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zahlenstrahl nur auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Nachbarzahlen auswählen und anschließend runden; Zahlenstrahl auf Hilfe",
+          "numberRange": "5 bis 995",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Selbstständig runden und Ergebnis begründen",
-          "numberRange": "0 bis 1000",
+          "description": "Nachbarzahlen, Rundung und passende Abstandsbegründung selbstständig auswählen",
+          "numberRange": "5 bis 995",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "67 ist 3 von 70 und 7 von 60 entfernt. Daher wird auf 70 gerundet.",
-      "successFeedback": "Du hast die Abstände zu den Nachbarzehnern richtig verglichen.",
-      "remediation": "Zuerst werden nur die beiden Nachbarzehner bestimmt.",
+      "successFeedback": "Das Rundungsergebnis stimmt.",
+      "remediation": {
+        "strategy": "Zuerst werden nur die beiden Nachbarzehner bestimmt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Auf Zehner runden“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Zahlenstrahl",
+        "keepSubskill": true
+      },
       "transferPrompt": "Erkläre, warum die andere Nachbarzahl weiter entfernt ist.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "round-tens:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "round-tens:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "round-tens:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "round-tens:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "round-tens:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "round-tens:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "round-hundreds",
@@ -664,9 +1524,14 @@
         "maxValue": 1000
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Nachbarhunderter bestimmen",
@@ -678,31 +1543,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Nachbarhunderter und Abstände sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Nachbarhunderter und Abstände sind am Zahlenstrahl sichtbar",
+          "numberRange": "50 bis 950",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zahlenstrahl nur auf Hilfe",
-          "numberRange": "0 bis 1000",
+          "description": "Nachbarzahlen auswählen und anschließend runden; Zahlenstrahl auf Hilfe",
+          "numberRange": "50 bis 950",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Selbstständig runden und Ergebnis begründen",
-          "numberRange": "0 bis 1000",
+          "description": "Nachbarzahlen, Rundung und passende Abstandsbegründung selbstständig auswählen",
+          "numberRange": "50 bis 950",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "650 liegt genau in der Mitte. Nach der Grundschulregel wird auf 700 gerundet.",
-      "successFeedback": "Du hast die Abstände zu den Nachbarhundertern richtig verglichen.",
-      "remediation": "Zuerst werden nur die beiden Nachbarhunderter bestimmt.",
+      "successFeedback": "Das Rundungsergebnis stimmt.",
+      "remediation": {
+        "strategy": "Zuerst werden nur die beiden Nachbarhunderter bestimmt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Auf Hunderter runden“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Zahlenstrahl",
+        "keepSubskill": true
+      },
       "transferPrompt": "Finde eine weitere Zahl, die auf denselben Hunderter gerundet wird.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "round-hundreds:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "round-hundreds:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "round-hundreds:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "round-hundreds:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "round-hundreds:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "round-hundreds:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "word-problem",
@@ -724,12 +1670,21 @@
         "minLevel": 1,
         "maxLevel": 3,
         "minValue": 0,
-        "maxValue": 20
+        "maxValue": 100
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "modelling",
+          "elicitedBy": "Das Kind ordnet die Sachsituation einer Mengenbeziehung und einer Rechnung zu."
+        },
+        {
+          "id": "representing",
+          "elicitedBy": "Ab Stufe 2 wählt das Kind eine passende Darstellung der Mengenbeziehung."
+        },
+        {
+          "id": "communicating",
+          "elicitedBy": "Das Kind wählt einen zur Rechnung passenden Antwortsatz."
+        }
       ],
       "prerequisites": [
         "Kurze Sätze lesen",
@@ -742,31 +1697,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Eindeutige Handlung und sichtbare Darstellung",
+          "description": "Wichtige Angaben, Mengenbeziehung, Rechnung und Antwortsatz bei sichtbarer Darstellung",
           "numberRange": "Ergebnisse bis 20",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": true,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Frage und Darstellung selbst auswählen",
+          "description": "Zusätzlich Frage und Darstellung auswählen; sprachlich verschiedene Beziehungen",
           "numberRange": "Ergebnisse bis 100",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": true,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Unwichtige Angabe und Plausibilität prüfen",
+          "description": "Zusätzlich unwichtige Angabe und situationsbezogene Plausibilität prüfen",
           "numberRange": "Ergebnisse bis 100",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": true,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "Erst klären: Was verändert sich? Dann passende Darstellung und Rechnung wählen.",
-      "successFeedback": "Du hast Handlung, Rechnung und Antwort miteinander verbunden.",
-      "remediation": "Die Geschichte wird auf zwei Mengen und ihre Beziehung reduziert.",
+      "successFeedback": "Du hast Frage, Mengenbeziehung, Rechnung und Antwort richtig verbunden.",
+      "remediation": {
+        "strategy": "Die Geschichte wird auf zwei Mengen und ihre Beziehung reduziert.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Sachaufgabe“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Balkenmodell",
+        "keepSubskill": true
+      },
       "transferPrompt": "Erfinde eine andere Geschichte zur gleichen Rechnung.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "word-problem:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "word-problem:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "word-problem:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "word-problem:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "word-problem:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "word-problem:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "symmetry",
@@ -791,9 +1827,10 @@
         "maxValue": 1
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Das Kind wählt die zur vorgegebenen Achse passende gespiegelte Rasterfigur."
+        }
       ],
       "prerequisites": [
         "Links und rechts unterscheiden",
@@ -805,31 +1842,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "3×3-Raster mit deutlichen Distraktoren",
-          "numberRange": "0 bis 10",
+          "description": "Geprüfte 3x3-Figur an senkrechter Achse",
+          "numberRange": "3x3-Raster",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "4×4-Raster mit plausibler Verschiebung",
-          "numberRange": "0 bis 20",
+          "description": "Geprüfte 4x4-Figur mit plausiblem Verschiebungsdistraktor",
+          "numberRange": "4x4-Raster",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "5×5-Raster mit waagerechter oder senkrechter Achse",
-          "numberRange": "0 bis 20",
+          "description": "Geprüfte 5x5-Figur mit senkrechter oder waagerechter Achse",
+          "numberRange": "5x5-Raster",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "transfer"
         }
       ],
       "workedExample": "Ein Feld direkt neben der Achse liegt im Spiegel wieder direkt neben der Achse.",
-      "successFeedback": "Du hast Spiegelung und Verschiebung richtig unterschieden.",
-      "remediation": "Nur eine Rasterzeile wird zuerst gemeinsam gespiegelt.",
+      "successFeedback": "Du hast die richtige Spiegelung ausgewählt.",
+      "remediation": {
+        "strategy": "Nur eine Rasterzeile wird zuerst gemeinsam gespiegelt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Spiegelbilder“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Rasterbild",
+        "keepSubskill": true
+      },
       "transferPrompt": "Beschreibe, welche Felder beim Spiegeln ihre Seite wechseln.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "symmetry:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "symmetry:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "symmetry:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "symmetry:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "symmetry:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "symmetry:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "addition-1000",
@@ -854,9 +1972,14 @@
         "maxValue": 1000
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Stellenwerte bis 1000",
@@ -869,31 +1992,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Hunderter oder Zehner ohne Übergang; Material sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Hunderter- oder Zehneraddition ohne Übergang; Stellenwerttafel sichtbar",
+          "numberRange": "200 bis 990",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Eineraddition mit einem Zehnerübergang; Hilfe zeigt Teilschritte",
-          "numberRange": "0 bis 1000",
+          "description": "Eineraddition mit einem Zehnerübergang; Hilfe zeigt Sprünge",
+          "numberRange": "200 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Zehneraddition mit einem Übergang ohne sichtbares Material",
-          "numberRange": "0 bis 1000",
+          "description": "Zehneraddition mit einem Hunderterübergang ohne sichtbare Hilfe",
+          "numberRange": "200 bis 999",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "368 + 7: Erst +2 bis 370, dann +5 bis 375.",
-      "successFeedback": "Du hast stellenweise addiert und den Übergang sinnvoll zerlegt.",
-      "remediation": "Die Summanden werden nach Hundertern, Zehnern und Einern sortiert.",
+      "successFeedback": "Das Ergebnis der Plusaufgabe bis 1000 stimmt.",
+      "remediation": {
+        "strategy": "Die Summanden werden nach Hundertern, Zehnern und Einern sortiert.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Addieren bis 1000“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Stellenwerttafel",
+        "keepSubskill": true
+      },
       "transferPrompt": "Löse dieselbe Aufgabe auf einem Rechenstrich.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "addition-1000:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "addition-1000:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "addition-1000:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "addition-1000:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "addition-1000:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "addition-1000:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "subtraction-1000",
@@ -918,9 +2122,14 @@
         "maxValue": 1000
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Stellenwerte bis 1000",
@@ -933,31 +2142,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Hunderter oder Zehner ohne Entbündeln; Material sichtbar",
-          "numberRange": "0 bis 1000",
+          "description": "Ganze Hunderter ohne Entbündeln; Stellenwerttafel sichtbar",
+          "numberRange": "100 bis 900",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Gemischte Stellen ohne Entbündeln; Hilfe zeigt Teilschritte",
-          "numberRange": "0 bis 1000",
+          "description": "Zehner von einer gemischten Zahl ohne Entbündeln; Sprung auf Hilfe",
+          "numberRange": "100 bis 999",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Subtraktion über einen vollen Hunderter mit Ergänzungsstrategie",
-          "numberRange": "0 bis 1000",
+          "description": "Von einem vollen Hunderter in zwei Rückwärtssprüngen subtrahieren",
+          "numberRange": "100 bis 900",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "572 − 30: Drei Zehner weg, die Hunderter und Einer bleiben. Ergebnis 542.",
-      "successFeedback": "Du hast stellenweise subtrahiert, ohne die Stellen zu vertauschen.",
-      "remediation": "Es wird nur eine Stelle verändert und im Material gezeigt.",
+      "successFeedback": "Das Ergebnis der Minusaufgabe bis 1000 stimmt.",
+      "remediation": {
+        "strategy": "Es wird nur eine Stelle verändert und im Material gezeigt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Subtrahieren bis 1000“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Stellenwerttafel",
+        "keepSubskill": true
+      },
       "transferPrompt": "Prüfe dein Ergebnis durch Addition.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "subtraction-1000:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "subtraction-1000:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "subtraction-1000:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "subtraction-1000:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "subtraction-1000:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "subtraction-1000:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     },
     {
       "id": "complement-1000",
@@ -982,9 +2272,14 @@
         "maxValue": 1000
       },
       "processCompetencies": [
-        "Problemlösen",
-        "Darstellen",
-        "Kommunizieren"
+        {
+          "id": "representing",
+          "elicitedBy": "Die Aufgabe wird zwischen Material, Sprache und mathematischer Schreibweise verknüpft."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt eine passende Strategie und prüft das Ergebnis."
+        }
       ],
       "prerequisites": [
         "Nachbarzehner und Nachbarhunderter",
@@ -996,31 +2291,112 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Zum nächsten Zehner mit sichtbarem Sprung",
-          "numberRange": "0 bis 1000",
+          "description": "Zum nächsten Zehner mit sichtbarem Sprung ergänzen",
+          "numberRange": "0 bis 900",
           "representation": "always",
-          "cognitiveSteps": 1
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
         },
         {
           "level": 2,
-          "description": "Zum nächsten Hunderter in zwei sichtbaren Sprüngen",
+          "description": "Zum nächsten Hunderter über den nächsten Zehner ergänzen; Sprünge auf Hilfe",
           "numberRange": "0 bis 1000",
           "representation": "hint",
-          "cognitiveSteps": 2
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
         },
         {
           "level": 3,
-          "description": "Ergänzungsweg ohne sichtbaren Rechenstrich",
+          "description": "Zum nächsten Hunderter ohne sichtbaren Rechenstrich ergänzen",
           "numberRange": "0 bis 1000",
           "representation": "none",
-          "cognitiveSteps": 3
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
         }
       ],
       "workedExample": "Von 470 bis 500 fehlen 30.",
-      "successFeedback": "Du hast bis zur nächsten vollen Zahl ergänzt.",
-      "remediation": "Der Weg wird in einen kleinen und einen vollen Zehnersprung geteilt.",
+      "successFeedback": "Der fehlende Abstand stimmt.",
+      "remediation": {
+        "strategy": "Der Weg wird in einen kleinen und einen vollen Zehnersprung geteilt.",
+        "foundationStrategy": "Baue zuerst die Grundlage von „Zur vollen Zahl ergänzen“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "representation": "Rechenstrich",
+        "keepSubskill": true
+      },
       "transferPrompt": "Schreibe die passende Plusaufgabe.",
-      "releaseStatus": "active"
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "exerciseTypes": [
+            "complement-1000:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "exerciseTypes": [
+            "complement-1000:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "exerciseTypes": [
+            "complement-1000:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "exerciseTypes": [
+            "complement-1000:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "exerciseTypes": [
+            "complement-1000:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "exerciseTypes": [
+            "complement-1000:difficulty-3"
+          ],
+          "releaseStatus": "ready-for-review"
+        }
+      ],
+      "successCriteria": [
+        "Die Lösung ist mathematisch korrekt.",
+        "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
+        "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ]
     }
   ],
   "wordProblems": [
@@ -1044,7 +2420,33 @@
         "max": 6
       },
       "operationHint": "Zu Milas Muscheln kommen weitere dazu. Die neue Gesamtmenge wird mit Plus berechnet.",
-      "operationError": "Beide Mengen gehören nacheinander zu Mila. Verbinde sie zu einer größeren Gesamtmenge."
+      "operationError": "Beide Mengen gehören nacheinander zu Mila. Verbinde sie zu einer größeren Gesamtmenge.",
+      "relationshipLabel": "Eine vorhandene Menge wird durch Hinzufügen größer.",
+      "relationshipDistractors": [
+        "Zwei vorhandene Teilmengen bilden zusammen ein Ganzes.",
+        "Zwei Mengen werden über ihren Unterschied verglichen."
+      ],
+      "questionDistractors": [
+        "Wie viele Muscheln hatte Mila zuerst?",
+        "Wie viele Muscheln findet Mila am Strand?"
+      ],
+      "plausibility": {
+        "prompt": "Mila hatte {first} Muscheln und findet {second} dazu. Welche Aussage muss stimmen?",
+        "options": [
+          {
+            "label": "Das Ergebnis {result} ist größer als die Anfangsmenge {first}.",
+            "correct": true
+          },
+          {
+            "label": "Das Ergebnis {result} ist kleiner als die Anfangsmenge {first}.",
+            "correct": false
+          },
+          {
+            "label": "Das Ergebnis {result} ist genauso groß wie die neu gefundenen {second}.",
+            "correct": false
+          }
+        ]
+      }
     },
     {
       "id": "pencils-subtraction",
@@ -1066,7 +2468,33 @@
         "max": 8
       },
       "operationHint": "Von der Anfangsmenge werden Stifte weggenommen. Die verbleibende Menge wird mit Minus berechnet.",
-      "operationError": "Die herausgenommenen Stifte gehören danach nicht mehr zur Menge in der Kiste."
+      "operationError": "Die herausgenommenen Stifte gehören danach nicht mehr zur Menge in der Kiste.",
+      "relationshipLabel": "Von einer Anfangsmenge wird ein Teil weggenommen.",
+      "relationshipDistractors": [
+        "Ein fehlender Teil eines Ganzen wird ergänzt.",
+        "Mehrere gleich große Gruppen werden zusammengefasst."
+      ],
+      "questionDistractors": [
+        "Wie viele Buntstifte lagen zuerst in der Kiste?",
+        "Wie viele Buntstifte werden herausgenommen?"
+      ],
+      "plausibility": {
+        "prompt": "Von {first} Buntstiften werden {second} herausgenommen. Welche Aussage muss stimmen?",
+        "options": [
+          {
+            "label": "Die verbleibenden {result} sind kleiner als die Anfangsmenge {first}.",
+            "correct": true
+          },
+          {
+            "label": "Die verbleibenden {result} sind größer als die Anfangsmenge {first}.",
+            "correct": false
+          },
+          {
+            "label": "Nach dem Herausnehmen bleiben weiterhin genau {first} Stifte.",
+            "correct": false
+          }
+        ]
+      }
     },
     {
       "id": "books-combine",
@@ -1088,7 +2516,33 @@
         "max": 35
       },
       "operationHint": "Tierbücher und Weltraumbücher sind zwei Teile derselben Gesamtmenge.",
-      "operationError": "Hier verändert sich nichts. Zwei Teilmengen werden zu einer Gesamtmenge zusammengefasst."
+      "operationError": "Hier verändert sich nichts. Zwei Teilmengen werden zu einer Gesamtmenge zusammengefasst.",
+      "relationshipLabel": "Zwei vorhandene Teilmengen bilden zusammen ein Ganzes.",
+      "relationshipDistractors": [
+        "Eine Menge wird durch Hinzufügen verändert.",
+        "Zwei Mengen werden über ihren Unterschied verglichen."
+      ],
+      "questionDistractors": [
+        "Wie viele Tierbücher stehen im Regal?",
+        "Wie viele Weltraumbücher stehen im Regal?"
+      ],
+      "plausibility": {
+        "prompt": "{first} Tierbücher und {second} Weltraumbücher werden zusammengezählt. Welche Aussage stimmt?",
+        "options": [
+          {
+            "label": "Die Gesamtzahl {result} ist größer als jede der beiden Teilmengen.",
+            "correct": true
+          },
+          {
+            "label": "Die Gesamtzahl {result} muss kleiner als {first} sein.",
+            "correct": false
+          },
+          {
+            "label": "Die Gesamtzahl ist nur die größere Teilmenge {first}.",
+            "correct": false
+          }
+        ]
+      }
     },
     {
       "id": "stickers-compare",
@@ -1110,7 +2564,33 @@
         "max": 30
       },
       "operationHint": "Gesucht ist der Unterschied zwischen Noahs und Lias Stickerzahl.",
-      "operationError": "Vergleiche beide Mengen: Ziehe die kleinere Stickerzahl von der größeren ab."
+      "operationError": "Vergleiche beide Mengen: Ziehe die kleinere Stickerzahl von der größeren ab.",
+      "relationshipLabel": "Zwei Mengen werden über ihren Unterschied verglichen.",
+      "relationshipDistractors": [
+        "Zwei Teilmengen werden zu einer Gesamtmenge zusammengefasst.",
+        "Von einer Anfangsmenge wird ein Teil weggenommen."
+      ],
+      "questionDistractors": [
+        "Wie viele Sticker hat Noah?",
+        "Wie viele Sticker hat Lia?"
+      ],
+      "plausibility": {
+        "prompt": "Noah hat {first}, Lia {second} Sticker. Welche Aussage über den Unterschied {result} stimmt?",
+        "options": [
+          {
+            "label": "Der Unterschied {result} ist kleiner als Noahs Menge {first}.",
+            "correct": true
+          },
+          {
+            "label": "Der Unterschied {result} ist größer als Noahs Menge {first}.",
+            "correct": false
+          },
+          {
+            "label": "Der Unterschied ist die Summe {first} + {second}.",
+            "correct": false
+          }
+        ]
+      }
     },
     {
       "id": "seats-complement",
@@ -1132,7 +2612,33 @@
         "max": 35
       },
       "operationHint": "Besetzte und freie Plätze ergeben zusammen alle Sitzplätze. Gesucht ist der fehlende Teil.",
-      "operationError": "Die freien Plätze sind der fehlende Teil zwischen den besetzten Plätzen und allen Sitzplätzen."
+      "operationError": "Die freien Plätze sind der fehlende Teil zwischen den besetzten Plätzen und allen Sitzplätzen.",
+      "relationshipLabel": "Zu einem bekannten Teil wird der fehlende Teil des Ganzen gesucht.",
+      "relationshipDistractors": [
+        "Zwei Mengen werden nur über ihren Unterschied verglichen.",
+        "Mehrere gleich große Gruppen werden zusammengefasst."
+      ],
+      "questionDistractors": [
+        "Wie viele Sitzplätze hat der Bus insgesamt?",
+        "Wie viele Plätze sind besetzt?"
+      ],
+      "plausibility": {
+        "prompt": "Der Bus hat {first} Plätze, davon sind {second} besetzt. Welche Prüfung ist richtig?",
+        "options": [
+          {
+            "label": "{second} besetzte plus {result} freie Plätze ergeben {first} Plätze.",
+            "correct": true
+          },
+          {
+            "label": "{second} besetzte plus {result} freie Plätze ergeben nur {second} Plätze.",
+            "correct": false
+          },
+          {
+            "label": "Die Zahl der freien Plätze {result} ist größer als alle {first} Plätze.",
+            "correct": false
+          }
+        ]
+      }
     },
     {
       "id": "teams-equal-groups",
@@ -1154,7 +2660,81 @@
         "max": 8
       },
       "operationHint": "Jedes Team hat gleich viele Kinder. Gleich große Gruppen lassen sich mit Mal zusammenfassen.",
-      "operationError": "Die Kinderzahl pro Team wird für jedes Team gleich oft genommen."
+      "operationError": "Die Kinderzahl pro Team wird für jedes Team gleich oft genommen.",
+      "relationshipLabel": "Mehrere gleich große Gruppen bilden zusammen die Gesamtmenge.",
+      "relationshipDistractors": [
+        "Zwei verschiedene Teilmengen bilden ein Ganzes.",
+        "Von einer Anfangsmenge wird ein Teil weggenommen."
+      ],
+      "questionDistractors": [
+        "Wie viele Teams gibt es?",
+        "Wie viele Kinder sind in einem Team?"
+      ],
+      "plausibility": {
+        "prompt": "{first} Teams haben je {second} Kinder. Welche Aussage zur Gesamtzahl {result} stimmt?",
+        "options": [
+          {
+            "label": "Die Gesamtzahl {result} ist größer als die Kinderzahl {second} eines Teams.",
+            "correct": true
+          },
+          {
+            "label": "Die Gesamtzahl {result} ist kleiner als die Kinderzahl {second} eines Teams.",
+            "correct": false
+          },
+          {
+            "label": "Die Gesamtzahl {result} ist kleiner als die Anzahl der Teams {first}.",
+            "correct": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "cards-sharing",
+      "relationship": "sharing",
+      "operation": ":",
+      "story": "{total} Karten werden gleichmäßig auf {first} Kinder verteilt. {irrelevant} Wie viele Karten bekommt jedes Kind?",
+      "question": "Wie viele Karten bekommt jedes Kind?",
+      "relevant": "{total} Karten werden gleichmäßig auf {first} Kinder verteilt",
+      "irrelevant": "Die Karten haben verschiedene Farben.",
+      "answer": "Jedes Kind bekommt {result} Karten.",
+      "minDifficulty": 2,
+      "representation": "groups",
+      "firstRange": {
+        "min": 2,
+        "max": 6
+      },
+      "secondRange": {
+        "min": 2,
+        "max": 8
+      },
+      "operationHint": "Die Gesamtmenge wird in {first} gleich große Gruppen verteilt. Deshalb passt Geteilt.",
+      "operationError": "Gesucht ist die Größe einer von {first} gleich großen Gruppen.",
+      "relationshipLabel": "Eine Gesamtmenge wird gleichmäßig auf mehrere Gruppen verteilt.",
+      "relationshipDistractors": [
+        "Mehrere gleich große Gruppen werden zu einer Gesamtmenge zusammengefasst.",
+        "Von einer Anfangsmenge wird ein Teil weggenommen."
+      ],
+      "questionDistractors": [
+        "Wie viele Karten werden insgesamt verteilt?",
+        "Auf wie viele Kinder werden die Karten verteilt?"
+      ],
+      "plausibility": {
+        "prompt": "{total} Karten werden auf {first} Kinder verteilt. Welche Aussage zu {result} Karten je Kind stimmt?",
+        "options": [
+          {
+            "label": "{first} Gruppen mit je {result} Karten ergeben zusammen {total} Karten.",
+            "correct": true
+          },
+          {
+            "label": "Jedes Kind bekommt mehr als die Gesamtzahl {total}.",
+            "correct": false
+          },
+          {
+            "label": "{result} Karten je Kind ergeben zusammen nur {first} Karten.",
+            "correct": false
+          }
+        ]
+      }
     }
   ],
   "wordProblemSteps": {
@@ -1169,19 +2749,23 @@
     "operationOptions": [
       {
         "value": "+",
-        "label": "Plus: Es kommt etwas dazu."
+        "label": "Plus (+): Teilmengen oder eine hinzugefügte Menge verbinden"
       },
       {
         "value": "−",
-        "label": "Minus: Es geht etwas weg."
+        "label": "Minus (−): Unterschied oder fehlenden Teil bestimmen"
       },
       {
         "value": "·",
-        "label": "Mal: Es gibt gleich große Gruppen."
+        "label": "Mal (·): mehrere gleich große Gruppen zusammenfassen"
+      },
+      {
+        "value": ":",
+        "label": "Geteilt (:): eine Menge gleichmäßig verteilen"
       }
     ],
-    "additionError": "Im Text kommt etwas dazu.",
-    "subtractionError": "Im Text wird etwas herausgenommen.",
+    "additionError": "Prüfe, ob Teilmengen verbunden werden oder eine Menge größer wird.",
+    "subtractionError": "Prüfe, ob ein Unterschied, ein Rest oder ein fehlender Teil gesucht wird.",
     "operationSuccess": "Diese Rechenart passt zur Geschichte.",
     "calculatePrompt": "Rechne: {first} {operation} {second} = ?",
     "calculateError": "Rechne die beiden wichtigen Zahlen noch einmal.",
@@ -1192,13 +2776,9 @@
     "additionHint": "Es kommt etwas dazu. Die Menge wird größer.",
     "subtractionHint": "Es geht etwas weg. Die Menge wird kleiner.",
     "questionPrompt": "Welche Frage soll beantwortet werden?",
-    "questionDistractors": [
-      "Wie heißt das Kind in der Geschichte?",
-      "Welche Farbe wird genannt?"
-    ],
     "questionError": "Suche den Satz, der nach einer unbekannten Menge fragt.",
     "questionSuccess": "Du hast erkannt, was gesucht wird.",
-    "multiplicationError": "Es gibt mehrere gleich große Gruppen.",
+    "multiplicationError": "Prüfe, ob mehrere gleich große Gruppen zusammengefasst werden.",
     "multiplicationHint": "Gleich große Gruppen kannst du mit einer Malaufgabe zusammenfassen.",
     "representationPrompt": "Welche Darstellung passt zur Beziehung?",
     "barModelLabel": "Balkenmodell für Teil und Ganzes",
@@ -1206,12 +2786,11 @@
     "noModelLabel": "Eine zufällige Zahlenliste",
     "representationError": "Die Darstellung muss zeigen, wie die Mengen zusammenhängen.",
     "representationSuccess": "Diese Darstellung macht die Beziehung sichtbar.",
-    "plausibilityPrompt": "Passt die Größe des Ergebnisses zur Geschichte?",
-    "plausibleLabel": "Ja, das Ergebnis passt zu den Mengen.",
-    "tooSmallLabel": "Nein, das Ergebnis müsste immer kleiner als beide Zahlen sein.",
-    "tooLargeLabel": "Nein, das Ergebnis müsste immer größer als 1000 sein.",
     "plausibilityError": "Vergleiche das Ergebnis noch einmal mit den Mengen aus der Geschichte.",
-    "plausibilitySuccess": "Du hast nicht nur gerechnet, sondern das Ergebnis auch geprüft."
+    "plausibilitySuccess": "Du hast nicht nur gerechnet, sondern das Ergebnis auch geprüft.",
+    "relationshipPrompt": "Welche Mengenbeziehung beschreibt die Geschichte?",
+    "relationshipError": "Achte darauf, was mit den Mengen geschieht und welche Menge gesucht wird.",
+    "relationshipSuccess": "Diese Mengenbeziehung passt zur Geschichte."
   },
   "symmetry": {
     "optionLabels": [
@@ -1221,7 +2800,121 @@
     ],
     "templates": [
       {
-        "id": "stairs",
+        "id": "stairs-3",
+        "difficulty": 1,
+        "axis": "vertical",
+        "grid": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ],
+        "shiftGrid": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ],
+        "wrongAxisGrid": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "hook-3",
+        "difficulty": 1,
+        "axis": "vertical",
+        "grid": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "shiftGrid": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ],
+        "wrongAxisGrid": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "stairs-4",
+        "difficulty": 2,
+        "axis": "vertical",
         "grid": [
           [
             1,
@@ -1247,10 +2940,64 @@
             1,
             0
           ]
+        ],
+        "shiftGrid": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ],
+        "wrongAxisGrid": [
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ]
         ]
       },
       {
-        "id": "hook",
+        "id": "hook-4",
+        "difficulty": 2,
+        "axis": "vertical",
         "grid": [
           [
             0,
@@ -1276,18 +3023,204 @@
             1,
             0
           ]
+        ],
+        "shiftGrid": [
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ]
+        ],
+        "wrongAxisGrid": [
+          [
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ]
         ]
       },
       {
-        "id": "zigzag",
+        "id": "path-5",
+        "difficulty": 3,
+        "axis": "vertical",
+        "grid": [
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1,
+            0
+          ]
+        ],
+        "shiftGrid": [
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            1
+          ]
+        ],
+        "wrongAxisGrid": [
+          [
+            0,
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "corner-5",
+        "difficulty": 3,
+        "axis": "horizontal",
         "grid": [
           [
             1,
             1,
             0,
+            0,
             0
           ],
           [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
             0,
             1,
             0,
@@ -1297,16 +3230,209 @@
             0,
             1,
             1,
+            0,
+            0
+          ]
+        ],
+        "shiftGrid": [
+          [
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1,
             0
           ],
           [
             0,
             0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ]
+        ],
+        "wrongAxisGrid": [
+          [
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
             1,
             0
           ]
         ]
       }
     ]
+  },
+  "fieldUsage": {
+    "workedExample": "review",
+    "remediation": "runtime",
+    "transferPrompt": "planned",
+    "processCompetencies": "review",
+    "difficultyLevels": "runtime",
+    "representations": "review",
+    "misconceptions": "review",
+    "successFeedback": "runtime",
+    "errorFeedback": "runtime",
+    "releaseStatus": "runtime",
+    "learningPhases": "runtime",
+    "successCriteria": "review"
+  },
+  "preparedTopics": [
+    {
+      "id": "money",
+      "label": "Geldwerte",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Euro und Cent darstellen, vergleichen und in einfachen Kaufsituationen verwenden.",
+      "prerequisites": [
+        "Stellenwertverständnis",
+        "Addition und Subtraktion bis 1000"
+      ],
+      "representations": [
+        "Münzen und Scheine",
+        "Preisschilder",
+        "Balkenmodell"
+      ],
+      "misconceptions": [
+        "Euro und Cent werden ohne Einheitenbezug wie ganze Zahlen behandelt.",
+        "Beim Wechselgeld wird Kaufpreis und Rückgabe vertauscht."
+      ],
+      "progression": [
+        "Geldwerte erkennen",
+        "gleichwertige Darstellungen finden",
+        "Preise addieren",
+        "Wechselgeld ergänzen"
+      ],
+      "remediation": "Zu realistischen Münzbildern und Ergänzen zum nächsten vollen Euro zurückkehren.",
+      "releaseStatus": "disabled"
+    },
+    {
+      "id": "lengths",
+      "label": "Längen",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Längen schätzen, messen, vergleichen und zwischen mm, cm und m passend darstellen.",
+      "prerequisites": [
+        "Zahlen bis 1000",
+        "Stellenwertverständnis"
+      ],
+      "representations": [
+        "Messstrecke",
+        "Lineal",
+        "Größenvergleich"
+      ],
+      "misconceptions": [
+        "Die größere Maßzahl wird unabhängig von der Einheit für länger gehalten.",
+        "Einheiten werden beim Umrechnen vertauscht."
+      ],
+      "progression": [
+        "passende Einheit wählen",
+        "mit einer Skala messen",
+        "Längen vergleichen",
+        "einfache Einheitenbeziehungen nutzen"
+      ],
+      "remediation": "An einer Messstrecke dieselbe Länge in zwei Einheiten sichtbar machen.",
+      "releaseStatus": "disabled"
+    },
+    {
+      "id": "spatial-reasoning",
+      "label": "Raumvorstellung",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Ansichten, Lageänderungen und einfache Kopfgeometrie an geprüften Modellen verstehen.",
+      "prerequisites": [
+        "Lagebegriffe",
+        "ebene Figuren erkennen",
+        "einfache Symmetrie"
+      ],
+      "representations": [
+        "Würfelbauwerk",
+        "Ansichtenraster",
+        "Faltvorlage"
+      ],
+      "misconceptions": [
+        "Drehen wird mit Spiegeln verwechselt.",
+        "Verdeckte Würfel werden nicht berücksichtigt."
+      ],
+      "progression": [
+        "Ansichten zuordnen",
+        "Körper gedanklich drehen",
+        "einfache Kippbewegungen verfolgen",
+        "Faltungen vorhersagen"
+      ],
+      "remediation": "Mit einem kleinen sichtbaren Würfelmodell und nur einer Lageänderung beginnen.",
+      "releaseStatus": "disabled"
+    }
+  ],
+  "strategySteps": {
+    "placeValue": {
+      "digitPrompt": "Welche Ziffer steht bei {number} an der {position}stelle?",
+      "digitError": "Lies zuerst nur die Ziffer an der {position}stelle ab.",
+      "digitSuccess": "Die Ziffer {digit} steht an der richtigen Stelle.",
+      "valuePrompt": "Welchen Wert hat die Ziffer {digit} dort?",
+      "valueError": "Ziffer und Wert sind verschieden: Entscheidend ist die Stelle.",
+      "valueSuccess": "Richtig: Die Ziffer {digit} hat dort den Wert {answer}."
+    },
+    "rounding": {
+      "neighborsPrompt": "Zwischen welchen beiden Nachbarzahlen liegt {number}?",
+      "neighborsError": "Bestimme zuerst die kleinere und die größere Nachbarzahl.",
+      "neighborsSuccess": "Die Nachbarzahlen {lower} und {upper} stimmen.",
+      "resultPrompt": "Auf welche Nachbarzahl wird {number} gerundet?",
+      "resultError": "Vergleiche die Abstände {lowerDistance} und {upperDistance}.",
+      "resultSuccess": "{number} wird auf {answer} gerundet.",
+      "reasonPrompt": "Welche Begründung passt?",
+      "reasonError": "Vergleiche beide Abstände. Bei gleichem Abstand gilt die Grundschulregel: aufrunden.",
+      "reasonSuccess": "Die Begründung passt zu den Abständen.",
+      "closerLower": "{number} liegt näher bei {lower} als bei {upper}.",
+      "closerUpper": "{number} liegt näher bei {upper} als bei {lower}.",
+      "halfwayUp": "{number} liegt genau in der Mitte; deshalb wird auf {upper} aufgerundet.",
+      "wrongLower": "Man rundet diese Zahl immer auf {lower} ab.",
+      "wrongUpper": "Man rundet diese Zahl immer auf {upper} auf."
+    }
   }
 }

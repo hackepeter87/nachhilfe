@@ -1,6 +1,6 @@
 services:
   mathe-reise:
-    image: ghcr.io/hackepeter87/nachhilfe:0.3.0
+    image: ghcr.io/hackepeter87/nachhilfe:0.5.0
     ports:
       - "127.0.0.1:8080:8080"
     read_only: true

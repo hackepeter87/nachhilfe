@@ -1,7 +1,7 @@
 import { generateExercise } from './generators'
 import { dailySeed, seededRandom } from './random'
 import { selectionWeight, subskillWeight } from './progress'
-import { getActiveCatalogMetadata } from '../content/catalog'
+import { getActiveCatalogMetadata, isSkillEnabled } from '../content/catalog'
 import { APP_VERSION } from '../version'
 import type { Difficulty, Exercise, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId } from './types'
 
@@ -32,7 +32,7 @@ function weightedIndex(weights: number[], random: () => number): number {
 
 function weightedSkills(progress: ProgressMap, seed: number, count: number): SkillId[] {
   const random = seededRandom(seed)
-  const available = [...FOCUS_SKILLS]
+  const available = FOCUS_SKILLS.filter(isSkillEnabled)
   const selected: SkillId[] = []
   while (selected.length < count && available.length > 0) {
     const weights = available.map((skill) => selectionWeight(progress[skill]))
@@ -45,19 +45,20 @@ function weightedSkills(progress: ProgressMap, seed: number, count: number): Ski
 
 function warmupSkills(progress: ProgressMap, seed: number): SkillId[] {
   const random = seededRandom(seed)
+  const available = WARMUP_SKILLS.filter(isSkillEnabled)
   const selected: SkillId[] = []
   for (let round = 0; round < 2; round += 1) {
-    const weights = WARMUP_SKILLS.map((skill) => selectionWeight(progress[skill]) * (selected.includes(skill) ? 0.45 : 1))
-    selected.push(WARMUP_SKILLS[weightedIndex(weights, random)] as SkillId)
+    const weights = available.map((skill) => selectionWeight(progress[skill]) * (selected.includes(skill) ? 0.45 : 1))
+    selected.push(available[weightedIndex(weights, random)] as SkillId)
   }
   return selected
 }
 
 function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, difficulty: Difficulty): string | undefined {
   const candidates = skillId === 'addition'
-    ? ['addition-within-10', 'addition-bridge-10']
+    ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])
     : skillId === 'subtraction'
-      ? ['subtraction-within-10', 'subtraction-bridge-10']
+      ? (difficulty === 1 ? ['subtraction-within-10'] : ['subtraction-bridge-10'])
       : skillId === 'multiplication'
         ? (difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]).map((row) => `times-${row}`)
         : skillId === 'division'
@@ -96,7 +97,7 @@ export function createSessionPlan(
 ): SessionPlan {
   const warmups = warmupSkills(progress, seed + 17)
   const focus = weightedSkills(progress, seed + 31, 3)
-  const skills = [...warmups, ...focus, 'word-problem', 'symmetry'] as SkillId[]
+  const skills = [...warmups, ...focus, ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled)]
   const exercises = skills.map((skillId, index) => {
     const skillProgress = progress[skillId]
     const difficulty = skillProgress?.difficulty ?? 1
@@ -116,4 +117,14 @@ export function createSessionPlan(
 export function createRepetitionExercise(skillId: SkillId, seed: number, difficulty: Difficulty, lastVariantKey: string, subskillId?: string): Exercise {
   const easier = Math.max(1, difficulty - 1) as Difficulty
   return uniqueExercise(skillId, seed + 7_919, easier, lastVariantKey, subskillId)
+}
+
+export function createRemediationExercise(exercise: Exercise, seed: number): Exercise {
+  return uniqueExercise(
+    exercise.skillId,
+    seed + 7_919,
+    exercise.remediation.nextDifficulty,
+    exercise.variant.key,
+    exercise.remediation.keepSubskill ? exercise.subskillId : undefined
+  )
 }

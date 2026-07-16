@@ -20,7 +20,15 @@ export const SKILL_IDS = [
 export type SkillId = typeof SKILL_IDS[number]
 
 export type Difficulty = 1 | 2 | 3
-export type AnswerMode = 'number' | 'choice' | 'guided-word' | 'symmetry'
+export type AnswerMode = 'number' | 'choice' | 'guided-choice' | 'guided-word' | 'symmetry'
+
+export type LearningPhase =
+  | 'activate'
+  | 'understand'
+  | 'guided-practice'
+  | 'independent-practice'
+  | 'automate'
+  | 'transfer'
 
 export interface Hint {
   level: 1 | 2
@@ -36,11 +44,25 @@ export interface AnswerOption {
 
 export type RepresentationKind = 'place-value' | 'number-line' | 'bar-model' | 'groups'
 
+export interface NumberLineJump {
+  from: number
+  to: number
+  label: string
+}
+
+export interface DifficultyRequirements {
+  requiresNeighborIdentification: boolean
+  requiresRepresentationChoice: boolean
+  requiresOperationChoice: boolean
+  requiresJustification: boolean
+  requiresMultiStepCalculation: boolean
+}
+
 export interface ExerciseRepresentation {
   kind: RepresentationKind
   visibility: 'always' | 'hint'
   label: string
-  values: Record<string, number | string>
+  values: Record<string, number | string | NumberLineJump[]>
 }
 
 export interface ExerciseStep {
@@ -63,6 +85,7 @@ export interface Exercise {
   typeId: string
   skillId: SkillId
   difficulty: Difficulty
+  learningPhase: LearningPhase
   title: string
   prompt: string
   answerMode: AnswerMode
@@ -76,14 +99,22 @@ export interface Exercise {
   successFeedback: string
   errorFeedback: string
   explanation: string
+  remediation: {
+    helpLevel: 4 | 5
+    nextDifficulty: Difficulty
+    keepSubskill: boolean
+    strategy: string
+    representation: string
+  }
   variant: ExerciseVariant
   testMetadata: {
     min: number
     max: number
     uniqueSolution: true
-    cognitiveSteps: number
+    requirements: DifficultyRequirements
     representation: RepresentationKind | 'none'
     distractorSources: string[]
+    learningPhase: LearningPhase
   }
 }
 
@@ -116,6 +147,7 @@ export interface SkillProgress {
   hintsUsed: number
   lastPracticedAt: string | null
   difficulty: Difficulty
+  learningPhase: LearningPhase
   mastery: number
   recentErrors: number
   correctStreak: number

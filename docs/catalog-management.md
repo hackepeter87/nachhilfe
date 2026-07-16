@@ -25,11 +25,11 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 
 ```json
 {
-  "schemaVersion": 2,
-  "catalogVersion": "0.2.0",
+  "schemaVersion": 4,
+  "catalogVersion": "0.4.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-16",
-  "status": "review"
+  "status": "ready-for-review"
 }
 ```
 
@@ -37,9 +37,9 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 - `catalogVersion` bezeichnet die fachliche Inhaltsversion und folgt SemVer.
 - `catalogId` ist die stabile Kennung dieses Förderkatalogs.
 - `releasedAt` ist das geplante Veröffentlichungsdatum im Format `YYYY-MM-DD`.
-- `status` ist `draft`, `review` oder `approved`.
+- `status` ist `draft`, `ready-for-review`, `active` oder `disabled`.
 
-`draft` ist nur für Entwicklung und Tests gedacht und wird vom Produktionsbuild abgelehnt. `review` bedeutet technisch validiert und zur fachlichen Erprobung vorgesehen. `approved` darf nur gesetzt werden, wenn eine geeignete Lehrkraft die konkrete Katalogversion nachweislich geprüft und freigegeben hat. Der aktuelle Katalog steht deshalb auf `review`.
+`draft` ist inkonsistent oder in Entwicklung. `ready-for-review` ist intern vollständig und technisch geprüft. `active` wird für tatsächlich von Generator, UI und Tests getragene Inhalte verwendet. `disabled` bleibt unsichtbar. Der Gesamtkatalog steht auf `ready-for-review`, die produktiven Kompetenzen auf `active`; dies behauptet keine externe Lehrkraftfreigabe.
 
 ## Versionsregeln
 
@@ -70,6 +70,8 @@ npm run catalog:check     # Artefakte und Produktionsstatus abgleichen
 
 Die Validierung prüft Metadaten, bekannte und eindeutige Kompetenz-IDs, Pflichtfelder, Platzhalter, Zahlenbereiche, Sachaufgaben, Symmetrievarianten und eindeutige Optionen. `npm run build` führt `catalog:check` automatisch vor Vite aus. CI führt dieselbe Prüfung explizit aus.
 
+Schema 4 ergänzt das vereinfachte Statusmodell, sechs Lernphasen, Erfolgskriterien, strukturierte Remediation, Strategie-Schritttexte und deaktiviert vorbereitete Themen. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
+
 ## Sitzungen und Altdaten
 
 Beim Start einer Runde werden `catalogId`, `catalogVersion`, `schemaVersion` und `appVersion` in den Sitzungsplan kopiert. Alle Aufgaben dieser Runde werden mit diesem unveränderlichen Katalog-Snapshot erzeugt. Eine abgeschlossene Sitzung übernimmt dieselben Angaben.
@@ -92,8 +94,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build -t mathe-reise:0.3.0 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.3.0
+docker build -t mathe-reise:0.5.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.5.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.

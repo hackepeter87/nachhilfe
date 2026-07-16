@@ -1,4 +1,5 @@
-import type { AppSettings, CompletedSession, Profile, ProgressMap, SkillProgress } from '../domain'
+import { learningPhaseFor } from '../domain/progress'
+import type { AppSettings, CompletedSession, Profile, ProgressMap, SkillProgress } from '../domain/types'
 
 const DB_NAME = 'mathe-reise'
 const DB_VERSION = 1
@@ -39,6 +40,13 @@ export function migrateCompletedSession(session: CompletedSession | Record<strin
     catalogVersion: typeof session.catalogVersion === 'string' ? session.catalogVersion : LEGACY_SESSION_METADATA.catalogVersion,
     schemaVersion: typeof session.schemaVersion === 'number' ? session.schemaVersion : LEGACY_SESSION_METADATA.schemaVersion,
     appVersion: typeof session.appVersion === 'string' ? session.appVersion : LEGACY_SESSION_METADATA.appVersion
+  }
+}
+
+export function migrateSkillProgress(progress: SkillProgress): SkillProgress {
+  return {
+    ...progress,
+    learningPhase: progress.learningPhase ?? learningPhaseFor(progress.attempts, progress.mastery, progress.difficulty, progress.status)
   }
 }
 
@@ -106,7 +114,7 @@ export async function loadAppData(): Promise<AppData> {
   return {
     profile: profile ?? null,
     settings: settings ?? { key: 'app-settings', installHelpDismissed: false, schemaVersion: 1 },
-    progress: Object.fromEntries(progressRows.map((entry) => [entry.skillId, entry])) as ProgressMap,
+    progress: Object.fromEntries(progressRows.map((entry) => [entry.skillId, migrateSkillProgress(entry)])) as ProgressMap,
     sessions: sessions.map(migrateCompletedSession).sort((first, second) => second.completedAt.localeCompare(first.completedAt))
   }
 }
