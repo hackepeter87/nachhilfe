@@ -12,6 +12,7 @@
 - [ ] `npm test`
 - [ ] `npm run build`
 - [ ] Relevante E2E-/Container-Prüfungen
+- [ ] Read-only-Rootfs und Compose-Konfiguration geprüft, falls Containerbetrieb betroffen ist
 
 ## Didaktische Prüfung bei Katalogänderungen
 

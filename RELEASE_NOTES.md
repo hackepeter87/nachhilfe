@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## GHCR- und Podman-Deployment 0.3.0
+
+- Ein eigener Workflow veröffentlicht Git-Tags `vX.Y.Z` nach `ghcr.io/hackepeter87/nachhilfe` und erzeugt SemVer-, SHA- sowie kontrollierte `latest`-Tags.
+- Dynamische OCI-Labels ersetzen die zuvor im Dockerfile fest eingetragene Versionsnummer.
+- `deploy/compose.yaml` pinnt Version `0.3.0`, bindet nur an `127.0.0.1:8080` und benötigt weder Umgebungsvariablen noch Volumes.
+- Der Container läuft mit schreibgeschütztem Root-Dateisystem, nur `/tmp` als tmpfs, ohne Capabilities und mit `no-new-privileges`.
+- CI prüft Compose-Syntax, Read-only-Start, Healthcheck, zentrale PWA-Ressourcen sowie Security- und Cache-Header.
+- Die Deployment-Dokumentation beschreibt GHCR-Sichtbarkeit, Betrieb, Reverse Proxy, HTTPS, Update, Rollback und den Tag-basierten Releaseprozess.
+
+Podman war in der Entwicklungsumgebung nicht installiert und wird nicht als lokal getestet ausgewiesen. Ein GitHub Release wird durch den Publish-Workflow nicht automatisch erstellt.
+
+Lokal erfolgreich geprüft wurden Compose-Parsing und -Start mit Docker Compose, Read-only-Rootfs mit ausschließlich `/tmp` als tmpfs, UID 101, vollständiger Capability-Drop, `no-new-privileges`, Healthcheck, alle zentralen PWA-Ressourcen, Security-/Cache-Header sowie die vollständige Offline-E2E-Suite gegen den gehärteten Container. Podman-Befehle sind dokumentiert, aber mangels lokaler Podman-Installation nicht ausgeführt.
+
 ## Katalog-Releases 0.3.0
 
 - Schema- und Inhaltsversion sind als `schemaVersion: 2` und `catalogVersion: 0.2.0` getrennt; Katalog-ID, Veröffentlichungsdatum und Freigabestatus werden validiert.
