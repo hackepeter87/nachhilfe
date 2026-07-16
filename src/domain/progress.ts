@@ -34,7 +34,8 @@ export function learningPhaseFor(attempts: number, mastery: number, difficulty: 
   if (mastery < 45) return 'understand'
   if (difficulty === 1) return 'guided-practice'
   if (difficulty === 2) return 'independent-practice'
-  return status === 'secure' ? 'automate' : 'independent-practice'
+  if (status !== 'secure') return 'independent-practice'
+  return mastery >= 92 ? 'transfer' : 'automate'
 }
 
 export type RepetitionState = 'new' | 'building' | 'review' | 'secure' | 'overdue'

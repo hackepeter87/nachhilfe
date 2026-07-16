@@ -25,7 +25,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(4)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.4.0')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.5.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -96,14 +96,27 @@ describe('versionierter Aufgabenkatalog', () => {
     catalog.wordProblems.forEach((template) => {
       for (let first = template.firstRange.min; first <= template.firstRange.max; first += 1) {
         for (let second = template.secondRange.min; second <= template.secondRange.max; second += 1) {
-          const result = template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
-          expect(result).toBeGreaterThanOrEqual(0)
-          const answer = renderCatalogText(template.answer, { first, second, result })
-          expect(answer).toContain(String(result))
-          expect(answer).not.toMatch(/\{\w+\}/)
+          const intermediate = template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
+          const thirds = template.thirdRange ? [template.thirdRange.min, template.thirdRange.max] : [0]
+          thirds.forEach((third) => {
+            const result = template.secondOperation === '+' ? intermediate + third : template.secondOperation === '−' ? intermediate - third : intermediate
+            expect(result).toBeGreaterThanOrEqual(0)
+            expect(result).toBeLessThanOrEqual(1000)
+            const answer = renderCatalogText(template.answer, { first, second, third, intermediate, result })
+            expect(answer).toContain(String(result))
+            expect(answer).not.toMatch(/\{\w+\}/)
+          })
         }
       }
     })
+  })
+
+  it('lehnt unvollständige zweischrittige Sachaufgaben ab', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    const multiStep = catalog.wordProblems.find((template) => template.secondOperation)
+    expect(multiStep).toBeDefined()
+    delete multiStep!.thirdRange
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('erzeugt je Symmetrievorlage genau eine unterscheidbare Spiegelung', () => {

@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Rechenstrategien und Transfer 0.7.0
+
+- Addition bis 1000 prüft bei Einer- und Zehnerübergängen zuerst die passende volle Zwischenzahl und danach das Endergebnis.
+- Subtraktion bis 1000 ergänzt kontrolliertes Entbündeln an genau einer Einer- oder Zehnerstelle. Mehrere gleichzeitige Übergänge und schriftliche Verfahren bleiben ausgeschlossen.
+- Der Katalog enthält zwei kurze zweischrittige Sachaufgaben. Zwischenergebnis, zweite Rechenart, Endergebnis, Antwortsatz und Plausibilität werden konsistent geführt.
+- Lernphasen wirken nun auf die tatsächliche Generatorschwierigkeit und Hilfsdarstellung: Einstieg und Verstehen nutzen Stufe 1, selbstständiges Üben Stufe 2, Automatisieren und Transfer Stufe 3.
+- Der Katalog steigt inhaltlich auf 0.5.0; das kompatible Schema bleibt bei 4 und der Status bei `ready-for-review`.
+- Dokumentation, PR-Checkliste und historischer Backlog wurden gegen den tatsächlich produktiven Umfang abgeglichen.
+
+Eine Freigabe durch eine Lehrkraft und ein Test auf einem echten iPhone sind weiterhin nicht dokumentiert. Die offenen manuellen Nachweise stehen in `docs/validation-0.6.md` und den Issues #58 und #59.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 149 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und drei Playwright-Szenarien jeweils gegen Vite Preview und den Container. Die vollständige Runde lief bei `375 x 812` nach Reload und Offline-Neustart bis zum Abschluss; Landscape `812 x 375` blieb ohne horizontales Overflow. Das OCI-Image `mathe-reise:0.7.0` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Podman war nicht installiert und wurde nicht als ausgeführt behauptet.
+
 ## Punktgruppen-Hotfix 0.5.1
 
 - Faktoren, Divisoren und Quotienten bleiben im kleinen Einmaleins zwischen 2 und 10; die bestehenden Produkthöchstwerte der Schwierigkeitsstufen bleiben erhalten.

@@ -28,11 +28,11 @@
 - [ ] Keine personenbezogenen Inhalte
 - [ ] `catalogVersion` und `releasedAt` wurden korrekt erhöht
 - [ ] `npm run catalog:build` hat beide Artefakte aus der zentralen Quelle erzeugt
-- [ ] Der Status bildet den belegten Freigabestand ab; `approved` ist dokumentiert
+- [ ] Der Status bildet den belegten Freigabestand mit `draft`, `ready-for-review`, `active` oder `disabled` ab
 
 ## Manuelle Abnahme
 
-- [ ] Fachliche Freigabe durch geeignete Lehrkraft dokumentiert, falls `status: approved`
+- [ ] Fachliche Freigabe durch geeignete Lehrkraft separat dokumentiert, falls sie behauptet wird
 - [ ] Echter iPhone-Test durchgeführt, falls hier als bestanden angegeben
 
 Nicht durchgeführte Prüfungen und bekannte Restpunkte:

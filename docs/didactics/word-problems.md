@@ -17,9 +17,9 @@ Frage, Angaben, Beziehung, Operation, Darstellung, Rechnung, Antwortsatz und Pla
 ## 8. Geeignete Darstellungen
 Balkenmodell für Teil-Ganzes/Unterschied und Gruppenbild für Multiplikation/Division.
 ## 9. Lernprogression
-Stufe 1 eindeutige Handlung; Stufe 2 Frage und Darstellung wählen; Stufe 3 Nebendetail und Plausibilität.
+Stufe 1 eindeutige Handlung; Stufe 2 Frage und Darstellung wählen; Stufe 3 Nebendetail, Plausibilität und bei ausgewählten Vorlagen zwei aufeinanderfolgende Handlungen.
 ## 10. Aufgabentypen
-Hinzufügen, Wegnehmen, Zusammenfassen, Vergleichen, Ergänzen, gleich große Gruppen, gleichmäßig Verteilen.
+Hinzufügen, Wegnehmen, Zusammenfassen, Vergleichen, Ergänzen, gleich große Gruppen, gleichmäßig Verteilen sowie zwei kurze Folgen „dazu, dann weg“ und „weg, dann dazu“.
 ## 11. Hilfestufen
 Gesuchte Größe benennen; Veränderung/Gleichheit klären; passendes Modell wählen; Rechnung am Modell prüfen.
 ## 12. Remediation
@@ -31,6 +31,6 @@ Gleiche Beziehung mit anderer Oberfläche und anderen Zahlen, nicht derselbe Tex
 ## 15. Erfolgskriterien
 Text, Beziehung, Operation, Modell, Ergebnis und Antwortsatz sind vollständig konsistent.
 ## 16. Grenzen der aktuellen Umsetzung
-Mehrstufige Situationen, Geld und Längen sind deaktiviert; freie Antwortsätze werden nicht bewertet.
+Komplexere mehrstufige Situationen, Geld und Längen sind deaktiviert; freie Antwortsätze werden nicht bewertet.
 ## 17. Punkte für die Gesamtprüfung
 Sprachliche Zugänglichkeit und Lebensnähe der sieben Vorlagen im Gesamtprodukt prüfen.

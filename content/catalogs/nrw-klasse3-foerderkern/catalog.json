@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "catalogVersion": "0.4.0",
+  "catalogVersion": "0.5.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-16",
   "status": "ready-for-review",
@@ -2020,7 +2020,7 @@
         },
         {
           "level": 3,
-          "description": "Zehneraddition mit einem Hunderterübergang ohne sichtbare Hilfe",
+          "description": "Zehneraddition mit einem Hunderterübergang und geprüftem Zwischenschritt",
           "numberRange": "200 bis 999",
           "representation": "none",
           "requirements": {
@@ -2170,8 +2170,8 @@
         },
         {
           "level": 3,
-          "description": "Von einem vollen Hunderter in zwei Rückwärtssprüngen subtrahieren",
-          "numberRange": "100 bis 900",
+          "description": "Einer- oder Zehnersubtraktion mit genau einem kontrollierten Stellenübergang",
+          "numberRange": "100 bis 999",
           "representation": "none",
           "requirements": {
             "requiresNeighborIdentification": false,
@@ -2735,6 +2735,110 @@
           }
         ]
       }
+    },
+    {
+      "id": "library-arrivals-and-loans",
+      "relationship": "join",
+      "operation": "+",
+      "secondOperation": "−",
+      "story": "In einem Regal stehen {first} Bücher. {second} Bücher kommen dazu. Danach werden {third} Bücher ausgeliehen. Wie viele Bücher stehen nun im Regal?",
+      "question": "Wie viele Bücher stehen nach beiden Veränderungen im Regal?",
+      "relevant": "{first} Bücher, {second} neue Bücher und {third} ausgeliehene Bücher",
+      "answer": "Nun stehen {result} Bücher im Regal.",
+      "minDifficulty": 3,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 30,
+        "max": 60
+      },
+      "secondRange": {
+        "min": 5,
+        "max": 15
+      },
+      "thirdRange": {
+        "min": 3,
+        "max": 12
+      },
+      "operationHint": "Zuerst kommen Bücher dazu. Berechne diese neue Menge, bevor Bücher ausgeliehen werden.",
+      "operationError": "Im ersten Schritt wird die Büchermenge größer.",
+      "relationshipLabel": "Eine Menge wird zuerst größer und danach wieder kleiner.",
+      "relationshipDistractors": [
+        "Eine Gesamtmenge wird gleichmäßig verteilt.",
+        "Zwei unveränderte Mengen werden nur verglichen."
+      ],
+      "questionDistractors": [
+        "Wie viele Bücher kommen neu dazu?",
+        "Wie viele Bücher werden ausgeliehen?"
+      ],
+      "plausibility": {
+        "prompt": "Nach dem Dazukommen sind es {intermediate} Bücher, danach werden {third} ausgeliehen. Welche Prüfung passt?",
+        "options": [
+          {
+            "label": "{result} plus {third} ergibt wieder {intermediate}.",
+            "correct": true
+          },
+          {
+            "label": "Das Endergebnis {result} muss größer als {intermediate} sein.",
+            "correct": false
+          },
+          {
+            "label": "Die ausgeliehenen {third} Bücher sind das Endergebnis.",
+            "correct": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "stickers-give-and-receive",
+      "relationship": "separate",
+      "operation": "−",
+      "secondOperation": "+",
+      "story": "Mira hat {first} Aufkleber. Sie verschenkt {second}. Später bekommt sie {third} neue Aufkleber. Wie viele hat sie danach?",
+      "question": "Wie viele Aufkleber hat Mira nach beiden Veränderungen?",
+      "relevant": "{first} Aufkleber, {second} verschenkte und {third} neue Aufkleber",
+      "answer": "Danach hat Mira {result} Aufkleber.",
+      "minDifficulty": 3,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 35,
+        "max": 80
+      },
+      "secondRange": {
+        "min": 5,
+        "max": 20
+      },
+      "thirdRange": {
+        "min": 3,
+        "max": 15
+      },
+      "operationHint": "Zuerst werden Aufkleber weggegeben. Berechne den Rest, bevor neue dazukommen.",
+      "operationError": "Im ersten Schritt wird die Aufklebermenge kleiner.",
+      "relationshipLabel": "Eine Menge wird zuerst kleiner und danach wieder größer.",
+      "relationshipDistractors": [
+        "Mehrere gleich große Gruppen werden zusammengefasst.",
+        "Zwei Mengen werden nur nach ihrem Unterschied verglichen."
+      ],
+      "questionDistractors": [
+        "Wie viele Aufkleber verschenkt Mira?",
+        "Wie viele neue Aufkleber bekommt Mira?"
+      ],
+      "plausibility": {
+        "prompt": "Nach dem Verschenken bleiben {intermediate} Aufkleber. Dann kommen {third} dazu. Welche Prüfung passt?",
+        "options": [
+          {
+            "label": "Das Ergebnis {result} ist um {third} größer als {intermediate}.",
+            "correct": true
+          },
+          {
+            "label": "Das Ergebnis {result} muss kleiner als {intermediate} sein.",
+            "correct": false
+          },
+          {
+            "label": "Die neuen {third} Aufkleber sind allein das Endergebnis.",
+            "correct": false
+          }
+        ]
+      }
     }
   ],
   "wordProblemSteps": {
@@ -2743,8 +2847,8 @@
       "Nur die Zahl {first}",
       "Es gibt keine wichtigen Zahlen"
     ],
-    "relevantError": "Für die Lösung brauchst du beide Mengen aus dem Text.",
-    "relevantSuccess": "Genau, diese beiden Angaben helfen dir.",
+    "relevantError": "Für die Lösung brauchst du alle Mengen, die sich in der Geschichte verändern.",
+    "relevantSuccess": "Genau, diese Angaben helfen dir durch die ganze Geschichte.",
     "operationPrompt": "Welche Rechenart passt?",
     "operationOptions": [
       {
@@ -2770,6 +2874,12 @@
     "calculatePrompt": "Rechne: {first} {operation} {second} = ?",
     "calculateError": "Rechne die beiden wichtigen Zahlen noch einmal.",
     "calculateSuccess": "Die Rechnung stimmt.",
+    "secondOperationPrompt": "Nun hast du {intermediate}. Welche Rechenart passt für die Veränderung um {third}?",
+    "secondOperationError": "Achte auf die zweite Handlung: Wird die Menge größer oder kleiner?",
+    "secondOperationSuccess": "Die zweite Rechenart passt zur Veränderung.",
+    "finalCalculationPrompt": "Rechne weiter: {intermediate} {secondOperation} {third} = ?",
+    "finalCalculationError": "Nutze dein Zwischenergebnis {intermediate} und die zweite Veränderung {third}.",
+    "finalCalculationSuccess": "Du hast beide Rechenschritte richtig verbunden.",
     "checkPrompt": "Welcher Antwortsatz passt?",
     "checkError": "Der Antwortsatz muss zu deinem Rechenergebnis passen.",
     "checkSuccess": "Rechnung und Antwort passen zusammen.",
@@ -3433,6 +3543,14 @@
       "halfwayUp": "{number} liegt genau in der Mitte; deshalb wird auf {upper} aufgerundet.",
       "wrongLower": "Man rundet diese Zahl immer auf {lower} ab.",
       "wrongUpper": "Man rundet diese Zahl immer auf {upper} auf."
+    },
+    "arithmetic1000": {
+      "bridgePrompt": "Welche volle Zahl erreichst du im ersten Teilschritt?",
+      "bridgeError": "Zerlege die zweite Zahl so, dass du zuerst die nächste passende Zehner- oder Hunderterzahl erreichst.",
+      "bridgeSuccess": "{bridge} ist eine hilfreiche Zwischenstation.",
+      "resultPrompt": "Wie lautet das Ergebnis nach dem restlichen Schritt?",
+      "resultError": "Rechne von {bridge} nur noch den übrigen Teil weiter.",
+      "resultSuccess": "Der Teilschritt führt sicher zum Ergebnis {answer}."
     }
   }
 }

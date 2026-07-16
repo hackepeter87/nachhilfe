@@ -9,8 +9,8 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Adaptive Addition und Subtraktion bis 20 sowie reihenspezifisches Einmaleins und Division ohne Rest
 - Stellenwerte bis 1000, Zerlegen und Zusammensetzen von Zahlen
 - Nachbarzehner, Nachbarhunderter sowie Runden auf Zehner und Hunderter
-- Erste Additions-, Subtraktions- und Ergänzungsstrategien bis 1000 mit Stellenwerttafel oder Rechenstrich
-- Geführte Sachaufgaben mit sechs Mengenbeziehungen und Raster-Symmetrie ohne Drag-and-drop
+- Additions-, Subtraktions- und Ergänzungsstrategien bis 1000 mit geprüftem Zwischenschritt, Stellenwerttafel oder Rechenstrich
+- Geführte ein- und zweischrittige Sachaufgaben mit sieben Mengenbeziehungen und Raster-Symmetrie ohne Drag-and-drop
 - Drei inhaltlich wirksame Stufen mit sichtbarer, abrufbarer oder entfallender Darstellung
 - Zwei Hilfestufen, konkretes Fehlerfeedback und eine schrittweise Erklärung nach wiederholten Fehlern
 - Lokaler Lernstand mit einfacher adaptiver Aufgabenauswahl
@@ -125,7 +125,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Multi-Arch-Release-Images für `linux/amd64` und `linux/arm64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.5.1
+podman pull ghcr.io/hackepeter87/nachhilfe:0.7.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -164,8 +164,8 @@ Die Offline- und Mobilabläufe wurden automatisiert mit Playwright geprüft. Ein
 
 Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen versioniert in nativer IndexedDB. Neue Sitzungen speichern App-, Katalog- und Schemaversion. Alte Sitzungen bleiben erhalten und werden beim Lesen ehrlich mit `unknown` beziehungsweise Schema `0` gekennzeichnet. Es gibt kein Backend, Tracking, Werbung oder externe Laufzeit-API.
 
-Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Schwierigkeit steuert zusätzlich Zahlenraum, Denkschritte und Hilfsdarstellung. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
+Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.5.1
+## Release-Stand 0.7.0
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.5.1 stellt Punktgruppen beim Einmaleins und bei Divisionen vollständig und ohne würfelartige Mehrdeutigkeit dar. Die didaktischen Erweiterungen aus 0.5.0 bleiben unverändert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.7.0 ergänzt kontrollierte Stellenübergänge mit überprüfbarer Zwischenstation, erste zweischrittige Sachaufgaben und wirksame adaptive Lernphasen. Die offene externe Abnahme ist in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

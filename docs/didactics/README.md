@@ -1,6 +1,6 @@
 # Didaktisches Gesamtmodell
 
-Stand: App 0.5.1, Katalog 0.4.0, Schema 4. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form sowie Größen und Messen und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen.
+Stand: App 0.7.0, Katalog 0.5.0, Schema 4. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form sowie Größen und Messen und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen.
 
 ## Lernphasen
 
@@ -11,7 +11,7 @@ Stand: App 0.5.1, Katalog 0.4.0, Schema 4. Verbindliche curriculare Quelle ist d
 5. `automate`: Aufgabenfamilien sicher und ohne Zeitdruck abrufen.
 6. `transfer`: begründen, Darstellung wechseln oder Alltagssituation lösen.
 
-Die aktive Runtime nutzt geführt üben, selbstständig üben und je Kompetenz Automatisieren oder Transfer. Aktivieren und Verstehen sind vollständig beschrieben und werden bei niedrigem Lernwert über Darstellung, Hinweise und Remediation aufgegriffen. Sie sind noch keine eigenständigen Sitzungsblöcke.
+Die aktive Runtime bindet jede Aufgabe an eine Lernphase. Aktivieren, Verstehen und geführtes Üben erzeugen Stufe 1 mit sichtbarer tragender Darstellung; selbstständiges Üben erzeugt Stufe 2; Automatisieren und Transfer erzeugen Stufe 3. Der Übergang in Transfer erfolgt erst bei sicherem Status und einem Lernwert ab 92. Die Phasen bleiben eine Produktheuristik und keine Diagnose.
 
 ## Hilfestufen
 

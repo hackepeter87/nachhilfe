@@ -3,7 +3,7 @@ import { dailySeed, seededRandom } from './random'
 import { selectionWeight, subskillWeight } from './progress'
 import { getActiveCatalogMetadata, isSkillEnabled } from '../content/catalog'
 import { APP_VERSION } from '../version'
-import type { Difficulty, Exercise, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId } from './types'
+import type { Difficulty, Exercise, LearningPhase, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId, SkillProgress } from './types'
 
 const FOCUS_SKILLS: SkillId[] = [
   'place-value',
@@ -80,6 +80,28 @@ function uniqueExercise(skillId: SkillId, seed: number, difficulty: Difficulty, 
   return exercise
 }
 
+function settingsForProgress(progress: SkillProgress | undefined): { difficulty: Difficulty; phase: LearningPhase } {
+  const phase = progress?.learningPhase ?? 'activate'
+  const difficulty: Difficulty = phase === 'independent-practice'
+    ? 2
+    : phase === 'automate' || phase === 'transfer'
+      ? 3
+      : 1
+  return { difficulty, phase }
+}
+
+function applyLearningPhase(exercise: Exercise, phase: LearningPhase): Exercise {
+  const showRepresentation = ['activate', 'understand', 'guided-practice'].includes(phase)
+  return {
+    ...exercise,
+    learningPhase: phase,
+    representation: exercise.representation
+      ? { ...exercise.representation, visibility: showRepresentation ? 'always' : 'hint' }
+      : exercise.representation,
+    testMetadata: { ...exercise.testMetadata, learningPhase: phase }
+  }
+}
+
 export function currentSessionReleaseMetadata(): SessionReleaseMetadata {
   const catalog = getActiveCatalogMetadata()
   return {
@@ -100,10 +122,10 @@ export function createSessionPlan(
   const skills = [...warmups, ...focus, ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled)]
   const exercises = skills.map((skillId, index) => {
     const skillProgress = progress[skillId]
-    const difficulty = skillProgress?.difficulty ?? 1
+    const { difficulty, phase } = settingsForProgress(skillProgress)
     const exerciseSeed = seed + (index + 1) * 113
     const focus = selectSubskill(skillId, progress, exerciseSeed + 41, difficulty)
-    return uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus)
+    return applyLearningPhase(uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus), phase)
   })
   return {
     id: `session-${seed}`,

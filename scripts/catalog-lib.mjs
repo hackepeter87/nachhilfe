@@ -12,10 +12,11 @@ export const SKILL_IDS = [
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
-  'answer', 'answerSentence', 'axis', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
+  'answer', 'answerSentence', 'axis', 'bridge', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
-  'sumExpression', 'target', 'tens', 'tensValue', 'total', 'upper', 'upperDistance'
+  'sumExpression', 'target', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
+  'intermediate', 'secondOperation'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -134,6 +135,15 @@ function validateWordProblem(template, numberRange) {
       fail(`${context}.${field} ist ungültig`)
     }
   }
+  const hasSecondStep = template.secondOperation !== undefined || template.thirdRange !== undefined
+  if (hasSecondStep) {
+    if (!['+', '−'].includes(template.secondOperation) || !isRecord(template.thirdRange) ||
+      !Number.isInteger(template.thirdRange.min) || !Number.isInteger(template.thirdRange.max) ||
+      template.thirdRange.min < numberRange.min || template.thirdRange.max > numberRange.max || template.thirdRange.min > template.thirdRange.max) {
+      fail(`${context} hat einen unvollständigen zweiten Rechenschritt`)
+    }
+    if (!template.story.includes('{third}') || template.minDifficulty !== 3) fail(`${context} muss den zweiten Schritt als Stufe 3 ausweisen`)
+  }
   if (!template.story.includes('{first}') || !template.answer.includes('{result}') ||
     (template.relationship === 'sharing' ? !template.story.includes('{total}') : !template.story.includes('{second}'))) fail(`${context} enthält nicht alle benötigten Platzhalter`)
   for (const field of ['questionDistractors', 'relationshipDistractors']) {
@@ -151,8 +161,14 @@ function validateWordProblem(template, numberRange) {
   const firstMax = template.firstRange.max
   const secondMin = template.secondRange.min
   const secondMax = template.secondRange.max
-  const minResult = template.operation === '+' ? firstMin + secondMin : template.operation === '−' ? firstMin - secondMax : template.operation === ':' ? secondMin : firstMin * secondMin
-  const maxResult = template.operation === '+' ? firstMax + secondMax : template.operation === '−' ? firstMax - secondMin : template.operation === ':' ? secondMax : firstMax * secondMax
+  const firstResults = [firstMin, firstMax].flatMap((first) => [secondMin, secondMax].map((second) =>
+    template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
+  ))
+  const results = hasSecondStep
+    ? firstResults.flatMap((intermediate) => [template.thirdRange.min, template.thirdRange.max].map((third) => template.secondOperation === '+' ? intermediate + third : intermediate - third))
+    : firstResults
+  const minResult = Math.min(...results)
+  const maxResult = Math.max(...results)
   if (minResult < numberRange.min || maxResult > numberRange.max) fail(`${context} erzeugt Ergebnisse außerhalb des Zahlenraums`)
 }
 
@@ -206,14 +222,15 @@ export function validateCatalog(catalog) {
       if (!Array.isArray(topic[field]) || topic[field].length === 0 || !topic[field].every(isText)) fail(`preparedTopics.${topic.id}.${field} ist unvollständig`)
     }
   }
-  if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding)) fail('strategySteps fehlt')
+  if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding) || !isRecord(catalog.strategySteps.arithmetic1000)) fail('strategySteps fehlt')
   for (const field of ['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess']) requireText(catalog.strategySteps.placeValue, field, 'strategySteps.placeValue')
   for (const field of ['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper']) requireText(catalog.strategySteps.rounding, field, 'strategySteps.rounding')
+  for (const field of ['bridgePrompt', 'bridgeError', 'bridgeSuccess', 'resultPrompt', 'resultError', 'resultSuccess']) requireText(catalog.strategySteps.arithmetic1000, field, 'strategySteps.arithmetic1000')
   if (!Array.isArray(catalog.wordProblems) || catalog.wordProblems.length === 0) fail('wordProblems fehlt')
   requireUnique(catalog.wordProblems.map((template) => template.id), 'Sachaufgaben-IDs')
   catalog.wordProblems.forEach((template) => validateWordProblem(template, numberRange))
   if (!isRecord(catalog.wordProblemSteps)) fail('wordProblemSteps fehlt')
-  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'relationshipPrompt', 'relationshipError', 'relationshipSuccess', 'operationPrompt', 'operationSuccess', 'representationPrompt', 'representationError', 'representationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
+  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'relationshipPrompt', 'relationshipError', 'relationshipSuccess', 'operationPrompt', 'operationSuccess', 'representationPrompt', 'representationError', 'representationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'secondOperationPrompt', 'secondOperationError', 'secondOperationSuccess', 'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
     requireText(catalog.wordProblemSteps, field, 'wordProblemSteps')
   }
   const operationOptions = catalog.wordProblemSteps.operationOptions

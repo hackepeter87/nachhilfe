@@ -452,10 +452,12 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const first = integer(random, template.firstRange.min, template.firstRange.max)
   const secondMax = template.operation === '−' ? Math.min(template.secondRange.max, first - 1) : template.secondRange.max
   const second = integer(random, template.secondRange.min, secondMax)
+  const third = template.thirdRange ? integer(random, template.thirdRange.min, template.thirdRange.max) : 0
   const total = template.relationship === 'sharing' ? first * second : 0
-  const result = template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
+  const intermediate = template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
+  const result = template.secondOperation === '+' ? intermediate + third : template.secondOperation === '−' ? intermediate - third : intermediate
   const irrelevant = difficulty === 3 ? (template.irrelevant ?? '') : ''
-  const templateValues = { first, second, total, result, irrelevant }
+  const templateValues = { first, second, third, total, intermediate, result, irrelevant, secondOperation: template.secondOperation ?? '' }
   const story = renderCatalogText(template.story, templateValues)
     .replace(/\s+/g, ' ')
     .replace(/\s+([?.!,])/g, '$1')
@@ -464,7 +466,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const relevant = renderCatalogText(template.relevant, templateValues)
   const answerSentence = renderCatalogText(template.answer, templateValues)
   const operationHint = template.operationHint
-  const values = { first, second, total, result, operation: template.operation, story, answerSentence, operationHint, question, irrelevant, relationship: template.relationshipLabel, templateId: template.id }
+  const values = { first, second, third, total, intermediate, result, operation: template.operation, secondOperation: template.secondOperation ?? '', story, answerSentence, operationHint, question, irrelevant, relationship: template.relationshipLabel, templateId: template.id }
   const steps: ExerciseStep[] = []
   if (difficulty >= 2) {
     steps.push({
@@ -524,16 +526,37 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   steps.push({
       id: 'calculate',
       prompt: renderCatalogText(stepsContent.calculatePrompt, values),
+      options: numberOptions(random, intermediate, [
+        { value: Math.max(0, intermediate - 1), misconception: 'Rechenfehler um eins' },
+        { value: intermediate + 1, misconception: 'Rechenfehler um eins' },
+        { value: template.operation === '−' ? first + second : Math.abs(first - second), misconception: 'Unpassende Rechenart verwendet' }
+      ]),
+      correctAnswer: String(intermediate),
+      errorFeedback: stepsContent.calculateError,
+      successFeedback: stepsContent.calculateSuccess
+    })
+  if (template.secondOperation) {
+    steps.push({
+      id: 'second-operation',
+      prompt: renderCatalogText(stepsContent.secondOperationPrompt, values),
+      options: stepsContent.operationOptions,
+      correctAnswer: template.secondOperation,
+      errorFeedback: renderCatalogText(stepsContent.secondOperationError, values),
+      successFeedback: stepsContent.secondOperationSuccess
+    }, {
+      id: 'final-calculation',
+      prompt: renderCatalogText(stepsContent.finalCalculationPrompt, values),
       options: numberOptions(random, result, [
         { value: Math.max(0, result - 1), misconception: 'Rechenfehler um eins' },
         { value: result + 1, misconception: 'Rechenfehler um eins' },
-        { value: template.operation === '−' ? first + second : Math.abs(first - second), misconception: 'Unpassende Rechenart verwendet' }
+        { value: template.secondOperation === '−' ? intermediate + third : Math.max(0, intermediate - third), misconception: 'Zweite Rechenart verwechselt' }
       ]),
       correctAnswer: String(result),
-      errorFeedback: stepsContent.calculateError,
-      successFeedback: stepsContent.calculateSuccess
-    },
-    {
+      errorFeedback: stepsContent.finalCalculationError,
+      successFeedback: stepsContent.finalCalculationSuccess
+    })
+  }
+  steps.push({
       id: 'check',
       prompt: stepsContent.checkPrompt,
       options: textOptions(random, answerSentence, [
@@ -577,6 +600,39 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
       ...barValues, question: 'Welche Menge wird gesucht?', groups: first, size: second, relation: template.relationship
     })
   })
+}
+
+function arithmetic1000Steps(
+  random: () => number,
+  values: Record<string, number | string>,
+  bridge: number,
+  answer: number,
+  bridgeUnit: 10 | 100
+): ExerciseStep[] {
+  const content = getTaskCatalog().strategySteps.arithmetic1000
+  return [{
+    id: 'bridge',
+    prompt: renderCatalogText(content.bridgePrompt, values),
+    options: numberOptions(random, bridge, [
+      { value: bridge - bridgeUnit, misconception: 'Nachbarzahl in der falschen Richtung gewählt' },
+      { value: bridge + bridgeUnit, misconception: 'Einen Nachbar zu weit gegangen' },
+      { value: Number(values.first), misconception: 'Noch keinen Rechenschritt ausgeführt' }
+    ]),
+    correctAnswer: String(bridge),
+    errorFeedback: renderCatalogText(content.bridgeError, values),
+    successFeedback: renderCatalogText(content.bridgeSuccess, values)
+  }, {
+    id: 'result',
+    prompt: renderCatalogText(content.resultPrompt, values),
+    options: numberOptions(random, answer, [
+      { value: answer - 1, misconception: 'Einerfehler im Restschritt' },
+      { value: answer + 1, misconception: 'Einerfehler im Restschritt' },
+      { value: bridge, misconception: 'Nach dem Zwischenschritt aufgehört' }
+    ]),
+    correctAnswer: String(answer),
+    errorFeedback: renderCatalogText(content.resultError, values),
+    successFeedback: renderCatalogText(content.resultSuccess, values)
+  }]
 }
 
 function mirrorGrid(grid: number[][]): number[][] {
@@ -631,26 +687,28 @@ function addition1000(seed: number, difficulty: Difficulty): Exercise {
     }
   } else if (difficulty === 2) {
     const ones = integer(random, 6, 9)
-    second = integer(random, 10 - ones, 9)
+    second = integer(random, 11 - ones, 9)
     first = integer(random, 2, 8) * 100 + integer(random, 1, 8) * 10 + ones
     strategy = `Ergänze zuerst ${10 - ones} bis zum nächsten Zehner und addiere dann den Rest.`
   } else {
     const tens = integer(random, 6, 9)
-    second = integer(random, 10 - tens, Math.min(9, 15 - tens)) * 10
+    second = integer(random, 11 - tens, Math.min(9, 15 - tens)) * 10
     first = integer(random, 2, 8) * 100 + tens * 10 + integer(random, 1, 9)
     strategy = `Zerlege ${second} so, dass du zuerst den nächsten Hunderter erreichst.`
   }
   const answer = first + second
   const bridge = difficulty === 2 ? Math.ceil(first / 10) * 10 : difficulty === 3 ? Math.ceil(first / 100) * 100 : answer
   const jumps = difficulty === 1 ? [] : numberLineJumps(bridge === answer ? [first, answer] : [first, bridge, answer])
-  const values = { first, second, answer, strategy }
+  const bridgeUnit = difficulty === 3 ? 100 : 10
+  const values = { first, second, answer, bridge, strategy }
   return withMetadata({
     ...base('addition-1000', seed, difficulty, values),
     ...contentFor('addition-1000', values, difficulty),
     typeId: 'addition-to-1000',
     subskillId: difficulty === 1 ? 'addition-1000-no-bridge' : difficulty === 2 ? 'addition-1000-ones-bridge' : 'addition-1000-tens-bridge',
-    answerMode: 'number',
+    answerMode: difficulty === 1 ? 'number' : 'guided-choice',
     correctAnswer: String(answer),
+    steps: difficulty === 1 ? undefined : arithmetic1000Steps(random, values, bridge, answer, bridgeUnit),
     representation: representation('addition-1000', difficulty, difficulty === 1 ? 'place-value' : 'number-line', 'Rechenweg in Teilschritten', {
       start: first, end: answer, jumps,
       hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10
@@ -663,31 +721,46 @@ function subtraction1000(seed: number, difficulty: Difficulty): Exercise {
   let first: number
   let second: number
   let strategy: string
+  let bridge: number
+  let bridgeUnit: 10 | 100 = 10
   if (difficulty === 1) {
     first = integer(random, 4, 9) * 100
     second = integer(random, 1, Math.floor(first / 100) - 1) * 100
+    bridge = first - second
     strategy = `Ziehe ${second / 100} Hunderter von ${first / 100} Hundertern ab.`
   } else if (difficulty === 2) {
     const tens = integer(random, 4, 9)
     second = integer(random, 1, tens) * 10
     first = integer(random, 3, 9) * 100 + tens * 10 + integer(random, 0, 9)
+    bridge = first - second
     strategy = `Verändere nur die Zehner: ${tens} Zehner minus ${second / 10} Zehner.`
   } else {
-    first = integer(random, 4, 9) * 100
-    second = integer(random, 2, 9) * 10
-    strategy = `Gehe von ${first} zuerst ${second} Schritte auf dem Rechenstrich zurück.`
+    if (random() < 0.5) {
+      const ones = integer(random, 1, 8)
+      first = integer(random, 3, 9) * 100 + integer(random, 1, 8) * 10 + ones
+      second = integer(random, ones + 1, Math.min(9, ones + 5))
+      bridge = Math.floor(first / 10) * 10
+      strategy = `Gehe zuerst ${first - bridge} bis ${bridge} zurück und ziehe dann den Rest ab.`
+    } else {
+      const tens = integer(random, 1, 5)
+      first = integer(random, 3, 9) * 100 + tens * 10
+      second = integer(random, tens + 1, Math.min(9, tens + 4)) * 10
+      bridge = Math.floor(first / 100) * 100
+      bridgeUnit = 100
+      strategy = `Gehe zuerst ${first - bridge} bis ${bridge} zurück und ziehe dann den Rest ab.`
+    }
   }
   const answer = first - second
-  const firstJump = difficulty === 3 && second > 50 ? first - 50 : answer
-  const jumps = difficulty === 1 ? [] : numberLineJumps(firstJump === answer ? [first, answer] : [first, firstJump, answer])
-  const values = { first, second, answer, strategy }
+  const jumps = difficulty === 1 ? [] : numberLineJumps(bridge === answer ? [first, answer] : [first, bridge, answer])
+  const values = { first, second, answer, bridge, strategy }
   return withMetadata({
     ...base('subtraction-1000', seed, difficulty, values),
     ...contentFor('subtraction-1000', values, difficulty),
     typeId: 'subtraction-to-1000',
-    subskillId: difficulty === 1 ? 'subtraction-1000-hundreds' : difficulty === 2 ? 'subtraction-1000-no-unbundling' : 'subtraction-1000-from-hundred',
-    answerMode: 'number',
+    subskillId: difficulty === 1 ? 'subtraction-1000-hundreds' : difficulty === 2 ? 'subtraction-1000-no-unbundling' : bridgeUnit === 10 ? 'subtraction-1000-ones-unbundling' : 'subtraction-1000-tens-unbundling',
+    answerMode: difficulty === 3 ? 'guided-choice' : 'number',
     correctAnswer: String(answer),
+    steps: difficulty === 3 ? arithmetic1000Steps(random, values, bridge, answer, bridgeUnit) : undefined,
     representation: representation('subtraction-1000', difficulty, difficulty === 1 ? 'place-value' : 'number-line', 'Rechenweg in Teilschritten', {
       start: first, end: answer, jumps,
       hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10

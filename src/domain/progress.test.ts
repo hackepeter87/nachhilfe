@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createSkillProgress, LEARNING_RULES, repetitionState, selectionWeight, subskillWeight, updateSkillProgress } from './progress'
+import { createSkillProgress, learningPhaseFor, LEARNING_RULES, repetitionState, selectionWeight, subskillWeight, updateSkillProgress } from './progress'
 import type { AttemptResult } from './types'
 
 function result(overrides: Partial<AttemptResult> = {}): AttemptResult {
@@ -69,5 +69,11 @@ describe('Lernstandsmodell', () => {
     progress = updateSkillProgress(progress, result({ correct: false }))
     expect(progress.learningPhase).toBe('understand')
     expect(repetitionState(progress, new Date('2026-07-30T10:00:00.000Z'))).toBe('overdue')
+  })
+
+  it('wechselt erst bei hohem sicheren Lernwert in den Transfer', () => {
+    expect(learningPhaseFor(8, 85, 3, 'secure')).toBe('automate')
+    expect(learningPhaseFor(8, 92, 3, 'secure')).toBe('transfer')
+    expect(learningPhaseFor(8, 100, 2, 'secure')).toBe('independent-practice')
   })
 })

@@ -80,4 +80,35 @@ describe('ExerciseCard', () => {
     if (!Array.isArray(jumps)) throw new Error('Sprünge fehlen')
     jumps.forEach((jump) => expect(screen.getByLabelText(`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`)).toBeVisible())
   })
+
+  it('prüft Zwischenstation und Ergebnis bei einem Stellenübergang', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('subtraction-1000', 42, 3)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    expect(exercise.steps?.map((step) => step.id)).toEqual(['bridge', 'result'])
+    for (const step of exercise.steps ?? []) {
+      const option = step.options.find((candidate) => candidate.value === step.correctAnswer)
+      if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
+      await user.click(screen.getByRole('button', { name: option.label }))
+    }
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
+
+  it('führt eine zweischrittige Sachaufgabe bis zum Antwortsatz', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = Array.from({ length: 200 }, (_, index) => generateExercise('word-problem', index + 1, 3))
+      .find((candidate) => candidate.variant.values.secondOperation)
+    if (!exercise) throw new Error('Keine zweischrittige Sachaufgabe erzeugt')
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    for (const step of exercise.steps ?? []) {
+      const option = step.options.find((candidate) => candidate.value === step.correctAnswer)
+      if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
+      await user.click(screen.getByRole('button', { name: option.label }))
+    }
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
 })

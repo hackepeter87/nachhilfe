@@ -204,9 +204,14 @@ describe('deterministische Aufgabengeneratoren', () => {
         const first = Number(exercise.variant.values.first)
         const second = Number(exercise.variant.values.second)
         const operation = exercise.variant.values.operation
-        const expected = operation === '+' ? first + second : operation === '−' ? first - second : operation === ':' ? second : first * second
+        const intermediate = operation === '+' ? first + second : operation === '−' ? first - second : operation === ':' ? second : first * second
+        const third = Number(exercise.variant.values.third)
+        const secondOperation = exercise.variant.values.secondOperation
+        const expected = secondOperation === '+' ? intermediate + third : secondOperation === '−' ? intermediate - third : intermediate
+        expect(Number(exercise.variant.values.intermediate)).toBe(intermediate)
         expect(Number(exercise.variant.values.result)).toBe(expected)
-        expect(exercise.steps).toHaveLength(difficulty === 1 ? 5 : difficulty === 2 ? 7 : 8)
+        const expectedSteps = difficulty === 1 ? 5 : difficulty === 2 ? 7 : secondOperation ? 10 : 8
+        expect(exercise.steps).toHaveLength(expectedSteps)
         expect(exercise.prompt).not.toMatch(/\{\w+\}/)
         expect(exercise.steps?.some((step) => step.id === 'relationship')).toBe(true)
         exercise.steps?.forEach((step) => {
@@ -331,6 +336,48 @@ describe('deterministische Aufgabengeneratoren', () => {
         }
       }
     }
+  })
+
+  it('führt genau einen Stellenübergang über eine geprüfte Zwischenstation', () => {
+    for (const skill of ['addition-1000', 'subtraction-1000'] as const) {
+      for (let seed = 1; seed <= 300; seed += 1) {
+        const difficulties = skill === 'addition-1000' ? [2, 3] as const : [3] as const
+        for (const difficulty of difficulties) {
+          const exercise = generateExercise(skill, seed, difficulty)
+          const first = Number(exercise.variant.values.first)
+          const bridge = Number(exercise.variant.values.bridge)
+          const answer = Number(exercise.correctAnswer)
+          expect(exercise.answerMode).toBe('guided-choice')
+          expect(exercise.steps?.map((step) => step.id)).toEqual(['bridge', 'result'])
+          expect(exercise.steps?.[0]?.correctAnswer).toBe(String(bridge))
+          expect(exercise.steps?.[1]?.correctAnswer).toBe(String(answer))
+          expect(bridge).not.toBe(first)
+          expect(bridge).not.toBe(answer)
+          exercise.steps?.forEach((step) => {
+            expect(new Set(step.options.map((option) => option.value)).size).toBe(step.options.length)
+            expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
+          })
+        }
+      }
+    }
+  })
+
+  it('liefert beide kontrollierten Entbündelungsarten bei der Subtraktion', () => {
+    const subskills = new Set<string>()
+    for (let seed = 1; seed <= 300; seed += 1) subskills.add(generateExercise('subtraction-1000', seed, 3).subskillId ?? '')
+    expect(subskills).toEqual(new Set(['subtraction-1000-ones-unbundling', 'subtraction-1000-tens-unbundling']))
+  })
+
+  it('erzeugt zweischrittige Sachaufgaben mit zwei passenden Rechnungen', () => {
+    const exercises = Array.from({ length: 400 }, (_, index) => generateExercise('word-problem', index + 1, 3))
+    const multiStep = exercises.filter((exercise) => exercise.variant.values.secondOperation)
+    expect(multiStep.length).toBeGreaterThan(0)
+    multiStep.forEach((exercise) => {
+      expect(exercise.steps?.map((step) => step.id)).toContain('second-operation')
+      expect(exercise.steps?.map((step) => step.id)).toContain('final-calculation')
+      expect(exercise.prompt).not.toMatch(/\{\w+\}/)
+      expect(exercise.steps?.every((step) => !step.prompt.match(/\{\w+\}/))).toBe(true)
+    })
   })
 
   it('bildet Zahlenstrahlsprünge lückenlos und mathematisch korrekt ab', () => {

@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.4.0',
+      catalogVersion: '0.5.0',
       schemaVersion: 4,
-      appVersion: '0.5.1'
+      appVersion: '0.7.0'
     })
   })
 
@@ -29,14 +29,14 @@ describe('Sitzungsplanung', () => {
       const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
 
       const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
-      nextCatalog.catalogVersion = '0.4.1'
+      nextCatalog.catalogVersion = '0.5.1'
       nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.4.0')
+      expect(runningSession.catalogVersion).toBe('0.5.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
-      expect(nextSession.catalogVersion).toBe('0.4.1')
+      expect(nextSession.catalogVersion).toBe('0.5.1')
     } finally {
       setTaskCatalog(originalCatalog)
     }
@@ -65,12 +65,13 @@ describe('Sitzungsplanung', () => {
       mastery: 8,
       recentErrors: 3,
       difficulty: 3 as const,
+      learningPhase: 'transfer' as const,
       subskills: {
         'times-7': { attempts: 4, correctAnswers: 1, hintsUsed: 2, mastery: 10, recentErrors: 3, lastPracticedAt: null },
         'times-8': { attempts: 5, correctAnswers: 5, hintsUsed: 0, mastery: 92, recentErrors: 0, lastPracticedAt: new Date().toISOString() }
       }
     }
-    const secure = { ...createSkillProgress('addition'), attempts: 8, mastery: 95, status: 'secure' as const }
+    const secure = { ...createSkillProgress('addition'), attempts: 8, mastery: 95, status: 'secure' as const, difficulty: 3 as const, learningPhase: 'transfer' as const }
     let multiplicationSelections = 0
     let additionSelections = 0
     let rowSevenSelections = 0
@@ -95,6 +96,22 @@ describe('Sitzungsplanung', () => {
       if (skills.includes('place-value')) secureSelections += 1
     }
     expect(weakSelections).toBeGreaterThan(secureSelections)
+  })
+
+  it('übersetzt Lernphasen in tatsächliche Schwierigkeit und Darstellung', () => {
+    const understanding = { ...createSkillProgress('addition-1000'), attempts: 3, mastery: 30, difficulty: 3 as const, learningPhase: 'understand' as const }
+    const transfer = { ...createSkillProgress('subtraction-1000'), attempts: 10, mastery: 95, difficulty: 3 as const, status: 'secure' as const, learningPhase: 'transfer' as const }
+    let understandingExercise: ReturnType<typeof generateExercise> | undefined
+    let transferExercise: ReturnType<typeof generateExercise> | undefined
+    for (let seed = 1; seed <= 200 && (!understandingExercise || !transferExercise); seed += 1) {
+      const exercises = createSessionPlan({ 'addition-1000': understanding, 'subtraction-1000': transfer }, seed).exercises
+      understandingExercise ??= exercises.find((exercise) => exercise.skillId === 'addition-1000')
+      transferExercise ??= exercises.find((exercise) => exercise.skillId === 'subtraction-1000')
+    }
+    expect(understandingExercise).toMatchObject({ difficulty: 1, learningPhase: 'understand' })
+    expect(understandingExercise?.representation?.visibility).toBe('always')
+    expect(transferExercise).toMatchObject({ difficulty: 3, learningPhase: 'transfer' })
+    expect(transferExercise?.representation).toBeUndefined()
   })
 
   it('erzeugt nach einem Fehler eine leichtere, andere Wiederholung', () => {

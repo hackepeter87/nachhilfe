@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.4.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.5.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -109,7 +109,7 @@ Stand: Katalogversion 0.4.0. Die Stufen beschreiben die produktive Heuristik von
 - **Vorkenntnisse:** Nachbarzehner und Abstände vergleichen.
 - **Stufe 1:** beide Nachbarn und Abstände sichtbar.
 - **Stufe 2:** Zahlenstrahl nur auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** selbstständig runden; Halbpunkte werden nach Grundschulregel aufgerundet. Eine Begründung wird noch nicht abgefragt.
+- **Stufe 3 / MVP-Ziel:** selbstständig runden und die Abstandsentscheidung begründen; Halbpunkte werden nach Grundschulregel aufgerundet.
 - **Erhöhen / Zurückstufen:** sichere Abstandsentscheidung / immer auf- oder immer abrunden.
 - **Hilfe / Transfer:** beide Abstände berechnen / Rundung mit Nachbarzahlen begründen.
 - **Später:** Ergebnis in einem Sachzusammenhang bewerten.
@@ -119,7 +119,7 @@ Stand: Katalogversion 0.4.0. Die Stufen beschreiben die produktive Heuristik von
 - **Vorkenntnisse:** Nachbarhunderter und Abstände vergleichen.
 - **Stufe 1:** beide Nachbarn und Abstände sichtbar.
 - **Stufe 2:** Zahlenstrahl nur auf Hilfe.
-- **Stufe 3 / MVP-Ziel:** selbstständig runden, einschließlich 950 auf 1000. Eine Begründung wird noch nicht abgefragt.
+- **Stufe 3 / MVP-Ziel:** selbstständig runden und begründen, einschließlich 950 auf 1000.
 - **Erhöhen / Zurückstufen:** sichere Abstandsentscheidung / auf Zehner statt Hunderter runden.
 - **Hilfe / Transfer:** Abstände zu beiden Hundertern / sinnvolle Genauigkeit begründen.
 - **Später:** Überschlag bei Rechnungen.
@@ -139,7 +139,7 @@ Stand: Katalogversion 0.4.0. Die Stufen beschreiben die produktive Heuristik von
 - **Vorkenntnisse:** Stellenwertzerlegung und Subtraktion bis 20.
 - **Stufe 1:** volle Hunderter ohne Entbündeln; Material sichtbar.
 - **Stufe 2:** Zehner aus gemischter Zahl ohne Entbündeln; Hilfe auf Abruf.
-- **Stufe 3 / MVP-Ziel:** Zehner von einem vollen Hunderter durch zwei sichtbare Rückwärtssprünge abziehen.
+- **Stufe 3 / MVP-Ziel:** Einer oder Zehner mit genau einem kontrollierten Stellenübergang abziehen; Zwischenstation und Ergebnis werden getrennt geprüft.
 - **Erhöhen / Zurückstufen:** Stellen getrennt behandeln / Stellenwert vertauschen oder Ergebnis negativ machen.
 - **Hilfe / Transfer:** nur die betroffene Stelle verändern / Aufgabe als Ergänzung kontrollieren.
 - **Später:** mehrere Entbündelungen und schriftliche Darstellung.
@@ -161,10 +161,10 @@ Stand: Katalogversion 0.4.0. Die Stufen beschreiben die produktive Heuristik von
 - **Vorkenntnisse:** Grundrechenarten, Mengenbeziehungen und kurze Texte sinnverstehend lesen.
 - **Stufe 1:** wichtige Angaben, Mengenbeziehung, Rechenart, Ergebnis und Antwortsatz mit sichtbarer Darstellung auswählen.
 - **Stufe 2:** zusätzlich Frage und Darstellung auswählen; Zusammenfassen, Vergleichen und Ergänzen kommen hinzu.
-- **Stufe 3 / MVP-Ziel:** unwichtige Angabe, gleich große Gruppen und vorlagenspezifische Plausibilitätsprüfung.
+- **Stufe 3 / MVP-Ziel:** unwichtige Angabe, gleich große Gruppen, erste zweischrittige Situationen und vorlagenspezifische Plausibilitätsprüfung.
 - **Erhöhen / Zurückstufen:** Handlung, Rechnung und Antwort konsistent / Frage, Beziehung oder relevante Angaben verwechseln.
 - **Hilfe / Transfer:** beziehungsspezifischer Hinweis und passendes Modell / Geschichte mit anderer Darstellung erklären.
-- **Später:** Verteilen, mehrstufige Situationen, Geld und Längen nach eigener fachlicher Abnahme.
+- **Später:** komplexere mehrstufige Situationen, Geld und Längen nach eigener fachlicher Abnahme.
 
 ### Symmetrie
 

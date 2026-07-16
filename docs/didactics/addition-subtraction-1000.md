@@ -17,9 +17,9 @@ Hunderter/Zehner/Einer sortieren, zum nächsten vollen Wert ergänzen und Restsc
 ## 8. Geeignete Darstellungen
 Stellenwertmaterial und Rechenstrich mit mathematisch lückenlosen Sprüngen.
 ## 9. Lernprogression
-Gleiche Stellen ohne Übergang; Einerübergang; Zehnerübergang beziehungsweise Ergänzen über Zwischenzehner.
+Gleiche Stellen ohne Übergang; Einerübergang über den nächsten Zehner; Zehnerübergang über den nächsten Hunderter beziehungsweise Ergänzen über Zwischenzehner.
 ## 10. Aufgabentypen
-Addition, Subtraktion und Ergänzen zum nächsten Zehner/Hunderter als getrennte Generatoren.
+Addition, Subtraktion und Ergänzen zum nächsten Zehner/Hunderter als getrennte Generatoren. Übergangsaufgaben prüfen zuerst die volle Zwischenzahl und danach das Ergebnis.
 ## 11. Hilfestufen
 Veränderte Stelle markieren; Zwischenziel nennen; Sprünge sichtbar machen.
 ## 12. Remediation
@@ -31,6 +31,6 @@ Unterkompetenzen ohne Übergang, Einerübergang und Zehnerübergang werden getre
 ## 15. Erfolgskriterien
 Ergebnis 0 bis 1000, korrekte Sprungrichtung und lückenloser Rechenweg.
 ## 16. Grenzen der aktuellen Umsetzung
-Mehrere Übergänge, Entbündeln, Überträge und schriftliche Normalverfahren bleiben deaktiviert.
+Produktiv ist höchstens ein kontrollierter Einer- oder Zehnerübergang. Mehrere gleichzeitige Übergänge, schriftliche Übertragsschreibweisen und Normalverfahren bleiben deaktiviert.
 ## 17. Punkte für die Gesamtprüfung
 Prüfen, ob die Reihenfolge der halbschriftlichen Strategien zum Unterrichtsstand passt.

@@ -1,7 +1,7 @@
 {
   "name": "mathe-reise",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.7.0",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -19,7 +19,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:container": "E2E_BASE_URL=http://127.0.0.1:8080 playwright test"
+    "test:e2e:container": "E2E_BASE_URL=${E2E_BASE_URL:-http://127.0.0.1:8080} playwright test"
   },
   "dependencies": {
     "lucide-react": "^1.24.0",

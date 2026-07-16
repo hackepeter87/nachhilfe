@@ -45,7 +45,7 @@ describe('Katalog-Buildpipeline', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
       schemaVersion: 4,
-      catalogVersion: '0.4.0',
+      catalogVersion: '0.5.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -80,6 +80,13 @@ describe('Katalog-Buildpipeline', () => {
     const ambiguousPlausibility = sourceCatalog()
     ambiguousPlausibility.wordProblems[0].plausibility.options[1].correct = true
     expect(() => parseAndValidateCatalog(JSON.stringify(ambiguousPlausibility))).toThrow('genau eine richtige Antwort')
+  })
+
+  it('lehnt einen unvollständigen zweiten Rechenschritt ab', () => {
+    const catalog = sourceCatalog()
+    const template = catalog.wordProblems.find((candidate) => candidate.secondOperation)
+    delete template.thirdRange
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('unvollständigen zweiten Rechenschritt')
   })
 
   it('lehnt gekachelte oder unvollständige Symmetrievorlagen ab', () => {

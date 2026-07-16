@@ -122,6 +122,14 @@ export interface StrategySteps {
     wrongLower: string
     wrongUpper: string
   }
+  arithmetic1000: {
+    bridgePrompt: string
+    bridgeError: string
+    bridgeSuccess: string
+    resultPrompt: string
+    resultError: string
+    resultSuccess: string
+  }
 }
 
 export interface WordProblemTemplate {
@@ -142,6 +150,8 @@ export interface WordProblemTemplate {
   operationError: string
   firstRange: { min: number; max: number }
   secondRange: { min: number; max: number }
+  secondOperation?: '+' | '−'
+  thirdRange?: { min: number; max: number }
   plausibility: {
     prompt: string
     options: [
@@ -178,6 +188,12 @@ export interface WordProblemSteps {
   calculatePrompt: string
   calculateError: string
   calculateSuccess: string
+  secondOperationPrompt: string
+  secondOperationError: string
+  secondOperationSuccess: string
+  finalCalculationPrompt: string
+  finalCalculationError: string
+  finalCalculationSuccess: string
   checkPrompt: string
   checkError: string
   checkSuccess: string
@@ -222,10 +238,11 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 const KNOWN_PLACEHOLDERS = new Set([
-  'answer', 'answerSentence', 'axis', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
+  'answer', 'answerSentence', 'axis', 'bridge', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
-  'sumExpression', 'target', 'tens', 'tensValue', 'total', 'upper', 'upperDistance'
+  'sumExpression', 'target', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
+  'intermediate', 'secondOperation'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -322,6 +339,9 @@ function isWordProblem(value: unknown, numberRange: { min: number; max: number }
   if (new Set([value.question, ...value.questionDistractors]).size !== 3 || new Set([value.relationshipLabel, ...value.relationshipDistractors]).size !== 3) return false
   if (![1, 2, 3].includes(value.minDifficulty as number) || !['bar-model', 'groups'].includes(value.representation as string)) return false
   if (!isRange(value.firstRange, numberRange) || !isRange(value.secondRange, numberRange)) return false
+  const hasSecondStep = value.secondOperation !== undefined || value.thirdRange !== undefined
+  if (hasSecondStep && (!['+', '−'].includes(value.secondOperation as string) || !isRange(value.thirdRange, numberRange))) return false
+  if (hasSecondStep && (!(value.story as string).includes('{third}') || value.minDifficulty !== 3)) return false
   if (!(value.story as string).includes('{first}') || !(value.answer as string).includes('{result}')) return false
   if (value.relationship === 'sharing' ? !(value.story as string).includes('{total}') : !(value.story as string).includes('{second}')) return false
   const firstRange = value.firstRange as { min: number; max: number }
@@ -331,8 +351,17 @@ function isWordProblem(value: unknown, numberRange: { min: number; max: number }
   if (!plausibilityOptions.every((option) => isRecord(option) && isNonEmptyString(option.label) && typeof option.correct === 'boolean')) return false
   if (plausibilityOptions.filter((option) => (option as { correct: boolean }).correct).length !== 1) return false
   if (new Set(plausibilityOptions.map((option) => (option as { label: string }).label)).size !== 3) return false
-  const minResult = value.operation === '+' ? firstRange.min + secondRange.min : value.operation === '−' ? firstRange.min - secondRange.max : value.operation === ':' ? secondRange.min : firstRange.min * secondRange.min
-  const maxResult = value.operation === '+' ? firstRange.max + secondRange.max : value.operation === '−' ? firstRange.max - secondRange.min : value.operation === ':' ? secondRange.max : firstRange.max * secondRange.max
+  const firstResults = [firstRange.min, firstRange.max].flatMap((first) => [secondRange.min, secondRange.max].map((second) =>
+    value.operation === '+' ? first + second : value.operation === '−' ? first - second : value.operation === ':' ? second : first * second
+  ))
+  const results = hasSecondStep
+    ? firstResults.flatMap((intermediate) => {
+        const thirdRange = value.thirdRange as { min: number; max: number }
+        return [thirdRange.min, thirdRange.max].map((third) => value.secondOperation === '+' ? intermediate + third : intermediate - third)
+      })
+    : firstResults
+  const minResult = Math.min(...results)
+  const maxResult = Math.max(...results)
   return minResult >= numberRange.min && maxResult <= numberRange.max
 }
 
@@ -343,7 +372,10 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     'relationshipPrompt', 'relationshipError', 'relationshipSuccess',
     'operationPrompt', 'additionError', 'subtractionError', 'multiplicationError', 'operationSuccess',
     'representationPrompt', 'barModelLabel', 'groupsLabel', 'noModelLabel', 'representationError', 'representationSuccess',
-    'calculatePrompt', 'calculateError', 'calculateSuccess', 'checkPrompt', 'checkError', 'checkSuccess',
+    'calculatePrompt', 'calculateError', 'calculateSuccess',
+    'secondOperationPrompt', 'secondOperationError', 'secondOperationSuccess',
+    'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess',
+    'checkPrompt', 'checkError', 'checkSuccess',
     'plausibilityError', 'plausibilitySuccess',
     'additionHint', 'subtractionHint', 'multiplicationHint'
   ]
@@ -378,11 +410,13 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
     topic.releaseStatus === 'disabled'
   )) return false
   if (new Set(value.preparedTopics.map((topic) => (topic as PreparedTopic).id)).size !== 3) return false
-  if (!isRecord(value.strategySteps) || !isRecord(value.strategySteps.placeValue) || !isRecord(value.strategySteps.rounding)) return false
+  if (!isRecord(value.strategySteps) || !isRecord(value.strategySteps.placeValue) || !isRecord(value.strategySteps.rounding) || !isRecord(value.strategySteps.arithmetic1000)) return false
   const placeValueSteps = value.strategySteps.placeValue
   const roundingSteps = value.strategySteps.rounding
+  const arithmeticSteps = value.strategySteps.arithmetic1000
   if (!['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess'].every((field) => isNonEmptyString(placeValueSteps[field]))) return false
   if (!['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper'].every((field) => isNonEmptyString(roundingSteps[field]))) return false
+  if (!['bridgePrompt', 'bridgeError', 'bridgeSuccess', 'resultPrompt', 'resultError', 'resultSuccess'].every((field) => isNonEmptyString(arithmeticSteps[field]))) return false
   if (!Array.isArray(value.wordProblems) || value.wordProblems.length === 0 || !value.wordProblems.every((template) => isWordProblem(template, numberRange as { min: number; max: number }))) return false
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isRecord(value.symmetry)) return false
