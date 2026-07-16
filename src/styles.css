@@ -368,6 +368,41 @@ p {
   padding-top: 22px;
 }
 
+.version-details {
+  position: relative;
+}
+
+.version-details summary {
+  list-style: none;
+}
+
+.version-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.version-details dl {
+  position: absolute;
+  right: 0;
+  bottom: 52px;
+  z-index: 2;
+  width: min(310px, calc(100vw - 40px));
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0 8px 24px rgb(32 56 42 / 14%);
+}
+
+.version-details dl div {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.version-details dt { color: var(--muted); font-weight: 700; }
+.version-details dd { margin: 0; overflow-wrap: anywhere; font-weight: 800; }
+
 .status-pill {
   display: inline-flex;
   align-items: center;

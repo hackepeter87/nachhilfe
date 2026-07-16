@@ -124,7 +124,14 @@ export interface SkillProgress {
   subskills: Record<string, SubskillProgress>
 }
 
-export interface SessionPlan {
+export interface SessionReleaseMetadata {
+  catalogId: string
+  catalogVersion: string
+  schemaVersion: number
+  appVersion: string
+}
+
+export interface SessionPlan extends SessionReleaseMetadata {
   id: string
   seed: number
   startedAt: string
@@ -133,7 +140,7 @@ export interface SessionPlan {
 
 export type SelfAssessment = 'material' | 'hint' | 'thinking'
 
-export interface CompletedSession {
+export interface CompletedSession extends SessionReleaseMetadata {
   id: string
   startedAt: string
   completedAt: string

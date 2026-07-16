@@ -1,7 +1,19 @@
-import fallbackCatalogJson from './task-catalog.fallback.v1.json'
+import fallbackCatalogJson from './task-catalog.fallback.json'
 import { SKILL_IDS, type SkillId } from '../domain/types'
 
-export const TASK_CATALOG_URL = '/content/task-catalog.v1.json'
+export const TASK_CATALOG_URL = '/content/task-catalog.json'
+export const CATALOG_SCHEMA_VERSION = 2
+export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
+
+export type CatalogStatus = 'draft' | 'review' | 'approved'
+
+export interface CatalogMetadata {
+  catalogId: string
+  catalogVersion: string
+  schemaVersion: number
+  releasedAt: string
+  status: CatalogStatus
+}
 
 export interface DifficultyBounds {
   minLevel: 1 | 2 | 3
@@ -101,8 +113,7 @@ export interface SymmetryTemplate {
   grid: number[][]
 }
 
-export interface TaskCatalog {
-  version: 1
+export interface TaskCatalog extends CatalogMetadata {
   numberRange: { min: number; max: number }
   skills: CatalogSkill[]
   wordProblems: WordProblemTemplate[]
@@ -121,6 +132,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
+}
+
+const KNOWN_PLACEHOLDERS = new Set([
+  'answer', 'answerSentence', 'axis', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
+  'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
+  'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
+  'sumExpression', 'target', 'tens', 'tensValue', 'upper', 'upperDistance'
+])
+
+function hasOnlyKnownPlaceholders(value: unknown): boolean {
+  for (const match of JSON.stringify(value).matchAll(/\{([a-zA-Z]+)\}/g)) {
+    if (!KNOWN_PLACEHOLDERS.has(match[1] as string)) return false
+  }
+  return true
 }
 
 function isRange(value: unknown, outer: { min: number; max: number }): value is { min: number; max: number } {
@@ -177,7 +202,11 @@ function isWordProblem(value: unknown, numberRange: { min: number; max: number }
   if (![1, 2, 3].includes(value.minDifficulty as number) || !['bar-model', 'groups'].includes(value.representation as string)) return false
   if (!isRange(value.firstRange, numberRange) || !isRange(value.secondRange, numberRange)) return false
   if (!(value.story as string).includes('{first}') || !(value.story as string).includes('{second}') || !(value.answer as string).includes('{result}')) return false
-  return value.operation !== '−' || value.firstRange.min >= value.secondRange.max
+  const firstRange = value.firstRange as { min: number; max: number }
+  const secondRange = value.secondRange as { min: number; max: number }
+  const minResult = value.operation === '+' ? firstRange.min + secondRange.min : value.operation === '−' ? firstRange.min - secondRange.max : firstRange.min * secondRange.min
+  const maxResult = value.operation === '+' ? firstRange.max + secondRange.max : value.operation === '−' ? firstRange.max - secondRange.min : firstRange.max * secondRange.max
+  return minResult >= numberRange.min && maxResult <= numberRange.max
 }
 
 function isWordProblemSteps(value: unknown): value is WordProblemSteps {
@@ -193,13 +222,19 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
   if (!stringFields.every((field) => isNonEmptyString(value[field]))) return false
   if (!Array.isArray(value.relevantDistractors) || value.relevantDistractors.length !== 2 || !value.relevantDistractors.every(isNonEmptyString)) return false
   if (!Array.isArray(value.questionDistractors) || value.questionDistractors.length !== 2 || !value.questionDistractors.every(isNonEmptyString)) return false
-  return Array.isArray(value.operationOptions) && value.operationOptions.length === 3 && value.operationOptions.every((option) =>
+  if (!Array.isArray(value.operationOptions) || value.operationOptions.length !== 3 || !value.operationOptions.every((option) =>
     isRecord(option) && ['+', '−', '·'].includes(option.value as string) && isNonEmptyString(option.label)
-  )
+  )) return false
+  const operations = value.operationOptions as Array<{ value: string; label: string }>
+  return new Set(operations.map((option) => option.value)).size === 3 && new Set(operations.map((option) => option.label)).size === 3
 }
 
 export function validateTaskCatalog(value: unknown): value is TaskCatalog {
-  if (!isRecord(value) || value.version !== 1 || !isRecord(value.numberRange)) return false
+  if (!isRecord(value) || value.schemaVersion !== CATALOG_SCHEMA_VERSION || !isRecord(value.numberRange)) return false
+  if (!isNonEmptyString(value.catalogVersion) || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value.catalogVersion)) return false
+  if (value.catalogId !== TASK_CATALOG_ID) return false
+  if (!isNonEmptyString(value.releasedAt) || !/^\d{4}-\d{2}-\d{2}$/.test(value.releasedAt) || Number.isNaN(Date.parse(`${value.releasedAt}T00:00:00Z`))) return false
+  if (!['draft', 'review', 'approved'].includes(value.status as string)) return false
   const numberRange = value.numberRange
   if (!Number.isInteger(numberRange.min) || !Number.isInteger(numberRange.max) || numberRange.min !== 0 || numberRange.max !== 1000) return false
   if (!Array.isArray(value.skills) || value.skills.length !== SKILL_IDS.length || !value.skills.every((skill) => isSkill(skill, numberRange as { min: number; max: number }))) return false
@@ -209,8 +244,11 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isRecord(value.symmetry)) return false
   if (!Array.isArray(value.symmetry.optionLabels) || value.symmetry.optionLabels.length !== 3 || !value.symmetry.optionLabels.every(isNonEmptyString)) return false
+  if (new Set(value.symmetry.optionLabels).size !== 3) return false
   if (!Array.isArray(value.symmetry.templates) || value.symmetry.templates.length === 0) return false
-  return value.symmetry.templates.every((template) =>
+  const symmetryIds = value.symmetry.templates.map((template) => isRecord(template) ? template.id : undefined)
+  if (new Set(symmetryIds).size !== value.symmetry.templates.length) return false
+  return hasOnlyKnownPlaceholders(value) && value.symmetry.templates.every((template) =>
     isRecord(template) && isNonEmptyString(template.id) && isGrid(template.grid) && hasThreeDistinctSymmetryVariants(template.grid)
   )
 }
@@ -229,6 +267,11 @@ export function getTaskCatalog(): TaskCatalog {
   return activeCatalog
 }
 
+export function getActiveCatalogMetadata(): CatalogMetadata {
+  const { catalogId, catalogVersion, schemaVersion, releasedAt, status } = activeCatalog
+  return { catalogId, catalogVersion, schemaVersion, releasedAt, status }
+}
+
 export function getSkillContent(skillId: SkillId): CatalogSkill {
   return activeCatalog.skills.find((skill) => skill.id === skillId) ?? FALLBACK_TASK_CATALOG.skills.find((skill) => skill.id === skillId)!
 }
@@ -237,8 +280,8 @@ export function renderCatalogText(template: string, values: Record<string, numbe
   return template.replace(/\{([a-zA-Z]+)\}/g, (placeholder, key: string) => key in values ? String(values[key]) : placeholder)
 }
 
-export function resolveTaskCatalog(candidate: unknown): TaskCatalog {
-  return validateTaskCatalog(candidate) ? candidate : FALLBACK_TASK_CATALOG
+export function resolveTaskCatalog(candidate: unknown, allowDraft = import.meta.env.DEV): TaskCatalog {
+  return validateTaskCatalog(candidate) && (allowDraft || candidate.status !== 'draft') ? candidate : FALLBACK_TASK_CATALOG
 }
 
 export async function loadTaskCatalog(fetchCatalog: FetchCatalog = (input) => fetch(input)): Promise<TaskCatalog> {

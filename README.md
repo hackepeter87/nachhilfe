@@ -43,6 +43,7 @@ Vite zeigt die lokale URL beim Start an, standardmäßig `http://localhost:5173`
 npm run typecheck
 npm run lint
 npm test
+npm run catalog:check
 npm run build
 ```
 
@@ -70,7 +71,7 @@ Der statische Build liegt in `dist/`. Für ein statisches Deployment muss die An
 
 ## Versionierter Aufgabenkatalog
 
-Die fachlichen Inhalte liegen im austauschbaren JSON-Katalog `public/content/task-catalog.v1.json`. Er enthält:
+Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerderkern/catalog.json`. Daraus erzeugt `npm run catalog:build` deterministisch den öffentlichen Katalog `public/content/task-catalog.json` und den eingebetteten Fallback `src/content/task-catalog.fallback.json`. Der Katalog enthält:
 
 - Katalogversion und Zahlenraum `0..1000`
 - alle Kompetenz-IDs, Anzeigenamen und Lehrplanbereiche
@@ -81,11 +82,13 @@ Die fachlichen Inhalte liegen im austauschbaren JSON-Katalog `public/content/tas
 - strukturierte Sachaufgabenvorlagen mit Beziehung, Frage, Modell, unwichtiger Angabe und beziehungsspezifischen Hilfen
 - Raster- und Beschriftungsvorlagen für Symmetrieaufgaben
 
+Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Freigabestatus `draft`, `review` oder `approved`. Der aktuelle Status ist `review`; eine Freigabe durch eine Lehrkraft ist nicht dokumentiert.
+
 Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtraktion, Multiplikation/Division, Stellenwertberechnung, Nachbarzahlen, Rundung, Spiegelung, Distraktorprüfung, Lösungsprüfung, Sitzungsplanung und Adaptivität stehen weiterhin unter `src/domain/`. Der JSON-Katalog enthält keine ausführbare Logik.
 
-Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Version, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App `src/content/task-catalog.fallback.v1.json` als gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
+Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Metadaten, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App den gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
 
-Bei einer fachlichen Änderung wird zuerst `public/content/task-catalog.v1.json` angepasst. Soll die Änderung auch neuer eingebauter Fallback werden, ist dieselbe geprüfte Version zusätzlich nach `src/content/task-catalog.fallback.v1.json` zu übernehmen. `npm test` validiert beide Pfade und die produktiven Generatoren. Die vollständige Progression steht in [docs/didaktische-progression.md](docs/didaktische-progression.md); neue Inhalte werden mit [docs/didaktische-review-checkliste.md](docs/didaktische-review-checkliste.md) geprüft.
+Der Produktionsbuild scheitert bei einem ungültigen Katalog, einem `draft`-Status oder abweichenden Artefakten. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Die fachliche Progression steht in [docs/didaktische-progression.md](docs/didaktische-progression.md); neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
 
 ## Container
 
@@ -103,6 +106,7 @@ curl --fail http://127.0.0.1:8080/healthz
 curl --fail http://127.0.0.1:8080/
 curl --fail http://127.0.0.1:8080/manifest.webmanifest
 curl --fail http://127.0.0.1:8080/sw.js
+curl --fail http://127.0.0.1:8080/content/task-catalog.json
 npm run test:e2e:container
 ```
 
@@ -124,6 +128,7 @@ Die mitgelieferte Nginx-Konfiguration setzt folgende Regeln:
 - Hash-basierte Dateien unter `/assets/`: ein Jahr und `immutable`
 - `/sw.js`: keine Speicherung, immer neu validieren
 - `/manifest.webmanifest` und `/index.html`: keine dauerhafte Speicherung, immer neu validieren
+- `/content/task-catalog.json`: JSON-MIME-Typ und kontrollierte Revalidierung
 - Andere Routen: SPA-Fallback und Revalidierung
 
 Diese Regeln sollten bei einem anderen statischen Host oder vorgeschalteten CDN beibehalten werden. Insbesondere darf `sw.js` niemals mit einer langfristigen Immutable-Regel ausgeliefert werden.
@@ -143,10 +148,10 @@ Die Offline- und Mobilabläufe wurden automatisiert mit Playwright geprüft. Ein
 
 ## Daten und Adaptivität
 
-Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen versioniert in nativer IndexedDB. Es gibt kein Backend, Tracking, Werbung oder externe Laufzeit-API.
+Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen versioniert in nativer IndexedDB. Neue Sitzungen speichern App-, Katalog- und Schemaversion. Alte Sitzungen bleiben erhalten und werden beim Lesen ehrlich mit `unknown` beziehungsweise Schema `0` gekennzeichnet. Es gibt kein Backend, Tracking, Werbung oder externe Laufzeit-API.
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Schwierigkeit steuert zusätzlich Zahlenraum, Denkschritte und Hilfsdarstellung. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.2.0
+## Release-Stand 0.3.0
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.2.0 vertieft die didaktische Progression, Aufgabenvalidierung, Grundrechenadaptivität, Sachaufgaben und erste Rechenstrategien bis 1000. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.3.0 ergänzt reproduzierbare Katalog-Releases, Sitzungsmetadaten und ein kontrolliertes PWA-Updateverhalten. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

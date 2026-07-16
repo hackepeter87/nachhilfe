@@ -1,0 +1,1312 @@
+{
+  "schemaVersion": 2,
+  "catalogVersion": "0.2.0",
+  "catalogId": "nrw-klasse3-foerderkern",
+  "releasedAt": "2026-07-16",
+  "status": "review",
+  "numberRange": {
+    "min": 0,
+    "max": 1000
+  },
+  "skills": [
+    {
+      "id": "addition",
+      "label": "Plusaufgaben",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Additionen im Zahlenraum bis 20 sicher und flexibel lösen.",
+      "misconceptions": [
+        "Die zweite Zahl wird abgezogen.",
+        "Beim Zehnerübergang wird ein Schritt ausgelassen."
+      ],
+      "hints": [
+        "Starte bei {first} und zähle {second} weiter.",
+        "Zerlege {second}, sodass du zuerst bis 10 oder zur nächsten vollen Zahl kommst."
+      ],
+      "prompt": "Wie viel ist {first} + {second}?",
+      "errorFeedback": "Fast. Prüfe noch einmal, wie viele Schritte du von {first} weiterzählst.",
+      "explanation": "{first} plus {second} sind {answer}. Du kannst die zweite Zahl in kleine Schritte zerlegen.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 20
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Zahlen bis 20 lesen",
+        "Mengen bis 10 erfassen"
+      ],
+      "representations": [
+        "Punktefelder",
+        "Rechenstrich"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Summen bis 10 mit sichtbaren Gruppen",
+          "numberRange": "0 bis 10",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zehnerübergang durch Zerlegen auf Hilfe",
+          "numberRange": "0 bis 20",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Ergänzen und Nachbaraufgaben ohne sichtbares Material",
+          "numberRange": "0 bis 20",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "8 + 5: Erst 8 + 2 = 10, dann noch 3. Also 13.",
+      "successFeedback": "Du hast die Plusaufgabe passend zerlegt.",
+      "remediation": "Zurück zu Summen bis 10 mit zwei sichtbaren Gruppen.",
+      "transferPrompt": "Finde eine Tauschaufgabe mit demselben Ergebnis.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "subtraction",
+      "label": "Minusaufgaben",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Subtraktionen im Zahlenraum bis 20 sicher lösen.",
+      "misconceptions": [
+        "Die Zahlen werden vertauscht.",
+        "Beim Rückwärtszählen wird die Startzahl mitgezählt."
+      ],
+      "hints": [
+        "Gehe von {first} aus {second} Schritte zurück.",
+        "Du kannst erst bis 10 zurückgehen und dann den Rest abziehen."
+      ],
+      "prompt": "Wie viel ist {first} − {second}?",
+      "errorFeedback": "Noch nicht ganz. Beim Minusrechnen wird die Zahl kleiner.",
+      "explanation": "Von {first} gehen {second} weg. Übrig bleiben {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 20
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Zahlen bis 20 lesen",
+        "Teil-Ganzes-Beziehungen verstehen"
+      ],
+      "representations": [
+        "Punktefelder",
+        "Rechenstrich"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Abziehen ohne Zehnerübergang mit Darstellung",
+          "numberRange": "0 bis 10",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zehnerübergang durch Zerlegen auf Hilfe",
+          "numberRange": "0 bis 20",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Ergänzen als zweite Strategie ohne sichtbares Material",
+          "numberRange": "0 bis 20",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "14 − 6: Erst 14 − 4 = 10, dann noch 2 weg. Also 8.",
+      "successFeedback": "Du hast den passenden Minusweg gefunden.",
+      "remediation": "Abziehen in zwei sichtbaren Schritten bis zur 10.",
+      "transferPrompt": "Prüfe das Ergebnis mit der passenden Plusaufgabe.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "multiplication",
+      "label": "Einmaleins",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Kernaufgaben des kleinen Einmaleins über gleich große Gruppen verstehen.",
+      "misconceptions": [
+        "Faktoren werden addiert.",
+        "Eine Gruppe wird zu viel oder zu wenig gezählt."
+      ],
+      "hints": [
+        "{first} · {second} bedeutet: {second} wird {first}-mal genommen.",
+        "Rechne schrittweise: {sumExpression}."
+      ],
+      "prompt": "Wie viel ist {first} · {second}?",
+      "errorFeedback": "Schau noch einmal auf die {first} gleich großen Gruppen.",
+      "explanation": "{first} Gruppen mit je {second} sind zusammen {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 100
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Gleich große Gruppen erkennen",
+        "Verdoppeln"
+      ],
+      "representations": [
+        "Gruppenbild",
+        "Aufgabenfamilie"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "2er-, 5er- und 10er-Reihe mit Gruppen",
+          "numberRange": "Produkte bis 50",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "3er-, 4er- und 6er-Reihe mit Gruppen auf Hilfe",
+          "numberRange": "Produkte bis 60",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "7er-, 8er- und 9er-Reihe über Nachbar- und Tauschaufgaben",
+          "numberRange": "Produkte bis 90",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "6 · 7: Nutze 5 · 7 = 35 und noch einmal 7. Das ergibt 42.",
+      "successFeedback": "Du hast die {first}er-Reihe über gleich große Gruppen gelöst.",
+      "remediation": "Zurück zu einer bekannten Nachbarreihe mit Gruppenbild.",
+      "transferPrompt": "Nenne die Tauschaufgabe und eine passende Division.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "division",
+      "label": "Umkehraufgaben",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Division ohne Rest als Umkehrung der Multiplikation nutzen.",
+      "misconceptions": [
+        "Dividend und Divisor werden vertauscht.",
+        "Die Gruppen sind nicht gleich groß."
+      ],
+      "hints": [
+        "Welche Zahl mal {divisor} ergibt {dividend}?",
+        "Nutze die Umkehraufgabe: {divisor} · ? = {dividend}."
+      ],
+      "prompt": "{dividend} : {divisor} = ?",
+      "errorFeedback": "Die Gruppen müssen gleich groß sein. Nutze die passende Malaufgabe.",
+      "explanation": "{divisor} · {quotient} = {dividend}. Deshalb ist {dividend} : {divisor} = {quotient}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 100
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Einmaleins als Gruppen verstehen",
+        "Umkehraufgaben kennen"
+      ],
+      "representations": [
+        "Gruppenbild",
+        "Aufgabenfamilie"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Teilen durch 2, 5 oder 10 mit Gruppen",
+          "numberRange": "Dividend bis 50",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Teilen durch 3, 4 oder 6 mit Hilfe",
+          "numberRange": "Dividend bis 60",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Divisionen zu 7er-, 8er- und 9er-Reihe als Umkehraufgabe",
+          "numberRange": "Dividend bis 90",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "42 : 6: Suche 6 · ? = 42. 6 · 7 = 42, also ist das Ergebnis 7.",
+      "successFeedback": "Du hast die Umkehraufgabe mit dem Teiler {divisor} genutzt.",
+      "remediation": "Die Menge wird noch einmal in sichtbare gleich große Gruppen gelegt.",
+      "transferPrompt": "Bilde aus den drei Zahlen eine weitere Mal- oder Geteiltaufgabe.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "place-value",
+      "label": "Stellenwerte",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Den Wert einer Ziffer im Stellenwertsystem bis 1000 bestimmen.",
+      "misconceptions": [
+        "Ziffer und Stellenwert werden gleichgesetzt.",
+        "Einer, Zehner und Hunderter werden verwechselt."
+      ],
+      "hints": [
+        "Suche die {position}-Spalte.",
+        "{digit} {position} bedeuten nicht nur die Ziffer {digit}, sondern ihren Wert an dieser Stelle."
+      ],
+      "prompt": "Welchen Wert hat die Ziffer {digit} bei den {position}n in {number}?",
+      "errorFeedback": "Ziffer und Stellenwert sind verschieden. Achte auf die Spalte der {position}.",
+      "explanation": "In {number} steht die {digit} bei den {position}n. Ihr Wert ist {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Hunderter, Zehner und Einer unterscheiden"
+      ],
+      "representations": [
+        "Stellenwerttafel",
+        "Stellenwertmaterial"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Alle Stellen ungleich null; Tafel sichtbar und Stelle markiert",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Eine Null als Platzhalter; Tafel erst auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Ähnliche Optionen und keine Hervorhebung",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "In 472 steht die 7 bei den Zehnern. Ihr Wert ist 70.",
+      "successFeedback": "Du hast Ziffer und Stellenwert richtig unterschieden.",
+      "remediation": "Die Zahl wird mit Hundertern, Zehnern und Einern gelegt.",
+      "transferPrompt": "Welche Ziffer müsste sich ändern, damit die Zahl um 100 wächst?",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "decompose",
+      "label": "Zahlen zerlegen",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zahlen bis 1000 in Hunderter, Zehner und Einer zerlegen.",
+      "misconceptions": [
+        "Ziffern werden ohne Stellenwert addiert.",
+        "Zehner und Hunderter werden vertauscht."
+      ],
+      "hints": [
+        "Trenne Hunderter, Zehner und Einer.",
+        "{hundreds} Hunderter sind {hundredsValue}, {tens} Zehner sind {tensValue}."
+      ],
+      "prompt": "Welche Zerlegung passt zu {number}?",
+      "errorFeedback": "Achte darauf, dass jede Ziffer den Wert ihrer Stelle bekommt.",
+      "explanation": "{number} besteht aus {hundredsValue}, {tensValue} und {ones}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Stellenwerte bis 1000"
+      ],
+      "representations": [
+        "Stellenwerttafel"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Keine Null; Tafel sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Eine Null als Platzhalter; Tafel auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Mehrere ähnliche Zerlegungen ohne Tafel",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "406 = 400 + 0 + 6.",
+      "successFeedback": "Du hast jeder Ziffer ihren Stellenwert gegeben.",
+      "remediation": "Jede Ziffer wird zuerst in die passende Stelle gelegt.",
+      "transferPrompt": "Baue aus derselben Zerlegung wieder die Zahl.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "compose",
+      "label": "Zahlen bauen",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Aus Hundertern, Zehnern und Einern eine Zahl bis 1000 zusammensetzen.",
+      "misconceptions": [
+        "Stellen werden in falscher Reihenfolge notiert.",
+        "Nullen als Platzhalter fehlen."
+      ],
+      "hints": [
+        "Schreibe zuerst die Hunderter-, dann die Zehner- und zuletzt die Einerziffer.",
+        "{hundredsValue} + {tensValue} + {ones} ergibt die gesuchte Zahl."
+      ],
+      "prompt": "Baue die Zahl aus {hundreds} Hundertern, {tens} Zehnern und {ones} Einern.",
+      "errorFeedback": "Prüfe die Reihenfolge: Hunderter, Zehner, Einer.",
+      "explanation": "{hundredsValue} + {tensValue} + {ones} = {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Stellenwerte bis 1000"
+      ],
+      "representations": [
+        "Stellenwerttafel"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Alle Stellen besetzt; Tafel sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Eine leere Stelle; Tafel auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Zahl aus gemischten Stellenwertangaben ohne Tafel",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "4 Hunderter, 0 Zehner und 6 Einer ergeben 406.",
+      "successFeedback": "Du hast die Stellen in der richtigen Reihenfolge zusammengesetzt.",
+      "remediation": "Hunderter, Zehner und Einer werden in drei Spalten sortiert.",
+      "transferPrompt": "Zerlege die gebaute Zahl wieder.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "neighbor-tens",
+      "label": "Nachbarzehner",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Eine Zahl zwischen ihren direkt benachbarten Zehnern einordnen.",
+      "misconceptions": [
+        "Nicht direkt benachbarte Zehner werden gewählt.",
+        "Nur der kleinere Zehner wird betrachtet."
+      ],
+      "hints": [
+        "Suche die volle Zehnerzahl direkt unter und über {number}.",
+        "{number} ist größer als {lower} und kleiner als {upper}."
+      ],
+      "prompt": "Zwischen welchen Nachbarzehnern liegt {number}?",
+      "errorFeedback": "Die gesuchten Zahlen müssen direkt unter und über {number} liegen.",
+      "explanation": "{lower} < {number} < {upper}. Darum sind {lower} und {upper} die Nachbarzehner.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Zehnerzahlen kennen"
+      ],
+      "representations": [
+        "Zahlenstrahl"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Zahl in der Mitte; Zahlenstrahl sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zahl nahe an einem Zehner; Zahlenstrahl auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Ohne Zahlenstrahl und mit anschließender Rundungsidee",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "64 liegt zwischen 60 und 70.",
+      "successFeedback": "Du hast beide direkten Nachbarzehner gefunden.",
+      "remediation": "Die Zahl wird auf einem Abschnitt zwischen zwei Zehnern markiert.",
+      "transferPrompt": "Zu welchem Nachbarzehner liegt die Zahl näher?",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "neighbor-hundreds",
+      "label": "Nachbarhunderter",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Eine Zahl zwischen ihren direkt benachbarten Hundertern einordnen.",
+      "misconceptions": [
+        "Nicht direkt benachbarte Hunderter werden gewählt.",
+        "Zehner statt Hunderter werden betrachtet."
+      ],
+      "hints": [
+        "Suche die volle Hunderterzahl direkt unter und über {number}.",
+        "{number} ist größer als {lower} und kleiner als {upper}."
+      ],
+      "prompt": "Zwischen welchen Nachbarhundertern liegt {number}?",
+      "errorFeedback": "Die gesuchten Zahlen müssen direkt unter und über {number} liegen.",
+      "explanation": "{lower} < {number} < {upper}. Darum sind {lower} und {upper} die Nachbarhunderter.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Hunderterzahlen kennen"
+      ],
+      "representations": [
+        "Zahlenstrahl"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Zahl deutlich zwischen zwei Hundertern; Strahl sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zahl nahe an einem Hunderter; Strahl auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Ohne Strahl und mit Rundungsidee",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "640 liegt zwischen 600 und 700.",
+      "successFeedback": "Du hast beide direkten Nachbarhunderter gefunden.",
+      "remediation": "Die Zahl wird zwischen zwei Hundertern auf dem Zahlenstrahl markiert.",
+      "transferPrompt": "Zu welchem Nachbarhunderter liegt die Zahl näher?",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "round-tens",
+      "label": "Auf Zehner runden",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zahlen bis 1000 über Nachbarzehner und Abstände auf Zehner runden.",
+      "misconceptions": [
+        "Am Halbpunkt wird abgerundet.",
+        "Eine Antwort außerhalb des Zahlenraums wird gewählt."
+      ],
+      "hints": [
+        "{number} liegt zwischen {lower} und {upper}.",
+        "Der Abstand zu {lower} ist {lowerDistance}, der Abstand zu {upper} ist {upperDistance}."
+      ],
+      "prompt": "Runde {number} auf den nächsten Zehner.",
+      "errorFeedback": "Vergleiche die Abstände zu {lower} und {upper}.",
+      "explanation": "{number} liegt näher bei {answer}. Deshalb wird auf {answer} gerundet.",
+      "halfExplanation": "Die Abstände zu {lower} und {upper} sind beide {lowerDistance}. Nach der Grundschulregel wird am Halbpunkt aufgerundet: {number} wird zu {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Nachbarzehner bestimmen",
+        "Abstände vergleichen"
+      ],
+      "representations": [
+        "Zahlenstrahl"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Nachbarzehner und Abstände sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zahlenstrahl nur auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Selbstständig runden und Ergebnis begründen",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "67 ist 3 von 70 und 7 von 60 entfernt. Daher wird auf 70 gerundet.",
+      "successFeedback": "Du hast die Abstände zu den Nachbarzehnern richtig verglichen.",
+      "remediation": "Zuerst werden nur die beiden Nachbarzehner bestimmt.",
+      "transferPrompt": "Erkläre, warum die andere Nachbarzahl weiter entfernt ist.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "round-hundreds",
+      "label": "Auf Hunderter runden",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zahlen bis 1000 über Nachbarhunderter und Abstände auf Hunderter runden.",
+      "misconceptions": [
+        "Am Halbpunkt wird abgerundet.",
+        "Die Zehnerstelle wird statt des Abstands betrachtet."
+      ],
+      "hints": [
+        "{number} liegt zwischen {lower} und {upper}.",
+        "Der Abstand zu {lower} ist {lowerDistance}, der Abstand zu {upper} ist {upperDistance}."
+      ],
+      "prompt": "Runde {number} auf den nächsten Hunderter.",
+      "errorFeedback": "Vergleiche die Abstände zu {lower} und {upper}.",
+      "explanation": "{number} liegt näher bei {answer}. Deshalb wird auf {answer} gerundet.",
+      "halfExplanation": "Die Abstände zu {lower} und {upper} sind beide {lowerDistance}. Nach der Grundschulregel wird am Halbpunkt aufgerundet: {number} wird zu {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Nachbarhunderter bestimmen",
+        "Abstände vergleichen"
+      ],
+      "representations": [
+        "Zahlenstrahl"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Nachbarhunderter und Abstände sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zahlenstrahl nur auf Hilfe",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Selbstständig runden und Ergebnis begründen",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "650 liegt genau in der Mitte. Nach der Grundschulregel wird auf 700 gerundet.",
+      "successFeedback": "Du hast die Abstände zu den Nachbarhundertern richtig verglichen.",
+      "remediation": "Zuerst werden nur die beiden Nachbarhunderter bestimmt.",
+      "transferPrompt": "Finde eine weitere Zahl, die auf denselben Hunderter gerundet wird.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "word-problem",
+      "label": "Sachaufgabe",
+      "curriculumArea": "Größen und Messen / Sachsituationen",
+      "supportGoal": "Wichtige Angaben erkennen, eine passende Rechenart wählen und einen Antwortsatz prüfen.",
+      "misconceptions": [
+        "Nur eine Zahl wird verwendet.",
+        "Die Rechenart passt nicht zur Veränderung der Menge."
+      ],
+      "hints": [
+        "Unterstreiche im Kopf die beiden Mengen.",
+        "{operationHint}"
+      ],
+      "prompt": "{story}",
+      "errorFeedback": "Gehe die Geschichte Schritt für Schritt durch.",
+      "explanation": "{first} {operation} {second} = {result}. {answerSentence}",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 20
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Kurze Sätze lesen",
+        "Grundrechenarten als Beziehungen verstehen"
+      ],
+      "representations": [
+        "Balkenmodell",
+        "Gruppenbild"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Eindeutige Handlung und sichtbare Darstellung",
+          "numberRange": "Ergebnisse bis 20",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Frage und Darstellung selbst auswählen",
+          "numberRange": "Ergebnisse bis 100",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Unwichtige Angabe und Plausibilität prüfen",
+          "numberRange": "Ergebnisse bis 100",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "Erst klären: Was verändert sich? Dann passende Darstellung und Rechnung wählen.",
+      "successFeedback": "Du hast Handlung, Rechnung und Antwort miteinander verbunden.",
+      "remediation": "Die Geschichte wird auf zwei Mengen und ihre Beziehung reduziert.",
+      "transferPrompt": "Erfinde eine andere Geschichte zur gleichen Rechnung.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "symmetry",
+      "label": "Spiegelbilder",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Eine Figur an einer senkrechten oder waagerechten Spiegelachse erkennen.",
+      "misconceptions": [
+        "Eine Verschiebung wird als Spiegelung gewählt.",
+        "Oben und unten werden statt links und rechts vertauscht."
+      ],
+      "hints": [
+        "Prüfe bei jedem Feld den Abstand zur Spiegelachse.",
+        "Gehe Reihe für Reihe oder Spalte für Spalte vor. Die Abstände zur Achse bleiben gleich."
+      ],
+      "prompt": "Welches Bild ist das genaue Spiegelbild an einer {axis} Spiegelachse?",
+      "errorFeedback": "Das ist verschoben oder an der falschen Achse gespiegelt. Vergleiche die Abstände zur Spiegelachse.",
+      "explanation": "Beim Spiegeln wechselt jedes Feld auf die andere Seite der Achse. Sein Abstand zur Achse bleibt gleich.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Links und rechts unterscheiden",
+        "Raster zeilenweise lesen"
+      ],
+      "representations": [
+        "Rasterbild"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "3×3-Raster mit deutlichen Distraktoren",
+          "numberRange": "0 bis 10",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "4×4-Raster mit plausibler Verschiebung",
+          "numberRange": "0 bis 20",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "5×5-Raster mit waagerechter oder senkrechter Achse",
+          "numberRange": "0 bis 20",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "Ein Feld direkt neben der Achse liegt im Spiegel wieder direkt neben der Achse.",
+      "successFeedback": "Du hast Spiegelung und Verschiebung richtig unterschieden.",
+      "remediation": "Nur eine Rasterzeile wird zuerst gemeinsam gespiegelt.",
+      "transferPrompt": "Beschreibe, welche Felder beim Spiegeln ihre Seite wechseln.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "addition-1000",
+      "label": "Addieren bis 1000",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Einfache Additionen bis 1000 über Stellenwerte und Teilschritte lösen.",
+      "misconceptions": [
+        "Stellen werden vermischt.",
+        "Beim Übergang wird der Rest vergessen."
+      ],
+      "hints": [
+        "Verändere zuerst nur die Stelle von {second}.",
+        "{strategy}"
+      ],
+      "prompt": "Rechne {first} + {second}.",
+      "errorFeedback": "Ordne die Zahlen nach Hundertern, Zehnern und Einern.",
+      "explanation": "{strategy} Das Ergebnis ist {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Stellenwerte bis 1000",
+        "Addition bis 20"
+      ],
+      "representations": [
+        "Stellenwerttafel",
+        "Rechenstrich"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Hunderter oder Zehner ohne Übergang; Material sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Eineraddition mit einem Zehnerübergang; Hilfe zeigt Teilschritte",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Zehneraddition mit einem Übergang ohne sichtbares Material",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "368 + 7: Erst +2 bis 370, dann +5 bis 375.",
+      "successFeedback": "Du hast stellenweise addiert und den Übergang sinnvoll zerlegt.",
+      "remediation": "Die Summanden werden nach Hundertern, Zehnern und Einern sortiert.",
+      "transferPrompt": "Löse dieselbe Aufgabe auf einem Rechenstrich.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "subtraction-1000",
+      "label": "Subtrahieren bis 1000",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Einfache Subtraktionen bis 1000 stellenweise und über Ergänzen lösen.",
+      "misconceptions": [
+        "Stellen werden vertauscht.",
+        "Die Zahl wird beim Minusrechnen größer."
+      ],
+      "hints": [
+        "Verändere zuerst nur die Stelle von {second}.",
+        "{strategy}"
+      ],
+      "prompt": "Rechne {first} − {second}.",
+      "errorFeedback": "Prüfe, welche Stelle durch das Subtrahieren kleiner wird.",
+      "explanation": "{strategy} Das Ergebnis ist {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Stellenwerte bis 1000",
+        "Subtraktion bis 20"
+      ],
+      "representations": [
+        "Stellenwerttafel",
+        "Rechenstrich"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Hunderter oder Zehner ohne Entbündeln; Material sichtbar",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Gemischte Stellen ohne Entbündeln; Hilfe zeigt Teilschritte",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Subtraktion über einen vollen Hunderter mit Ergänzungsstrategie",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "572 − 30: Drei Zehner weg, die Hunderter und Einer bleiben. Ergebnis 542.",
+      "successFeedback": "Du hast stellenweise subtrahiert, ohne die Stellen zu vertauschen.",
+      "remediation": "Es wird nur eine Stelle verändert und im Material gezeigt.",
+      "transferPrompt": "Prüfe dein Ergebnis durch Addition.",
+      "releaseStatus": "active"
+    },
+    {
+      "id": "complement-1000",
+      "label": "Zur vollen Zahl ergänzen",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zum nächsten Zehner oder Hunderter ergänzen.",
+      "misconceptions": [
+        "Die volle Zielzahl wird mitgezählt.",
+        "Die Differenz wird in falscher Richtung gebildet."
+      ],
+      "hints": [
+        "Gehe von {first} aus bis zur nächsten vollen Zahl.",
+        "{strategy}"
+      ],
+      "prompt": "Wie viel fehlt von {first} bis {target}?",
+      "errorFeedback": "Gesucht ist der Abstand von der Startzahl bis zur größeren Zielzahl.",
+      "explanation": "{strategy} Es fehlen {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        "Problemlösen",
+        "Darstellen",
+        "Kommunizieren"
+      ],
+      "prerequisites": [
+        "Nachbarzehner und Nachbarhunderter",
+        "Ergänzen bis 20"
+      ],
+      "representations": [
+        "Rechenstrich"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Zum nächsten Zehner mit sichtbarem Sprung",
+          "numberRange": "0 bis 1000",
+          "representation": "always",
+          "cognitiveSteps": 1
+        },
+        {
+          "level": 2,
+          "description": "Zum nächsten Hunderter in zwei sichtbaren Sprüngen",
+          "numberRange": "0 bis 1000",
+          "representation": "hint",
+          "cognitiveSteps": 2
+        },
+        {
+          "level": 3,
+          "description": "Ergänzungsweg ohne sichtbaren Rechenstrich",
+          "numberRange": "0 bis 1000",
+          "representation": "none",
+          "cognitiveSteps": 3
+        }
+      ],
+      "workedExample": "Von 470 bis 500 fehlen 30.",
+      "successFeedback": "Du hast bis zur nächsten vollen Zahl ergänzt.",
+      "remediation": "Der Weg wird in einen kleinen und einen vollen Zehnersprung geteilt.",
+      "transferPrompt": "Schreibe die passende Plusaufgabe.",
+      "releaseStatus": "active"
+    }
+  ],
+  "wordProblems": [
+    {
+      "id": "shells-addition",
+      "relationship": "join",
+      "operation": "+",
+      "story": "Mila sammelt {first} Muscheln. Am Strand findet sie noch {second}. {irrelevant} Wie viele Muscheln hat sie jetzt?",
+      "question": "Wie viele Muscheln hat Mila jetzt?",
+      "relevant": "{first} Muscheln und {second} neue Muscheln",
+      "irrelevant": "Ihr Eimer ist blau.",
+      "answer": "Mila hat jetzt {result} Muscheln.",
+      "minDifficulty": 1,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 7,
+        "max": 14
+      },
+      "secondRange": {
+        "min": 2,
+        "max": 6
+      },
+      "operationHint": "Zu Milas Muscheln kommen weitere dazu. Die neue Gesamtmenge wird mit Plus berechnet.",
+      "operationError": "Beide Mengen gehören nacheinander zu Mila. Verbinde sie zu einer größeren Gesamtmenge."
+    },
+    {
+      "id": "pencils-subtraction",
+      "relationship": "separate",
+      "operation": "−",
+      "story": "In einer Kiste liegen {first} Buntstifte. {second} werden herausgenommen. {irrelevant} Wie viele bleiben in der Kiste?",
+      "question": "Wie viele Buntstifte bleiben?",
+      "relevant": "{first} Buntstifte und {second} herausgenommene",
+      "irrelevant": "Die Kiste steht auf einem Tisch.",
+      "answer": "{result} Buntstifte bleiben in der Kiste.",
+      "minDifficulty": 1,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 12,
+        "max": 20
+      },
+      "secondRange": {
+        "min": 2,
+        "max": 8
+      },
+      "operationHint": "Von der Anfangsmenge werden Stifte weggenommen. Die verbleibende Menge wird mit Minus berechnet.",
+      "operationError": "Die herausgenommenen Stifte gehören danach nicht mehr zur Menge in der Kiste."
+    },
+    {
+      "id": "books-combine",
+      "relationship": "combine",
+      "operation": "+",
+      "story": "Im Regal stehen {first} Tierbücher und {second} Weltraumbücher. {irrelevant} Wie viele Bücher sind das zusammen?",
+      "question": "Wie viele Bücher stehen zusammen im Regal?",
+      "relevant": "{first} Tierbücher und {second} Weltraumbücher",
+      "irrelevant": "Das Regal hat drei Bretter.",
+      "answer": "Zusammen stehen dort {result} Bücher.",
+      "minDifficulty": 2,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 20,
+        "max": 60
+      },
+      "secondRange": {
+        "min": 10,
+        "max": 35
+      },
+      "operationHint": "Tierbücher und Weltraumbücher sind zwei Teile derselben Gesamtmenge.",
+      "operationError": "Hier verändert sich nichts. Zwei Teilmengen werden zu einer Gesamtmenge zusammengefasst."
+    },
+    {
+      "id": "stickers-compare",
+      "relationship": "compare",
+      "operation": "−",
+      "story": "Noah hat {first} Sticker, Lia hat {second} Sticker. {irrelevant} Wie viele Sticker hat Noah mehr?",
+      "question": "Wie viele Sticker hat Noah mehr als Lia?",
+      "relevant": "{first} Sticker von Noah und {second} Sticker von Lia",
+      "irrelevant": "Lias Album ist grün.",
+      "answer": "Noah hat {result} Sticker mehr.",
+      "minDifficulty": 2,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 35,
+        "max": 80
+      },
+      "secondRange": {
+        "min": 10,
+        "max": 30
+      },
+      "operationHint": "Gesucht ist der Unterschied zwischen Noahs und Lias Stickerzahl.",
+      "operationError": "Vergleiche beide Mengen: Ziehe die kleinere Stickerzahl von der größeren ab."
+    },
+    {
+      "id": "seats-complement",
+      "relationship": "complement",
+      "operation": "−",
+      "story": "Ein Bus hat {first} Sitzplätze. {second} Plätze sind besetzt. {irrelevant} Wie viele Plätze sind noch frei?",
+      "question": "Wie viele Sitzplätze sind noch frei?",
+      "relevant": "{first} Sitzplätze und {second} besetzte Plätze",
+      "irrelevant": "Der Bus ist gelb.",
+      "answer": "Es sind noch {result} Plätze frei.",
+      "minDifficulty": 2,
+      "representation": "bar-model",
+      "firstRange": {
+        "min": 40,
+        "max": 80
+      },
+      "secondRange": {
+        "min": 12,
+        "max": 35
+      },
+      "operationHint": "Besetzte und freie Plätze ergeben zusammen alle Sitzplätze. Gesucht ist der fehlende Teil.",
+      "operationError": "Die freien Plätze sind der fehlende Teil zwischen den besetzten Plätzen und allen Sitzplätzen."
+    },
+    {
+      "id": "teams-equal-groups",
+      "relationship": "equal-groups",
+      "operation": "·",
+      "story": "{first} Teams haben jeweils {second} Kinder. {irrelevant} Wie viele Kinder sind es zusammen?",
+      "question": "Wie viele Kinder sind in allen Teams zusammen?",
+      "relevant": "{first} Teams und {second} Kinder je Team",
+      "irrelevant": "Ein Team trägt rote Bänder.",
+      "answer": "Zusammen sind es {result} Kinder.",
+      "minDifficulty": 3,
+      "representation": "groups",
+      "firstRange": {
+        "min": 2,
+        "max": 6
+      },
+      "secondRange": {
+        "min": 2,
+        "max": 8
+      },
+      "operationHint": "Jedes Team hat gleich viele Kinder. Gleich große Gruppen lassen sich mit Mal zusammenfassen.",
+      "operationError": "Die Kinderzahl pro Team wird für jedes Team gleich oft genommen."
+    }
+  ],
+  "wordProblemSteps": {
+    "relevantPrompt": "Welche Angaben sind wichtig?",
+    "relevantDistractors": [
+      "Nur die Zahl {first}",
+      "Es gibt keine wichtigen Zahlen"
+    ],
+    "relevantError": "Für die Lösung brauchst du beide Mengen aus dem Text.",
+    "relevantSuccess": "Genau, diese beiden Angaben helfen dir.",
+    "operationPrompt": "Welche Rechenart passt?",
+    "operationOptions": [
+      {
+        "value": "+",
+        "label": "Plus: Es kommt etwas dazu."
+      },
+      {
+        "value": "−",
+        "label": "Minus: Es geht etwas weg."
+      },
+      {
+        "value": "·",
+        "label": "Mal: Es gibt gleich große Gruppen."
+      }
+    ],
+    "additionError": "Im Text kommt etwas dazu.",
+    "subtractionError": "Im Text wird etwas herausgenommen.",
+    "operationSuccess": "Diese Rechenart passt zur Geschichte.",
+    "calculatePrompt": "Rechne: {first} {operation} {second} = ?",
+    "calculateError": "Rechne die beiden wichtigen Zahlen noch einmal.",
+    "calculateSuccess": "Die Rechnung stimmt.",
+    "checkPrompt": "Welcher Antwortsatz passt?",
+    "checkError": "Der Antwortsatz muss zu deinem Rechenergebnis passen.",
+    "checkSuccess": "Rechnung und Antwort passen zusammen.",
+    "additionHint": "Es kommt etwas dazu. Die Menge wird größer.",
+    "subtractionHint": "Es geht etwas weg. Die Menge wird kleiner.",
+    "questionPrompt": "Welche Frage soll beantwortet werden?",
+    "questionDistractors": [
+      "Wie heißt das Kind in der Geschichte?",
+      "Welche Farbe wird genannt?"
+    ],
+    "questionError": "Suche den Satz, der nach einer unbekannten Menge fragt.",
+    "questionSuccess": "Du hast erkannt, was gesucht wird.",
+    "multiplicationError": "Es gibt mehrere gleich große Gruppen.",
+    "multiplicationHint": "Gleich große Gruppen kannst du mit einer Malaufgabe zusammenfassen.",
+    "representationPrompt": "Welche Darstellung passt zur Beziehung?",
+    "barModelLabel": "Balkenmodell für Teil und Ganzes",
+    "groupsLabel": "Bild mit gleich großen Gruppen",
+    "noModelLabel": "Eine zufällige Zahlenliste",
+    "representationError": "Die Darstellung muss zeigen, wie die Mengen zusammenhängen.",
+    "representationSuccess": "Diese Darstellung macht die Beziehung sichtbar.",
+    "plausibilityPrompt": "Passt die Größe des Ergebnisses zur Geschichte?",
+    "plausibleLabel": "Ja, das Ergebnis passt zu den Mengen.",
+    "tooSmallLabel": "Nein, das Ergebnis müsste immer kleiner als beide Zahlen sein.",
+    "tooLargeLabel": "Nein, das Ergebnis müsste immer größer als 1000 sein.",
+    "plausibilityError": "Vergleiche das Ergebnis noch einmal mit den Mengen aus der Geschichte.",
+    "plausibilitySuccess": "Du hast nicht nur gerechnet, sondern das Ergebnis auch geprüft."
+  },
+  "symmetry": {
+    "optionLabels": [
+      "Antwort A",
+      "Antwort B",
+      "Antwort C"
+    ],
+    "templates": [
+      {
+        "id": "stairs",
+        "grid": [
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "hook",
+        "grid": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "zigzag",
+        "grid": [
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ]
+      }
+    ]
+  }
+}

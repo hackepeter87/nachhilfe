@@ -57,6 +57,32 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   await finishCurrentRound(page)
   await page.getByRole('button', { name: 'Mein Denken' }).click()
   await expect(page.getByText('1', { exact: true }).first()).toBeVisible()
+  const completedSessionMetadata = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('mathe-reise')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    const sessions = await new Promise<Array<Record<string, unknown>>>((resolve, reject) => {
+      const request = database.transaction('sessions', 'readonly').objectStore('sessions').getAll()
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    database.close()
+    const session = sessions[0]
+    return session && {
+      catalogId: session.catalogId,
+      catalogVersion: session.catalogVersion,
+      schemaVersion: session.schemaVersion,
+      appVersion: session.appVersion
+    }
+  })
+  expect(completedSessionMetadata).toEqual({
+    catalogId: 'nrw-klasse3-foerderkern',
+    catalogVersion: '0.2.0',
+    schemaVersion: 2,
+    appVersion: '0.3.0'
+  })
 
   await page.reload()
   await expect(page.getByText('Hallo, Nova!')).toBeVisible()

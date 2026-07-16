@@ -3,6 +3,13 @@ import type { AppSettings, CompletedSession, Profile, ProgressMap, SkillProgress
 const DB_NAME = 'mathe-reise'
 const DB_VERSION = 1
 
+export const LEGACY_SESSION_METADATA = {
+  catalogId: 'unknown',
+  catalogVersion: 'unknown',
+  schemaVersion: 0,
+  appVersion: 'unknown'
+} as const
+
 const stores = {
   profile: 'profile',
   settings: 'settings',
@@ -23,6 +30,16 @@ function transactionDone(transaction: IDBTransaction): Promise<void> {
     transaction.onerror = () => reject(transaction.error ?? new Error('IndexedDB-Transaktion fehlgeschlagen.'))
     transaction.onabort = () => reject(transaction.error ?? new Error('IndexedDB-Transaktion wurde abgebrochen.'))
   })
+}
+
+export function migrateCompletedSession(session: CompletedSession | Record<string, unknown>): CompletedSession {
+  return {
+    ...(session as unknown as CompletedSession),
+    catalogId: typeof session.catalogId === 'string' ? session.catalogId : LEGACY_SESSION_METADATA.catalogId,
+    catalogVersion: typeof session.catalogVersion === 'string' ? session.catalogVersion : LEGACY_SESSION_METADATA.catalogVersion,
+    schemaVersion: typeof session.schemaVersion === 'number' ? session.schemaVersion : LEGACY_SESSION_METADATA.schemaVersion,
+    appVersion: typeof session.appVersion === 'string' ? session.appVersion : LEGACY_SESSION_METADATA.appVersion
+  }
 }
 
 export function openDatabase(): Promise<IDBDatabase> {
@@ -77,7 +94,7 @@ export async function loadAppData(): Promise<AppData> {
   const profileRequest = transaction.objectStore(stores.profile).get('local-profile') as IDBRequest<Profile | undefined>
   const settingsRequest = transaction.objectStore(stores.settings).get('app-settings') as IDBRequest<AppSettings | undefined>
   const progressRequest = transaction.objectStore(stores.progress).getAll() as IDBRequest<SkillProgress[]>
-  const sessionsRequest = transaction.objectStore(stores.sessions).getAll() as IDBRequest<CompletedSession[]>
+  const sessionsRequest = transaction.objectStore(stores.sessions).getAll() as IDBRequest<Array<CompletedSession | Record<string, unknown>>>
   const [profile, settings, progressRows, sessions] = await Promise.all([
     requestResult(profileRequest),
     requestResult(settingsRequest),
@@ -90,7 +107,7 @@ export async function loadAppData(): Promise<AppData> {
     profile: profile ?? null,
     settings: settings ?? { key: 'app-settings', installHelpDismissed: false, schemaVersion: 1 },
     progress: Object.fromEntries(progressRows.map((entry) => [entry.skillId, entry])) as ProgressMap,
-    sessions: sessions.sort((first, second) => second.completedAt.localeCompare(first.completedAt))
+    sessions: sessions.map(migrateCompletedSession).sort((first, second) => second.completedAt.localeCompare(first.completedAt))
   }
 }
 
