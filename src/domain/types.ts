@@ -1,17 +1,20 @@
-export type SkillId =
-  | 'addition'
-  | 'subtraction'
-  | 'multiplication'
-  | 'division'
-  | 'place-value'
-  | 'decompose'
-  | 'compose'
-  | 'neighbor-tens'
-  | 'neighbor-hundreds'
-  | 'round-tens'
-  | 'round-hundreds'
-  | 'word-problem'
-  | 'symmetry'
+export const SKILL_IDS = [
+  'addition',
+  'subtraction',
+  'multiplication',
+  'division',
+  'place-value',
+  'decompose',
+  'compose',
+  'neighbor-tens',
+  'neighbor-hundreds',
+  'round-tens',
+  'round-hundreds',
+  'word-problem',
+  'symmetry'
+] as const
+
+export type SkillId = typeof SKILL_IDS[number]
 
 export type Difficulty = 1 | 2 | 3
 export type AnswerMode = 'number' | 'choice' | 'guided-word' | 'symmetry'

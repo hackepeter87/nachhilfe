@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "numberRange": { "min": 0, "max": 1000 },
+  "skills": [
+    {
+      "id": "addition",
+      "label": "Plusaufgaben",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Additionen im Zahlenraum bis 20 sicher und flexibel lösen.",
+      "misconceptions": ["Die zweite Zahl wird abgezogen.", "Beim Zehnerübergang wird ein Schritt ausgelassen."],
+      "hints": ["Starte bei {first} und zähle {second} weiter.", "Zerlege {second}, sodass du zuerst bis 10 oder zur nächsten vollen Zahl kommst."],
+      "prompt": "Wie viel ist {first} + {second}?",
+      "errorFeedback": "Fast. Prüfe noch einmal, wie viele Schritte du von {first} weiterzählst.",
+      "explanation": "{first} plus {second} sind {answer}. Du kannst die zweite Zahl in kleine Schritte zerlegen.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 20 }
+    },
+    {
+      "id": "subtraction",
+      "label": "Minusaufgaben",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Subtraktionen im Zahlenraum bis 20 sicher lösen.",
+      "misconceptions": ["Die Zahlen werden vertauscht.", "Beim Rückwärtszählen wird die Startzahl mitgezählt."],
+      "hints": ["Gehe von {first} aus {second} Schritte zurück.", "Du kannst erst bis 10 zurückgehen und dann den Rest abziehen."],
+      "prompt": "Wie viel ist {first} − {second}?",
+      "errorFeedback": "Noch nicht ganz. Beim Minusrechnen wird die Zahl kleiner.",
+      "explanation": "Von {first} gehen {second} weg. Übrig bleiben {answer}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 20 }
+    },
+    {
+      "id": "multiplication",
+      "label": "Einmaleins",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Kernaufgaben des kleinen Einmaleins über gleich große Gruppen verstehen.",
+      "misconceptions": ["Faktoren werden addiert.", "Eine Gruppe wird zu viel oder zu wenig gezählt."],
+      "hints": ["{first} · {second} bedeutet: {second} wird {first}-mal genommen.", "Rechne schrittweise: {sumExpression}."],
+      "prompt": "Wie viel ist {first} · {second}?",
+      "errorFeedback": "Schau noch einmal auf die {first} gleich großen Gruppen.",
+      "explanation": "{first} Gruppen mit je {second} sind zusammen {answer}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 100 }
+    },
+    {
+      "id": "division",
+      "label": "Umkehraufgaben",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Division ohne Rest als Umkehrung der Multiplikation nutzen.",
+      "misconceptions": ["Dividend und Divisor werden vertauscht.", "Die Gruppen sind nicht gleich groß."],
+      "hints": ["Welche Zahl mal {divisor} ergibt {dividend}?", "Nutze die Umkehraufgabe: {divisor} · ? = {dividend}."],
+      "prompt": "{dividend} : {divisor} = ?",
+      "errorFeedback": "Die Gruppen müssen gleich groß sein. Nutze die passende Malaufgabe.",
+      "explanation": "{divisor} · {quotient} = {dividend}. Deshalb ist {dividend} : {divisor} = {quotient}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 100 }
+    },
+    {
+      "id": "place-value",
+      "label": "Stellenwerte",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Den Wert einer Ziffer im Stellenwertsystem bis 1000 bestimmen.",
+      "misconceptions": ["Ziffer und Stellenwert werden gleichgesetzt.", "Einer, Zehner und Hunderter werden verwechselt."],
+      "hints": ["Suche die {position}-Spalte.", "{digit} {position} bedeuten nicht nur die Ziffer {digit}, sondern ihren Wert an dieser Stelle."],
+      "prompt": "Welchen Wert hat die Ziffer {digit} bei den {position}n in {number}?",
+      "errorFeedback": "Ziffer und Stellenwert sind verschieden. Achte auf die Spalte der {position}.",
+      "explanation": "In {number} steht die {digit} bei den {position}n. Ihr Wert ist {answer}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "decompose",
+      "label": "Zahlen zerlegen",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zahlen bis 1000 in Hunderter, Zehner und Einer zerlegen.",
+      "misconceptions": ["Ziffern werden ohne Stellenwert addiert.", "Zehner und Hunderter werden vertauscht."],
+      "hints": ["Trenne Hunderter, Zehner und Einer.", "{hundreds} Hunderter sind {hundredsValue}, {tens} Zehner sind {tensValue}."],
+      "prompt": "Welche Zerlegung passt zu {number}?",
+      "errorFeedback": "Achte darauf, dass jede Ziffer den Wert ihrer Stelle bekommt.",
+      "explanation": "{number} besteht aus {hundredsValue}, {tensValue} und {ones}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "compose",
+      "label": "Zahlen bauen",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Aus Hundertern, Zehnern und Einern eine Zahl bis 1000 zusammensetzen.",
+      "misconceptions": ["Stellen werden in falscher Reihenfolge notiert.", "Nullen als Platzhalter fehlen."],
+      "hints": ["Schreibe zuerst die Hunderter-, dann die Zehner- und zuletzt die Einerziffer.", "{hundredsValue} + {tensValue} + {ones} ergibt die gesuchte Zahl."],
+      "prompt": "Baue die Zahl aus {hundreds} Hundertern, {tens} Zehnern und {ones} Einern.",
+      "errorFeedback": "Prüfe die Reihenfolge: Hunderter, Zehner, Einer.",
+      "explanation": "{hundredsValue} + {tensValue} + {ones} = {answer}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "neighbor-tens",
+      "label": "Nachbarzehner",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Eine Zahl zwischen ihren direkt benachbarten Zehnern einordnen.",
+      "misconceptions": ["Nicht direkt benachbarte Zehner werden gewählt.", "Nur der kleinere Zehner wird betrachtet."],
+      "hints": ["Suche die volle Zehnerzahl direkt unter und über {number}.", "{number} ist größer als {lower} und kleiner als {upper}."],
+      "prompt": "Zwischen welchen Nachbarzehnern liegt {number}?",
+      "errorFeedback": "Die gesuchten Zahlen müssen direkt unter und über {number} liegen.",
+      "explanation": "{lower} < {number} < {upper}. Darum sind {lower} und {upper} die Nachbarzehner.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "neighbor-hundreds",
+      "label": "Nachbarhunderter",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Eine Zahl zwischen ihren direkt benachbarten Hundertern einordnen.",
+      "misconceptions": ["Nicht direkt benachbarte Hunderter werden gewählt.", "Zehner statt Hunderter werden betrachtet."],
+      "hints": ["Suche die volle Hunderterzahl direkt unter und über {number}.", "{number} ist größer als {lower} und kleiner als {upper}."],
+      "prompt": "Zwischen welchen Nachbarhundertern liegt {number}?",
+      "errorFeedback": "Die gesuchten Zahlen müssen direkt unter und über {number} liegen.",
+      "explanation": "{lower} < {number} < {upper}. Darum sind {lower} und {upper} die Nachbarhunderter.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "round-tens",
+      "label": "Auf Zehner runden",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zahlen bis 1000 über Nachbarzehner und Abstände auf Zehner runden.",
+      "misconceptions": ["Am Halbpunkt wird abgerundet.", "Eine Antwort außerhalb des Zahlenraums wird gewählt."],
+      "hints": ["{number} liegt zwischen {lower} und {upper}.", "Der Abstand zu {lower} ist {lowerDistance}, der Abstand zu {upper} ist {upperDistance}."],
+      "prompt": "Runde {number} auf den nächsten Zehner.",
+      "errorFeedback": "Vergleiche die Abstände zu {lower} und {upper}.",
+      "explanation": "{number} liegt näher bei {answer}. Deshalb wird auf {answer} gerundet.",
+      "halfExplanation": "Die Abstände zu {lower} und {upper} sind beide {lowerDistance}. Nach der Grundschulregel wird am Halbpunkt aufgerundet: {number} wird zu {answer}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "round-hundreds",
+      "label": "Auf Hunderter runden",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Zahlen bis 1000 über Nachbarhunderter und Abstände auf Hunderter runden.",
+      "misconceptions": ["Am Halbpunkt wird abgerundet.", "Die Zehnerstelle wird statt des Abstands betrachtet."],
+      "hints": ["{number} liegt zwischen {lower} und {upper}.", "Der Abstand zu {lower} ist {lowerDistance}, der Abstand zu {upper} ist {upperDistance}."],
+      "prompt": "Runde {number} auf den nächsten Hunderter.",
+      "errorFeedback": "Vergleiche die Abstände zu {lower} und {upper}.",
+      "explanation": "{number} liegt näher bei {answer}. Deshalb wird auf {answer} gerundet.",
+      "halfExplanation": "Die Abstände zu {lower} und {upper} sind beide {lowerDistance}. Nach der Grundschulregel wird am Halbpunkt aufgerundet: {number} wird zu {answer}.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1000 }
+    },
+    {
+      "id": "word-problem",
+      "label": "Sachaufgabe",
+      "curriculumArea": "Größen und Messen / Sachsituationen",
+      "supportGoal": "Wichtige Angaben erkennen, eine passende Rechenart wählen und einen Antwortsatz prüfen.",
+      "misconceptions": ["Nur eine Zahl wird verwendet.", "Die Rechenart passt nicht zur Veränderung der Menge."],
+      "hints": ["Unterstreiche im Kopf die beiden Mengen.", "{operationHint}"],
+      "prompt": "{story}",
+      "errorFeedback": "Gehe die Geschichte Schritt für Schritt durch.",
+      "explanation": "{first} {operation} {second} = {result}. {answerSentence}",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 20 }
+    },
+    {
+      "id": "symmetry",
+      "label": "Spiegelbilder",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Eine Figur an einer senkrechten Spiegelachse erkennen.",
+      "misconceptions": ["Eine Verschiebung wird als Spiegelung gewählt.", "Oben und unten werden statt links und rechts vertauscht."],
+      "hints": ["Was links nah an der Spiegelkante liegt, liegt im Spiegel rechts nah an der Kante.", "Vergleiche jede Reihe von links nach rechts in umgekehrter Reihenfolge."],
+      "prompt": "Welches Bild ist das genaue Spiegelbild an einer senkrechten Spiegelachse?",
+      "errorFeedback": "Das ist verschoben oder gekippt. Beim Spiegeln tauschen links und rechts die Plätze.",
+      "explanation": "Beim Spiegelbild bleibt jede Reihe gleich, aber ihre Reihenfolge läuft von rechts nach links.",
+      "difficultyBounds": { "minLevel": 1, "maxLevel": 3, "minValue": 0, "maxValue": 1 }
+    }
+  ],
+  "wordProblems": [
+    {
+      "id": "shells-addition",
+      "operation": "+",
+      "story": "Mila sammelt {first} Muscheln. Am Strand findet sie noch {second}. Wie viele Muscheln hat sie jetzt?",
+      "relevant": "{first} Muscheln und {second} neue Muscheln",
+      "answer": "Mila hat jetzt {result} Muscheln.",
+      "firstRange": { "min": 7, "max": 14 },
+      "secondRange": { "min": 2, "max": 6 }
+    },
+    {
+      "id": "pencils-subtraction",
+      "operation": "−",
+      "story": "In einer Kiste liegen {first} Buntstifte. {second} werden herausgenommen. Wie viele bleiben in der Kiste?",
+      "relevant": "{first} Buntstifte und {second} herausgenommene",
+      "answer": "{result} Buntstifte bleiben in der Kiste.",
+      "firstRange": { "min": 12, "max": 20 },
+      "secondRange": { "min": 2, "max": 8 }
+    }
+  ],
+  "wordProblemSteps": {
+    "relevantPrompt": "Welche Angaben sind wichtig?",
+    "relevantDistractors": ["Nur die Zahl {first}", "Es gibt keine wichtigen Zahlen"],
+    "relevantError": "Für die Lösung brauchst du beide Mengen aus dem Text.",
+    "relevantSuccess": "Genau, diese beiden Angaben helfen dir.",
+    "operationPrompt": "Welche Rechenart passt?",
+    "operationOptions": [
+      { "value": "+", "label": "Plus: Es kommt etwas dazu." },
+      { "value": "−", "label": "Minus: Es geht etwas weg." },
+      { "value": "·", "label": "Mal: Es gibt gleich große Gruppen." }
+    ],
+    "additionError": "Im Text kommt etwas dazu.",
+    "subtractionError": "Im Text wird etwas herausgenommen.",
+    "operationSuccess": "Diese Rechenart passt zur Geschichte.",
+    "calculatePrompt": "Rechne: {first} {operation} {second} = ?",
+    "calculateError": "Rechne die beiden wichtigen Zahlen noch einmal.",
+    "calculateSuccess": "Die Rechnung stimmt.",
+    "checkPrompt": "Welcher Antwortsatz passt?",
+    "checkError": "Der Antwortsatz muss zu deinem Rechenergebnis passen.",
+    "checkSuccess": "Rechnung und Antwort passen zusammen.",
+    "additionHint": "Es kommt etwas dazu. Die Menge wird größer.",
+    "subtractionHint": "Es geht etwas weg. Die Menge wird kleiner."
+  },
+  "symmetry": {
+    "optionLabels": ["Antwort A", "Antwort B", "Antwort C"],
+    "templates": [
+      { "id": "stairs", "grid": [[1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0]] },
+      { "id": "hook", "grid": [[0, 1, 0, 0], [1, 1, 0, 0], [1, 0, 0, 0], [1, 1, 1, 0]] },
+      { "id": "zigzag", "grid": [[1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0]] }
+    ]
+  }
+}

@@ -4,7 +4,7 @@ import { registerSW } from 'virtual:pwa-register'
 import {
   createRepetitionExercise,
   createSessionPlan,
-  SKILL_LABELS,
+  getSkillLabel,
   updateSkillProgress,
   type AppSettings,
   type AttemptResult,
@@ -15,7 +15,8 @@ import {
   type SessionPlan
 } from './domain'
 import { ExerciseCard } from './components/ExerciseCard'
-import { loadAppData, saveCompletedSession, saveProfile, saveSettings, saveSkillProgress, verifyStorage } from './storage/db'
+import { loadAppData, saveCompletedSession, saveProfile, saveSettings, saveSkillProgress } from './storage/db'
+import { verifyOfflineReadiness } from './pwa/offlineReadiness'
 
 type Screen = 'loading' | 'onboarding' | 'home' | 'session' | 'summary' | 'error'
 
@@ -125,7 +126,7 @@ function Home({ profile, progress, sessions, offlineReady, online, onStart, onSh
           <div><strong>{secure}</strong><span>Bereiche sicher</span></div>
         </div>
         <p className="progress-note">
-          {mostImproved ? `Am sichersten fühlst du dich gerade bei „${SKILL_LABELS[mostImproved.skillId]}“.` : 'Nach deiner ersten Runde siehst du hier deinen Fortschritt.'}
+          {mostImproved ? `Am sichersten fühlst du dich gerade bei „${getSkillLabel(mostImproved.skillId)}“.` : 'Nach deiner ersten Runde siehst du hier deinen Fortschritt.'}
         </p>
       </section>
 
@@ -192,16 +193,27 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    let readinessRun = 0
+    const updateOfflineReadiness = async () => {
+      const currentRun = ++readinessRun
+      for (const delay of [0, 250, 750, 1500]) {
+        if (delay > 0) await new Promise((resolve) => window.setTimeout(resolve, delay))
+        if (currentRun !== readinessRun) return
+        const ready = await verifyOfflineReadiness()
+        if (currentRun !== readinessRun) return
+        setOfflineReady(ready)
+        if (ready) return
+      }
+    }
     const updateSW = registerSW({
       immediate: true,
       onNeedRefresh: () => setUpdateAvailable(true),
-      onOfflineReady: () => setOfflineReady(true),
-      onRegisteredSW: () => {
-        verifyStorage().then((ready) => setOfflineReady(ready)).catch(() => setOfflineReady(false))
-      }
+      onOfflineReady: () => { void updateOfflineReadiness() },
+      onRegisteredSW: () => { void updateOfflineReadiness() }
     })
     updateServiceWorker.current = updateSW
-    navigator.serviceWorker?.ready.then(() => verifyStorage()).then((ready) => setOfflineReady(ready)).catch(() => undefined)
+    navigator.serviceWorker?.ready.then(() => updateOfflineReadiness()).catch(() => setOfflineReady(false))
+    return () => { readinessRun += 1 }
   }, [])
 
   useEffect(() => {

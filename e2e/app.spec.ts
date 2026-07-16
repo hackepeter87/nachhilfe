@@ -52,6 +52,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
 
   await onboard(page)
   await expect.poll(() => page.evaluate(() => navigator.serviceWorker?.ready.then(() => true))).toBe(true)
+  await expect(page.getByText('Offline bereit')).toBeVisible()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishCurrentRound(page)
   await page.getByRole('button', { name: 'Mein Denken' }).click()
