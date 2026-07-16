@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 4,
-      catalogVersion: '0.5.0',
+      schemaVersion: 5,
+      catalogVersion: '0.6.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -87,6 +87,12 @@ describe('Katalog-Buildpipeline', () => {
     const template = catalog.wordProblems.find((candidate) => candidate.secondOperation)
     delete template.thirdRange
     expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('unvollständigen zweiten Rechenschritt')
+  })
+
+  it('lehnt unvollständige Größeninhalte ab', () => {
+    const catalog = sourceCatalog()
+    catalog.quantityContent.money.countPrompt = ''
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('quantityContent.money.countPrompt')
   })
 
   it('lehnt gekachelte oder unvollständige Symmetrievorlagen ab', () => {

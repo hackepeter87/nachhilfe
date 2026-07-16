@@ -78,7 +78,10 @@ describe('ExerciseCard', () => {
     const jumps = exercise.representation?.values.jumps
     expect(Array.isArray(jumps)).toBe(true)
     if (!Array.isArray(jumps)) throw new Error('Sprünge fehlen')
-    jumps.forEach((jump) => expect(screen.getByLabelText(`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`)).toBeVisible())
+    jumps.forEach((jump) => {
+      if (typeof jump === 'number') throw new Error('Ungültiger Zahlenstrahlsprung')
+      expect(screen.getByLabelText(`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`)).toBeVisible()
+    })
   })
 
   it('prüft Zwischenstation und Ergebnis bei einem Stellenübergang', async () => {
@@ -110,5 +113,17 @@ describe('ExerciseCard', () => {
     }
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
+
+  it.each(['money', 'lengths'] as const)('lässt eine Größenaufgabe %s vollständig lösen', async (skill) => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise(skill, 77, 1)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    const option = exercise.options?.find((candidate) => candidate.value === exercise.correctAnswer)
+    if (!option) throw new Error('Richtige Größenoption fehlt')
+    await user.click(screen.getByRole('button', { name: option.label }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, skillId: skill }))
   })
 })

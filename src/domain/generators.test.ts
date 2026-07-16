@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { createRoundingExercise, generateExercise, isAnswerCorrect, mirrorGrid, roundToUnit } from './generators'
+import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, mirrorGrid, roundToUnit } from './generators'
 import { getTaskCatalog } from '../content/catalog'
 import type { SkillId } from './types'
 
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-  'addition-1000', 'subtraction-1000', 'complement-1000', 'word-problem', 'symmetry'
+  'addition-1000', 'subtraction-1000', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
 ]
 
 describe('deterministische Aufgabengeneratoren', () => {
@@ -368,6 +368,64 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(subskills).toEqual(new Set(['subtraction-1000-ones-unbundling', 'subtraction-1000-tens-unbundling']))
   })
 
+  it('berechnet Geldbeträge exakt in Cent und stellt jede Münzsumme korrekt dar', () => {
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 500; seed += 1) {
+        const exercise = generateExercise('money', seed, difficulty)
+        const amountCents = Number(exercise.variant.values.amountCents)
+        expect(amountCents).toBeGreaterThanOrEqual(0)
+        expect(amountCents).toBeLessThanOrEqual(1000)
+        expect(exercise.correctAnswer).toBe(String(amountCents))
+        expect(exercise.options?.find((option) => option.value === exercise.correctAnswer)?.label).toBe(formatEuro(amountCents))
+        expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(exercise.options?.length)
+        if (difficulty < 3) {
+          const coins = exercise.representation?.values.coins
+          expect(Array.isArray(coins)).toBe(true)
+          if (!Array.isArray(coins) || coins.some((coin) => typeof coin !== 'number')) throw new Error('Ungültige Münzwerte')
+          expect((coins as number[]).reduce((sum, coin) => sum + coin, 0)).toBe(exercise.representation?.values.displayedCents)
+        } else {
+          expect(Number(exercise.variant.values.paidCents) - Number(exercise.variant.values.priceCents)).toBe(amountCents)
+          expect(exercise.subskillId).toBe('money-change')
+        }
+      }
+    }
+  })
+
+  it('verwendet eine eindeutige deutsche Geldschreibweise', () => {
+    expect(formatEuro(0)).toBe('0,00 €')
+    expect(formatEuro(250)).toBe('2,50 €')
+    expect(formatEuro(1000)).toBe('10,00 €')
+  })
+
+  it('misst und rechnet Längen konsistent in Zentimetern', () => {
+    const subskills = new Set<string>()
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 500; seed += 1) {
+        const exercise = generateExercise('lengths', seed, difficulty)
+        const answerCm = Number(exercise.variant.values.answerCm)
+        subskills.add(exercise.subskillId ?? '')
+        expect(answerCm).toBeGreaterThan(0)
+        expect(answerCm).toBeLessThanOrEqual(1000)
+        expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(exercise.options?.length)
+        if (difficulty === 1) {
+          expect(exercise.correctAnswer).toBe(`${answerCm} cm`)
+          expect(exercise.representation?.values.lengthCm).toBe(answerCm)
+        }
+        if (difficulty === 2) expect(answerCm % 100).toBe(0)
+        if (difficulty === 3) expect(exercise.correctAnswer).toBe(formatLength(answerCm))
+      }
+    }
+    expect(subskills).toEqual(new Set([
+      'length-read-centimeters', 'length-m-to-cm', 'length-cm-to-m', 'length-add', 'length-difference'
+    ]))
+  })
+
+  it('formatiert Zentimeter und Meter ohne Dezimalrundung', () => {
+    expect(formatLength(45)).toBe('45 cm')
+    expect(formatLength(300)).toBe('3 m')
+    expect(formatLength(370)).toBe('3 m 70 cm')
+  })
+
   it('erzeugt zweischrittige Sachaufgaben mit zwei passenden Rechnungen', () => {
     const exercises = Array.from({ length: 400 }, (_, index) => generateExercise('word-problem', index + 1, 3))
     const multiStep = exercises.filter((exercise) => exercise.variant.values.secondOperation)
@@ -390,10 +448,17 @@ describe('deterministische Aufgabengeneratoren', () => {
           expect(Array.isArray(jumps)).toBe(true)
           if (!Array.isArray(jumps)) continue
           jumps.forEach((jump, index) => {
-            if (index > 0) expect(jump.from).toBe(jumps[index - 1]!.to)
+            if (typeof jump === 'number') throw new Error('Ungültiger Zahlenstrahlsprung')
+            const previous = jumps[index - 1]
+            if (index > 0) {
+              if (typeof previous === 'number') throw new Error('Ungültiger Zahlenstrahlsprung')
+              expect(jump.from).toBe(previous?.to)
+            }
             expect(jump.label).toBe(jump.to - jump.from > 0 ? `+${jump.to - jump.from}` : String(jump.to - jump.from))
           })
-          expect(jumps.at(-1)?.to).toBe(Number(exercise.correctAnswer) + (skill === 'complement-1000' ? Number(exercise.variant.values.first) : 0))
+          const lastJump = jumps.at(-1)
+          if (typeof lastJump === 'number') throw new Error('Ungültiger Zahlenstrahlsprung')
+          expect(lastJump?.to).toBe(Number(exercise.correctAnswer) + (skill === 'complement-1000' ? Number(exercise.variant.values.first) : 0))
         }
       }
     }

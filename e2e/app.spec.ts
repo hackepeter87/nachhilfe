@@ -11,6 +11,7 @@ async function finishCurrentRound(page: Page) {
     const next = page.getByRole('button', { name: 'Weiter', exact: true })
     if (await next.isVisible().catch(() => false)) {
       await next.click()
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
       continue
     }
     const numberInput = page.getByLabel('Deine Antwort')
@@ -79,9 +80,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.5.0',
-    schemaVersion: 4,
-    appVersion: '0.7.0'
+    catalogVersion: '0.6.0',
+    schemaVersion: 5,
+    appVersion: '0.8.0'
   })
 
   await page.reload()
@@ -145,4 +146,57 @@ test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt',
   expect(counts.totalPoints).toBe(counts.groups * counts.pointsPerGroup[0]!)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('punktgruppen-375x812.png'), fullPage: true })
+})
+
+test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'money', 'lengths'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Maß')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  let moneySeen = false
+  let lengthSeen = false
+  for (let action = 0; action < 30 && (!moneySeen || !lengthSeen); action += 1) {
+    if (await page.locator('.money-visual').isVisible().catch(() => false)) {
+      moneySeen = true
+      expect(await page.locator('.coin').count()).toBeGreaterThan(0)
+      await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('geld-375x812.png') })
+    }
+    if (await page.locator('.length-visual').isVisible().catch(() => false)) {
+      lengthSeen = true
+      await expect(page.getByRole('img', { name: /Messstrecke.*Zentimeter/ })).toBeVisible()
+      await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('laenge-375x812.png') })
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    const next = page.getByRole('button', { name: 'Weiter', exact: true })
+    if (await next.isVisible().catch(() => false)) {
+      await next.click()
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
+      continue
+    }
+    const scaffold = page.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ })
+    if (await scaffold.isVisible().catch(() => false)) {
+      await scaffold.click()
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
+      continue
+    }
+    const numberInput = page.getByLabel('Deine Antwort')
+    if (await numberInput.isVisible().catch(() => false)) {
+      await numberInput.fill('9999')
+      await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+      continue
+    }
+    const option = page.locator('.answer-option:visible').first()
+    if (await option.isVisible().catch(() => false)) await option.click()
+  }
+  expect(moneySeen).toBe(true)
+  expect(lengthSeen).toBe(true)
 })

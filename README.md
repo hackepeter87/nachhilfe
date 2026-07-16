@@ -11,13 +11,15 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Nachbarzehner, Nachbarhunderter sowie Runden auf Zehner und Hunderter
 - Additions-, Subtraktions- und Ergänzungsstrategien bis 1000 mit geprüftem Zwischenschritt, Stellenwerttafel oder Rechenstrich
 - Geführte ein- und zweischrittige Sachaufgaben mit sieben Mengenbeziehungen und Raster-Symmetrie ohne Drag-and-drop
+- Geldbeträge in Euro und Cent mit lokaler Münzdarstellung sowie Wechselgeld aus 10 Euro
+- Längen in Zentimetern und Metern mit Messstrecke, Umrechnung und einfachen Rechnungen
 - Drei inhaltlich wirksame Stufen mit sichtbarer, abrufbarer oder entfallender Darstellung
 - Zwei Hilfestufen, konkretes Fehlerfeedback und eine schrittweise Erklärung nach wiederholten Fehlern
 - Lokaler Lernstand mit einfacher adaptiver Aufgabenauswahl
 - Installierbare PWA mit vollständig vorgehaltenen MVP-Ressourcen
 - OCI-Container mit unprivilegiertem Nginx, Healthcheck und passenden Cache-Regeln
 
-Nicht Bestandteil dieses MVP sind vollständige schriftliche Verfahren, mehrere Stellenübergänge, Geld, Längen, Elternbereich, PIN, Backup, Körperansichten, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen.
+Nicht Bestandteil dieses MVP sind vollständige schriftliche Verfahren, mehrere gleichzeitige Stellenübergänge, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN, Backup, Körperansichten, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen.
 
 ## Voraussetzungen
 
@@ -78,7 +80,7 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - Förderziele, Prozesskompetenzen, Vorkenntnisse und typische Fehlvorstellungen
 - sechs Lernphasen, drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
 - zwei Hinweise, gearbeitetes Beispiel, Erklärung, strukturierte Remediation und Transferimpuls
-- überprüfbare Erfolgskriterien sowie deaktivierte Vorbereitungen für Geld, Längen und Raumvorstellung
+- überprüfbare Erfolgskriterien, produktive Größenkompetenzen für Geld und Längen sowie eine deaktivierte Vorbereitung für Raumvorstellung
 - kompetenzbezogene Erfolgs- und Fehlertexte sowie Release-Status
 - strukturierte Sachaufgabenvorlagen mit Mengenbeziehung, vorlagenspezifischen Fragen, Modell, unwichtiger Angabe und Plausibilitätsprüfung
 - explizite 3x3-, 4x4- und 5x5-Vorlagen für Symmetrieaufgaben
@@ -125,7 +127,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Multi-Arch-Release-Images für `linux/amd64` und `linux/arm64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.7.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.8.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -166,6 +168,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.7.0
+## Release-Stand 0.8.0
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.7.0 ergänzt kontrollierte Stellenübergänge mit überprüfbarer Zwischenstation, erste zweischrittige Sachaufgaben und wirksame adaptive Lernphasen. Die offene externe Abnahme ist in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.8.0 aktiviert Geld und Längen mit jeweils drei wirksamen Schwierigkeitsstufen und eigenen Darstellungen. Die offene externe Abnahme ist in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

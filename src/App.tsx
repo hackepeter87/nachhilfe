@@ -252,6 +252,10 @@ export default function App() {
 
   const currentExercise = useMemo(() => session?.exercises[exerciseIndex] ?? null, [session, exerciseIndex])
 
+  useEffect(() => {
+    if (screen === 'session') window.scrollTo({ top: 0, left: 0 })
+  }, [screen, exerciseIndex])
+
   const dismissInstallHelp = async () => {
     const next = { ...settings, installHelpDismissed: true } as AppSettings
     setSettingsState(next)

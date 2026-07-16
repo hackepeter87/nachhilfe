@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 4,
-  "catalogVersion": "0.5.0",
+  "schemaVersion": 5,
+  "catalogVersion": "0.6.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-16",
   "status": "ready-for-review",
@@ -2397,6 +2397,308 @@
         "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
         "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
       ]
+    },
+    {
+      "id": "money",
+      "label": "Geldwerte",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Euro und Cent als zusammengehörigen Geldbetrag lesen und in einfachen Kaufsituationen verwenden.",
+      "misconceptions": [
+        "Euro und Cent werden ohne Einheitenbezug wie eine ganze Zahl gelesen.",
+        "Beim Rückgeld werden Preis und Zahlbetrag vertauscht."
+      ],
+      "hints": [
+        "Achte zuerst auf die Einheiten Euro und Cent.",
+        "{strategy}"
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Prüfe den Euroanteil, den Centanteil und die Richtung der Geldbewegung getrennt.",
+      "explanation": "{quantityExplanation}",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        {
+          "id": "modelling",
+          "elicitedBy": "Eine Kaufsituation wird als Geldbetrag oder Ergänzungsaufgabe dargestellt."
+        },
+        {
+          "id": "representing",
+          "elicitedBy": "Münzbild, Centwert und Euro-Schreibweise werden miteinander verbunden."
+        }
+      ],
+      "prerequisites": [
+        "Stellenwertverständnis",
+        "Addition und Subtraktion bis 1000"
+      ],
+      "representations": [
+        "Münzbild",
+        "Preisschild",
+        "Euro-Cent-Schreibweise"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Ganze Eurobeträge aus wenigen sichtbaren 1- und 2-Euro-Münzen bestimmen",
+          "numberRange": "2 bis 10 Euro",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Gemischte Euro- und Centbeträge aus Münzen lesen; Darstellung auf Hilfe",
+          "numberRange": "1,20 bis 9,80 Euro",
+          "representation": "hint",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Rückgeld von einem Zahlbetrag von 10 Euro selbstständig ergänzen",
+          "numberRange": "Preise von 2,50 bis 9,00 Euro",
+          "representation": "none",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "4,50 Euro plus 50 Cent ergeben 5 Euro; von 5 Euro bis 10 Euro fehlen weitere 5 Euro.",
+      "successFeedback": "Der Geldbetrag stimmt einschließlich seiner Einheit.",
+      "remediation": {
+        "strategy": "Euro und Cent werden getrennt gezählt und anschließend zusammengeführt.",
+        "foundationStrategy": "Beginne mit wenigen sichtbaren 1- und 2-Euro-Münzen.",
+        "representation": "Münzbild",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Finde eine zweite Münzzusammenstellung mit demselben Wert.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Bekannte Münzwerte erkennen.",
+          "exerciseTypes": [
+            "money:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Münzen, Centwert und Euroschreibweise verbinden.",
+          "exerciseTypes": [
+            "money:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Ganze Eurobeträge mit sichtbaren Münzen bestimmen.",
+          "exerciseTypes": [
+            "money:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Gemischte Beträge mit abrufbarer Hilfe lesen.",
+          "exerciseTypes": [
+            "money:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Euro- und Centbeträge sicher lesen.",
+          "exerciseTypes": [
+            "money:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Rückgeld in einer Kaufsituation ergänzen.",
+          "exerciseTypes": [
+            "money:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Münzsumme und Betrag stimmen überein.",
+        "Euro und Cent sind korrekt formatiert.",
+        "Rückgeld ergänzt Preis und Zahlbetrag exakt."
+      ]
+    },
+    {
+      "id": "lengths",
+      "label": "Längen",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Längen in Zentimetern und Metern messen, umwandeln und in einfachen Rechnungen verwenden.",
+      "misconceptions": [
+        "Der Nullpunkt einer Skala wird als erster Zentimeter mitgezählt.",
+        "Beim Wechsel zwischen Meter und Zentimeter wird mit 10 statt mit 100 gerechnet."
+      ],
+      "hints": [
+        "Lies Maßzahl und Einheit immer zusammen.",
+        "{strategy}"
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Prüfe Nullpunkt, Skalenabschnitte und die Beziehung 1 Meter = 100 Zentimeter.",
+      "explanation": "{quantityExplanation}",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Messstrecke, Zentimeterwert und Meterangabe werden verbunden."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Einheitenbeziehung und Rechenrichtung werden am Ergebnis geprüft."
+        }
+      ],
+      "prerequisites": [
+        "Zahlen bis 1000",
+        "Skalen in gleichen Abschnitten lesen"
+      ],
+      "representations": [
+        "Messstrecke",
+        "Zentimeterskala",
+        "Einheitenbeziehung"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Ganze Zentimeter an einer sichtbaren Messstrecke mit Nullpunkt ablesen",
+          "numberRange": "2 bis 20 Zentimeter",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Ganze Meter und Zentimeter mit der Beziehung 1 m = 100 cm umwandeln",
+          "numberRange": "1 bis 9 Meter",
+          "representation": "hint",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Zwei Längen bis 1000 Zentimeter selbstständig addieren oder ihre Differenz bestimmen",
+          "numberRange": "20 bis 900 Zentimeter",
+          "representation": "none",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "3 Meter sind 300 Zentimeter, weil jeder Meter 100 Zentimeter enthält.",
+      "successFeedback": "Länge, Maßzahl und Einheit passen zusammen.",
+      "remediation": {
+        "strategy": "Beide Längen werden zuerst in Zentimeter übersetzt.",
+        "foundationStrategy": "Beginne am markierten Nullpunkt einer kurzen Zentimeterskala.",
+        "representation": "Messstrecke",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Nenne einen Gegenstand, zu dem diese Länge ungefähr passt.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Nullpunkt und Zentimeterabschnitte erkennen.",
+          "exerciseTypes": [
+            "lengths:entry"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Dieselbe Länge in Meter und Zentimeter darstellen.",
+          "exerciseTypes": [
+            "lengths:representation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Ganze Zentimeter an einer Messstrecke ablesen.",
+          "exerciseTypes": [
+            "lengths:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Meter und Zentimeter mit abrufbarer Hilfe umwandeln.",
+          "exerciseTypes": [
+            "lengths:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Einfache Einheitenwechsel sicher ausführen.",
+          "exerciseTypes": [
+            "lengths:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Längen in einem Rechenschritt verbinden oder vergleichen.",
+          "exerciseTypes": [
+            "lengths:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Messstrecke und Zentimeterwert stimmen überein.",
+        "1 Meter wird als 100 Zentimeter verwendet.",
+        "Rechenergebnis und Einheit sind konsistent."
+      ]
     }
   ],
   "wordProblems": [
@@ -3437,60 +3739,6 @@
   },
   "preparedTopics": [
     {
-      "id": "money",
-      "label": "Geldwerte",
-      "curriculumArea": "Größen und Messen",
-      "supportGoal": "Euro und Cent darstellen, vergleichen und in einfachen Kaufsituationen verwenden.",
-      "prerequisites": [
-        "Stellenwertverständnis",
-        "Addition und Subtraktion bis 1000"
-      ],
-      "representations": [
-        "Münzen und Scheine",
-        "Preisschilder",
-        "Balkenmodell"
-      ],
-      "misconceptions": [
-        "Euro und Cent werden ohne Einheitenbezug wie ganze Zahlen behandelt.",
-        "Beim Wechselgeld wird Kaufpreis und Rückgabe vertauscht."
-      ],
-      "progression": [
-        "Geldwerte erkennen",
-        "gleichwertige Darstellungen finden",
-        "Preise addieren",
-        "Wechselgeld ergänzen"
-      ],
-      "remediation": "Zu realistischen Münzbildern und Ergänzen zum nächsten vollen Euro zurückkehren.",
-      "releaseStatus": "disabled"
-    },
-    {
-      "id": "lengths",
-      "label": "Längen",
-      "curriculumArea": "Größen und Messen",
-      "supportGoal": "Längen schätzen, messen, vergleichen und zwischen mm, cm und m passend darstellen.",
-      "prerequisites": [
-        "Zahlen bis 1000",
-        "Stellenwertverständnis"
-      ],
-      "representations": [
-        "Messstrecke",
-        "Lineal",
-        "Größenvergleich"
-      ],
-      "misconceptions": [
-        "Die größere Maßzahl wird unabhängig von der Einheit für länger gehalten.",
-        "Einheiten werden beim Umrechnen vertauscht."
-      ],
-      "progression": [
-        "passende Einheit wählen",
-        "mit einer Skala messen",
-        "Längen vergleichen",
-        "einfache Einheitenbeziehungen nutzen"
-      ],
-      "remediation": "An einer Messstrecke dieselbe Länge in zwei Einheiten sichtbar machen.",
-      "releaseStatus": "disabled"
-    },
-    {
       "id": "spatial-reasoning",
       "label": "Raumvorstellung",
       "curriculumArea": "Raum und Form",
@@ -3519,6 +3767,28 @@
       "releaseStatus": "disabled"
     }
   ],
+  "quantityContent": {
+    "money": {
+      "countPrompt": "Wie viel Geld zeigen die Münzen?",
+      "changePrompt": "Der Preis ist {price}. Du bezahlst mit {paid}. Wie viel Geld bekommst du zurück?",
+      "countExplanation": "Die Münzen ergeben zusammen {amount}.",
+      "changeExplanation": "Von {price} bis {paid} fehlen {change}.",
+      "coinsLabel": "Geprüfte Münzdarstellung",
+      "priceLabel": "Preis",
+      "paidLabel": "Bezahlt"
+    },
+    "lengths": {
+      "readPrompt": "Wie lang ist die markierte Strecke?",
+      "toCentimetersPrompt": "Wie viele Zentimeter sind {length}?",
+      "toMetersPrompt": "Wie viele Meter sind {length}?",
+      "calculationPrompt": "Rechne die Längen: {firstLength} {operation} {secondLength}.",
+      "readExplanation": "Die Strecke beginnt bei 0 und endet bei {length}.",
+      "conversionExplanation": "Mit 1 m = 100 cm erhältst du {length}.",
+      "calculationExplanation": "{firstLength} {operation} {secondLength} ergibt {answerLength}.",
+      "rulerLabel": "Messstrecke mit markiertem Nullpunkt",
+      "equivalenceLabel": "1 m = 100 cm"
+    }
+  },
   "strategySteps": {
     "placeValue": {
       "digitPrompt": "Welche Ziffer steht bei {number} an der {position}stelle?",

@@ -49,6 +49,13 @@ Diese Liste ist bei jedem neuen oder geänderten produktiven Katalogeintrag abzu
 - [ ] Jede Plausibilitätsprüfung ist situationsbezogen und besitzt genau eine richtige Aussage.
 - [ ] Die richtige Plausibilitätsaussage ist nicht über alle Vorlagen hinweg derselbe allgemeine Text.
 
+## Größen und Messen
+
+- [ ] Geldwerte werden intern ganzzahlig in Cent berechnet; Münzsumme, Text, Lösung und Darstellung stimmen exakt überein.
+- [ ] Euro-/Cent-Schreibweise ist eindeutig, und Wechselgeld wird als Differenz zum tatsächlich gegebenen Betrag geprüft.
+- [ ] Längen werden intern in Zentimetern berechnet; Messmarke, Skalenwert, Einheit und Lösung stimmen überein.
+- [ ] Umrechnungen nutzen die fachlich richtige Beziehung `1 m = 100 cm`; nicht produktive Einheiten erscheinen nicht als Attrappe.
+
 ## Abnahme
 
 - [ ] Katalog- und Fallback-Datei erfüllen dasselbe Schema.

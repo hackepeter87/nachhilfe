@@ -2,21 +2,22 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 4
+export const CATALOG_SCHEMA_VERSION = 5
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'subtraction-1000', 'complement-1000', 'word-problem', 'symmetry'
+  'subtraction-1000', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
   'answer', 'answerSentence', 'axis', 'bridge', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
-  'sumExpression', 'target', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
-  'intermediate', 'secondOperation'
+  'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
+  'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
+  'length', 'firstLength', 'secondLength', 'answerLength'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -213,15 +214,18 @@ export function validateCatalog(catalog) {
   requireUnique(skillIds, 'Kompetenz-IDs')
   if (!SKILL_IDS.every((id) => skillIds.includes(id))) fail('mindestens eine bekannte Kompetenz fehlt')
   catalog.skills.forEach((skill) => validateSkill(skill, numberRange))
-  if (!Array.isArray(catalog.preparedTopics) || catalog.preparedTopics.length !== 3) fail('preparedTopics muss drei deaktivierte Themen enthalten')
+  if (!Array.isArray(catalog.preparedTopics) || catalog.preparedTopics.length !== 1) fail('preparedTopics muss genau das deaktivierte Thema Raumvorstellung enthalten')
   requireUnique(catalog.preparedTopics.map((topic) => topic.id), 'preparedTopics IDs')
   for (const topic of catalog.preparedTopics) {
-    if (!isRecord(topic) || !['money', 'lengths', 'spatial-reasoning'].includes(topic.id) || topic.releaseStatus !== 'disabled') fail('preparedTopics enthält ein ungültiges oder aktives Thema')
+    if (!isRecord(topic) || topic.id !== 'spatial-reasoning' || topic.releaseStatus !== 'disabled') fail('preparedTopics enthält ein ungültiges oder aktives Thema')
     for (const field of ['label', 'curriculumArea', 'supportGoal', 'remediation']) requireText(topic, field, `preparedTopics.${topic.id}`)
     for (const field of ['prerequisites', 'representations', 'misconceptions', 'progression']) {
       if (!Array.isArray(topic[field]) || topic[field].length === 0 || !topic[field].every(isText)) fail(`preparedTopics.${topic.id}.${field} ist unvollständig`)
     }
   }
+  if (!isRecord(catalog.quantityContent) || !isRecord(catalog.quantityContent.money) || !isRecord(catalog.quantityContent.lengths)) fail('quantityContent fehlt')
+  for (const field of ['countPrompt', 'changePrompt', 'countExplanation', 'changeExplanation', 'coinsLabel', 'priceLabel', 'paidLabel']) requireText(catalog.quantityContent.money, field, 'quantityContent.money')
+  for (const field of ['readPrompt', 'toCentimetersPrompt', 'toMetersPrompt', 'calculationPrompt', 'readExplanation', 'conversionExplanation', 'calculationExplanation', 'rulerLabel', 'equivalenceLabel']) requireText(catalog.quantityContent.lengths, field, 'quantityContent.lengths')
   if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding) || !isRecord(catalog.strategySteps.arithmetic1000)) fail('strategySteps fehlt')
   for (const field of ['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess']) requireText(catalog.strategySteps.placeValue, field, 'strategySteps.placeValue')
   for (const field of ['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper']) requireText(catalog.strategySteps.rounding, field, 'strategySteps.rounding')

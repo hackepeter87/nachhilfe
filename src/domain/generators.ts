@@ -792,6 +792,179 @@ function complement1000(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+export function formatEuro(cents: number): string {
+  if (!Number.isInteger(cents) || cents < 0) throw new RangeError('Geldbeträge müssen nichtnegative ganze Centbeträge sein.')
+  return `${Math.floor(cents / 100)},${String(cents % 100).padStart(2, '0')} €`
+}
+
+function moneyDenominations(cents: number): number[] {
+  const denominations = [200, 100, 50, 20, 10]
+  const result: number[] = []
+  let remaining = cents
+  for (const denomination of denominations) {
+    while (remaining >= denomination) {
+      result.push(denomination)
+      remaining -= denomination
+    }
+  }
+  if (remaining !== 0) throw new Error(`Betrag ${cents} kann mit den freigegebenen Münzen nicht dargestellt werden.`)
+  return result
+}
+
+function money(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().quantityContent.money
+  let amountCents: number
+  let paidCents = 0
+  let priceCents = 0
+  let taskPrompt: string
+  let quantityExplanation: string
+  let strategy: string
+  let coins: number[]
+  let subskillId: string
+  if (difficulty === 1) {
+    amountCents = integer(random, 2, 10) * 100
+    coins = moneyDenominations(amountCents)
+    taskPrompt = content.countPrompt
+    quantityExplanation = renderCatalogText(content.countExplanation, { amount: formatEuro(amountCents) })
+    strategy = 'Zähle zuerst die 2-Euro-Münzen und danach die 1-Euro-Münzen.'
+    subskillId = 'money-whole-euros'
+  } else if (difficulty === 2) {
+    amountCents = integer(random, 12, 98) * 10
+    coins = moneyDenominations(amountCents)
+    taskPrompt = content.countPrompt
+    quantityExplanation = renderCatalogText(content.countExplanation, { amount: formatEuro(amountCents) })
+    strategy = 'Zähle Euro und Cent getrennt. 100 Cent ergeben 1 Euro.'
+    subskillId = 'money-euro-cent'
+  } else {
+    paidCents = 1000
+    priceCents = integer(random, 25, 90) * 10
+    amountCents = paidCents - priceCents
+    coins = moneyDenominations(paidCents)
+    taskPrompt = renderCatalogText(content.changePrompt, { price: formatEuro(priceCents), paid: formatEuro(paidCents) })
+    quantityExplanation = renderCatalogText(content.changeExplanation, { price: formatEuro(priceCents), paid: formatEuro(paidCents), change: formatEuro(amountCents) })
+    strategy = 'Ergänze den Preis zuerst bis zum nächsten vollen Euro und dann bis 10 Euro.'
+    subskillId = 'money-change'
+  }
+  const values = {
+    amountCents,
+    priceCents,
+    paidCents,
+    taskPrompt,
+    quantityExplanation,
+    strategy,
+    amount: formatEuro(amountCents),
+    price: formatEuro(priceCents),
+    paid: formatEuro(paidCents),
+    change: formatEuro(amountCents)
+  }
+  const options = numberOptions(random, amountCents, [
+    { value: amountCents - 10, misconception: 'Centbetrag um 10 zu klein gelesen' },
+    { value: amountCents + 10, misconception: 'Centbetrag um 10 zu groß gelesen' },
+    { value: amountCents - 100, misconception: 'Einen Euro zu wenig berücksichtigt' },
+    { value: amountCents + 100, misconception: 'Einen Euro zu viel berücksichtigt' },
+    { value: priceCents, misconception: 'Preis und Rückgeld verwechselt' }
+  ]).map((option) => ({ ...option, label: formatEuro(Number(option.value)) }))
+  return withMetadata({
+    ...base('money', seed, difficulty, values),
+    ...contentFor('money', values, difficulty),
+    typeId: difficulty === 3 ? 'money-change' : 'money-count',
+    subskillId,
+    answerMode: 'choice',
+    correctAnswer: String(amountCents),
+    options,
+    representation: representation('money', difficulty, 'money', content.coinsLabel, {
+      coins,
+      displayedCents: paidCents || amountCents,
+      priceCents,
+      paidCents,
+      priceLabel: content.priceLabel,
+      paidLabel: content.paidLabel
+    })
+  })
+}
+
+export function formatLength(centimeters: number): string {
+  if (!Number.isInteger(centimeters) || centimeters < 0) throw new RangeError('Längen müssen nichtnegative ganze Zentimeterwerte sein.')
+  if (centimeters >= 100 && centimeters % 100 === 0) return `${centimeters / 100} m`
+  if (centimeters >= 100) return `${Math.floor(centimeters / 100)} m ${centimeters % 100} cm`
+  return `${centimeters} cm`
+}
+
+function lengths(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().quantityContent.lengths
+  let answerCm: number
+  let correctAnswer: string
+  let options: AnswerOption[]
+  let taskPrompt: string
+  let quantityExplanation: string
+  let strategy: string
+  let subskillId: string
+  let representationValues: ExerciseRepresentation['values']
+  if (difficulty === 1) {
+    answerCm = integer(random, 2, 20)
+    correctAnswer = `${answerCm} cm`
+    taskPrompt = content.readPrompt
+    quantityExplanation = renderCatalogText(content.readExplanation, { length: correctAnswer })
+    strategy = 'Beginne am Nullpunkt und zähle die gleich großen Zentimeterabschnitte.'
+    subskillId = 'length-read-centimeters'
+    representationValues = { lengthCm: answerCm, maxCm: 20 }
+    options = textOptions(random, correctAnswer, [
+      { value: `${answerCm - 1} cm`, misconception: 'Nullpunkt als ersten Zentimeter mitgezählt' },
+      { value: `${answerCm + 1} cm`, misconception: 'Einen Skalenabschnitt zu weit gezählt' },
+      { value: `${answerCm * 10} cm`, misconception: 'Skalenteilung mit Zehnerschritten verwechselt' }
+    ])
+  } else if (difficulty === 2) {
+    const meters = integer(random, 1, 9)
+    answerCm = meters * 100
+    const toCentimeters = random() < 0.5
+    correctAnswer = toCentimeters ? `${answerCm} cm` : `${meters} m`
+    taskPrompt = renderCatalogText(toCentimeters ? content.toCentimetersPrompt : content.toMetersPrompt, {
+      length: toCentimeters ? `${meters} m` : `${answerCm} cm`
+    })
+    quantityExplanation = renderCatalogText(content.conversionExplanation, { length: correctAnswer })
+    strategy = 'Nutze die Beziehung 1 m = 100 cm.'
+    subskillId = toCentimeters ? 'length-m-to-cm' : 'length-cm-to-m'
+    representationValues = { lengthCm: 100, maxCm: 100, equivalence: content.equivalenceLabel }
+    options = textOptions(random, correctAnswer, toCentimeters ? [
+      { value: `${meters * 10} cm`, misconception: 'Mit 10 statt mit 100 umgerechnet' },
+      { value: `${meters} cm`, misconception: 'Maßzahl ohne Einheitenumrechnung übernommen' }
+    ] : [
+      { value: `${answerCm / 10} m`, misconception: 'Durch 10 statt durch 100 geteilt' },
+      { value: `${answerCm} m`, misconception: 'Maßzahl ohne Einheitenumrechnung übernommen' }
+    ])
+  } else {
+    const additionTask = random() < 0.5
+    const firstCm = additionTask ? integer(random, 12, 65) * 10 : integer(random, 25, 90) * 10
+    const secondCm = additionTask ? integer(random, 2, Math.min(25, 90 - firstCm / 10)) * 10 : integer(random, 2, firstCm / 10 - 5) * 10
+    answerCm = additionTask ? firstCm + secondCm : firstCm - secondCm
+    correctAnswer = formatLength(answerCm)
+    const operation = additionTask ? '+' : '−'
+    taskPrompt = renderCatalogText(content.calculationPrompt, { firstLength: formatLength(firstCm), secondLength: formatLength(secondCm), operation })
+    quantityExplanation = renderCatalogText(content.calculationExplanation, { firstLength: formatLength(firstCm), secondLength: formatLength(secondCm), answerLength: correctAnswer, operation })
+    strategy = additionTask ? 'Rechne beide Längen in Zentimetern zusammen.' : 'Ziehe die kleinere Zentimeterlänge von der größeren ab.'
+    subskillId = additionTask ? 'length-add' : 'length-difference'
+    representationValues = { lengthCm: firstCm, secondLengthCm: secondCm, maxCm: 1000, operation }
+    options = textOptions(random, correctAnswer, [
+      { value: formatLength(Math.max(0, answerCm - 10)), misconception: 'Zehn Zentimeter zu wenig gerechnet' },
+      { value: formatLength(answerCm + 10), misconception: 'Zehn Zentimeter zu viel gerechnet' },
+      { value: formatLength(additionTask ? Math.abs(firstCm - secondCm) : firstCm + secondCm), misconception: 'Rechenart vertauscht' }
+    ])
+  }
+  const values = { answerCm, taskPrompt, quantityExplanation, strategy, answerLength: correctAnswer }
+  return withMetadata({
+    ...base('lengths', seed, difficulty, values),
+    ...contentFor('lengths', values, difficulty),
+    typeId: difficulty === 1 ? 'length-read' : difficulty === 2 ? 'length-convert' : 'length-calculate',
+    subskillId,
+    answerMode: 'choice',
+    correctAnswer,
+    options,
+    representation: representation('lengths', difficulty, 'length', content.rulerLabel, representationValues)
+  })
+}
+
 export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
   switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus)
@@ -808,6 +981,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'addition-1000': return addition1000(seed, difficulty)
     case 'subtraction-1000': return subtraction1000(seed, difficulty)
     case 'complement-1000': return complement1000(seed, difficulty)
+    case 'money': return money(seed, difficulty)
+    case 'lengths': return lengths(seed, difficulty)
     case 'word-problem': return wordProblem(seed, difficulty)
     case 'symmetry': return symmetry(seed, difficulty)
   }

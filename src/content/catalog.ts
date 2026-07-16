@@ -2,7 +2,7 @@ import fallbackCatalogJson from './task-catalog.fallback.json'
 import { SKILL_IDS, type LearningPhase, type SkillId } from '../domain/types'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 4
+export const CATALOG_SCHEMA_VERSION = 5
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -85,7 +85,7 @@ export interface CatalogRemediation {
 }
 
 export interface PreparedTopic {
-  id: 'money' | 'lengths' | 'spatial-reasoning'
+  id: 'spatial-reasoning'
   label: string
   curriculumArea: string
   supportGoal: string
@@ -95,6 +95,29 @@ export interface PreparedTopic {
   progression: string[]
   remediation: string
   releaseStatus: 'disabled'
+}
+
+export interface QuantityContent {
+  money: {
+    countPrompt: string
+    changePrompt: string
+    countExplanation: string
+    changeExplanation: string
+    coinsLabel: string
+    priceLabel: string
+    paidLabel: string
+  }
+  lengths: {
+    readPrompt: string
+    toCentimetersPrompt: string
+    toMetersPrompt: string
+    calculationPrompt: string
+    readExplanation: string
+    conversionExplanation: string
+    calculationExplanation: string
+    rulerLabel: string
+    equivalenceLabel: string
+  }
 }
 
 export interface StrategySteps {
@@ -218,6 +241,7 @@ export interface TaskCatalog extends CatalogMetadata {
   numberRange: { min: number; max: number }
   skills: CatalogSkill[]
   preparedTopics: PreparedTopic[]
+  quantityContent: QuantityContent
   strategySteps: StrategySteps
   wordProblems: WordProblemTemplate[]
   wordProblemSteps: WordProblemSteps
@@ -241,8 +265,9 @@ const KNOWN_PLACEHOLDERS = new Set([
   'answer', 'answerSentence', 'axis', 'bridge', 'digit', 'dividend', 'divisor', 'first', 'hundreds',
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
-  'sumExpression', 'target', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
-  'intermediate', 'secondOperation'
+  'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
+  'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
+  'length', 'firstLength', 'secondLength', 'answerLength'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -403,13 +428,19 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!Array.isArray(value.skills) || value.skills.length !== SKILL_IDS.length || !value.skills.every((skill) => isSkill(skill, numberRange as { min: number; max: number }))) return false
   const skillIds = value.skills.map((skill) => (skill as CatalogSkill).id)
   if (new Set(skillIds).size !== SKILL_IDS.length || !SKILL_IDS.every((id) => skillIds.includes(id))) return false
-  if (!Array.isArray(value.preparedTopics) || value.preparedTopics.length !== 3 || !value.preparedTopics.every((topic) =>
-    isRecord(topic) && ['money', 'lengths', 'spatial-reasoning'].includes(topic.id as string) &&
+  if (!Array.isArray(value.preparedTopics) || value.preparedTopics.length !== 1 || !value.preparedTopics.every((topic) =>
+    isRecord(topic) && topic.id === 'spatial-reasoning' &&
     [topic.label, topic.curriculumArea, topic.supportGoal, topic.remediation].every(isNonEmptyString) &&
     ['prerequisites', 'representations', 'misconceptions', 'progression'].every((field) => Array.isArray(topic[field]) && (topic[field] as unknown[]).length > 0 && (topic[field] as unknown[]).every(isNonEmptyString)) &&
     topic.releaseStatus === 'disabled'
   )) return false
-  if (new Set(value.preparedTopics.map((topic) => (topic as PreparedTopic).id)).size !== 3) return false
+  if (new Set(value.preparedTopics.map((topic) => (topic as PreparedTopic).id)).size !== 1) return false
+  if (!isRecord(value.quantityContent) || !isRecord(value.quantityContent.money) || !isRecord(value.quantityContent.lengths)) return false
+  const quantityContent = value.quantityContent
+  const moneyContent = quantityContent.money as Record<string, unknown>
+  const lengthsContent = quantityContent.lengths as Record<string, unknown>
+  if (!['countPrompt', 'changePrompt', 'countExplanation', 'changeExplanation', 'coinsLabel', 'priceLabel', 'paidLabel'].every((field) => isNonEmptyString(moneyContent[field]))) return false
+  if (!['readPrompt', 'toCentimetersPrompt', 'toMetersPrompt', 'calculationPrompt', 'readExplanation', 'conversionExplanation', 'calculationExplanation', 'rulerLabel', 'equivalenceLabel'].every((field) => isNonEmptyString(lengthsContent[field]))) return false
   if (!isRecord(value.strategySteps) || !isRecord(value.strategySteps.placeValue) || !isRecord(value.strategySteps.rounding) || !isRecord(value.strategySteps.arithmetic1000)) return false
   const placeValueSteps = value.strategySteps.placeValue
   const roundingSteps = value.strategySteps.rounding

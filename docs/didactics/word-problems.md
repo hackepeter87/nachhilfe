@@ -31,6 +31,6 @@ Gleiche Beziehung mit anderer Oberfläche und anderen Zahlen, nicht derselbe Tex
 ## 15. Erfolgskriterien
 Text, Beziehung, Operation, Modell, Ergebnis und Antwortsatz sind vollständig konsistent.
 ## 16. Grenzen der aktuellen Umsetzung
-Komplexere mehrstufige Situationen, Geld und Längen sind deaktiviert; freie Antwortsätze werden nicht bewertet.
+Komplexere mehrstufige Situationen bleiben deaktiviert. Geld und Längen sind eigenständige Größenkompetenzen und werden nicht als bloße Sachaufgabenverkleidung behandelt; freie Antwortsätze werden nicht bewertet.
 ## 17. Punkte für die Gesamtprüfung
 Sprachliche Zugänglichkeit und Lebensnähe der sieben Vorlagen im Gesamtprodukt prüfen.

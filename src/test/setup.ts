@@ -5,6 +5,11 @@ import { afterEach } from 'vitest'
 
 afterEach(() => cleanup())
 
+Object.defineProperty(window, 'scrollTo', {
+  writable: true,
+  value: () => undefined
+})
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string) => ({

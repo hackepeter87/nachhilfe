@@ -40,3 +40,38 @@ describe('MathRepresentation Gruppenbild', () => {
     expect(container.querySelector('.visual-group')).not.toBeInTheDocument()
   })
 })
+
+describe('MathRepresentation Größen', () => {
+  it('stellt eine geprüfte Münzsumme vollständig dar', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'money', visibility: 'always', label: 'Münzen', values: { coins: [200, 100, 50, 20], displayedCents: 370 }
+    }} />)
+    expect(screen.getByRole('img', { name: 'Münzen: 370 Cent' })).toBeVisible()
+    expect(container.querySelectorAll('.coin')).toHaveLength(4)
+    expect(container).toHaveTextContent('2 €')
+    expect(container).toHaveTextContent('50 ct')
+  })
+
+  it('lehnt eine widersprüchliche Münzsumme sichtbar ab', () => {
+    render(<MathRepresentation representation={{
+      kind: 'money', visibility: 'always', label: 'Münzen', values: { coins: [200, 100], displayedCents: 250 }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültigen Betrag')
+  })
+
+  it('stellt eine Messstrecke mit Nullpunkt und Endwert dar', () => {
+    render(<MathRepresentation representation={{
+      kind: 'length', visibility: 'always', label: 'Messstrecke', values: { lengthCm: 14, maxCm: 20 }
+    }} />)
+    expect(screen.getByRole('img', { name: 'Messstrecke: 14 Zentimeter' })).toBeVisible()
+    expect(screen.getByText('14 cm')).toBeVisible()
+    expect(screen.getByText('20 cm')).toBeVisible()
+  })
+
+  it('lehnt Messstrecken außerhalb ihrer Skala sichtbar ab', () => {
+    render(<MathRepresentation representation={{
+      kind: 'length', visibility: 'always', label: 'Messstrecke', values: { lengthCm: 21, maxCm: 20 }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Längenangaben')
+  })
+})

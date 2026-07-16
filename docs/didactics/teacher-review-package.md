@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit `npm run dev`; der Container mit `docker run --rm -p 8080:8080 mathe-reise:0.7.0`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.7.0`.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit `npm run dev`; der Container mit `docker run --rm -p 8080:8080 mathe-reise:0.8.0`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.8.0`.
 
 ## Förderziel
 
@@ -10,7 +10,7 @@ Mathe-Reise unterstützt ein etwa neunjähriges Kind am Ende der Klasse 3 dabei,
 
 ## Behandelte Themen
 
-Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen und Raster-Symmetrie. Geld, Längen und Raumvorstellung sind methodisch vorbereitet, aber bewusst deaktiviert.
+Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, Raster-Symmetrie, Geldbeträge in Euro/Cent und Längen in Zentimetern/Metern. Raumvorstellung ist methodisch vorbereitet, aber bewusst deaktiviert.
 
 ## Methodischer Aufbau
 
@@ -36,4 +36,4 @@ Stufe 1 nutzt kleinere Zahlen und sichtbare Darstellung. Stufe 2 reduziert die D
 
 ## Bekannte Grenzen
 
-Es liegt keine dokumentierte Lehrkraftfreigabe vor. Ein echter iPhone-Test ist noch offen. Freie Rechenwege oder Freitextbegründungen werden nicht diagnostisch ausgewertet. Geld, Längen, Körperansichten, Kippen und Falten sind nicht sichtbar. Das adaptive Modell ist eine getestete Produktheuristik, kein wissenschaftlich validiertes Diagnosemodell.
+Es liegt keine dokumentierte Lehrkraftfreigabe vor. Ein echter iPhone-Test ist noch offen. Freie Rechenwege oder Freitextbegründungen werden nicht diagnostisch ausgewertet. Millimeter/Kilometer, komplexe Kaufsituationen, Körperansichten, Kippen und Falten sind nicht sichtbar. Das adaptive Modell ist eine getestete Produktheuristik, kein wissenschaftlich validiertes Diagnosemodell.

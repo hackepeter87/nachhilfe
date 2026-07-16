@@ -1,6 +1,6 @@
 # Geldwerte
 
-Status: `disabled`. Es gibt keine sichtbaren Aufgaben oder Generatoren.
+Status: `active` seit App 0.8.0 und Katalog 0.6.0. Eine Lehrkraftfreigabe ist noch nicht dokumentiert.
 
 ## 1. Bezug zum Förderbedarf
 Geldwerte sollen als Größen mit Einheit verstanden und in einfachen Kaufsituationen genutzt werden.
@@ -21,7 +21,7 @@ Geprüfte Münz-/Scheinbilder, Preisschild und Balkenmodell.
 ## 9. Lernprogression
 Erkennen, gleichwertig legen, vergleichen, addieren, Wechselgeld bestimmen.
 ## 10. Aufgabentypen
-Geplant: Darstellung auswählen, Betrag eingeben, Wechselgeld ergänzen.
+Stufe 1 zählt ganze Eurobeträge von 2 bis 10 Euro aus 1- und 2-Euro-Münzen. Stufe 2 zählt gemischte Euro-/Cent-Beträge in 10-Cent-Schritten. Stufe 3 bestimmt Wechselgeld zu einem Preis zwischen 2,50 und 9,00 Euro bei Zahlung mit 10 Euro. Alle Rechnungen erfolgen intern exakt in Cent.
 ## 11. Hilfestufen
 Einheit markieren; in Cent darstellen; bis zum nächsten Euro und dann zum Zahlbetrag ergänzen.
 ## 12. Remediation
@@ -31,8 +31,8 @@ Zwei verschiedene Bezahlmöglichkeiten oder Plausibilität eines Preises beurtei
 ## 14. Wiederholung
 Einheiten- und Wechselgeldfehler getrennt wiederholen.
 ## 15. Erfolgskriterien
-Vor Aktivierung: lokale Assets, eindeutige Lösungen, realistische Preise, vollständige Tests und mobile Abnahme.
+Münzsumme und dargestellter Betrag stimmen exakt überein; Lösung und Optionen bleiben im Zahlenraum bis 1000 Cent; Optionen sind eindeutig formatiert; Wechselgeld ist positiv und wird als Differenz geprüft.
 ## 16. Grenzen der aktuellen Umsetzung
-Nur methodisch und im Katalog vorbereitet; bewusst nicht produktiv.
+Produktiv sind Zählen, Euro-/Cent-Beziehung und einfaches Wechselgeld. Scheine, mehrere Einkäufe, freie Bezahlmöglichkeiten, Dezimalrechnung als eigenes Verfahren und reale Kaufentscheidungen sind bewusst nicht enthalten.
 ## 17. Punkte für die Gesamtprüfung
-Vor Aktivierung Auswahl der Münzdarstellungen und übliche Unterrichtsnotation prüfen.
+Auswahl der stilisierten Münzdarstellungen, übliche Unterrichtsnotation und Verständlichkeit der Wechselgeldsituation durch eine Lehrkraft prüfen.

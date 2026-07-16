@@ -13,6 +13,8 @@ export const SKILL_IDS = [
   'addition-1000',
   'subtraction-1000',
   'complement-1000',
+  'money',
+  'lengths',
   'word-problem',
   'symmetry'
 ] as const
@@ -42,7 +44,7 @@ export interface AnswerOption {
   misconception?: string
 }
 
-export type RepresentationKind = 'place-value' | 'number-line' | 'bar-model' | 'groups'
+export type RepresentationKind = 'place-value' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length'
 
 export interface NumberLineJump {
   from: number
@@ -62,7 +64,7 @@ export interface ExerciseRepresentation {
   kind: RepresentationKind
   visibility: 'always' | 'hint'
   label: string
-  values: Record<string, number | string | NumberLineJump[]>
+  values: Record<string, number | string | number[] | NumberLineJump[]>
 }
 
 export interface ExerciseStep {

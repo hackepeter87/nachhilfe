@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.5.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.6.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -152,7 +152,7 @@ Stand: Katalogversion 0.5.0. Die Stufen beschreiben die produktive Heuristik von
 - **Stufe 3 / MVP-Ziel:** denselben Ergänzungsbereich ohne sichtbaren Rechenstrich bearbeiten.
 - **Erhöhen / Zurückstufen:** Ergänzungsweg sicher / Differenz mit Zielzahl verwechseln.
 - **Hilfe / Transfer:** Zwischenziel am nächsten Zehner / Ergebnis mit Subtraktion prüfen.
-- **Später:** Ergänzen über mehrere Hunderter und Geldbeträge.
+- **Später:** Ergänzen über mehrere Hunderter; Geldbeträge werden seit 0.8 in einer eigenen Kompetenz geübt.
 
 ## Sachrechnen und Raumvorstellung
 
@@ -164,7 +164,7 @@ Stand: Katalogversion 0.5.0. Die Stufen beschreiben die produktive Heuristik von
 - **Stufe 3 / MVP-Ziel:** unwichtige Angabe, gleich große Gruppen, erste zweischrittige Situationen und vorlagenspezifische Plausibilitätsprüfung.
 - **Erhöhen / Zurückstufen:** Handlung, Rechnung und Antwort konsistent / Frage, Beziehung oder relevante Angaben verwechseln.
 - **Hilfe / Transfer:** beziehungsspezifischer Hinweis und passendes Modell / Geschichte mit anderer Darstellung erklären.
-- **Später:** komplexere mehrstufige Situationen, Geld und Längen nach eigener fachlicher Abnahme.
+- **Später:** komplexere mehrstufige Situationen; Geld und Längen werden seit 0.8 als eigenständige Größenkompetenzen geübt.
 
 ### Symmetrie
 
@@ -176,6 +176,22 @@ Stand: Katalogversion 0.5.0. Die Stufen beschreiben die produktive Heuristik von
 - **Hilfe / Transfer:** Reihe oder Spalte einzeln spiegeln / Lageänderung eines Feldes beschreiben.
 - **Später:** fehlende Hälfte ergänzen; Diagonalachsen erst nach eigenständiger Prüfung.
 
+## Größen und Messen
+
+### Geld
+
+- **Stufe 1:** ganze Eurobeträge aus sichtbaren 1- und 2-Euro-Münzen bestimmen.
+- **Stufe 2:** gemischte Euro-/Cent-Beträge in 10-Cent-Schritten bestimmen.
+- **Stufe 3 / MVP-Ziel:** Wechselgeld aus 10 Euro ohne vorweggenommene Darstellung berechnen.
+- **Hilfe / Transfer:** Münzen in Cent zusammenfassen / Preis vom gegebenen Betrag ergänzen.
+
+### Längen
+
+- **Stufe 1:** ganze Zentimeter an einer sichtbaren Messstrecke ablesen.
+- **Stufe 2:** ganze Meter und volle Hunderter Zentimeter ineinander umrechnen.
+- **Stufe 3 / MVP-Ziel:** Längen in Zentimetern addieren oder ihren Unterschied bestimmen.
+- **Hilfe / Transfer:** Nullpunkt und Einheit beachten / Rechnung mit einer plausiblen Größenordnung prüfen.
+
 ## Bewusst offene Förderbereiche
 
-Geld, Längen, schriftliche Rechenverfahren, mehrere Stellenübergänge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen, Grenzwerttests und eine menschliche didaktische Prüfung.
+Millimeter/Kilometer, komplexe Kaufsituationen, schriftliche Rechenverfahren, mehrere Stellenübergänge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen, Grenzwerttests und eine menschliche didaktische Prüfung.

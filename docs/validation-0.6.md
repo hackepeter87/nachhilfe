@@ -1,13 +1,13 @@
 # Validierung und Konsolidierung 0.6
 
-Stand: App 0.7.0, Katalog 0.5.0, Schema 4. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
+Stand: App 0.8.0, Katalog 0.6.0, Schema 5. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
 
 ## Intern prüfbar
 
 - Katalogquelle, öffentlicher Katalog und eingebetteter Fallback werden deterministisch abgeglichen.
 - Generator-, Komponenten-, Persistenz-, Mobile-, Offline- und Containerprüfungen sind Bestandteil der Release-Abnahme.
 - Die didaktische Progression und der Runtime-Abgleich nennen nur produktiv wirksame Funktionen.
-- Geld, Längen, schriftliche Verfahren, mehrere gleichzeitige Übergänge und Raumvorstellung bleiben deaktiviert.
+- Geld und Längen sind seit 0.8 mit eigenen Darstellungen und Grenzwerttests aktiv. Schriftliche Verfahren, mehrere gleichzeitige Übergänge, Millimeter/Kilometer und Raumvorstellung bleiben deaktiviert.
 
 Die konkreten ausgeführten Befehle und Ergebnisse stehen in den Release Notes. Automatisierte Tests ersetzen keine Unterrichtserprobung.
 

@@ -24,8 +24,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(4)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.5.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(5)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.6.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -38,7 +38,7 @@ describe('versionierter Aufgabenkatalog', () => {
   })
 
   it.each([
-    ['schemaVersion', 5],
+    ['schemaVersion', 6],
     ['catalogVersion', 'keine-version'],
     ['catalogId', ''],
     ['status', 'review'],
@@ -145,7 +145,8 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     expect(catalog.skills.every((skill) => skill.releaseStatus === 'active')).toBe(true)
     expect(catalog.skills.every((skill) => skill.learningPhases.some((phase) => phase.releaseStatus === 'active'))).toBe(true)
-    expect(catalog.preparedTopics.map((topic) => topic.id).sort()).toEqual(['lengths', 'money', 'spatial-reasoning'])
+    expect(catalog.preparedTopics.map((topic) => topic.id)).toEqual(['spatial-reasoning'])
+    expect(catalog.skills.filter((skill) => ['money', 'lengths'].includes(skill.id)).every((skill) => skill.releaseStatus === 'active')).toBe(true)
     expect(catalog.preparedTopics.every((topic) => topic.releaseStatus === 'disabled')).toBe(true)
   })
 
@@ -165,6 +166,14 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(validateTaskCatalog(draftCatalog)).toBe(true)
     expect(resolveTaskCatalog(draftCatalog, false)).toBe(FALLBACK_TASK_CATALOG)
     expect(resolveTaskCatalog(draftCatalog, true)).toBe(draftCatalog)
+  })
+
+  it('validiert die verwendeten Größeninhalte und lehnt unvollständige Einheitenangaben ab', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    expect(catalog.quantityContent.money.coinsLabel).toContain('Münz')
+    expect(catalog.quantityContent.lengths.equivalenceLabel).toBe('1 m = 100 cm')
+    catalog.quantityContent.lengths.equivalenceLabel = ''
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('verwendet bei ungültigem oder nicht ladbarem Katalog den geprüften Fallback', async () => {

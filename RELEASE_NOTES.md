@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Größen und Messen 0.8.0
+
+- Geld ist als produktive Kompetenz aktiviert: ganze Euro mit sichtbaren Münzgruppen, gemischte Euro-/Cent-Beträge und Wechselgeld aus 10 Euro. Alle Rechnungen erfolgen intern exakt in Cent.
+- Längen sind als produktive Kompetenz aktiviert: Zentimeter an einer Messstrecke ablesen, ganze Meter und Zentimeter umrechnen sowie Längen addieren oder vergleichen. Alle Rechnungen verwenden intern Zentimeter.
+- Beide Kompetenzen besitzen drei tatsächlich unterschiedliche Schwierigkeitsstufen, zwei fachliche Hilfen, konkrete Fehlertexte, Remediation und adaptive Auswahl über den bestehenden Lernstand.
+- Das Katalogschema steigt auf 5 und der fachliche Katalog auf 0.6.0. Neue Texte und Darstellungsbegriffe liegen in `quantityContent`; Generatoren, Umrechnung und Lösungsprüfung bleiben in TypeScript.
+- Münzsumme, Messwert, Wertebereiche, eindeutige Optionen und mobile Darstellungen werden durch Generator-, Komponenten- und E2E-Tests abgesichert.
+- Raumvorstellung bleibt vorbereitet und deaktiviert. Millimeter/Kilometer, komplexe Kaufsituationen und schriftliche Verfahren sind nicht Teil dieses Releases.
+
+Eine Freigabe durch eine Lehrkraft und ein Test auf einem echten iPhone sind weiterhin nicht dokumentiert. Die offenen manuellen Nachweise stehen in `docs/validation-0.6.md` und den Issues #58 und #59.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 164 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und vier Playwright-Szenarien jeweils gegen Vite Preview und den Container. Die vollständige Runde lief bei `375 x 812` nach Reload und Offline-Neustart bis zum Abschluss; Landscape `812 x 375` sowie die Geld- und Längenansichten blieben ohne horizontales Overflow. Das OCI-Image `mathe-reise:0.8.0` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Podman war nicht installiert und wurde nicht als ausgeführt behauptet. Das Multi-Arch-Release-Image wird ausschließlich durch den tag-gesteuerten GitHub-Workflow gebaut.
+
 ## Rechenstrategien und Transfer 0.7.0
 
 - Addition bis 1000 prüft bei Einer- und Zehnerübergängen zuerst die passende volle Zwischenzahl und danach das Endergebnis.
