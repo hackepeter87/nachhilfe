@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.title="Mathe-Reise" \
       org.opencontainers.image.description="Offline-fähige Mathematik-Förderapp für die dritte Klasse" \
       org.opencontainers.image.source="https://github.com/hackepeter87/nachhilfe" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.version="0.1.1"
+      org.opencontainers.image.version="0.2.0"
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build --chown=101:101 /app/dist /usr/share/nginx/html

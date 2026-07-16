@@ -23,7 +23,8 @@ export function createSkillProgress(skillId: SkillId): SkillProgress {
     recentErrors: 0,
     correctStreak: 0,
     lastVariantKey: null,
-    status: 'not_started'
+    status: 'not_started',
+    subskills: {}
   }
 }
 
@@ -50,6 +51,24 @@ export function updateSkillProgress(current: SkillProgress | undefined, result: 
   const mastery = Math.max(LEARNING_RULES.minMastery, Math.min(LEARNING_RULES.maxMastery, previous.mastery + delta))
   const attempts = previous.attempts + 1
   const correctStreak = result.correct ? previous.correctStreak + 1 : 0
+  const previousSubskills = previous.subskills ?? {}
+  const previousSubskill = result.subskillId ? previousSubskills[result.subskillId] : undefined
+  const subskillMastery = previousSubskill
+    ? Math.max(0, Math.min(100, previousSubskill.mastery + delta))
+    : Math.max(0, Math.min(100, LEARNING_RULES.initialMastery + delta))
+  const subskills = result.subskillId
+    ? {
+        ...previousSubskills,
+        [result.subskillId]: {
+          attempts: (previousSubskill?.attempts ?? 0) + 1,
+          correctAnswers: (previousSubskill?.correctAnswers ?? 0) + (result.correct ? 1 : 0),
+          hintsUsed: (previousSubskill?.hintsUsed ?? 0) + result.hintsUsed,
+          mastery: subskillMastery,
+          recentErrors: result.correct ? Math.max(0, (previousSubskill?.recentErrors ?? 0) - 1) : Math.min(3, (previousSubskill?.recentErrors ?? 0) + 1),
+          lastPracticedAt: result.completedAt
+        }
+      }
+    : previousSubskills
 
   return {
     ...previous,
@@ -62,8 +81,18 @@ export function updateSkillProgress(current: SkillProgress | undefined, result: 
     recentErrors: result.correct ? Math.max(0, previous.recentErrors - 1) : Math.min(3, previous.recentErrors + 1),
     correctStreak,
     lastVariantKey: result.variantKey,
-    status: statusFor(attempts, mastery)
+    status: statusFor(attempts, mastery),
+    subskills
   }
+}
+
+export function subskillWeight(progress: SkillProgress | undefined, subskillId: string, now = new Date()): number {
+  const subskill = progress?.subskills?.[subskillId]
+  if (!subskill) return 120
+  const daysSincePractice = subskill.lastPracticedAt
+    ? Math.max(0, (now.getTime() - new Date(subskill.lastPracticedAt).getTime()) / 86_400_000)
+    : 14
+  return Math.max(10, 110 - subskill.mastery + subskill.recentErrors * 24 + Math.min(30, daysSincePractice * 3))
 }
 
 export function selectionWeight(progress: SkillProgress | undefined, now = new Date()): number {

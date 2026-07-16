@@ -10,6 +10,9 @@ export const SKILL_IDS = [
   'neighbor-hundreds',
   'round-tens',
   'round-hundreds',
+  'addition-1000',
+  'subtraction-1000',
+  'complement-1000',
   'word-problem',
   'symmetry'
 ] as const
@@ -28,6 +31,16 @@ export interface AnswerOption {
   value: string
   label: string
   grid?: number[][]
+  misconception?: string
+}
+
+export type RepresentationKind = 'place-value' | 'number-line' | 'bar-model' | 'groups'
+
+export interface ExerciseRepresentation {
+  kind: RepresentationKind
+  visibility: 'always' | 'hint'
+  label: string
+  values: Record<string, number | string>
 }
 
 export interface ExerciseStep {
@@ -57,7 +70,10 @@ export interface Exercise {
   options?: AnswerOption[]
   steps?: ExerciseStep[]
   sourceGrid?: number[][]
+  subskillId?: string
+  representation?: ExerciseRepresentation
   hints: [Hint, Hint]
+  successFeedback: string
   errorFeedback: string
   explanation: string
   variant: ExerciseVariant
@@ -65,12 +81,16 @@ export interface Exercise {
     min: number
     max: number
     uniqueSolution: true
+    cognitiveSteps: number
+    representation: RepresentationKind | 'none'
+    distractorSources: string[]
   }
 }
 
 export interface AttemptResult {
   exerciseId: string
   skillId: SkillId
+  subskillId?: string
   variantKey: string
   correct: boolean
   hintsUsed: number
@@ -79,6 +99,15 @@ export interface AttemptResult {
 }
 
 export type LearningStatus = 'not_started' | 'learning' | 'practicing' | 'secure'
+
+export interface SubskillProgress {
+  attempts: number
+  correctAnswers: number
+  hintsUsed: number
+  mastery: number
+  recentErrors: number
+  lastPracticedAt: string | null
+}
 
 export interface SkillProgress {
   skillId: SkillId
@@ -92,6 +121,7 @@ export interface SkillProgress {
   correctStreak: number
   lastVariantKey: string | null
   status: LearningStatus
+  subskills: Record<string, SubskillProgress>
 }
 
 export interface SessionPlan {

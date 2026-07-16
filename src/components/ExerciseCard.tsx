@@ -3,6 +3,7 @@ import { Check, HelpCircle, Lightbulb, Send } from 'lucide-react'
 import { isAnswerCorrect, isStepAnswerCorrect } from '../domain'
 import type { AttemptResult, Exercise } from '../domain'
 import { GridPicture } from './GridPicture'
+import { MathRepresentation } from './MathRepresentation'
 
 interface ExerciseCardProps {
   exercise: Exercise
@@ -39,7 +40,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
     setChecks((current) => current + 1)
     if (isAnswerCorrect(exercise, value)) {
       setAnswerState('correct')
-      setMessage(hadError ? 'Jetzt passt es. Du bist drangeblieben!' : 'Richtig erkannt!')
+      setMessage(hadError ? `Jetzt passt es. ${exercise.successFeedback}` : exercise.successFeedback)
       return
     }
     registerWrongAnswer(exercise.errorFeedback)
@@ -65,6 +66,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
     onComplete({
       exerciseId: exercise.id,
       skillId: exercise.skillId,
+      subskillId: exercise.subskillId,
       variantKey: exercise.variant.key,
       correct: !hadError && answerState === 'correct',
       hintsUsed: hintsShown,
@@ -102,6 +104,10 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         <span className="eyebrow">{exercise.title}</span>
         <h2 id="exercise-title">{exercise.prompt}</h2>
       </div>
+
+      {exercise.representation && (exercise.representation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
+        <MathRepresentation representation={exercise.representation} />
+      )}
 
       {exercise.answerMode === 'guided-word' && currentStep && answerState === 'answering' && (
         <div className="guided-step">

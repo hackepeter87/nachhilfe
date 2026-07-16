@@ -24,11 +24,26 @@ describe('IndexedDB-Speicherung', () => {
   it('stellt Profil, Einstellungen und Lernstand nach erneutem Öffnen wieder her', async () => {
     await saveProfile({ id: 'local-profile', nickname: 'Lina', createdAt: '2026-07-16T10:00:00.000Z' })
     await saveSettings({ key: 'app-settings', installHelpDismissed: true, schemaVersion: 1 })
-    await saveSkillProgress({ ...createSkillProgress('round-tens'), attempts: 2, mastery: 47 })
+    await saveSkillProgress({
+      ...createSkillProgress('round-tens'),
+      attempts: 2,
+      mastery: 47,
+      subskills: {
+        'round-tens-midpoint': {
+          attempts: 2,
+          correctAnswers: 1,
+          hintsUsed: 1,
+          mastery: 47,
+          recentErrors: 1,
+          lastPracticedAt: '2026-07-16T10:00:00.000Z'
+        }
+      }
+    })
 
     const data = await loadAppData()
     expect(data.profile?.nickname).toBe('Lina')
     expect(data.settings.installHelpDismissed).toBe(true)
     expect(data.progress['round-tens']?.mastery).toBe(47)
+    expect(data.progress['round-tens']?.subskills['round-tens-midpoint']?.recentErrors).toBe(1)
   })
 })
