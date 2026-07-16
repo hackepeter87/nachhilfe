@@ -45,4 +45,13 @@ describe('ExerciseCard', () => {
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
+
+  it('blendet eine Hilfe-Darstellung erst mit dem Tipp ein', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('place-value', 42, 2)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    expect(screen.queryByRole('img', { name: 'Stellenwerttafel' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /tipp/i }))
+    expect(screen.getByRole('img', { name: 'Stellenwerttafel' })).toBeVisible()
+  })
 })

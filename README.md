@@ -6,16 +6,18 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 
 - Optionales lokales Onboarding mit frei wählbarem Spitznamen
 - Vollständige Mathe-Runden mit sieben Aufgaben und höchstens drei gezielten Wiederholungen
-- Addition und Subtraktion bis 20, Einmaleins und Division ohne Rest
+- Adaptive Addition und Subtraktion bis 20 sowie reihenspezifisches Einmaleins und Division ohne Rest
 - Stellenwerte bis 1000, Zerlegen und Zusammensetzen von Zahlen
 - Nachbarzehner, Nachbarhunderter sowie Runden auf Zehner und Hunderter
-- Geführte Sachaufgaben in vier Schritten und Raster-Symmetrie ohne Drag-and-drop
+- Erste Additions-, Subtraktions- und Ergänzungsstrategien bis 1000 mit Stellenwerttafel oder Rechenstrich
+- Geführte Sachaufgaben mit sechs Mengenbeziehungen und Raster-Symmetrie ohne Drag-and-drop
+- Drei inhaltlich wirksame Stufen mit sichtbarer, abrufbarer oder entfallender Darstellung
 - Zwei Hilfestufen, konkretes Fehlerfeedback und eine schrittweise Erklärung nach wiederholten Fehlern
 - Lokaler Lernstand mit einfacher adaptiver Aufgabenauswahl
 - Installierbare PWA mit vollständig vorgehaltenen MVP-Ressourcen
 - OCI-Container mit unprivilegiertem Nginx, Healthcheck und passenden Cache-Regeln
 
-Nicht Bestandteil dieses MVP sind schriftliche Addition und Subtraktion, Geld, Längen, Elternbereich, PIN, Backup, Körperansichten, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen.
+Nicht Bestandteil dieses MVP sind vollständige schriftliche Verfahren, mehrere Stellenübergänge, Geld, Längen, Elternbereich, PIN, Backup, Körperansichten, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen.
 
 ## Voraussetzungen
 
@@ -72,17 +74,18 @@ Die fachlichen Inhalte liegen im austauschbaren JSON-Katalog `public/content/tas
 
 - Katalogversion und Zahlenraum `0..1000`
 - alle Kompetenz-IDs, Anzeigenamen und Lehrplanbereiche
-- Förderziele, typische Fehlvorstellungen und zwei Hilfestufen je Kompetenz
-- Aufgabentexte, Fehlerfeedback und Erklärungen
-- Schwierigkeits- und Wertebereichsgrenzen
-- strukturierte Sachaufgabenvorlagen und die Texte ihrer vier Schritte
+- Förderziele, Prozesskompetenzen, Vorkenntnisse und typische Fehlvorstellungen
+- drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
+- zwei Hilfestufen, gearbeitetes Beispiel, Erklärung, Remediation und Transferimpuls
+- kompetenzbezogene Erfolgs- und Fehlertexte sowie Release-Status
+- strukturierte Sachaufgabenvorlagen mit Beziehung, Frage, Modell, unwichtiger Angabe und beziehungsspezifischen Hilfen
 - Raster- und Beschriftungsvorlagen für Symmetrieaufgaben
 
-Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtraktion, Multiplikation/Division, Stellenwertberechnung, Nachbarzahlen, Rundung, Spiegelung, Lösungsprüfung, Sitzungsplanung und Adaptivität stehen weiterhin unter `src/domain/`. Der JSON-Katalog enthält keine ausführbare Logik.
+Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtraktion, Multiplikation/Division, Stellenwertberechnung, Nachbarzahlen, Rundung, Spiegelung, Distraktorprüfung, Lösungsprüfung, Sitzungsplanung und Adaptivität stehen weiterhin unter `src/domain/`. Der JSON-Katalog enthält keine ausführbare Logik.
 
 Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Version, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App `src/content/task-catalog.fallback.v1.json` als gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
 
-Bei einer fachlichen Änderung wird zuerst `public/content/task-catalog.v1.json` angepasst. Soll die Änderung auch neuer eingebauter Fallback werden, ist dieselbe geprüfte Version zusätzlich nach `src/content/task-catalog.fallback.v1.json` zu übernehmen. `npm test` validiert beide Pfade und die produktiven Generatoren.
+Bei einer fachlichen Änderung wird zuerst `public/content/task-catalog.v1.json` angepasst. Soll die Änderung auch neuer eingebauter Fallback werden, ist dieselbe geprüfte Version zusätzlich nach `src/content/task-catalog.fallback.v1.json` zu übernehmen. `npm test` validiert beide Pfade und die produktiven Generatoren. Die vollständige Progression steht in [docs/didaktische-progression.md](docs/didaktische-progression.md); neue Inhalte werden mit [docs/didaktische-review-checkliste.md](docs/didaktische-review-checkliste.md) geprüft.
 
 ## Container
 
@@ -142,8 +145,8 @@ Die Offline- und Mobilabläufe wurden automatisiert mit Playwright geprüft. Ein
 
 Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen versioniert in nativer IndexedDB. Es gibt kein Backend, Tracking, Werbung oder externe Laufzeit-API.
 
-Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
+Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Schwierigkeit steuert zusätzlich Zahlenraum, Denkschritte und Hilfsdarstellung. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.1.1
+## Release-Stand 0.2.0
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.1.1 ergänzt die Review-Korrekturen für Rundung, Offline-Readiness, JSON-Katalog und CI. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.2.0 vertieft die didaktische Progression, Aufgabenvalidierung, Grundrechenadaptivität, Sachaufgaben und erste Rechenstrategien bis 1000. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

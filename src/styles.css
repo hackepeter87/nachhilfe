@@ -472,6 +472,68 @@ p {
   font-size: 1.45rem;
 }
 
+.math-visual {
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 14px;
+  border: 2px solid #d9e6dd;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+
+.place-value-visual {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.place-column {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  border: 1px solid #b8cabd;
+  background: #fff;
+}
+
+.place-column span { font-size: .76rem; font-weight: 800; color: #557060; }
+.place-column strong { font-size: 1.45rem; }
+.place-column--highlight { border-color: #df6b3d; background: #fff3ec; }
+
+.number-line-track {
+  position: relative;
+  height: 4px;
+  margin: 18px 10px 10px;
+  background: #315d45;
+}
+
+.number-line-track::before,
+.number-line-track::after,
+.number-line-marker {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 18px;
+  background: #315d45;
+  transform: translate(-50%, -50%);
+  content: '';
+}
+
+.number-line-track::before { left: 0; }
+.number-line-track::after { left: 100%; }
+.number-line-marker { background: #df6b3d; height: 24px; }
+.number-line-labels { display: flex; justify-content: space-between; align-items: center; }
+.number-line-labels strong { color: #b94c24; }
+.number-line-visual p { margin: 10px 0 0; font-weight: 700; text-align: center; }
+
+.bar-segments { display: grid; grid-template-columns: 2fr 1fr; min-height: 48px; margin-bottom: 10px; }
+.bar-segments span { display: grid; place-items: center; border: 1px solid #315d45; background: #dceee3; font-weight: 800; }
+.bar-segments span + span { background: #ffe5d7; }
+.bar-model-visual > strong { display: block; text-align: center; }
+
+.groups-visual { display: flex; flex-wrap: wrap; gap: 8px; }
+.visual-group { display: flex; flex-wrap: wrap; gap: 3px; width: 44px; min-height: 32px; padding: 5px; border: 1px solid #87a792; background: #fff; }
+.visual-group i { width: 7px; height: 7px; border-radius: 50%; background: #df6b3d; }
+
 .number-row {
   display: grid;
   grid-template-columns: 1fr 52px;

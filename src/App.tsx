@@ -258,8 +258,18 @@ export default function App() {
 
     let nextExercises = session.exercises
     if (!result.correct && repeatCount < 3 && session.exercises.length < 10) {
-      const repetition = createRepetitionExercise(result.skillId, session.seed + session.exercises.length * 211, currentExercise.difficulty, result.variantKey)
-      nextExercises = [...session.exercises, repetition]
+      const repetition = createRepetitionExercise(
+        result.skillId,
+        session.seed + session.exercises.length * 211,
+        currentExercise.difficulty,
+        result.variantKey,
+        result.subskillId
+      )
+      nextExercises = [
+        ...session.exercises.slice(0, exerciseIndex + 1),
+        repetition,
+        ...session.exercises.slice(exerciseIndex + 1)
+      ]
       setSession({ ...session, exercises: nextExercises })
       setRepeatCount((current) => current + 1)
     }

@@ -6,10 +6,35 @@ describe('Sitzungsplanung', () => {
   it('erstellt sieben Aufgaben mit Grundlagen, Transfer und Symmetrie', () => {
     const session = createSessionPlan({}, 12_345)
     expect(session.exercises).toHaveLength(7)
-    expect(session.exercises.slice(0, 2).map((exercise) => exercise.skillId)).toEqual(['subtraction', 'division'])
+    expect(session.exercises.slice(0, 2).every((exercise) => ['addition', 'subtraction', 'multiplication', 'division'].includes(exercise.skillId))).toBe(true)
     expect(session.exercises.at(-2)?.skillId).toBe('word-problem')
     expect(session.exercises.at(-1)?.skillId).toBe('symmetry')
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
+  })
+
+  it('berücksichtigt schwache Grundrechenarten und Unterkompetenzen häufiger', () => {
+    const weakMultiplication = {
+      ...createSkillProgress('multiplication'),
+      mastery: 8,
+      recentErrors: 3,
+      difficulty: 3 as const,
+      subskills: {
+        'times-7': { attempts: 4, correctAnswers: 1, hintsUsed: 2, mastery: 10, recentErrors: 3, lastPracticedAt: null },
+        'times-8': { attempts: 5, correctAnswers: 5, hintsUsed: 0, mastery: 92, recentErrors: 0, lastPracticedAt: new Date().toISOString() }
+      }
+    }
+    const secure = { ...createSkillProgress('addition'), attempts: 8, mastery: 95, status: 'secure' as const }
+    let multiplicationSelections = 0
+    let additionSelections = 0
+    let rowSevenSelections = 0
+    for (let seed = 1; seed <= 300; seed += 1) {
+      const warmups = createSessionPlan({ multiplication: weakMultiplication, addition: secure }, seed).exercises.slice(0, 2)
+      multiplicationSelections += warmups.filter((exercise) => exercise.skillId === 'multiplication').length
+      additionSelections += warmups.filter((exercise) => exercise.skillId === 'addition').length
+      rowSevenSelections += warmups.filter((exercise) => exercise.subskillId === 'times-7').length
+    }
+    expect(multiplicationSelections).toBeGreaterThan(additionSelections)
+    expect(rowSevenSelections).toBeGreaterThan(0)
   })
 
   it('bevorzugt einen schwachen Fokusbereich über viele Sitzungen', () => {

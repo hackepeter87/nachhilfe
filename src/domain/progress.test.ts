@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createSkillProgress, LEARNING_RULES, selectionWeight, updateSkillProgress } from './progress'
+import { createSkillProgress, LEARNING_RULES, selectionWeight, subskillWeight, updateSkillProgress } from './progress'
 import type { AttemptResult } from './types'
 
 function result(overrides: Partial<AttemptResult> = {}): AttemptResult {
@@ -51,5 +51,15 @@ describe('Lernstandsmodell', () => {
     const secure = { ...createSkillProgress('addition'), attempts: 8, mastery: 90, recentErrors: 0, lastPracticedAt: now.toISOString() }
     const weak = { ...createSkillProgress('addition'), attempts: 4, mastery: 25, recentErrors: 2, lastPracticedAt: '2026-07-01T12:00:00.000Z' }
     expect(selectionWeight(weak, now)).toBeGreaterThan(selectionWeight(secure, now))
+  })
+
+  it('führt benötigte Unterkompetenzen getrennt und gewichtet schwache höher', () => {
+    let progress = createSkillProgress('multiplication')
+    progress = updateSkillProgress(progress, result({ skillId: 'multiplication', subskillId: 'times-7', correct: false }))
+    progress = updateSkillProgress(progress, result({ skillId: 'multiplication', subskillId: 'times-8', correct: true }))
+    progress = updateSkillProgress(progress, result({ skillId: 'multiplication', subskillId: 'times-8', correct: true }))
+    expect(progress.subskills['times-7']?.recentErrors).toBe(1)
+    expect(progress.subskills['times-8']?.mastery).toBeGreaterThan(progress.subskills['times-7']?.mastery ?? 0)
+    expect(subskillWeight(progress, 'times-7')).toBeGreaterThan(subskillWeight(progress, 'times-8'))
   })
 })

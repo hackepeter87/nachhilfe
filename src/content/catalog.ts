@@ -14,27 +14,55 @@ export interface CatalogSkill {
   id: SkillId
   label: string
   curriculumArea: string
+  processCompetencies: string[]
   supportGoal: string
+  prerequisites: string[]
+  difficultyLevels: [CatalogDifficultyLevel, CatalogDifficultyLevel, CatalogDifficultyLevel]
+  representations: string[]
   misconceptions: string[]
   hints: [string, string]
+  workedExample: string
   prompt: string
+  successFeedback: string
   errorFeedback: string
   explanation: string
+  remediation: string
+  transferPrompt: string
+  releaseStatus: 'active' | 'planned'
   halfExplanation?: string
   difficultyBounds: DifficultyBounds
 }
 
+export interface CatalogDifficultyLevel {
+  level: 1 | 2 | 3
+  description: string
+  numberRange: string
+  representation: 'always' | 'hint' | 'none'
+  cognitiveSteps: number
+}
+
 export interface WordProblemTemplate {
   id: string
-  operation: '+' | '−'
+  relationship: 'join' | 'separate' | 'combine' | 'compare' | 'complement' | 'equal-groups' | 'sharing'
+  operation: '+' | '−' | '·'
   story: string
+  question: string
   relevant: string
+  irrelevant?: string
   answer: string
+  minDifficulty: 1 | 2 | 3
+  representation: 'bar-model' | 'groups'
+  operationHint: string
+  operationError: string
   firstRange: { min: number; max: number }
   secondRange: { min: number; max: number }
 }
 
 export interface WordProblemSteps {
+  questionPrompt: string
+  questionDistractors: [string, string]
+  questionError: string
+  questionSuccess: string
   relevantPrompt: string
   relevantDistractors: [string, string]
   relevantError: string
@@ -43,15 +71,29 @@ export interface WordProblemSteps {
   operationOptions: Array<{ value: '+' | '−' | '·'; label: string }>
   additionError: string
   subtractionError: string
+  multiplicationError: string
   operationSuccess: string
+  representationPrompt: string
+  barModelLabel: string
+  groupsLabel: string
+  noModelLabel: string
+  representationError: string
+  representationSuccess: string
   calculatePrompt: string
   calculateError: string
   calculateSuccess: string
   checkPrompt: string
   checkError: string
   checkSuccess: string
+  plausibilityPrompt: string
+  plausibleLabel: string
+  tooSmallLabel: string
+  tooLargeLabel: string
+  plausibilityError: string
+  plausibilitySuccess: string
   additionHint: string
   subtractionHint: string
+  multiplicationHint: string
 }
 
 export interface SymmetryTemplate {
@@ -106,7 +148,15 @@ function hasThreeDistinctSymmetryVariants(grid: number[][]): boolean {
 
 function isSkill(value: unknown, numberRange: { min: number; max: number }): value is CatalogSkill {
   if (!isRecord(value) || !SKILL_IDS.includes(value.id as SkillId)) return false
-  if (![value.label, value.curriculumArea, value.supportGoal, value.prompt, value.errorFeedback, value.explanation].every(isNonEmptyString)) return false
+  if (![value.label, value.curriculumArea, value.supportGoal, value.workedExample, value.prompt, value.successFeedback, value.errorFeedback, value.explanation, value.remediation, value.transferPrompt].every(isNonEmptyString)) return false
+  if (!Array.isArray(value.processCompetencies) || value.processCompetencies.length === 0 || !value.processCompetencies.every(isNonEmptyString)) return false
+  if (!Array.isArray(value.prerequisites) || !value.prerequisites.every(isNonEmptyString)) return false
+  if (!Array.isArray(value.representations) || value.representations.length === 0 || !value.representations.every(isNonEmptyString)) return false
+  if (!Array.isArray(value.difficultyLevels) || value.difficultyLevels.length !== 3 || !value.difficultyLevels.every((level, index) =>
+    isRecord(level) && level.level === index + 1 && isNonEmptyString(level.description) && isNonEmptyString(level.numberRange) &&
+    ['always', 'hint', 'none'].includes(level.representation as string) && Number.isInteger(level.cognitiveSteps) && (level.cognitiveSteps as number) >= 1
+  )) return false
+  if (value.releaseStatus !== 'active' && value.releaseStatus !== 'planned') return false
   if (!Array.isArray(value.misconceptions) || value.misconceptions.length === 0 || !value.misconceptions.every(isNonEmptyString)) return false
   if (!Array.isArray(value.hints) || value.hints.length !== 2 || !value.hints.every(isNonEmptyString)) return false
   if (!isRecord(value.difficultyBounds)) return false
@@ -121,22 +171,28 @@ function isSkill(value: unknown, numberRange: { min: number; max: number }): val
 }
 
 function isWordProblem(value: unknown, numberRange: { min: number; max: number }): value is WordProblemTemplate {
-  if (!isRecord(value) || !isNonEmptyString(value.id) || (value.operation !== '+' && value.operation !== '−')) return false
-  if (![value.story, value.relevant, value.answer].every(isNonEmptyString)) return false
+  if (!isRecord(value) || !isNonEmptyString(value.id) || !['+', '−', '·'].includes(value.operation as string)) return false
+  if (!['join', 'separate', 'combine', 'compare', 'complement', 'equal-groups', 'sharing'].includes(value.relationship as string)) return false
+  if (![value.story, value.question, value.relevant, value.answer, value.operationHint, value.operationError].every(isNonEmptyString)) return false
+  if (![1, 2, 3].includes(value.minDifficulty as number) || !['bar-model', 'groups'].includes(value.representation as string)) return false
   if (!isRange(value.firstRange, numberRange) || !isRange(value.secondRange, numberRange)) return false
   if (!(value.story as string).includes('{first}') || !(value.story as string).includes('{second}') || !(value.answer as string).includes('{result}')) return false
-  return value.operation === '+' || value.firstRange.min >= value.secondRange.max
+  return value.operation !== '−' || value.firstRange.min >= value.secondRange.max
 }
 
 function isWordProblemSteps(value: unknown): value is WordProblemSteps {
   if (!isRecord(value)) return false
   const stringFields = [
-    'relevantPrompt', 'relevantError', 'relevantSuccess', 'operationPrompt', 'additionError', 'subtractionError',
-    'operationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'checkPrompt', 'checkError',
-    'checkSuccess', 'additionHint', 'subtractionHint'
+    'questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess',
+    'operationPrompt', 'additionError', 'subtractionError', 'multiplicationError', 'operationSuccess',
+    'representationPrompt', 'barModelLabel', 'groupsLabel', 'noModelLabel', 'representationError', 'representationSuccess',
+    'calculatePrompt', 'calculateError', 'calculateSuccess', 'checkPrompt', 'checkError', 'checkSuccess',
+    'plausibilityPrompt', 'plausibleLabel', 'tooSmallLabel', 'tooLargeLabel', 'plausibilityError', 'plausibilitySuccess',
+    'additionHint', 'subtractionHint', 'multiplicationHint'
   ]
   if (!stringFields.every((field) => isNonEmptyString(value[field]))) return false
   if (!Array.isArray(value.relevantDistractors) || value.relevantDistractors.length !== 2 || !value.relevantDistractors.every(isNonEmptyString)) return false
+  if (!Array.isArray(value.questionDistractors) || value.questionDistractors.length !== 2 || !value.questionDistractors.every(isNonEmptyString)) return false
   return Array.isArray(value.operationOptions) && value.operationOptions.length === 3 && value.operationOptions.every((option) =>
     isRecord(option) && ['+', '−', '·'].includes(option.value as string) && isNonEmptyString(option.label)
   )

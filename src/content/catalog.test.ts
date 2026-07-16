@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { mirrorGrid } from '../domain/generators'
 import { SKILL_IDS } from '../domain/types'
 import publicCatalogJson from '../../public/content/task-catalog.v1.json?raw'
+import fallbackCatalogJson from './task-catalog.fallback.v1.json?raw'
 import {
   FALLBACK_TASK_CATALOG,
   loadTaskCatalog,
@@ -26,6 +27,10 @@ describe('versionierter Aufgabenkatalog', () => {
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
   })
 
+  it('hält öffentlichen Katalog und eingebauten Fallback auf demselben geprüften Stand', () => {
+    expect(JSON.parse(fallbackCatalogJson)).toEqual(readPublicCatalog())
+  })
+
   it('kennt ausschließlich alle produktiven Skill-IDs', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     expect(catalog.skills.map((skill) => skill.id).sort()).toEqual([...SKILL_IDS].sort())
@@ -39,6 +44,13 @@ describe('versionierter Aufgabenkatalog', () => {
       expect(skill.supportGoal.length).toBeGreaterThan(0)
       expect(skill.misconceptions.length).toBeGreaterThan(0)
       expect(skill.hints).toHaveLength(2)
+      expect(skill.processCompetencies.length).toBeGreaterThan(0)
+      expect(skill.difficultyLevels.map((level) => level.level)).toEqual([1, 2, 3])
+      expect(skill.representations.length).toBeGreaterThan(0)
+      expect(skill.workedExample.length).toBeGreaterThan(0)
+      expect(skill.remediation.length).toBeGreaterThan(0)
+      expect(skill.transferPrompt.length).toBeGreaterThan(0)
+      expect(skill.releaseStatus).toBe('active')
     })
   })
 
@@ -47,7 +59,7 @@ describe('versionierter Aufgabenkatalog', () => {
     catalog.wordProblems.forEach((template) => {
       for (let first = template.firstRange.min; first <= template.firstRange.max; first += 1) {
         for (let second = template.secondRange.min; second <= template.secondRange.max; second += 1) {
-          const result = template.operation === '+' ? first + second : first - second
+          const result = template.operation === '+' ? first + second : template.operation === '−' ? first - second : first * second
           expect(result).toBeGreaterThanOrEqual(0)
           const answer = renderCatalogText(template.answer, { first, second, result })
           expect(answer).toContain(String(result))
