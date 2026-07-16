@@ -46,6 +46,8 @@ npm run build
 
 Die Unit- und Komponententests prüfen Generatoren, fachliche Grenzen, Lernstandsregeln, Adaptivität, IndexedDB-Persistenz, Onboarding, Hilfen und Feedback.
 
+Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` dieselben Qualitätsbefehle mit Node.js 24 aus. Separate, bewusst kleine Jobs prüfen Chromium-E2E und den Container-Build ohne Registry-Publish.
+
 Für die Browser-Tests wird Chromium einmalig installiert:
 
 ```bash
@@ -63,6 +65,24 @@ npm run preview
 ```
 
 Der statische Build liegt in `dist/`. Für ein statisches Deployment muss die Anwendung unter HTTPS ausgeliefert werden, damit Service Worker und PWA-Installation außerhalb von `localhost` funktionieren. Alle Routen benötigen einen SPA-Fallback auf `index.html`.
+
+## Versionierter Aufgabenkatalog
+
+Die fachlichen Inhalte liegen im austauschbaren JSON-Katalog `public/content/task-catalog.v1.json`. Er enthält:
+
+- Katalogversion und Zahlenraum `0..1000`
+- alle Kompetenz-IDs, Anzeigenamen und Lehrplanbereiche
+- Förderziele, typische Fehlvorstellungen und zwei Hilfestufen je Kompetenz
+- Aufgabentexte, Fehlerfeedback und Erklärungen
+- Schwierigkeits- und Wertebereichsgrenzen
+- strukturierte Sachaufgabenvorlagen und die Texte ihrer vier Schritte
+- Raster- und Beschriftungsvorlagen für Symmetrieaufgaben
+
+Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtraktion, Multiplikation/Division, Stellenwertberechnung, Nachbarzahlen, Rundung, Spiegelung, Lösungsprüfung, Sitzungsplanung und Adaptivität stehen weiterhin unter `src/domain/`. Der JSON-Katalog enthält keine ausführbare Logik.
+
+Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Version, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App `src/content/task-catalog.fallback.v1.json` als gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
+
+Bei einer fachlichen Änderung wird zuerst `public/content/task-catalog.v1.json` angepasst. Soll die Änderung auch neuer eingebauter Fallback werden, ist dieselbe geprüfte Version zusätzlich nach `src/content/task-catalog.fallback.v1.json` zu übernehmen. `npm test` validiert beide Pfade und die produktiven Generatoren.
 
 ## Container
 
@@ -116,12 +136,14 @@ Diese Regeln sollten bei einem anderen statischen Host oder vorgeschalteten CDN 
 
 Die Offline- und Mobilabläufe wurden automatisiert mit Playwright geprüft. Ein Test auf einem echten iPhone 13 mini wurde nicht durchgeführt und bleibt eine manuelle Release-Abnahme.
 
+**Offline bereit** wird erst angezeigt, wenn `verifyOfflineReadiness()` einen aktivierten Service Worker, schreib- und lesbare IndexedDB, die zentralen Ressourcen im Cache, eine lokal erzeugte und geprüfte Beispielaufgabe sowie eine Schreib-/Leseprobe im Lernstands-Store bestätigt. Eine fehlgeschlagene Teilprüfung lässt die Anzeige auf **Offline wird vorbereitet**; es werden keine Diagnosedaten übertragen oder dauerhaft gespeichert.
+
 ## Daten und Adaptivität
 
 Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen versioniert in nativer IndexedDB. Es gibt kein Backend, Tracking, Werbung oder externe Laufzeit-API.
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.1.0
+## Release-Stand 0.1.1
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Details zu ausgeführten Prüfungen und bewusst verschobenen Funktionen stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.1.1 ergänzt die Review-Korrekturen für Rundung, Offline-Readiness, JSON-Katalog und CI. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

@@ -97,8 +97,34 @@ export async function loadAppData(): Promise<AppData> {
 export async function verifyStorage(): Promise<boolean> {
   const database = await openDatabase()
   const available = Object.values(stores).every((store) => database.objectStoreNames.contains(store))
+  if (!available) {
+    database.close()
+    return false
+  }
+  const transaction = database.transaction(stores.settings, 'readwrite')
+  const store = transaction.objectStore(stores.settings)
+  const probe = { key: '__storage-readiness__', checkedAt: new Date().toISOString() }
+  store.put(probe)
+  const readRequest = store.get(probe.key) as IDBRequest<typeof probe | undefined>
+  store.delete(probe.key)
+  const readBack = await requestResult(readRequest)
+  await transactionDone(transaction)
   database.close()
-  return available
+  return readBack?.checkedAt === probe.checkedAt
+}
+
+export async function verifyProgressStorage(): Promise<boolean> {
+  const database = await openDatabase()
+  const transaction = database.transaction(stores.progress, 'readwrite')
+  const store = transaction.objectStore(stores.progress)
+  const probe = { skillId: '__progress-readiness__', mastery: 37, checkedAt: new Date().toISOString() }
+  store.put(probe)
+  const readRequest = store.get(probe.skillId) as IDBRequest<typeof probe | undefined>
+  store.delete(probe.skillId)
+  const readBack = await requestResult(readRequest)
+  await transactionDone(transaction)
+  database.close()
+  return readBack?.mastery === probe.mastery && readBack.checkedAt === probe.checkedAt
 }
 
 export const databaseMetadata = { name: DB_NAME, version: DB_VERSION, stores }

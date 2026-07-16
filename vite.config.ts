@@ -7,7 +7,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['apple-touch-icon.png', 'icons/*.png', 'mathe-reise-island.png'],
       manifest: {
         name: 'Mathe-Reise',
         short_name: 'Mathe-Reise',
@@ -26,7 +25,8 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,json,png,svg,webmanifest}'],
+        globIgnores: ['icons/*.png', 'manifest.webmanifest'],
         navigateFallback: '/index.html'
       },
       devOptions: {

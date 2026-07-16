@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createSkillProgress } from '../domain'
-import { databaseMetadata, loadAppData, saveProfile, saveSettings, saveSkillProgress, verifyStorage } from './db'
+import { databaseMetadata, loadAppData, saveProfile, saveSettings, saveSkillProgress, verifyProgressStorage, verifyStorage } from './db'
 
 function deleteDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -17,6 +17,7 @@ describe('IndexedDB-Speicherung', () => {
 
   it('legt die versionierte Datenstruktur an', async () => {
     expect(await verifyStorage()).toBe(true)
+    expect(await verifyProgressStorage()).toBe(true)
     expect(databaseMetadata.version).toBe(1)
   })
 

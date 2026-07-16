@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateExercise, isAnswerCorrect, mirrorGrid } from './generators'
+import { createRoundingExercise, generateExercise, isAnswerCorrect, mirrorGrid, roundToUnit } from './generators'
 import type { SkillId } from './types'
 
 const skills: SkillId[] = [
@@ -71,6 +71,42 @@ describe('deterministische Aufgabengeneratoren', () => {
       expect(Number(exercise.correctAnswer)).toBe(Math.round(number / unit) * unit)
     }
     expect(halfBoundarySeen).toBe(true)
+  })
+
+  it.each([
+    [5, 10, 10],
+    [14, 10, 10],
+    [15, 10, 20],
+    [994, 10, 990],
+    [995, 10, 1000],
+    [949, 100, 900],
+    [950, 100, 1000]
+  ] as const)('rundet %i auf den nächsten %i korrekt zu %i', (number, unit, expected) => {
+    const exercise = createRoundingExercise(number, unit)
+    expect(roundToUnit(number, unit)).toBe(expected)
+    expect(Number(exercise.correctAnswer)).toBe(expected)
+    expect(exercise.options).toHaveLength(3)
+    expect(exercise.options?.every((option) => Number(option.value) >= 0 && Number(option.value) <= 1000)).toBe(true)
+  })
+
+  it.each([
+    [995, 10],
+    [950, 100]
+  ] as const)('erklärt den Halbpunkt bei %i fachlich korrekt', (number, unit) => {
+    const exercise = createRoundingExercise(number, unit)
+    expect(exercise.explanation).toContain('beide')
+    expect(exercise.explanation).toContain('Halbpunkt')
+    expect(exercise.explanation).toContain('aufgerundet')
+  })
+
+  it.each(['round-tens', 'round-hundreds'] as const)('erzeugt für %s ausschließlich Antwortoptionen von 0 bis 1000', (skill) => {
+    for (let seed = 1; seed <= 5_000; seed += 1) {
+      const exercise = generateExercise(skill, seed)
+      expect(exercise.options?.every((option) => {
+        const value = Number(option.value)
+        return Number.isInteger(value) && value >= 0 && value <= 1000
+      })).toBe(true)
+    }
   })
 
   it('zerlegt und baut Zahlen stellenwertgerecht', () => {
