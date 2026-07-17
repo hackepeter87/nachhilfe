@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 6
+export const CATALOG_SCHEMA_VERSION = 7
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -193,31 +193,76 @@ function validateWordProblem(template, numberRange) {
 }
 
 function validateSymmetry(symmetry) {
-  if (!isRecord(symmetry) || !Array.isArray(symmetry.optionLabels) || symmetry.optionLabels.length !== 3 || !symmetry.optionLabels.every(isText)) {
-    fail('symmetry.optionLabels ist ungültig')
-  }
+  if (!isRecord(symmetry) || !isText(symmetry.entryRationale) || !isText(symmetry.axisLegend) ||
+    !Array.isArray(symmetry.optionLabels) || symmetry.optionLabels.length !== 3 || !symmetry.optionLabels.every(isText)) fail('symmetry Grunddaten sind ungültig')
   requireUnique(symmetry.optionLabels, 'symmetry.optionLabels')
+  for (const position of ['between-cells', 'through-cells']) {
+    const guidance = symmetry.guidance?.[position]
+    if (!isRecord(guidance) || !['hint1', 'hint2', 'explanation', 'errorFeedback', 'successFeedback'].every((field) => isText(guidance[field]))) {
+      fail(`symmetry.guidance.${position} ist ungültig`)
+    }
+  }
+  if (!Array.isArray(symmetry.progression) || symmetry.progression.length !== 5) fail('symmetry.progression muss fünf Phasen enthalten')
+  symmetry.progression.forEach((phase, index) => {
+    if (!isRecord(phase) || phase.phase !== index + 1 || !isText(phase.title) || !isText(phase.goal) ||
+      !['even', 'odd', 'mixed'].includes(phase.gridParity) || !['between-cells', 'through-cells', 'mixed'].includes(phase.axisPosition) ||
+      !['simple', 'connected', 'complex'].includes(phase.figureComplexity) || !['clear', 'plausible', 'close'].includes(phase.distractorSimilarity) ||
+      !Array.isArray(phase.axes) || phase.axes.length === 0 || !phase.axes.every((axis) => ['vertical', 'horizontal'].includes(axis)) ||
+      !isRecord(phase.occupiedCells) || !Number.isInteger(phase.occupiedCells.min) || !Number.isInteger(phase.occupiedCells.max) ||
+      phase.occupiedCells.min < 1 || phase.occupiedCells.min > phase.occupiedCells.max) fail(`symmetry.progression Phase ${index + 1} ist ungültig`)
+  })
   if (!Array.isArray(symmetry.templates) || symmetry.templates.length === 0) fail('symmetry.templates fehlt')
   const ids = symmetry.templates.map((template) => template.id)
   requireUnique(ids, 'symmetry.templates IDs')
   symmetry.templates.forEach((template) => {
-    const size = template.difficulty + 2
-    const isGrid = (grid) => Array.isArray(grid) && grid.length === size && grid.every((row) => Array.isArray(row) && row.length === size && row.every((cell) => cell === 0 || cell === 1))
-    if (!isRecord(template) || !isText(template.id) || ![1, 2, 3].includes(template.difficulty) || !['vertical', 'horizontal'].includes(template.axis) ||
-      !isGrid(template.grid) || !isGrid(template.shiftGrid) || !isGrid(template.wrongAxisGrid)) {
-      fail(`Symmetrievorlage ${String(template?.id)} ist ungültig`)
+    const grid = template.grid
+    const width = Array.isArray(grid?.[0]) ? grid[0].length : 0
+    const isGrid = Array.isArray(grid) && grid.length >= 2 && width >= 2 && grid.every((row) => Array.isArray(row) && row.length === width && row.every((cell) => cell === 0 || cell === 1))
+    if (!isRecord(template) || !isText(template.id) || ![1, 2, 3].includes(template.difficulty) || ![1, 2, 3, 4, 5].includes(template.progressionPhase) ||
+      !['vertical', 'horizontal'].includes(template.axis) || !['between-cells', 'through-cells'].includes(template.axisPosition) ||
+      !['simple', 'connected', 'complex'].includes(template.figureComplexity) || !['clear', 'plausible', 'close'].includes(template.distractorSimilarity) ||
+      JSON.stringify(template.distractorStrategies) !== JSON.stringify(['shift-within-side', 'wrong-axis']) || !isGrid) fail(`Symmetrievorlage ${String(template?.id)} ist ungültig`)
+
+    const phase = symmetry.progression[template.progressionPhase - 1]
+    const axisSize = template.axis === 'vertical' ? width : grid.length
+    const expectedPosition = axisSize % 2 === 0 ? 'between-cells' : 'through-cells'
+    const expectedDifficulty = template.progressionPhase === 1 ? 1 : template.progressionPhase === 2 ? 2 : 3
+    const occupied = grid.flat().filter(Boolean).length
+    const middle = Math.floor(axisSize / 2)
+    const sourceOnOneSide = grid.every((row, rowIndex) => row.every((cell, columnIndex) => !cell ||
+      (axisSize % 2 === 0
+        ? (template.axis === 'vertical' ? columnIndex < middle : rowIndex < middle)
+        : (template.axis === 'vertical' ? columnIndex <= middle : rowIndex <= middle))))
+    const hasAxisCell = template.axis === 'vertical' ? grid.some((row) => row[middle] === 1) : grid[middle]?.some((cell) => cell === 1)
+    if (template.difficulty !== expectedDifficulty || template.axisPosition !== expectedPosition || !sourceOnOneSide ||
+      (template.axisPosition === 'through-cells' && !hasAxisCell) || !phase.axes.includes(template.axis) ||
+      (phase.gridParity !== 'mixed' && phase.gridParity !== (axisSize % 2 === 0 ? 'even' : 'odd')) ||
+      (phase.axisPosition !== 'mixed' && phase.axisPosition !== template.axisPosition) || phase.figureComplexity !== template.figureComplexity ||
+      phase.distractorSimilarity !== template.distractorSimilarity || occupied < phase.occupiedCells.min || occupied > phase.occupiedCells.max) {
+      fail(`Symmetrievorlage ${template.id} passt nicht zur Progressionsphase`)
     }
-    const mirror = template.grid.map((row) => [...row].reverse())
-    const flip = [...template.grid].reverse().map((row) => [...row])
-    if (new Set([template.grid, mirror, flip].map((variant) => JSON.stringify(variant))).size !== 3) {
-      fail(`Symmetrievorlage ${template.id} hat keine eindeutigen Varianten`)
-    }
-    const correct = template.axis === 'vertical' ? mirror : flip
-    const wrongAxis = template.axis === 'vertical' ? flip : mirror
-    if (JSON.stringify(wrongAxis) !== JSON.stringify(template.wrongAxisGrid) ||
-      new Set([correct, template.shiftGrid, template.wrongAxisGrid].map((variant) => JSON.stringify(variant))).size !== 3) {
-      fail(`Symmetrievorlage ${template.id} hat keine drei geprüften Antwortvarianten`)
-    }
+
+    const reflect = (axis) => axis === 'vertical' ? grid.map((row) => [...row].reverse()) : [...grid].reverse().map((row) => [...row])
+    const correct = reflect(template.axis)
+    const wrongAxis = reflect(template.axis === 'vertical' ? 'horizontal' : 'vertical')
+    const deltas = template.axis === 'vertical' ? [[0, 1], [1, 0], [-1, 0], [0, -1]] : [[1, 0], [0, 1], [0, -1], [-1, 0]]
+    const shifts = deltas.map(([rowDelta, columnDelta]) => {
+      const shifted = Array.from({ length: grid.length }, () => Array(width).fill(0))
+      for (let row = 0; row < grid.length; row += 1) for (let column = 0; column < width; column += 1) {
+        if (!grid[row][column]) continue
+        const nextRow = row + rowDelta
+        const nextColumn = column + columnDelta
+        if (nextRow < 0 || nextRow >= grid.length || nextColumn < 0 || nextColumn >= width) return null
+        shifted[nextRow][nextColumn] = 1
+      }
+      const staysOnSide = shifted.every((row, rowIndex) => row.every((cell, columnIndex) => !cell ||
+        (axisSize % 2 === 0
+          ? (template.axis === 'vertical' ? columnIndex < middle : rowIndex < middle)
+          : (template.axis === 'vertical' ? columnIndex <= middle : rowIndex <= middle))))
+      return staysOnSide ? shifted : null
+    }).filter(Boolean)
+    const shift = shifts.find((candidate) => new Set([grid, correct, wrongAxis, candidate].map((variant) => JSON.stringify(variant))).size === 4)
+    if (!shift || new Set([correct, shift, wrongAxis].map((variant) => JSON.stringify(variant))).size !== 3) fail(`Symmetrievorlage ${template.id} hat keine drei geprüften Antwortvarianten`)
   })
 }
 
@@ -233,6 +278,14 @@ export function validateCatalog(catalog) {
   requireUnique(skillIds, 'Kompetenz-IDs')
   if (!SKILL_IDS.every((id) => skillIds.includes(id))) fail('mindestens eine bekannte Kompetenz fehlt')
   catalog.skills.forEach((skill) => validateSkill(skill, numberRange))
+  const symmetrySkill = catalog.skills.find((skill) => skill.id === 'symmetry')
+  const expectedSymmetryExerciseTypes = [
+    ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
+    ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-4', 'symmetry:phase-5']
+  ]
+  if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) {
+    fail('Symmetrie-Lernphasen passen nicht zur fünfphasigen Progression')
+  }
   if (!Array.isArray(catalog.preparedTopics) || catalog.preparedTopics.length !== 1) fail('preparedTopics muss genau das deaktivierte Thema Raumvorstellung enthalten')
   requireUnique(catalog.preparedTopics.map((topic) => topic.id), 'preparedTopics IDs')
   for (const topic of catalog.preparedTopics) {

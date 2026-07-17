@@ -56,6 +56,15 @@ Diese Liste ist bei jedem neuen oder geänderten produktiven Katalogeintrag abzu
 - [ ] Längen werden intern in Zentimetern berechnet; Messmarke, Skalenwert, Einheit und Lösung stimmen überein.
 - [ ] Umrechnungen nutzen die fachlich richtige Beziehung `1 m = 100 cm`; nicht produktive Einheiten erscheinen nicht als Attrappe.
 
+## Symmetrie
+
+- [ ] Die Phasen 1 bis 3 verwenden in Achsenrichtung ausschließlich gerade Raster; die Achse liegt sichtbar zwischen Reihen oder Spalten.
+- [ ] Die Ausgangsfigur liegt vollständig auf einer Achsenseite und jede belegte Zelle besitzt genau einen Spiegelpartner.
+- [ ] Ungerade Raster und belegte Achsenzellen erscheinen frühestens in Phase 4 und werden mit einer passenden Erklärung eingeführt.
+- [ ] Die Schwierigkeit wird durch Belegung, Figurenkomplexität, Achsenlage und Distraktorähnlichkeit begründet, nicht allein durch Rastergröße.
+- [ ] Verschiebung und falsche Achse sind plausible, eindeutige Distraktoren und bleiben vollständig innerhalb des Rasters.
+- [ ] Die Spiegelachse ist auf dem mobilen Zielviewport in Vorlage und allen Antwortbildern eindeutig erkennbar.
+
 ## Abnahme
 
 - [ ] Katalog- und Fallback-Datei erfüllen dasselbe Schema.

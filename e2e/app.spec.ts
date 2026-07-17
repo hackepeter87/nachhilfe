@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.7.0',
-    schemaVersion: 6,
-    appVersion: '0.9.1'
+    catalogVersion: '0.8.0',
+    schemaVersion: 7,
+    appVersion: '0.10.0'
   })
 
   await page.reload()
@@ -157,6 +157,51 @@ test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt',
   expect(counts.totalPoints).toBe(counts.groups * counts.pointsPerGroup[0]!)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('punktgruppen-375x812.png'), fullPage: true })
+})
+
+test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'symmetry'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Spiegel')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  const source = page.getByRole('img', { name: /Vorlage zum Spiegeln.*Senkrechte Spiegelachse zwischen Feldern/ })
+  await expect(source).toBeVisible()
+  await expect(page.getByText('Die grüne Linie ist die Spiegelachse.')).toBeVisible()
+  const axisMetrics = await source.evaluate((element) => {
+    const box = element.getBoundingClientRect()
+    const style = getComputedStyle(element)
+    const axis = getComputedStyle(element, '::after')
+    return {
+      columns: Number(style.getPropertyValue('--grid-columns')),
+      rows: Number(style.getPropertyValue('--grid-rows')),
+      boxRatio: box.width / box.height,
+      axisRatio: Number.parseFloat(axis.left) / box.width,
+      axisWidth: Number.parseFloat(axis.width),
+      axisColor: axis.backgroundColor
+    }
+  })
+  expect(axisMetrics.boxRatio).toBeCloseTo(axisMetrics.columns / axisMetrics.rows, 1)
+  expect(axisMetrics.axisRatio).toBeCloseTo(0.5, 1)
+  expect(axisMetrics.axisWidth).toBeGreaterThanOrEqual(3)
+  expect(axisMetrics.axisColor).not.toBe('rgba(0, 0, 0, 0)')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('symmetrie-achse-375x812.png'), fullPage: true })
 })
 
 test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen Rechnung', async ({ page }, testInfo) => {

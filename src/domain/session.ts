@@ -57,6 +57,16 @@ function warmupSkills(progress: ProgressMap, seed: number): SkillId[] {
 }
 
 function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, difficulty: Difficulty): string | undefined {
+  if (skillId === 'symmetry') {
+    if (difficulty === 1) return 'symmetry-phase-1'
+    if (difficulty === 2) return 'symmetry-phase-2'
+    const skillProgress = progress.symmetry
+    if (skillProgress?.learningPhase !== 'transfer') return 'symmetry-phase-3'
+    const axisCellProgress = skillProgress.subskills?.['symmetry-phase-4']
+    return axisCellProgress && axisCellProgress.attempts >= 3 && axisCellProgress.mastery >= 65
+      ? 'symmetry-phase-5'
+      : 'symmetry-phase-4'
+  }
   const candidates = skillId === 'addition'
     ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])
     : skillId === 'subtraction'

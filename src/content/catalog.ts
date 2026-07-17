@@ -1,8 +1,19 @@
 import fallbackCatalogJson from './task-catalog.fallback.json'
 import { SKILL_IDS, type LearningPhase, type SkillId } from '../domain/types'
+import {
+  createShiftDistractor,
+  expectedAxisPosition,
+  hasOccupiedAxisCell,
+  isRectangularBinaryGrid,
+  occupiedCellCount,
+  reflectGrid,
+  sourceStaysOnOneAxisSide,
+  type SymmetryAxis,
+  type SymmetryAxisPosition
+} from '../domain/symmetry'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 6
+export const CATALOG_SCHEMA_VERSION = 7
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -245,10 +256,33 @@ export interface WordProblemSteps {
 export interface SymmetryTemplate {
   id: string
   difficulty: 1 | 2 | 3
-  axis: 'vertical' | 'horizontal'
+  progressionPhase: 1 | 2 | 3 | 4 | 5
+  axis: SymmetryAxis
+  axisPosition: SymmetryAxisPosition
+  figureComplexity: 'simple' | 'connected' | 'complex'
+  distractorSimilarity: 'clear' | 'plausible' | 'close'
+  distractorStrategies: ['shift-within-side', 'wrong-axis']
   grid: number[][]
-  shiftGrid: number[][]
-  wrongAxisGrid: number[][]
+}
+
+export interface SymmetryProgressionPhase {
+  phase: 1 | 2 | 3 | 4 | 5
+  title: string
+  goal: string
+  gridParity: 'even' | 'odd' | 'mixed'
+  axes: SymmetryAxis[]
+  axisPosition: SymmetryAxisPosition | 'mixed'
+  occupiedCells: { min: number; max: number }
+  figureComplexity: SymmetryTemplate['figureComplexity']
+  distractorSimilarity: SymmetryTemplate['distractorSimilarity']
+}
+
+export interface SymmetryGuidance {
+  hint1: string
+  hint2: string
+  explanation: string
+  errorFeedback: string
+  successFeedback: string
 }
 
 export interface TaskCatalog extends CatalogMetadata {
@@ -261,7 +295,11 @@ export interface TaskCatalog extends CatalogMetadata {
   wordProblems: WordProblemTemplate[]
   wordProblemSteps: WordProblemSteps
   symmetry: {
+    entryRationale: string
+    axisLegend: string
     optionLabels: [string, string, string]
+    guidance: Record<SymmetryAxisPosition, SymmetryGuidance>
+    progression: SymmetryProgressionPhase[]
     templates: SymmetryTemplate[]
   }
 }
@@ -297,22 +335,50 @@ function isRange(value: unknown, outer: { min: number; max: number }): value is 
     (value.min as number) >= outer.min && (value.max as number) <= outer.max && (value.min as number) <= (value.max as number)
 }
 
-function isGrid(value: unknown, size: number): value is number[][] {
-  return Array.isArray(value) && value.length === size && value.every((row) =>
-    Array.isArray(row) && row.length === size && row.every((cell) => cell === 0 || cell === 1)
-  )
-}
-
-function mirror(grid: number[][]): number[][] {
-  return grid.map((row) => [...row].reverse())
-}
-
-function flip(grid: number[][]): number[][] {
-  return [...grid].reverse().map((row) => [...row])
-}
-
-function hasThreeDistinctSymmetryVariants(grid: number[][]): boolean {
-  return new Set([grid, mirror(grid), flip(grid)].map((variant) => JSON.stringify(variant))).size === 3
+function isSymmetryContent(value: unknown): value is TaskCatalog['symmetry'] {
+  if (!isRecord(value) || !isNonEmptyString(value.entryRationale) || !isNonEmptyString(value.axisLegend)) return false
+  if (!Array.isArray(value.optionLabels) || value.optionLabels.length !== 3 || !value.optionLabels.every(isNonEmptyString) || new Set(value.optionLabels).size !== 3) return false
+  if (!isRecord(value.guidance) || !['between-cells', 'through-cells'].every((position) => {
+    const guidance = (value.guidance as Record<string, unknown>)[position]
+    return isRecord(guidance) && ['hint1', 'hint2', 'explanation', 'errorFeedback', 'successFeedback'].every((field) => isNonEmptyString(guidance[field]))
+  })) return false
+  if (!Array.isArray(value.progression) || value.progression.length !== 5) return false
+  const progression = value.progression as unknown[]
+  if (!progression.every((candidate, index) => {
+    if (!isRecord(candidate) || candidate.phase !== index + 1 || !isNonEmptyString(candidate.title) || !isNonEmptyString(candidate.goal)) return false
+    if (!['even', 'odd', 'mixed'].includes(candidate.gridParity as string) || !['between-cells', 'through-cells', 'mixed'].includes(candidate.axisPosition as string)) return false
+    if (!['simple', 'connected', 'complex'].includes(candidate.figureComplexity as string) || !['clear', 'plausible', 'close'].includes(candidate.distractorSimilarity as string)) return false
+    if (!Array.isArray(candidate.axes) || candidate.axes.length === 0 || !candidate.axes.every((axis) => ['vertical', 'horizontal'].includes(axis as string))) return false
+    const occupied = candidate.occupiedCells
+    return isRecord(occupied) && Number.isInteger(occupied.min) && Number.isInteger(occupied.max) && (occupied.min as number) > 0 && (occupied.min as number) <= (occupied.max as number)
+  })) return false
+  if (!Array.isArray(value.templates) || value.templates.length === 0) return false
+  const ids = value.templates.map((template) => isRecord(template) ? template.id : undefined)
+  if (new Set(ids).size !== value.templates.length) return false
+  return value.templates.every((candidate) => {
+    if (!isRecord(candidate) || !isNonEmptyString(candidate.id) || ![1, 2, 3].includes(candidate.difficulty as number) || ![1, 2, 3, 4, 5].includes(candidate.progressionPhase as number)) return false
+    if (!['vertical', 'horizontal'].includes(candidate.axis as string) || !['between-cells', 'through-cells'].includes(candidate.axisPosition as string)) return false
+    if (!['simple', 'connected', 'complex'].includes(candidate.figureComplexity as string) || !['clear', 'plausible', 'close'].includes(candidate.distractorSimilarity as string)) return false
+    if (!Array.isArray(candidate.distractorStrategies) || JSON.stringify(candidate.distractorStrategies) !== JSON.stringify(['shift-within-side', 'wrong-axis'])) return false
+    if (!isRectangularBinaryGrid(candidate.grid)) return false
+    const template = candidate as unknown as SymmetryTemplate
+    const phase = progression[template.progressionPhase - 1] as unknown as SymmetryProgressionPhase
+    const expectedDifficulty = template.progressionPhase === 1 ? 1 : template.progressionPhase === 2 ? 2 : 3
+    const axisSize = template.axis === 'vertical' ? template.grid[0]!.length : template.grid.length
+    const parity = axisSize % 2 === 0 ? 'even' : 'odd'
+    const occupied = occupiedCellCount(template.grid)
+    if (template.difficulty !== expectedDifficulty || template.axisPosition !== expectedAxisPosition(template.grid, template.axis)) return false
+    if (phase.gridParity !== 'mixed' && phase.gridParity !== parity) return false
+    if (phase.axisPosition !== 'mixed' && phase.axisPosition !== template.axisPosition) return false
+    if (!phase.axes.includes(template.axis) || phase.figureComplexity !== template.figureComplexity || phase.distractorSimilarity !== template.distractorSimilarity) return false
+    if (occupied < phase.occupiedCells.min || occupied > phase.occupiedCells.max || !sourceStaysOnOneAxisSide(template.grid, template.axis)) return false
+    if (template.axisPosition === 'through-cells' && !hasOccupiedAxisCell(template.grid, template.axis)) return false
+    const shift = createShiftDistractor(template.grid, template.axis)
+    if (!shift) return false
+    const correct = reflectGrid(template.grid, template.axis)
+    const wrongAxis = reflectGrid(template.grid, template.axis === 'vertical' ? 'horizontal' : 'vertical')
+    return new Set([correct, shift, wrongAxis].map((grid) => JSON.stringify(grid))).size === 3
+  })
 }
 
 const REQUIREMENT_FIELDS = [
@@ -459,6 +525,12 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!Array.isArray(value.skills) || value.skills.length !== SKILL_IDS.length || !value.skills.every((skill) => isSkill(skill, numberRange as { min: number; max: number }))) return false
   const skillIds = value.skills.map((skill) => (skill as CatalogSkill).id)
   if (new Set(skillIds).size !== SKILL_IDS.length || !SKILL_IDS.every((id) => skillIds.includes(id))) return false
+  const symmetrySkill = value.skills.find((skill) => (skill as CatalogSkill).id === 'symmetry') as CatalogSkill | undefined
+  const expectedSymmetryExerciseTypes = [
+    ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
+    ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-4', 'symmetry:phase-5']
+  ]
+  if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) return false
   if (!Array.isArray(value.preparedTopics) || value.preparedTopics.length !== 1 || !value.preparedTopics.every((topic) =>
     isRecord(topic) && topic.id === 'spatial-reasoning' &&
     [topic.label, topic.curriculumArea, topic.supportGoal, topic.remediation].every(isNonEmptyString) &&
@@ -481,21 +553,8 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!['bridgePrompt', 'bridgeError', 'bridgeSuccess', 'resultPrompt', 'resultError', 'resultSuccess'].every((field) => isNonEmptyString(arithmeticSteps[field]))) return false
   if (!Array.isArray(value.wordProblems) || value.wordProblems.length === 0 || !value.wordProblems.every((template) => isWordProblem(template, numberRange as { min: number; max: number }))) return false
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
-  if (!isWordProblemSteps(value.wordProblemSteps) || !isRecord(value.symmetry)) return false
-  if (!Array.isArray(value.symmetry.optionLabels) || value.symmetry.optionLabels.length !== 3 || !value.symmetry.optionLabels.every(isNonEmptyString)) return false
-  if (new Set(value.symmetry.optionLabels).size !== 3) return false
-  if (!Array.isArray(value.symmetry.templates) || value.symmetry.templates.length === 0) return false
-  const symmetryIds = value.symmetry.templates.map((template) => isRecord(template) ? template.id : undefined)
-  if (new Set(symmetryIds).size !== value.symmetry.templates.length) return false
-  return hasOnlyKnownPlaceholders(value) && value.symmetry.templates.every((template) => {
-    if (!isRecord(template) || !isNonEmptyString(template.id) || ![1, 2, 3].includes(template.difficulty as number) || !['vertical', 'horizontal'].includes(template.axis as string)) return false
-    const size = (template.difficulty as number) + 2
-    if (!isGrid(template.grid, size) || !isGrid(template.shiftGrid, size) || !isGrid(template.wrongAxisGrid, size) || !hasThreeDistinctSymmetryVariants(template.grid)) return false
-    const correct = template.axis === 'vertical' ? mirror(template.grid) : flip(template.grid)
-    const expectedWrongAxis = template.axis === 'vertical' ? flip(template.grid) : mirror(template.grid)
-    return JSON.stringify(template.wrongAxisGrid) === JSON.stringify(expectedWrongAxis) &&
-      new Set([correct, template.shiftGrid, template.wrongAxisGrid].map((grid) => JSON.stringify(grid))).size === 3
-  })
+  if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry)) return false
+  return hasOnlyKnownPlaceholders(value)
 }
 
 const fallbackCandidate: unknown = fallbackCatalogJson

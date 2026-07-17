@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { mirrorGrid } from '../domain/generators'
+import {
+  createShiftDistractor,
+  everyOccupiedCellHasMirrorPartner,
+  expectedAxisPosition,
+  hasOccupiedAxisCell,
+  reflectGrid,
+  sourceStaysOnOneAxisSide
+} from '../domain/symmetry'
 import { SKILL_IDS } from '../domain/types'
 import sourceCatalogJson from '../../content/catalogs/nrw-klasse3-foerderkern/catalog.json?raw'
 import publicCatalogJson from '../../public/content/task-catalog.json?raw'
@@ -24,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(6)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.7.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(7)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.8.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -119,15 +126,48 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
-  it('erzeugt je Symmetrievorlage genau eine unterscheidbare Spiegelung', () => {
+  it('bildet die fünf didaktischen Symmetriephasen ohne frühen Achsensonderfall ab', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const skill = catalog.skills.find((candidate) => candidate.id === 'symmetry')!
+    expect(skill.learningPhases.map((phase) => phase.exerciseTypes)).toEqual([
+      ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
+      ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-4', 'symmetry:phase-5']
+    ])
+    expect(catalog.symmetry.progression.map((phase) => phase.phase)).toEqual([1, 2, 3, 4, 5])
+    expect(catalog.symmetry.entryRationale).toMatch(/Gerade Raster.*eindeutig.*Sonderfall/i)
+    expect(catalog.symmetry.templates.filter((template) => template.progressionPhase <= 3).every((template) =>
+      template.axisPosition === 'between-cells' && (template.axis === 'vertical' ? template.grid[0]!.length : template.grid.length) % 2 === 0
+    )).toBe(true)
+    expect(catalog.symmetry.templates.filter((template) => template.progressionPhase <= 2).every((template) => template.axis === 'vertical')).toBe(true)
+    expect(catalog.symmetry.templates.filter((template) => template.progressionPhase === 4).every((template) =>
+      template.axisPosition === 'through-cells' && hasOccupiedAxisCell(template.grid, template.axis)
+    )).toBe(true)
+    expect(new Set(catalog.symmetry.templates.filter((template) => template.progressionPhase === 5).map((template) => template.axisPosition))).toEqual(new Set(['between-cells', 'through-cells']))
+  })
+
+  it('erzeugt je Symmetrievorlage genau eine fachlich gültige Spiegelung', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     catalog.symmetry.templates.forEach((template) => {
-      const mirror = mirrorGrid(template.grid)
-      const flip = [...template.grid].reverse().map((row) => [...row])
-      const correct = template.axis === 'vertical' ? mirror : flip
-      expect(template.grid).toHaveLength(template.difficulty + 2)
-      expect(new Set([correct, template.shiftGrid, template.wrongAxisGrid].map((grid) => JSON.stringify(grid))).size).toBe(3)
+      const correct = reflectGrid(template.grid, template.axis)
+      const shift = createShiftDistractor(template.grid, template.axis)
+      const wrongAxis = reflectGrid(template.grid, template.axis === 'vertical' ? 'horizontal' : 'vertical')
+      expect(template.axisPosition).toBe(expectedAxisPosition(template.grid, template.axis))
+      expect(sourceStaysOnOneAxisSide(template.grid, template.axis)).toBe(true)
+      expect(everyOccupiedCellHasMirrorPartner(template.grid, template.axis)).toBe(true)
+      expect(shift).not.toBeNull()
+      expect(new Set([correct, shift, wrongAxis].map((grid) => JSON.stringify(grid))).size).toBe(3)
+      ;[template.grid, correct, shift, wrongAxis].forEach((grid) => {
+        expect(grid).toHaveLength(template.grid.length)
+        expect(grid?.every((row) => row.length === template.grid[0]!.length)).toBe(true)
+      })
     })
+  })
+
+  it('lehnt eine Figur auf beiden Seiten der Achse ab', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    const template = catalog.symmetry.templates.find((candidate) => candidate.progressionPhase === 1)!
+    template.grid[0]![template.grid[0]!.length - 1] = 1
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('ordnet Sachaufgaben intern korrekt zu und liefert konkrete Modellierungsoptionen', () => {

@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.7.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.8.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -169,12 +169,14 @@ Stand: Katalogversion 0.7.0. Die Stufen beschreiben die produktive Heuristik von
 ### Symmetrie
 
 - **Vorkenntnisse:** Raster lesen, links/rechts sowie oben/unten unterscheiden.
-- **Stufe 1:** explizit geprüfte 3×3-Raster und deutlich unterscheidbare Varianten.
-- **Stufe 2:** explizit geprüfte 4×4-Raster mit plausibler Verschiebung.
-- **Stufe 3 / MVP-Ziel:** eigene, nicht gekachelte 5×5-Raster und wechselnde senkrechte oder waagerechte Achse.
-- **Erhöhen / Zurückstufen:** Abstände zur Achse sicher erhalten / Verschiebung oder falsche Achse wählen.
-- **Hilfe / Transfer:** Reihe oder Spalte einzeln spiegeln / Lageänderung eines Feldes beschreiben.
-- **Später:** fehlende Hälfte ergänzen; Diagonalachsen erst nach eigenständiger Prüfung.
+- **Phase 1 / Stufe 1:** gerade 4×2- oder 6×4-Raster, senkrechte Achse zwischen Spalten, wenige Felder und deutliche Distraktoren.
+- **Phase 2 / Stufe 2:** weiterhin gerade und senkrecht; mehr belegte Felder, komplexere Figuren und plausiblere Distraktoren. Ein kleineres Raster kann dabei schwerer sein als ein größeres.
+- **Phase 3 / Stufe 3:** waagerechte Achsen zwischen Reihen bei weiterhin geraden Rastern.
+- **Phase 4 / sicherer Transfer:** ungerade Raster und Achsen durch Zellen; Achsenzellen bleiben als neuer Sachverhalt unverändert.
+- **Phase 5 / gemischter Transfer:** unterschiedliche Raster, Achsenlagen und Achsenpositionen. Freigabe erst nach mindestens drei hinreichend sicheren Phase-4-Versuchen.
+- **Erhöhen / Zurückstufen:** Seite, Abstand und gegebenenfalls Achsenzellen sicher erhalten / Verschiebung, falsche Achse oder veränderte Achsenzelle wählen.
+- **Hilfe / Transfer:** zunächst ein Feld mit gleichem Abstand zuordnen / erklären, warum ein Feld auf der Achse stehen bleibt.
+- **Später:** fehlende Hälfte frei ergänzen; Diagonalachsen erst nach eigenständiger fachlicher und mobiler Prüfung.
 
 ## Größen und Messen
 

@@ -99,6 +99,12 @@ export interface Exercise {
   options?: AnswerOption[]
   steps?: ExerciseStep[]
   sourceGrid?: number[][]
+  symmetry?: {
+    axis: 'vertical' | 'horizontal'
+    axisPosition: 'between-cells' | 'through-cells'
+    progressionPhase: 1 | 2 | 3 | 4 | 5
+    axisLegend: string
+  }
   subskillId?: string
   representation?: ExerciseRepresentation
   hints: [Hint, Hint]

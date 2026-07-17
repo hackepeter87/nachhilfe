@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Didaktische Symmetrieprogression 0.10.0
+
+- Symmetrie beginnt mit geraden rechteckigen Rastern und einer senkrechten Achse zwischen Spalten. Dadurch besitzt jede belegte Zelle genau einen Spiegelpartner; achsenfeste Zellen sind kein gleichzeitiger Sonderfall.
+- Fünf katalogisierte Phasen steigern Belegung, Figurenkomplexität und Distraktorähnlichkeit, wechseln danach zu waagerechten Achsen und führen ungerade Raster mit Achsen durch Zellen erst im sicheren Transfer ein.
+- Die Rastergröße ist vom Schwierigkeitswert entkoppelt. Ein 6×4-Einstiegsraster kann einfacher sein als ein kompakteres 4×4-Raster mit komplexerer Figur.
+- Die grüne Spiegelachse ist in Vorlage und allen Antwortbildern sichtbar. Achsen zwischen Zellen sind durchgezogen; spätere Achsen durch Zellen werden gestrichelt dargestellt.
+- Distraktoren werden aus den katalogisierten Fehlstrategien „Verschiebung auf derselben Achsenseite“ und „Spiegelung an der falschen Achse“ deterministisch in TypeScript erzeugt.
+- Katalogversion `0.8.0` und Schema `7` validieren Progressionsphase, relevante Parität, Achsenposition, Belegungsgrenzen, Figurenkomplexität, Distraktorähnlichkeit und vollständige Seitenlage.
+
+Diese Progression ist intern didaktisch begründet und automatisiert konsistent geprüft. Eine Freigabe durch eine Lehrkraft, Unterrichtserprobung und ein echter iPhone-Test sind weiterhin nicht dokumentiert; eine pädagogische Wirksamkeit wird nicht behauptet.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 184 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und sechs Playwright-Szenarien jeweils gegen Vite Preview und den Container. Der neue Symmetrietest prüft bei `375 x 812` rechteckige Zellproportionen, die mittige sichtbare Achse und horizontales Overflow. Das OCI-Image `mathe-reise:0.10.0` und `mathe-reise:local` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Podman war nicht installiert und wurde nicht als ausgeführt behauptet.
+
 ## Sachaufgabenmodell-UI-Hotfix 0.9.1
 
 - Veränderungsmodelle stellen bekannte Anfangsmenge und hinzukommende Menge jetzt proportional dar. Bei `13 + 3` belegt der obere Balken deshalb `13/16` der Gesamtbreite statt fälschlich die volle Breite.

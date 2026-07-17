@@ -5,6 +5,15 @@ import { generateExercise } from '../domain'
 import { ExerciseCard } from './ExerciseCard'
 
 describe('ExerciseCard', () => {
+  it('zeigt bei Symmetrie die katalogisierte Spiegelachse eindeutig an', () => {
+    const exercise = generateExercise('symmetry', 42, 1, 'symmetry-phase-1')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    expect(screen.getByText('Die grüne Linie ist die Spiegelachse.')).toBeVisible()
+    expect(screen.getByRole('img', { name: /Vorlage zum Spiegeln.*Senkrechte Spiegelachse zwischen Feldern/ })).toBeVisible()
+    expect(screen.getAllByRole('img', { name: /Spiegelachse zwischen Feldern/ })).toHaveLength(4)
+  })
+
   it('zeigt Hilfen und konkretes Fehlerfeedback', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('addition', 42)

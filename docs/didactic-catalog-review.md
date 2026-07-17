@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App `0.9.1`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App `0.10.0`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -11,10 +11,11 @@ Stand: App `0.9.1`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Dies
 | `remediation` | Runtime | Strategie, Folgeschwierigkeit, Darstellung und Unterkompetenzbindung steuern die Folgeaufgabe |
 | `successFeedback` / `errorFeedback` | Runtime | konkrete Rückmeldung ohne behauptete Diagnose |
 | `releaseStatus` | Runtime | nur `active` wird in Sitzungen geplant |
+| `symmetry.progression`, `axisPosition`, `figureComplexity`, `distractorSimilarity` | Runtime | Progressionsphase, Achsenlage, Vorlage, Hilfen und Distraktortransformation ändern sich |
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.9.1
+## Aktive Veränderungen bis 0.10.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -29,6 +30,8 @@ Stand: App `0.9.1`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Dies
 - Katalogschema 5: `quantityContent` liefert fachliche Aufgaben-, Erklärungs- und Darstellungsbegriffe für beide Größenkompetenzen; Mathematik und Einheitenprüfung bleiben in TypeScript.
 - Katalogschema 6: Sachaufgaben definieren konkrete Situationen, Modelltypen, Modellalternativen, Gleichungen und eine siebenstufig dokumentierte Modellierungsfolge; Rendering und Mathematik bleiben in TypeScript.
 - Sachaufgabenmodell 0.9.1: Veränderungsbalken verwenden die tatsächlichen Mengenverhältnisse; positives Zwischenfeedback ist grün, Korrekturfeedback bleibt rot.
+- Katalogschema 7: Symmetrie trennt Rasterdimension, relevante Parität, Achsenposition, Figurenkomplexität und Distraktorähnlichkeit. Gerade Raster bilden den Einstieg; Achsen durch Zellen werden erst im sicheren Transfer aktiv.
+- Symmetrie-UI 0.10.0: Die grüne Achse ist in Vorlage und Optionen sichtbar. Achsen zwischen Zellen sind durchgezogen, spätere Achsen durch Zellen gestrichelt.
 
 ## Bewusst deaktiviert
 

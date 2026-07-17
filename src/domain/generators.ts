@@ -2,6 +2,7 @@ import { integer, pick, seededRandom, shuffle } from './random'
 import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, ExerciseStep, SkillId } from './types'
 import { getSkillContent, getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { WordModelType } from '../content/catalog'
+import { createShiftDistractor, flipGrid, mirrorGrid, reflectGrid } from './symmetry'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -678,27 +679,45 @@ function arithmetic1000Steps(
   }]
 }
 
-function mirrorGrid(grid: number[][]): number[][] {
-  return grid.map((row) => [...row].reverse())
+function symmetryProgressionPhase(difficulty: Difficulty, focus?: string): 1 | 2 | 3 | 4 | 5 {
+  const match = focus?.match(/^symmetry-phase-([1-5])$/)
+  const requested = match ? Number(match[1]) as 1 | 2 | 3 | 4 | 5 : undefined
+  if (requested) {
+    const expectedDifficulty = requested === 1 ? 1 : requested === 2 ? 2 : 3
+    if (expectedDifficulty === difficulty) return requested
+  }
+  return difficulty === 1 ? 1 : difficulty === 2 ? 2 : 3
 }
 
-function flipGrid(grid: number[][]): number[][] {
-  return [...grid].reverse().map((row) => [...row])
-}
-
-function symmetry(seed: number, difficulty: Difficulty): Exercise {
+function symmetry(seed: number, difficulty: Difficulty, focus?: string): Exercise {
   const random = seededRandom(seed)
   const symmetryContent = getTaskCatalog().symmetry
-  const template = pick(random, symmetryContent.templates.filter((candidate) => candidate.difficulty === difficulty))
+  const progressionPhase = symmetryProgressionPhase(difficulty, focus)
+  const template = pick(random, symmetryContent.templates.filter((candidate) => candidate.progressionPhase === progressionPhase))
   const sourceGrid = template.grid.map((row) => [...row])
   const horizontal = template.axis === 'horizontal'
-  const correct = horizontal ? flipGrid(sourceGrid) : mirrorGrid(sourceGrid)
-  const values = { shape: template.id, answer: 'mirror', axis: horizontal ? 'waagerechten' : 'senkrechten' }
+  const correct = reflectGrid(sourceGrid, template.axis)
+  const shift = createShiftDistractor(sourceGrid, template.axis)
+  if (!shift) throw new Error(`Symmetrievorlage ${template.id} besitzt keinen gültigen Verschiebungsdistraktor.`)
+  const wrongAxis = reflectGrid(sourceGrid, horizontal ? 'vertical' : 'horizontal')
+  const values = {
+    shape: template.id,
+    answer: 'mirror',
+    axis: horizontal ? 'waagerechten' : 'senkrechten',
+    axisDirection: template.axis,
+    axisPosition: template.axisPosition,
+    progressionPhase,
+    rows: sourceGrid.length,
+    columns: sourceGrid[0]?.length ?? 0,
+    figureComplexity: template.figureComplexity,
+    distractorSimilarity: template.distractorSimilarity
+  }
   const options = shuffle(random, [
     { value: 'mirror', label: symmetryContent.optionLabels[0], grid: correct },
-    { value: 'shift', label: symmetryContent.optionLabels[1], grid: template.shiftGrid, misconception: 'Spiegelung mit Verschiebung verwechselt' },
-    { value: 'wrong-axis', label: symmetryContent.optionLabels[2], grid: template.wrongAxisGrid, misconception: 'An der falschen Achse gespiegelt' }
+    { value: 'shift', label: symmetryContent.optionLabels[1], grid: shift, misconception: 'Spiegelung mit Verschiebung verwechselt' },
+    { value: 'wrong-axis', label: symmetryContent.optionLabels[2], grid: wrongAxis, misconception: 'An der falschen Achse gespiegelt' }
   ])
+  const guidance = symmetryContent.guidance[template.axisPosition]
   return withMetadata({
     ...base('symmetry', seed, difficulty, values),
     ...contentFor('symmetry', values, difficulty),
@@ -706,6 +725,20 @@ function symmetry(seed: number, difficulty: Difficulty): Exercise {
     answerMode: 'symmetry',
     correctAnswer: 'mirror',
     sourceGrid,
+    subskillId: `symmetry-phase-${progressionPhase}`,
+    symmetry: {
+      axis: template.axis,
+      axisPosition: template.axisPosition,
+      progressionPhase,
+      axisLegend: symmetryContent.axisLegend
+    },
+    hints: [
+      { level: 1, text: guidance.hint1 },
+      { level: 2, text: guidance.hint2 }
+    ],
+    successFeedback: guidance.successFeedback,
+    errorFeedback: guidance.errorFeedback,
+    explanation: guidance.explanation,
     options
   })
 }
@@ -1027,7 +1060,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'money': return money(seed, difficulty)
     case 'lengths': return lengths(seed, difficulty)
     case 'word-problem': return wordProblem(seed, difficulty)
-    case 'symmetry': return symmetry(seed, difficulty)
+    case 'symmetry': return symmetry(seed, difficulty, focus)
   }
 }
 
@@ -1039,4 +1072,4 @@ export function isStepAnswerCorrect(step: ExerciseStep, answer: string): boolean
   return answer === step.correctAnswer
 }
 
-export { mirrorGrid }
+export { flipGrid, mirrorGrid, reflectGrid }

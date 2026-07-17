@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit `npm run dev`; der Container mit `docker run --rm -p 8080:8080 mathe-reise:0.9.1`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.9.1`.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit `npm run dev`; der Container mit `docker run --rm -p 8080:8080 mathe-reise:0.10.0`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.10.0`.
 
 ## Förderziel
 
@@ -10,7 +10,7 @@ Mathe-Reise unterstützt ein etwa neunjähriges Kind am Ende der Klasse 3 dabei,
 
 ## Behandelte Themen
 
-Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, Raster-Symmetrie, Geldbeträge in Euro/Cent und Längen in Zentimetern/Metern. Raumvorstellung ist methodisch vorbereitet, aber bewusst deaktiviert.
+Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, fünfphasige Raster-Symmetrie mit später Achseninvarianz, Geldbeträge in Euro/Cent und Längen in Zentimetern/Metern. Raumvorstellung ist methodisch vorbereitet, aber bewusst deaktiviert.
 
 ## Methodischer Aufbau
 

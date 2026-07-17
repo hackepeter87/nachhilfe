@@ -107,7 +107,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
             type="button"
             onClick={() => currentStep ? checkStepAnswer(option.value) : checkRegularAnswer(option.value)}
           >
-            {option.grid ? <GridPicture grid={option.grid} label={option.label} /> : option.representation ? <><span>{option.label}</span><MathRepresentation representation={option.representation} /></> : option.label}
+            {option.grid ? <GridPicture grid={option.grid} label={option.label} axis={exercise.symmetry?.axis} axisPosition={exercise.symmetry?.axisPosition} /> : option.representation ? <><span>{option.label}</span><MathRepresentation representation={option.representation} /></> : option.label}
           </button>
         ))}
       </div>
@@ -150,7 +150,8 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         <div className="symmetry-task">
           <div className="source-grid">
             <span>Vorlage</span>
-            {exercise.sourceGrid && <GridPicture grid={exercise.sourceGrid} label="Vorlage zum Spiegeln" />}
+            {exercise.sourceGrid && <GridPicture grid={exercise.sourceGrid} label="Vorlage zum Spiegeln" axis={exercise.symmetry?.axis} axisPosition={exercise.symmetry?.axisPosition} />}
+            {exercise.symmetry && <small className="axis-legend">{exercise.symmetry.axisLegend}</small>}
           </div>
           {renderOptions()}
         </div>

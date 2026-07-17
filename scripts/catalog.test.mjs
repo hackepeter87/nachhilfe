@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 6,
-      catalogVersion: '0.7.0',
+      schemaVersion: 7,
+      catalogVersion: '0.8.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -95,10 +95,24 @@ describe('Katalog-Buildpipeline', () => {
     expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('quantityContent.money.countPrompt')
   })
 
-  it('lehnt gekachelte oder unvollständige Symmetrievorlagen ab', () => {
+  it('lehnt eine Symmetriefigur auf beiden Achsenseiten ab', () => {
     const catalog = sourceCatalog()
-    catalog.symmetry.templates[0].shiftGrid = catalog.symmetry.templates[0].wrongAxisGrid
-    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('keine drei geprüften Antwortvarianten')
+    const template = catalog.symmetry.templates.find((candidate) => candidate.progressionPhase === 1)
+    template.grid[0][template.grid[0].length - 1] = 1
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('passt nicht zur Progressionsphase')
+  })
+
+  it('lehnt verfrühte ungerade Raster und fehlende Achsenzellen ab', () => {
+    const earlyOdd = sourceCatalog()
+    earlyOdd.symmetry.templates[0].grid = [[1, 0, 0], [0, 0, 0]]
+    earlyOdd.symmetry.templates[0].axisPosition = 'through-cells'
+    expect(() => parseAndValidateCatalog(JSON.stringify(earlyOdd))).toThrow('passt nicht zur Progressionsphase')
+
+    const missingAxisCell = sourceCatalog()
+    const template = missingAxisCell.symmetry.templates.find((candidate) => candidate.progressionPhase === 4 && candidate.axis === 'vertical')
+    const middle = Math.floor(template.grid[0].length / 2)
+    template.grid.forEach((row) => { row[middle] = 0 })
+    expect(() => parseAndValidateCatalog(JSON.stringify(missingAxisCell))).toThrow('passt nicht zur Progressionsphase')
   })
 
   it('erzeugt beide Artefakte deterministisch aus einer Quelle', () => {

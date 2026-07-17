@@ -14,10 +14,39 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.7.0',
-      schemaVersion: 6,
-      appVersion: '0.9.1'
+      catalogVersion: '0.8.0',
+      schemaVersion: 7,
+      appVersion: '0.10.0'
     })
+  })
+
+  it('führt Achsenzellen erst im sicheren Symmetrietransfer ein', () => {
+    const automated = {
+      ...createSkillProgress('symmetry'),
+      attempts: 6,
+      difficulty: 3 as const,
+      learningPhase: 'automate' as const,
+      mastery: 86,
+      status: 'secure' as const
+    }
+    const firstTransfer = { ...automated, learningPhase: 'transfer' as const, mastery: 94 }
+    const mixedTransfer = {
+      ...firstTransfer,
+      subskills: {
+        'symmetry-phase-4': {
+          attempts: 3,
+          correctAnswers: 3,
+          hintsUsed: 0,
+          mastery: 71,
+          recentErrors: 0,
+          lastPracticedAt: '2026-07-17T08:00:00.000Z'
+        }
+      }
+    }
+
+    expect(createSessionPlan({ symmetry: automated }, 601).exercises.at(-1)?.symmetry?.progressionPhase).toBe(3)
+    expect(createSessionPlan({ symmetry: firstTransfer }, 602).exercises.at(-1)?.symmetry).toMatchObject({ progressionPhase: 4, axisPosition: 'through-cells' })
+    expect(createSessionPlan({ symmetry: mixedTransfer }, 603).exercises.at(-1)?.symmetry?.progressionPhase).toBe(5)
   })
 
   it('bindet eine laufende Runde unveränderlich an ihren Releasekontext', () => {
@@ -29,14 +58,14 @@ describe('Sitzungsplanung', () => {
       const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
 
       const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
-      nextCatalog.catalogVersion = '0.7.1'
+      nextCatalog.catalogVersion = '0.8.1'
       nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.7.0')
+      expect(runningSession.catalogVersion).toBe('0.8.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
-      expect(nextSession.catalogVersion).toBe('0.7.1')
+      expect(nextSession.catalogVersion).toBe('0.8.1')
     } finally {
       setTaskCatalog(originalCatalog)
     }

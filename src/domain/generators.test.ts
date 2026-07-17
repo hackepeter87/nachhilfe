@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, mirrorGrid, roundToUnit } from './generators'
+import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, roundToUnit } from './generators'
 import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
+import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSide } from './symmetry'
 
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
@@ -193,7 +194,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     for (let seed = 1; seed <= 100; seed += 1) {
       const exercise = generateExercise('symmetry', seed)
       const correct = exercise.options?.find((option) => option.value === exercise.correctAnswer)
-      expect(correct?.grid).toEqual(mirrorGrid(exercise.sourceGrid ?? []))
+      expect(correct?.grid).toEqual(reflectGrid(exercise.sourceGrid ?? [], exercise.symmetry!.axis))
       expect(new Set(exercise.options?.map((option) => JSON.stringify(option.grid))).size).toBe(3)
     }
   })
@@ -329,27 +330,43 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(hard.steps?.find((step) => step.id === 'relevant')).toBeDefined()
   })
 
-  it('vergrößert das Symmetrieraster und stärkt die Distraktoren stufenweise', () => {
+  it('steuert Symmetrie über didaktische Parameter statt feste Rastergrößen', () => {
     const easy = generateExercise('symmetry', 22, 1)
     const medium = generateExercise('symmetry', 22, 2)
     const hard = generateExercise('symmetry', 22, 3)
-    expect(easy.sourceGrid).toHaveLength(3)
-    expect(medium.sourceGrid).toHaveLength(4)
-    expect(hard.sourceGrid).toHaveLength(5)
-    ;[easy, medium, hard].forEach((exercise) => {
-      expect(new Set(exercise.options?.map((option) => JSON.stringify(option.grid))).size).toBe(3)
-    })
+    expect(easy.symmetry).toMatchObject({ progressionPhase: 1, axis: 'vertical', axisPosition: 'between-cells' })
+    expect(medium.symmetry).toMatchObject({ progressionPhase: 2, axis: 'vertical', axisPosition: 'between-cells' })
+    expect(hard.symmetry).toMatchObject({ progressionPhase: 3, axis: 'horizontal', axisPosition: 'between-cells' })
+    expect(Math.max(easy.sourceGrid!.length, easy.sourceGrid![0]!.length)).toBeGreaterThanOrEqual(Math.min(medium.sourceGrid!.length, medium.sourceGrid![0]!.length))
   })
 
-  it('spiegelt auf Stufe 3 passend zur angegebenen Achse', () => {
-    for (let seed = 1; seed <= 100; seed += 1) {
-      const exercise = generateExercise('symmetry', seed, 3)
-      const correct = exercise.options?.find((option) => option.value === 'mirror')?.grid
-      const expected = exercise.variant.values.axis === 'waagerechten'
-        ? [...exercise.sourceGrid!].reverse().map((row) => [...row])
-        : mirrorGrid(exercise.sourceGrid!)
-      expect(correct).toEqual(expected)
-      expect(exercise.prompt).toContain(String(exercise.variant.values.axis))
+  it('spiegelt in allen fünf Phasen passend zur sichtbaren Achse', () => {
+    for (const progressionPhase of [1, 2, 3, 4, 5] as const) {
+      const difficulty = progressionPhase === 1 ? 1 : progressionPhase === 2 ? 2 : 3
+      for (let seed = 1; seed <= 100; seed += 1) {
+        const exercise = generateExercise('symmetry', seed, difficulty, `symmetry-phase-${progressionPhase}`)
+        const source = exercise.sourceGrid!
+        const correct = exercise.options?.find((option) => option.value === 'mirror')?.grid
+        expect(exercise.symmetry?.progressionPhase).toBe(progressionPhase)
+        expect(correct).toEqual(reflectGrid(source, exercise.symmetry!.axis))
+        expect(sourceStaysOnOneAxisSide(source, exercise.symmetry!.axis)).toBe(true)
+        expect(everyOccupiedCellHasMirrorPartner(source, exercise.symmetry!.axis)).toBe(true)
+        expect(exercise.prompt).toContain(String(exercise.variant.values.axis))
+        expect(exercise.options?.every((option) => option.grid?.length === source.length && option.grid.every((row) => row.length === source[0]!.length))).toBe(true)
+        expect(new Set(exercise.options?.map((option) => JSON.stringify(option.grid))).size).toBe(3)
+      }
+    }
+  })
+
+  it('führt ungerade Raster ausschließlich in den hohen Progressionsphasen ein', () => {
+    for (const progressionPhase of [1, 2, 3, 4, 5] as const) {
+      const difficulty = progressionPhase === 1 ? 1 : progressionPhase === 2 ? 2 : 3
+      for (let seed = 1; seed <= 50; seed += 1) {
+        const exercise = generateExercise('symmetry', seed, difficulty, `symmetry-phase-${progressionPhase}`)
+        const relevantSize = exercise.symmetry?.axis === 'vertical' ? exercise.sourceGrid![0]!.length : exercise.sourceGrid!.length
+        if (progressionPhase <= 3) expect(relevantSize % 2).toBe(0)
+        if (progressionPhase === 4) expect(relevantSize % 2).toBe(1)
+      }
     }
   })
 
@@ -499,12 +516,13 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
-  it('verwendet ausschließlich explizite Symmetrievorlagen der jeweiligen Stufe', () => {
+  it('verwendet ausschließlich explizite Symmetrievorlagen der jeweiligen Progressionsphase', () => {
     const templates = getTaskCatalog().symmetry.templates
-    for (const difficulty of [1, 2, 3] as const) {
-      const allowed = new Set(templates.filter((template) => template.difficulty === difficulty).map((template) => JSON.stringify(template.grid)))
+    for (const progressionPhase of [1, 2, 3, 4, 5] as const) {
+      const difficulty = progressionPhase === 1 ? 1 : progressionPhase === 2 ? 2 : 3
+      const allowed = new Set(templates.filter((template) => template.progressionPhase === progressionPhase).map((template) => JSON.stringify(template.grid)))
       for (let seed = 1; seed <= 100; seed += 1) {
-        expect(allowed.has(JSON.stringify(generateExercise('symmetry', seed, difficulty).sourceGrid))).toBe(true)
+        expect(allowed.has(JSON.stringify(generateExercise('symmetry', seed, difficulty, `symmetry-phase-${progressionPhase}`).sourceGrid))).toBe(true)
       }
     }
   })

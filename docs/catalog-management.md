@@ -25,10 +25,10 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 
 ```json
 {
-  "schemaVersion": 6,
-  "catalogVersion": "0.7.0",
+  "schemaVersion": 7,
+  "catalogVersion": "0.8.0",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-16",
+  "releasedAt": "2026-07-17",
   "status": "ready-for-review"
 }
 ```
@@ -70,7 +70,7 @@ npm run catalog:check     # Artefakte und Produktionsstatus abgleichen
 
 Die Validierung prüft Metadaten, bekannte und eindeutige Kompetenz-IDs, Pflichtfelder, Platzhalter, Zahlenbereiche, Sachaufgaben, Symmetrievarianten und eindeutige Optionen. `npm run build` führt `catalog:check` automatisch vor Vite aus. CI führt dieselbe Prüfung explizit aus.
 
-Schema 6 ersetzt die frühere kindseitige Auswahl technischer Mengenbeziehungen und Rechenarten durch konkrete `situation`-, `modelType`- und `equation`-Felder sowie eine dokumentierte siebenstufige Modellierungsfolge. Das Schema validiert pro Vorlage zwei situationsbezogene, modellbezogene und rechnungsbezogene Alternativen. Rendering, Zahlenwahl, Rechenregeln und Lösungsprüfung bleiben in TypeScript. Die übrigen Status-, Lernphasen-, Größen- und Strategiefelder aus Schema 5 bleiben kompatibel. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
+Schema 6 ersetzt die frühere kindseitige Auswahl technischer Mengenbeziehungen und Rechenarten durch konkrete `situation`-, `modelType`- und `equation`-Felder sowie eine dokumentierte siebenstufige Modellierungsfolge. Schema 7 ersetzt quadratische, direkt an die Schwierigkeit gekoppelte Symmetrieraster durch rechteckige Vorlagen mit `progressionPhase`, `axisPosition`, `figureComplexity`, `distractorSimilarity` und fachlichen `distractorStrategies`. Der Katalog beschreibt die Fehlstrategien; Spiegelung und Transformation bleiben ausführbare TypeScript-Logik. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
 
 ## Sitzungen und Altdaten
 
@@ -94,8 +94,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build -t mathe-reise:0.9.1 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.9.1
+docker build -t mathe-reise:0.10.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.10.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 6,
-  "catalogVersion": "0.7.0",
+  "schemaVersion": 7,
+  "catalogVersion": "0.8.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -1808,18 +1808,19 @@
       "id": "symmetry",
       "label": "Spiegelbilder",
       "curriculumArea": "Raum und Form",
-      "supportGoal": "Eine Figur an einer senkrechten oder waagerechten Spiegelachse erkennen.",
+      "supportGoal": "Das Spiegelprinzip über gleiche Achsenabstände verstehen und achsenfeste Felder erst später als eigenen Sachverhalt erkennen.",
       "misconceptions": [
         "Eine Verschiebung wird als Spiegelung gewählt.",
-        "Oben und unten werden statt links und rechts vertauscht."
+        "Oben und unten werden statt links und rechts vertauscht.",
+        "Ein Feld auf der Spiegelachse wird unnötig versetzt."
       ],
       "hints": [
-        "Prüfe bei jedem Feld den Abstand zur Spiegelachse.",
-        "Gehe Reihe für Reihe oder Spalte für Spalte vor. Die Abstände zur Achse bleiben gleich."
+        "Suche die grüne Spiegelachse und vergleiche den Abstand jedes Feldes zu ihr.",
+        "Ordne die Felder Reihe für Reihe oder Spalte für Spalte zu. Auf beiden Seiten bleibt der Abstand zur Achse gleich."
       ],
-      "prompt": "Welches Bild ist das genaue Spiegelbild an einer {axis} Spiegelachse?",
-      "errorFeedback": "Das ist verschoben oder an der falschen Achse gespiegelt. Vergleiche die Abstände zur Spiegelachse.",
-      "explanation": "Beim Spiegeln wechselt jedes Feld auf die andere Seite der Achse. Sein Abstand zur Achse bleibt gleich.",
+      "prompt": "Welches Bild ist das genaue Spiegelbild an der {axis} grünen Spiegelachse?",
+      "errorFeedback": "Das Bild passt noch nicht genau. Vergleiche Seite und Abstand jedes Feldes zur grünen Achse.",
+      "explanation": "Beim Spiegeln liegt jedes Feld auf der anderen Seite im gleichen Abstand. Verläuft die Achse durch Felder, bleiben diese Felder an ihrem Platz.",
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
@@ -1833,17 +1834,18 @@
         }
       ],
       "prerequisites": [
-        "Links und rechts unterscheiden",
-        "Raster zeilenweise lesen"
+        "Links und rechts sowie oben und unten unterscheiden",
+        "Raster zeilen- und spaltenweise lesen",
+        "Abstände von einer markierten Linie vergleichen"
       ],
       "representations": [
-        "Rasterbild"
+        "Rechteckiges Rasterbild mit deutlich markierter Spiegelachse"
       ],
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Geprüfte 3x3-Figur an senkrechter Achse",
-          "numberRange": "3x3-Raster",
+          "description": "Phase 1: wenige Felder an einer senkrechten Achse zwischen zwei Spalten",
+          "numberRange": "Gerade 4x2- und 6x4-Raster; Rastergröße ist kein Schwierigkeitsmaß",
           "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
@@ -1856,8 +1858,8 @@
         },
         {
           "level": 2,
-          "description": "Geprüfte 4x4-Figur mit plausiblem Verschiebungsdistraktor",
-          "numberRange": "4x4-Raster",
+          "description": "Phase 2: komplexere Figuren und ähnlichere Distraktoren, weiterhin senkrecht und zwischen Spalten",
+          "numberRange": "Gerade 4x4- bis 8x4-Raster mit variierter Belegung",
           "representation": "hint",
           "requirements": {
             "requiresNeighborIdentification": false,
@@ -1870,8 +1872,8 @@
         },
         {
           "level": 3,
-          "description": "Geprüfte 5x5-Figur mit senkrechter oder waagerechter Achse",
-          "numberRange": "5x5-Raster",
+          "description": "Phasen 3 bis 5: waagerechte Achsen, später Achsen durch Felder und gemischter Transfer",
+          "numberRange": "Gerade und erst im sicheren Transfer ungerade Raster; Komplexität steuert die Anforderung",
           "representation": "none",
           "requirements": {
             "requiresNeighborIdentification": false,
@@ -1883,38 +1885,38 @@
           "learningPhase": "transfer"
         }
       ],
-      "workedExample": "Ein Feld direkt neben der Achse liegt im Spiegel wieder direkt neben der Achse.",
-      "successFeedback": "Du hast die richtige Spiegelung ausgewählt.",
+      "workedExample": "Ein Feld zwei Spalten links von der Achse liegt im Spiegel zwei Spalten rechts. Ein später eingeführtes Feld auf der Achse bleibt stehen.",
+      "successFeedback": "Du hast Seite und Abstand zur Spiegelachse richtig zugeordnet.",
       "remediation": {
-        "strategy": "Nur eine Rasterzeile wird zuerst gemeinsam gespiegelt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Spiegelbilder“ mit kleinen Zahlen und sichtbarem Material neu auf.",
-        "representation": "Rasterbild",
+        "strategy": "Nur ein Feld wird zuerst über die sichtbar markierte Achse gespiegelt.",
+        "foundationStrategy": "Kehre zu einer senkrechten Achse zwischen Spalten und einer einfachen Figur zurück.",
+        "representation": "Gerades Raster mit sichtbarer Spiegelachse",
         "keepSubskill": true
       },
-      "transferPrompt": "Beschreibe, welche Felder beim Spiegeln ihre Seite wechseln.",
+      "transferPrompt": "Beschreibe, was sich ändert und was gleich bleibt, wenn die Achse durch eine Reihe oder Spalte verläuft.",
       "releaseStatus": "active",
       "learningPhases": [
         {
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "symmetry:entry"
+            "symmetry:phase-1"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "symmetry:representation"
+            "symmetry:phase-1"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "symmetry:difficulty-1"
+            "symmetry:phase-1"
           ],
           "releaseStatus": "active"
         },
@@ -1922,7 +1924,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "symmetry:difficulty-2"
+            "symmetry:phase-2"
           ],
           "releaseStatus": "active"
         },
@@ -1930,15 +1932,16 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "symmetry:difficulty-3"
+            "symmetry:phase-3"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "symmetry:difficulty-3"
+            "symmetry:phase-4",
+            "symmetry:phase-5"
           ],
           "releaseStatus": "active"
         }
@@ -3348,128 +3351,200 @@
     "plausibilitySuccess": "Du hast geprüft, ob dein Ergebnis zur Geschichte passen kann."
   },
   "symmetry": {
+    "entryRationale": "Gerade Raster trennen zu Beginn jedes Feld eindeutig von seinem Spiegelbild. So wird zuerst der gleiche Abstand zur Achse verstanden, ohne gleichzeitig den Sonderfall achsenfester Felder lernen zu müssen.",
+    "axisLegend": "Die grüne Linie ist die Spiegelachse.",
     "optionLabels": [
       "Antwort A",
       "Antwort B",
       "Antwort C"
     ],
+    "guidance": {
+      "between-cells": {
+        "hint1": "Die grüne Achse liegt zwischen zwei Reihen oder Spalten. Jedes blaue Feld wechselt die Seite.",
+        "hint2": "Zähle vom blauen Feld bis zur Achse. Im Spiegelbild ist derselbe Abstand auf der anderen Seite.",
+        "explanation": "Kein Feld liegt auf der Achse. Deshalb hat jedes blaue Feld genau ein gegenüberliegendes Spiegelbild.",
+        "errorFeedback": "Prüfe, ob jedes Feld die Seite wechselt und sein Abstand zur grünen Achse gleich bleibt.",
+        "successFeedback": "Du hast alle Felder mit gleichem Abstand auf die andere Seite gespiegelt."
+      },
+      "through-cells": {
+        "hint1": "Die grüne Achse läuft durch eine Reihe oder Spalte. Felder direkt auf der Achse bleiben stehen.",
+        "hint2": "Spiegle zuerst die Felder neben der Achse. Kontrolliere danach, ob die Felder auf der Achse unverändert sind.",
+        "explanation": "Felder neben der Achse wechseln die Seite und behalten ihren Abstand. Felder auf der Achse haben Abstand null und bleiben deshalb an ihrem Platz.",
+        "errorFeedback": "Prüfe beide Fälle: Neben der Achse wird gespiegelt, auf der Achse bleibt ein Feld stehen.",
+        "successFeedback": "Du hast auch die Felder auf der Spiegelachse richtig behandelt."
+      }
+    },
+    "progression": [
+      {
+        "phase": 1,
+        "title": "Spiegelprinzip entdecken",
+        "goal": "Wenige Felder an einer senkrechten Achse zwischen Spalten eindeutig zuordnen.",
+        "gridParity": "even",
+        "axes": [
+          "vertical"
+        ],
+        "axisPosition": "between-cells",
+        "occupiedCells": {
+          "min": 1,
+          "max": 5
+        },
+        "figureComplexity": "simple",
+        "distractorSimilarity": "clear"
+      },
+      {
+        "phase": 2,
+        "title": "Spiegelprinzip festigen",
+        "goal": "Komplexere zusammenhängende Figuren mit plausibleren Fehlerbildern spiegeln.",
+        "gridParity": "even",
+        "axes": [
+          "vertical"
+        ],
+        "axisPosition": "between-cells",
+        "occupiedCells": {
+          "min": 4,
+          "max": 8
+        },
+        "figureComplexity": "connected",
+        "distractorSimilarity": "plausible"
+      },
+      {
+        "phase": 3,
+        "title": "Achsenlage wechseln",
+        "goal": "Das bekannte Spiegelprinzip auf waagerechte Achsen zwischen Reihen übertragen.",
+        "gridParity": "even",
+        "axes": [
+          "horizontal"
+        ],
+        "axisPosition": "between-cells",
+        "occupiedCells": {
+          "min": 3,
+          "max": 9
+        },
+        "figureComplexity": "connected",
+        "distractorSimilarity": "plausible"
+      },
+      {
+        "phase": 4,
+        "title": "Felder auf der Achse",
+        "goal": "Verstehen, dass Felder auf einer durch Zellen verlaufenden Achse unverändert bleiben.",
+        "gridParity": "odd",
+        "axes": [
+          "vertical",
+          "horizontal"
+        ],
+        "axisPosition": "through-cells",
+        "occupiedCells": {
+          "min": 5,
+          "max": 10
+        },
+        "figureComplexity": "complex",
+        "distractorSimilarity": "close"
+      },
+      {
+        "phase": 5,
+        "title": "Gemischter Transfer",
+        "goal": "Achsenlage und Achsenposition in gemischten Aufgaben selbstständig beachten.",
+        "gridParity": "mixed",
+        "axes": [
+          "vertical",
+          "horizontal"
+        ],
+        "axisPosition": "mixed",
+        "occupiedCells": {
+          "min": 5,
+          "max": 11
+        },
+        "figureComplexity": "complex",
+        "distractorSimilarity": "close"
+      }
+    ],
     "templates": [
       {
-        "id": "stairs-3",
+        "id": "single-4x2",
         "difficulty": 1,
+        "progressionPhase": 1,
         "axis": "vertical",
+        "axisPosition": "between-cells",
+        "figureComplexity": "simple",
+        "distractorSimilarity": "clear",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
         "grid": [
           [
             1,
             0,
-            0
-          ],
-          [
-            1,
-            1,
+            0,
             0
           ],
           [
             0,
-            1,
-            0
-          ]
-        ],
-        "shiftGrid": [
-          [
             0,
-            1,
-            0
-          ],
-          [
-            0,
-            1,
-            1
-          ],
-          [
-            0,
-            0,
-            1
-          ]
-        ],
-        "wrongAxisGrid": [
-          [
-            0,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
-            0
-          ],
-          [
-            1,
             0,
             0
           ]
         ]
       },
       {
-        "id": "hook-3",
+        "id": "wide-step-6x4",
         "difficulty": 1,
+        "progressionPhase": 1,
         "axis": "vertical",
+        "axisPosition": "between-cells",
+        "figureComplexity": "simple",
+        "distractorSimilarity": "clear",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
         "grid": [
           [
-            0,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
-            0
-          ],
-          [
             1,
             0,
-            0
-          ]
-        ],
-        "shiftGrid": [
-          [
             0,
             0,
-            1
-          ],
-          [
-            0,
-            1,
-            1
-          ],
-          [
-            0,
-            1,
-            0
-          ]
-        ],
-        "wrongAxisGrid": [
-          [
-            1,
             0,
             0
           ],
           [
             1,
             1,
+            0,
+            0,
+            0,
             0
           ],
           [
             0,
             1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
             0
           ]
         ]
       },
       {
-        "id": "stairs-4",
+        "id": "compact-hook-4x4",
         "difficulty": 2,
+        "progressionPhase": 2,
         "axis": "vertical",
+        "axisPosition": "between-cells",
+        "figureComplexity": "connected",
+        "distractorSimilarity": "plausible",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
         "grid": [
           [
             1,
@@ -3479,60 +3554,8 @@
           ],
           [
             1,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            1,
-            0
-          ],
-          [
             0,
             0,
-            1,
-            0
-          ]
-        ],
-        "shiftGrid": [
-          [
-            0,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            1,
-            0
-          ],
-          [
-            0,
-            0,
-            1,
-            1
-          ],
-          [
-            0,
-            0,
-            0,
-            1
-          ]
-        ],
-        "wrongAxisGrid": [
-          [
-            0,
-            0,
-            1,
-            0
-          ],
-          [
-            0,
-            1,
-            1,
             0
           ],
           [
@@ -3542,7 +3565,7 @@
             0
           ],
           [
-            1,
+            0,
             0,
             0,
             0
@@ -3550,103 +3573,24 @@
         ]
       },
       {
-        "id": "hook-4",
+        "id": "long-path-8x4",
         "difficulty": 2,
+        "progressionPhase": 2,
         "axis": "vertical",
-        "grid": [
-          [
-            0,
-            1,
-            0,
-            0
-          ],
-          [
-            1,
-            1,
-            0,
-            0
-          ],
-          [
-            1,
-            0,
-            0,
-            0
-          ],
-          [
-            1,
-            1,
-            1,
-            0
-          ]
+        "axisPosition": "between-cells",
+        "figureComplexity": "connected",
+        "distractorSimilarity": "plausible",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
         ],
-        "shiftGrid": [
-          [
-            0,
-            0,
-            1,
-            0
-          ],
-          [
-            0,
-            1,
-            1,
-            0
-          ],
-          [
-            0,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            1,
-            1
-          ]
-        ],
-        "wrongAxisGrid": [
-          [
-            1,
-            1,
-            1,
-            0
-          ],
-          [
-            1,
-            0,
-            0,
-            0
-          ],
-          [
-            1,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            0,
-            0
-          ]
-        ]
-      },
-      {
-        "id": "path-5",
-        "difficulty": 3,
-        "axis": "vertical",
         "grid": [
           [
             1,
-            0,
-            0,
-            0,
-            0
-          ],
-          [
             1,
-            1,
+            0,
+            0,
+            0,
             0,
             0,
             0
@@ -3656,6 +3600,9 @@
             1,
             1,
             0,
+            0,
+            0,
+            0,
             0
           ],
           [
@@ -3663,84 +3610,16 @@
             0,
             1,
             0,
-            0
-          ],
-          [
             0,
-            1,
-            1,
-            1,
-            0
-          ]
-        ],
-        "shiftGrid": [
-          [
-            0,
-            1,
             0,
             0,
             0
           ],
           [
             0,
-            1,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            0,
-            1,
-            1,
-            0
-          ],
-          [
             0,
             0,
             0,
-            1,
-            0
-          ],
-          [
-            0,
-            0,
-            1,
-            1,
-            1
-          ]
-        ],
-        "wrongAxisGrid": [
-          [
-            0,
-            1,
-            1,
-            1,
-            0
-          ],
-          [
-            0,
-            0,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            1,
-            0,
-            0
-          ],
-          [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          [
-            1,
             0,
             0,
             0,
@@ -3749,9 +3628,139 @@
         ]
       },
       {
-        "id": "corner-5",
+        "id": "top-zigzag-6x4",
         "difficulty": 3,
+        "progressionPhase": 3,
         "axis": "horizontal",
+        "axisPosition": "between-cells",
+        "figureComplexity": "connected",
+        "distractorSimilarity": "plausible",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
+        "grid": [
+          [
+            1,
+            1,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "top-path-8x6",
+        "difficulty": 3,
+        "progressionPhase": 3,
+        "axis": "horizontal",
+        "axisPosition": "between-cells",
+        "figureComplexity": "connected",
+        "distractorSimilarity": "plausible",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
+        "grid": [
+          [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "axis-hook-5x5",
+        "difficulty": 3,
+        "progressionPhase": 4,
+        "axis": "vertical",
+        "axisPosition": "through-cells",
+        "figureComplexity": "complex",
+        "distractorSimilarity": "close",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
         "grid": [
           [
             1,
@@ -3761,14 +3770,7 @@
             0
           ],
           [
-            1,
             0,
-            0,
-            0,
-            0
-          ],
-          [
-            1,
             1,
             1,
             0,
@@ -3782,71 +3784,152 @@
             0
           ],
           [
+            1,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "id": "axis-cap-5x5",
+        "difficulty": 3,
+        "progressionPhase": 4,
+        "axis": "horizontal",
+        "axisPosition": "through-cells",
+        "figureComplexity": "complex",
+        "distractorSimilarity": "close",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
+        ],
+        "grid": [
+          [
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
             0,
             1,
             1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
             0,
             0
           ]
+        ]
+      },
+      {
+        "id": "mixed-even-8x4",
+        "difficulty": 3,
+        "progressionPhase": 5,
+        "axis": "vertical",
+        "axisPosition": "between-cells",
+        "figureComplexity": "complex",
+        "distractorSimilarity": "close",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
         ],
-        "shiftGrid": [
+        "grid": [
           [
-            0,
-            1,
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            0,
-            0,
-            0
-          ],
-          [
-            0,
             1,
             1,
             1,
-            0
-          ],
-          [
             0,
             0,
             0,
-            1,
+            0,
             0
           ],
           [
             0,
             0,
             1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
             1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0
           ]
+        ]
+      },
+      {
+        "id": "mixed-axis-5x5",
+        "difficulty": 3,
+        "progressionPhase": 5,
+        "axis": "horizontal",
+        "axisPosition": "through-cells",
+        "figureComplexity": "complex",
+        "distractorSimilarity": "close",
+        "distractorStrategies": [
+          "shift-within-side",
+          "wrong-axis"
         ],
-        "wrongAxisGrid": [
+        "grid": [
           [
-            0,
-            0,
+            1,
             0,
             1,
-            1
+            1,
+            0
           ],
           [
-            0,
-            0,
-            0,
-            0,
-            1
-          ],
-          [
-            0,
-            0,
             1,
             1,
-            1
+            1,
+            0,
+            0
           ],
           [
             0,
@@ -3858,8 +3941,15 @@
           [
             0,
             0,
-            1,
-            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
             0
           ]
         ]
