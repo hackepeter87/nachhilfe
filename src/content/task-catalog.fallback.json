@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 16,
-  "catalogVersion": "0.17.0",
+  "schemaVersion": 17,
+  "catalogVersion": "0.18.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -4563,6 +4563,617 @@
         "1 Liter wird als 1000 Milliliter verwendet.",
         "Rechenergebnis und Einheit sind konsistent."
       ]
+    },
+    {
+      "id": "plane-shapes",
+      "label": "Ebene Figuren",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Quadrat, Rechteck und Dreieck an ihren Eigenschaften erkennen sowie einfache Figuren sichtbar zerlegen und zusammensetzen.",
+      "misconceptions": [
+        "Die Lage einer Figur wird mit ihrer Form verwechselt.",
+        "Quadrat und Rechteck werden als völlig unabhängige Formen behandelt.",
+        "Teilungslinien werden für Außenkanten gehalten.",
+        "Beim Zusammensetzen werden Lücken oder Überlappungen übersehen."
+      ],
+      "hints": [
+        "Fahre mit dem Blick nur am äußeren Rand entlang und beachte Ecken und Seiten.",
+        "Teilungslinien verändern die Außenform nicht. Prüfe beim Zusammensetzen, welche ganze Figur der Rand bildet."
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Prüfe Außenrand, Ecken und sichtbare Teilungslinien noch einmal.",
+      "explanation": "Die Außenkante bestimmt die ganze Figur; innere Linien zeigen, aus welchen Teilen sie besteht.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 4
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Figuren werden über Rand, Ecken und Teilungen beschrieben."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Zusammensetzung und Zerlegung werden über unveränderte Außenformen begründet."
+        }
+      ],
+      "prerequisites": [
+        "Gerade und gebogene Linien unterscheiden",
+        "Ecken und Seiten benennen"
+      ],
+      "representations": [
+        "Einzelne Grundfigur",
+        "Figur mit sichtbarer Zerlegung",
+        "Zusammengesetzte Figur mit Außenrand"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Eine deutlich dargestellte Grundfigur erkennen",
+          "numberRange": "Quadrat, Rechteck oder Dreieck",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Eine Grundfigur entlang sichtbarer Linien in gleichartige Teile zerlegen",
+          "numberRange": "zwei oder vier sichtbare Teile",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Aus sichtbaren Teilen die ganze Außenform bestimmen",
+          "numberRange": "zwei Dreiecke oder Rechtecke",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Zwei Dreiecke liegen ohne Lücke aneinander. Ihr äußerer Rand bildet ein Quadrat.",
+      "successFeedback": "Du hast Außenform und Teilung richtig unterschieden.",
+      "remediation": {
+        "strategy": "Markiere gedanklich nur den Außenrand und zähle danach die inneren Teilflächen.",
+        "foundationStrategy": "Beginne mit einer einzelnen deutlich ausgerichteten Grundfigur.",
+        "representation": "Große Grundfigur mit deutlich sichtbarem Rand",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Erkläre, warum eine gedrehte Figur trotzdem dieselbe Form behält.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Ecken und Seiten erinnern.",
+          "exerciseTypes": [
+            "plane-shapes:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Außenrand als Formmerkmal verstehen.",
+          "exerciseTypes": [
+            "plane-shapes:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Grundformen sicher erkennen.",
+          "exerciseTypes": [
+            "plane-shapes:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Sichtbare Zerlegungen bestimmen.",
+          "exerciseTypes": [
+            "plane-shapes:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Figuren in wechselnder Lage erkennen.",
+          "exerciseTypes": [
+            "plane-shapes:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Aus Teilen eine ganze Figur begründen.",
+          "exerciseTypes": [
+            "plane-shapes:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Lage und Form werden getrennt.",
+        "Teilungslinien werden nicht als Außenkanten gezählt.",
+        "Zusammengesetzte Figuren besitzen weder Lücke noch Überlappung."
+      ]
+    },
+    {
+      "id": "patterns",
+      "label": "Muster und Regeln",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Regelmäßige Folgen erfassen, fortsetzen und die zugrunde liegende Wiederholung sprachlich beschreiben.",
+      "misconceptions": [
+        "Nur das letzte Zeichen wird wiederholt.",
+        "Die Reihenfolge innerhalb des Musterblocks wird vertauscht.",
+        "Ein wachsender Block wird als einfaches Wechselmuster gelesen."
+      ],
+      "hints": [
+        "Suche zuerst den kleinsten Block, der sich wiederholt.",
+        "Sprich den Musterblock leise von vorne und setze genau an derselben Stelle fort."
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Suche den vollständigen Musterblock, nicht nur das letzte Zeichen.",
+      "explanation": "Ein Muster wird fortgesetzt, indem derselbe kleinste Block in derselben Reihenfolge wiederholt wird.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 4
+      },
+      "processCompetencies": [
+        {
+          "id": "problem-solving",
+          "elicitedBy": "Der kleinste wiederkehrende Block wird erkannt."
+        },
+        {
+          "id": "communicating",
+          "elicitedBy": "Die Regel wird über die Reihenfolge der Symbole beschrieben."
+        }
+      ],
+      "prerequisites": [
+        "Gleiche Symbole erkennen",
+        "Reihenfolgen von links nach rechts lesen"
+      ],
+      "representations": [
+        "AB-Musterstreifen",
+        "ABC-Musterstreifen",
+        "Wachsender AAB-Musterstreifen"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Ein AB-Muster um ein Symbol fortsetzen",
+          "numberRange": "zwei Symbole",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Ein ABC-Muster mit längerer Periode fortsetzen",
+          "numberRange": "drei Symbole",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Einen wiederkehrenden Block mit doppeltem Element erfassen",
+          "numberRange": "Block AAB oder ABB",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Kreis, Quadrat, Kreis, Quadrat wird mit Kreis fortgesetzt, weil der Block Kreis-Quadrat wiederkehrt.",
+      "successFeedback": "Du hast den wiederkehrenden Musterblock erkannt.",
+      "remediation": {
+        "strategy": "Trenne die Folge sichtbar in gleich lange Blöcke.",
+        "foundationStrategy": "Beginne mit einem klaren Wechsel aus zwei Symbolen.",
+        "representation": "Musterstreifen mit farblich getrennten Blöcken",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Beschreibe den kleinsten Block, der sich wiederholt.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Gleiche Symbole ordnen.",
+          "exerciseTypes": [
+            "patterns:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Wiederholung als Regel verstehen.",
+          "exerciseTypes": [
+            "patterns:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "AB-Folgen fortsetzen.",
+          "exerciseTypes": [
+            "patterns:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "ABC-Folgen fortsetzen.",
+          "exerciseTypes": [
+            "patterns:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Blöcke sicher erfassen.",
+          "exerciseTypes": [
+            "patterns:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Regel eines komplexeren Blocks beschreiben.",
+          "exerciseTypes": [
+            "patterns:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Der kleinste Block ist eindeutig.",
+        "Die Fortsetzung hat genau eine richtige Lösung.",
+        "Schwierigkeit entsteht durch die Regel, nicht durch unnötige Länge."
+      ]
+    },
+    {
+      "id": "area",
+      "label": "Fläche mit Einheitsquadraten",
+      "curriculumArea": "Größen und Messen; Raum und Form",
+      "supportGoal": "Flächeninhalt als Anzahl lückenlos bedeckender Einheitsquadrate verstehen und bei einfachen Figuren bestimmen.",
+      "misconceptions": [
+        "Nur Quadrate am Rand werden gezählt.",
+        "Reihen und Spalten werden addiert statt alle Felder zu erfassen.",
+        "Leere Rasterfelder werden mitgezählt.",
+        "Fläche und Umfang werden verwechselt."
+      ],
+      "hints": [
+        "Zähle nur die gefüllten Einheitsquadrate. Gehe Reihe für Reihe vor.",
+        "Markiere gedanklich jede vollständige Reihe und addiere die gefüllten Felder."
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Zähle die gefüllten Einheitsquadrate geordnet und lasse kein Feld doppelt zählen.",
+      "explanation": "Der Flächeninhalt ist die Anzahl der Einheitsquadrate, die die Figur ohne Lücke bedecken.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 1,
+        "maxValue": 20
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Einheitsquadrate machen Flächeninhalt sichtbar."
+        },
+        {
+          "id": "problem-solving",
+          "elicitedBy": "Reihenweises Zählen verhindert Auslassen und Doppelzählung."
+        }
+      ],
+      "prerequisites": [
+        "Ebene Figuren sicher erkennen und zusammensetzen",
+        "Sicheres Zählen bis 20"
+      ],
+      "representations": [
+        "Kleines vollständig gefülltes Rechteck",
+        "Größeres Rechteckgitter",
+        "Unregelmäßige zusammenhängende Figur aus Einheitsquadraten"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Wenige Einheitsquadrate in einem kleinen Rechteck zählen",
+          "numberRange": "4 bis 8 Felder",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Ein Rechteck reihenweise strukturiert erfassen",
+          "numberRange": "8 bis 15 Felder",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Eine unregelmäßige zusammenhängende Figur ohne leere Rasterfelder mitzuzählen erfassen",
+          "numberRange": "6 bis 12 gefüllte Felder",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Drei Reihen mit je zwei Einheitsquadraten bedecken eine Fläche von sechs Einheitsquadraten.",
+      "successFeedback": "Du hast jedes gefüllte Einheitsquadrat genau einmal erfasst.",
+      "remediation": {
+        "strategy": "Zähle Reihe für Reihe und zeige auf jedes gefüllte Feld.",
+        "foundationStrategy": "Beginne mit einem kleinen vollständig gefüllten Rechteck.",
+        "representation": "Deutlich getrennte Einheitsquadrate",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Erkläre, warum zwei verschieden geformte Figuren dieselbe Fläche haben können.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Einheitsquadrate erkennen.",
+          "exerciseTypes": [
+            "area:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Lückenlose Bedeckung verstehen.",
+          "exerciseTypes": [
+            "area:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Kleine Rechtecke zählen.",
+          "exerciseTypes": [
+            "area:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Reihen strukturiert erfassen.",
+          "exerciseTypes": [
+            "area:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Flächen unabhängig von Lage bestimmen.",
+          "exerciseTypes": [
+            "area:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Unregelmäßige Flächen geordnet zählen.",
+          "exerciseTypes": [
+            "area:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Nur gefüllte Felder werden gezählt.",
+        "Jedes Feld wird genau einmal gezählt.",
+        "Die Figur bleibt vollständig im Raster."
+      ]
+    },
+    {
+      "id": "perimeter",
+      "label": "Umfang als Randlänge",
+      "curriculumArea": "Größen und Messen; Raum und Form",
+      "supportGoal": "Umfang als Länge des vollständigen äußeren Randwegs verstehen und bei einfachen Rasterfiguren bestimmen.",
+      "misconceptions": [
+        "Einheitsquadrate werden statt Randkanten gezählt.",
+        "Innere gemeinsame Kanten werden mitgezählt.",
+        "Eine Randseite wird ausgelassen.",
+        "Fläche und Umfang werden verwechselt."
+      ],
+      "hints": [
+        "Starte an einer Ecke und fahre einmal vollständig am äußeren Rand entlang.",
+        "Zähle nur Kanten, die an ein leeres Feld oder nach außen grenzen. Gemeinsame Innenkanten gehören nicht zum Rand."
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Verfolge den markierten Außenrand einmal vollständig und zähle keine Innenkante mit.",
+      "explanation": "Der Umfang ist die Länge des geschlossenen äußeren Randwegs. Jede sichtbare Randkante zählt eine Längeneinheit.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 4,
+        "maxValue": 30
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Ein markierter Randweg trennt Außenkanten von Flächenfeldern."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Gemeinsame Innenkanten werden begründet ausgeschlossen."
+        }
+      ],
+      "prerequisites": [
+        "Ebene Figuren sicher erkennen und zusammensetzen",
+        "Sicheres Zählen bis 30"
+      ],
+      "representations": [
+        "Kleines Rechteck mit markiertem Rand",
+        "Größeres Rechteck ohne Maßformel",
+        "Unregelmäßige Rasterfigur mit vollständig sichtbarem Randweg"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Den Rand eines kleinen Rechtecks Kante für Kante zählen",
+          "numberRange": "Umfang 6 bis 12",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Einen längeren rechteckigen Randweg ohne Formel erfassen",
+          "numberRange": "Umfang 10 bis 18",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Den vollständigen Rand einer unregelmäßigen Rasterfigur verfolgen",
+          "numberRange": "Umfang 10 bis 22",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Bei zwei benachbarten Einheitsquadraten zählt die gemeinsame Innenkante nicht zum Umfang.",
+      "successFeedback": "Du hast den äußeren Randweg vollständig verfolgt.",
+      "remediation": {
+        "strategy": "Beginne an der markierten Ecke und zähle jede Außenkante genau einmal.",
+        "foundationStrategy": "Beginne mit einem kleinen Rechteck und einem deutlich markierten Rand.",
+        "representation": "Kleines Raster mit hervorgehobenem Außenrand",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Erkläre, warum eine Figur mit gleich vielen Feldern einen anderen Umfang haben kann.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Außen- und Innenkante unterscheiden.",
+          "exerciseTypes": [
+            "perimeter:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Randweg als geschlossene Linie verstehen.",
+          "exerciseTypes": [
+            "perimeter:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Kleine Rechtecke umranden.",
+          "exerciseTypes": [
+            "perimeter:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Längere Randwege zählen.",
+          "exerciseTypes": [
+            "perimeter:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Randkanten sicher verfolgen.",
+          "exerciseTypes": [
+            "perimeter:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Unregelmäßige Figuren begründen.",
+          "exerciseTypes": [
+            "perimeter:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Nur äußere Randkanten werden gezählt.",
+        "Der Randweg ist geschlossen und vollständig.",
+        "Keine gemeinsame Innenkante wird mitgezählt."
+      ]
     }
   ],
   "wordProblems": [
@@ -6936,6 +7547,26 @@
           "Ei"
         ]
       }
+    ]
+  },
+  "planeGeometry": {
+    "entryRationale": "Grundformen und regelmäßige Muster führen zu Flächen als Bedeckung und Umfang als äußerem Rand. Fläche und Umfang werden als verschiedene Größen behandelt.",
+    "shapeLabels": {
+      "square": "Quadrat",
+      "rectangle": "Rechteck",
+      "triangle": "Dreieck"
+    },
+    "displayLabels": {
+      "shape": "Ebene Figur mit sichtbarem Außenrand",
+      "pattern": "Musterstreifen mit offener Fortsetzung",
+      "area": "Figur aus Einheitsquadraten",
+      "perimeter": "Rasterfigur mit markiertem Außenrand"
+    },
+    "patternSymbols": [
+      "Kreis",
+      "Quadrat",
+      "Dreieck",
+      "Stern"
     ]
   }
 }

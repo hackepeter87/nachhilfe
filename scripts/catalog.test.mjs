@@ -33,7 +33,7 @@ describe('Katalog-Buildpipeline', () => {
     const files = [
       'addition.md', 'subtraction.md', 'multiplication.md', 'division.md', 'place-value.md',
       'decompose-compose.md', 'neighbor-numbers.md', 'rounding.md', 'word-problems.md', 'symmetry.md',
-      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md', 'probability-combinatorics.md', 'time-mass-capacity.md'
+      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md', 'probability-combinatorics.md', 'time-mass-capacity.md', 'plane-geometry.md'
     ]
     for (const file of files) {
       const text = fs.readFileSync(path.join(directory, file), 'utf8')
@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 16,
-      catalogVersion: '0.17.0',
+      schemaVersion: 17,
+      catalogVersion: '0.18.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -86,6 +86,16 @@ describe('Katalog-Buildpipeline', () => {
     const missingCorrectOption = sourceCatalog()
     missingCorrectOption.quantityContent.capacity.referenceEstimates[0].options = ['10 ml', '50 ml', '500 ml']
     expect(() => parseAndValidateCatalog(JSON.stringify(missingCorrectOption))).toThrow('options ist ungültig')
+  })
+
+  it('lehnt unvollständige Geometriebezeichnungen ab', () => {
+    const missingLabel = sourceCatalog()
+    missingLabel.planeGeometry.displayLabels.perimeter = ''
+    expect(() => parseAndValidateCatalog(JSON.stringify(missingLabel))).toThrow('planeGeometry.displayLabels')
+
+    const duplicateSymbol = sourceCatalog()
+    duplicateSymbol.planeGeometry.patternSymbols[3] = duplicateSymbol.planeGeometry.patternSymbols[0]
+    expect(() => parseAndValidateCatalog(JSON.stringify(duplicateSymbol))).toThrow('planeGeometry.patternSymbols')
   })
 
   it('lehnt doppelte IDs und unbekannte Platzhalter ab', () => {

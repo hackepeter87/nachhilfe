@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { isValidCubeBuilding, type CubeBuilding, type ExerciseRepresentation } from '../domain'
+import { areaInUnitSquares, isConnectedGridFigure, isValidCubeBuilding, perimeterInUnitEdges, validateGridCells, type CubeBuilding, type ExerciseRepresentation } from '../domain'
 import { WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 
 const isValidGroupValue = (value: number) => Number.isInteger(value) && value >= 1 && value <= 10
@@ -390,6 +390,77 @@ export function MathRepresentation({ representation }: { representation: Exercis
       <div className={`math-visual quantity-measure quantity-measure--${quantityType}`} role="img" aria-label={description}>
         {content}
         <small>{textValue(values.equivalenceLabel)}</small>
+        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+      </div>
+    )
+  }
+
+  if (representation.kind === 'shape-grid') {
+    const mode = String(values.mode)
+    const shapeType = String(values.shapeType)
+    const partCount = Number(values.partCount ?? 1)
+    const valid = ['identify', 'decompose', 'compose'].includes(mode) && ['square', 'rectangle', 'triangle'].includes(shapeType) &&
+      typeof values.answerLabel === 'string' && (mode === 'identify' || [2, 4].includes(partCount))
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Figurendarstellung enthält ungültige Formdaten.</div>
+    const answerVisible = isValueVisible('answerLabel')
+    const action = mode === 'identify' ? 'eine einzelne Außenform' : mode === 'decompose' ? `eine Außenform mit ${partCount} sichtbaren Teilen` : 'zwei Teile mit einer gemeinsamen Außenform'
+    return (
+      <div className="math-visual shape-visual" role="img" aria-label={`${representation.label}. Gezeigt wird ${action}. ${answerVisible ? `Ergebnis ${values.answerLabel}.` : 'Die gesuchte Antwort bleibt unbekannt.'}`}>
+        <span className={`shape-outline shape-outline--${shapeType} shape-outline--${mode} shape-outline--parts-${partCount}`} aria-hidden="true" />
+        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+      </div>
+    )
+  }
+
+  if (representation.kind === 'pattern-strip') {
+    const sequenceCount = Number(values.sequenceCount)
+    const sequence = Number.isInteger(sequenceCount) && sequenceCount >= 5 && sequenceCount <= 8
+      ? Array.from({ length: sequenceCount }, (_, index) => String(values[`symbol${index}`]))
+      : []
+    const blockLength = Number(values.blockLength)
+    const allowed = ['Kreis', 'Quadrat', 'Dreieck', 'Stern']
+    const valid = sequence.length === sequenceCount && sequence.every((symbol) => allowed.includes(symbol)) &&
+      Number.isInteger(blockLength) && blockLength >= 2 && blockLength <= 3 && typeof values.answerLabel === 'string'
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Der Musterstreifen enthält ungültige Symbole.</div>
+    const answerVisible = isValueVisible('answerLabel')
+    const symbolClass = (symbol: string) => `pattern-symbol pattern-symbol--${symbol.toLowerCase()}`
+    return (
+      <div className="math-visual pattern-visual" role="img" aria-label={`${representation.label}. Sichtbare Folge: ${sequence.join(', ')}. ${answerVisible ? `Fortsetzung ${values.answerLabel}.` : 'Die Fortsetzung bleibt unbekannt.'}`}>
+        <div className="pattern-sequence" aria-hidden="true">{sequence.map((symbol, index) => <i className={symbolClass(symbol)} key={`${symbol}-${index}`} />)}<i className="pattern-symbol pattern-symbol--unknown">?</i></div>
+        <strong className="quantity-result">{answerVisible ? `Fortsetzung: ${textValue(values.answerLabel)}` : 'Fortsetzung: ?'}</strong>
+      </div>
+    )
+  }
+
+  if (representation.kind === 'unit-squares' || representation.kind === 'perimeter-path') {
+    const rows = Number(values.rows)
+    const columns = Number(values.columns)
+    const cells = Array.isArray(values.cells) ? values.cells.map(Number) : []
+    const valid = validateGridCells(rows, columns, cells) && isConnectedGridFigure(rows, columns, cells) && typeof values.answerLabel === 'string'
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Rasterfigur enthält ungültige oder getrennte Felder.</div>
+    const answerVisible = isValueVisible('answerLabel')
+    const isPerimeter = representation.kind === 'perimeter-path'
+    const knownCount = isPerimeter ? perimeterInUnitEdges(rows, columns, cells) : areaInUnitSquares(rows, columns, cells)
+    const description = isPerimeter
+      ? `${representation.label}. Eine zusammenhängende Figur mit vollständig markiertem Außenrand. ${answerVisible ? `Randlänge ${values.answerLabel}.` : 'Die Randlänge bleibt unbekannt.'}`
+      : `${representation.label}. Eine zusammenhängende Figur aus sichtbaren Einheitsquadraten. ${answerVisible ? `Fläche ${values.answerLabel}.` : 'Die Anzahl der Einheitsquadrate bleibt unbekannt.'}`
+    const edgeClasses = (index: number) => {
+      if (!isPerimeter || !cells[index]) return ''
+      const row = Math.floor(index / columns)
+      const column = index % columns
+      return [
+        row === 0 || !cells[index - columns] ? 'unit-cell--edge-top' : '',
+        row === rows - 1 || !cells[index + columns] ? 'unit-cell--edge-bottom' : '',
+        column === 0 || !cells[index - 1] ? 'unit-cell--edge-left' : '',
+        column === columns - 1 || !cells[index + 1] ? 'unit-cell--edge-right' : ''
+      ].filter(Boolean).join(' ')
+    }
+    if (answerVisible && Number(values.answerLabel) !== knownCount) return <div className="math-visual math-visual--error" role="alert">Die Rasterfigur und das aufgedeckte Ergebnis widersprechen sich.</div>
+    return (
+      <div className={`math-visual unit-grid-visual ${isPerimeter ? 'unit-grid-visual--perimeter' : 'unit-grid-visual--area'}`} role="img" aria-label={description}>
+        <div className="unit-grid" aria-hidden="true" style={{ '--unit-columns': columns, '--unit-rows': rows } as CSSProperties}>
+          {cells.map((cell, index) => <i className={`${cell ? 'unit-cell unit-cell--filled' : 'unit-cell'} ${edgeClasses(index)}`} key={index} />)}
+        </div>
         <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
       </div>
     )

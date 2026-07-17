@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 16
+export const CATALOG_SCHEMA_VERSION = 17
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts', 'probability', 'combinatorics', 'time', 'mass', 'capacity'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts', 'probability', 'combinatorics', 'time', 'mass', 'capacity', 'plane-shapes', 'patterns', 'area', 'perimeter'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -617,6 +617,11 @@ export function validateCatalog(catalog) {
   validateSpatialFolding(catalog.spatialFolding)
   validateDataAndCharts(catalog.dataAndCharts)
   validateChanceContent(catalog.chanceContent)
+  if (!isRecord(catalog.planeGeometry)) fail('planeGeometry fehlt')
+  requireText(catalog.planeGeometry, 'entryRationale', 'planeGeometry')
+  if (!isRecord(catalog.planeGeometry.shapeLabels) || !['square', 'rectangle', 'triangle'].every((key) => isText(catalog.planeGeometry.shapeLabels[key]))) fail('planeGeometry.shapeLabels ist unvollständig')
+  if (!isRecord(catalog.planeGeometry.displayLabels) || !['shape', 'pattern', 'area', 'perimeter'].every((key) => isText(catalog.planeGeometry.displayLabels[key]))) fail('planeGeometry.displayLabels ist unvollständig')
+  if (JSON.stringify(catalog.planeGeometry.patternSymbols) !== JSON.stringify(['Kreis', 'Quadrat', 'Dreieck', 'Stern'])) fail('planeGeometry.patternSymbols ist ungültig')
   validatePlaceholders(catalog)
   return catalog
 }

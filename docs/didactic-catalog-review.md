@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.18.0, Katalog 0.17.0, Schema 16, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.19.0, Katalog 0.18.0, Schema 17, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -51,6 +51,7 @@ Stand: App 0.18.0, Katalog 0.17.0, Schema 16, Status ready-for-review. Diese Dat
 - App 0.16.0, Katalog 0.15.0 und Schema 14: Tabellenlesen, Strichlisten, Bild- und Säulendiagramme sind als zwei adaptive Kompetenzen aktiv. Diagramme setzen tragfähiges Tabellenlesen voraus; fehlende Werte bleiben maskiert.
 - App 0.17.0, Katalog 0.16.0 und Schema 15: Wahrscheinlichkeit klassifiziert sichtbare Ergebnisräume und vergleicht gleich große Felder. Kombinatorik zählt kleine Paarungen systematisch und markiert auf Stufe 3 genau eine ausgeschlossene Paarung; Klassifikation und Anzahl bleiben bis zur Antwort unbekannt.
 - App 0.18.0, Katalog 0.17.0 und Schema 16: Zeit, Masse und Rauminhalt verwenden getrennte adaptive Kompetenzen. Uhr, Waage und Messgefäß zeigen ausschließlich bekannte Angaben; Uhrzeit, Zeitspanne oder Mengenwert bleiben bis zur richtigen Antwort unbekannt.
+- App 0.19.0, Katalog 0.18.0 und Schema 17: Ebene Figuren, Muster, Fläche und Umfang sind vier adaptive Kompetenzen. Einheitsfelder und Außenkanten sind bekannte zählbare Informationen; Formname, Fortsetzung und Zahlenwert bleiben bis zur Antwort unbekannt.
 
 ## Bewusst deaktiviert
 

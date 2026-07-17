@@ -29,7 +29,11 @@ const FOCUS_SKILLS: SkillId[] = [
   'combinatorics',
   'time',
   'mass',
-  'capacity'
+  'capacity',
+  'plane-shapes',
+  'patterns',
+  'area',
+  'perimeter'
 ]
 
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']
@@ -77,6 +81,10 @@ export function isSkillEligible(skillId: SkillId, progress: ProgressMap): boolea
   if (skillId === 'read-charts') {
     const tables = progress['read-tables']
     return Boolean(tables && tables.attempts >= 5 && tables.mastery >= 60)
+  }
+  if (skillId === 'area' || skillId === 'perimeter') {
+    const shapes = progress['plane-shapes']
+    return Boolean(shapes && shapes.attempts >= 5 && shapes.mastery >= 60)
   }
   return true
 }
@@ -137,6 +145,10 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
   if (skillId === 'combinatorics') return difficulty === 3 ? 'combinations-one-exclusion' : 'combinations-systematic'
   if (skillId === 'time') return difficulty === 1 ? 'time-full-half-hours' : difficulty === 2 ? 'time-five-minute-reading' : 'time-forward-duration'
   if (skillId === 'mass' || skillId === 'capacity') return difficulty === 1 ? `${skillId}-reference-estimate` : difficulty === 2 ? `${skillId}-complement-to-1000` : undefined
+  if (skillId === 'plane-shapes') return difficulty === 1 ? 'shape-recognition' : difficulty === 2 ? 'shape-decomposition' : 'shape-composition'
+  if (skillId === 'patterns') return difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-complex-block'
+  if (skillId === 'area') return difficulty === 3 ? 'area-irregular' : 'area-structured-count'
+  if (skillId === 'perimeter') return difficulty === 3 ? 'perimeter-irregular' : 'perimeter-trace-border'
   const candidates = skillId === 'addition'
     ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])
     : skillId === 'subtraction'

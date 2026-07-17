@@ -17,6 +17,7 @@ import {
 import { createFoldingOutcomes, foldingCellsKey, type FoldingTemplate } from './folding'
 import { createDataDistractors, sameDataValues, varyDataValues, type DataDisplayType, type DataSetTemplate } from './dataDisplays'
 import { classifyEvent, combinationCount, compareEventFrequency, type CombinationTemplate, type ProbabilityTemplate } from './chance'
+import { areaInUnitSquares, perimeterInUnitEdges } from './planeGeometry'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1445,6 +1446,170 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
   })
 }
 
+function planeShapes(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().planeGeometry
+  const shapeTypes = ['square', 'rectangle', 'triangle'] as const
+  let correctAnswer: string
+  let taskPrompt: string
+  let typeId: string
+  let subskillId: string
+  let representationValues: ExerciseRepresentation['values']
+  let options: AnswerOption[]
+  if (difficulty === 1) {
+    const shapeType = pick(random, shapeTypes)
+    correctAnswer = content.shapeLabels[shapeType]
+    taskPrompt = 'Welche ebene Figur siehst du?'
+    typeId = 'shape-identify'
+    subskillId = 'shape-recognition'
+    representationValues = { mode: 'identify', shapeType, answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({ value: content.shapeLabels[candidate], misconception: 'Außenform anhand eines falschen Merkmals bestimmt' })))
+  } else if (difficulty === 2) {
+    const shapeType = pick(random, ['square', 'rectangle'] as const)
+    const partCount = random() < 0.55 ? 2 : 4
+    correctAnswer = String(partCount)
+    taskPrompt = 'In wie viele Teile ist die ganze Figur sichtbar zerlegt?'
+    typeId = 'shape-decompose'
+    subskillId = 'shape-decomposition'
+    representationValues = { mode: 'decompose', shapeType, partCount, answerLabel: correctAnswer }
+    options = numberOptions(random, partCount, [
+      { value: partCount === 2 ? 3 : 2, misconception: 'Außenbereiche statt Teilflächen gezählt' },
+      { value: partCount + 1, misconception: 'Außenrand als zusätzliche Teilung gezählt' },
+      { value: partCount * 2, misconception: 'Jede sichtbare Linie doppelt gezählt' }
+    ])
+  } else {
+    const shapeType = pick(random, ['square', 'rectangle'] as const)
+    correctAnswer = content.shapeLabels[shapeType]
+    taskPrompt = 'Welche ganze Außenform entsteht aus den beiden sichtbaren Teilen?'
+    typeId = 'shape-compose'
+    subskillId = 'shape-composition'
+    representationValues = { mode: 'compose', shapeType, partCount: 2, answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({ value: content.shapeLabels[candidate], misconception: 'Teilform statt äußerer Gesamtform gewählt' })))
+  }
+  const values = {
+    taskPrompt,
+    answer: correctAnswer,
+    shapeModel: String(representationValues.shapeType),
+    partCount: Number(representationValues.partCount ?? 0)
+  }
+  return withMetadata({
+    ...base('plane-shapes', seed, difficulty, values),
+    ...contentFor('plane-shapes', values, difficulty),
+    typeId,
+    subskillId,
+    answerMode: 'choice',
+    correctAnswer,
+    options,
+    representation: representation('plane-shapes', difficulty, 'shape-grid', content.displayLabels.shape, representationValues, ['answerLabel'])
+  })
+}
+
+function patterns(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().planeGeometry
+  const symbols = shuffle(random, [...content.patternSymbols])
+  const block = difficulty === 1 ? symbols.slice(0, 2) : difficulty === 2 ? symbols.slice(0, 3) : [symbols[0]!, symbols[0]!, symbols[1]!]
+  const visibleLength = difficulty === 1 ? 5 : 7
+  const sequence = Array.from({ length: visibleLength }, (_, index) => block[index % block.length]!)
+  const correctAnswer = block[visibleLength % block.length]!
+  const taskPrompt = 'Welches Zeichen setzt das Muster richtig fort?'
+  const values = {
+    taskPrompt,
+    answer: correctAnswer,
+    blockLength: block.length,
+    patternKey: sequence.join('|')
+  }
+  const options = textOptions(random, correctAnswer, symbols.filter((symbol) => symbol !== correctAnswer).map((symbol) => ({ value: symbol, misconception: 'Musterblock an der falschen Stelle fortgesetzt' })))
+  return withMetadata({
+    ...base('patterns', seed, difficulty, values),
+    ...contentFor('patterns', values, difficulty),
+    typeId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-repeated-element',
+    subskillId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-complex-block',
+    answerMode: 'choice',
+    correctAnswer,
+    options,
+    representation: representation('patterns', difficulty, 'pattern-strip', content.displayLabels.pattern, {
+      sequenceCount: sequence.length,
+      blockLength: block.length,
+      answerLabel: correctAnswer,
+      ...Object.fromEntries(sequence.map((symbol, index) => [`symbol${index}`, symbol]))
+    }, ['answerLabel'])
+  })
+}
+
+const IRREGULAR_UNIT_FIGURES = [
+  { rows: 3, columns: 4, cells: [1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1] },
+  { rows: 4, columns: 4, cells: [1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1] },
+  { rows: 3, columns: 5, cells: [0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1] }
+] as const
+
+function unitFigure(random: () => number, difficulty: Difficulty) {
+  if (difficulty === 3) return pick(random, IRREGULAR_UNIT_FIGURES)
+  const rows = difficulty === 1 ? 2 : 3
+  const columns = difficulty === 1 ? integer(random, 2, 4) : integer(random, 3, 5)
+  return { rows, columns, cells: Array.from({ length: rows * columns }, () => 1) }
+}
+
+function area(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().planeGeometry
+  const figure = unitFigure(random, difficulty)
+  const answer = areaInUnitSquares(figure.rows, figure.columns, [...figure.cells])
+  const taskPrompt = 'Wie viele Einheitsquadrate bedecken die grüne Fläche?'
+  const values = {
+    taskPrompt,
+    answer,
+    rows: figure.rows,
+    columns: figure.columns,
+    figureKey: figure.cells.join('')
+  }
+  return withMetadata({
+    ...base('area', seed, difficulty, values),
+    ...contentFor('area', values, difficulty),
+    typeId: difficulty === 3 ? 'area-irregular-unit-squares' : 'area-rectangle-unit-squares',
+    subskillId: difficulty === 3 ? 'area-irregular' : 'area-structured-count',
+    answerMode: 'choice',
+    correctAnswer: String(answer),
+    options: numberOptions(random, answer, [
+      { value: answer - 1, misconception: 'Ein gefülltes Feld ausgelassen' },
+      { value: answer + 1, misconception: 'Ein leeres Feld mitgezählt' },
+      { value: figure.rows + figure.columns, misconception: 'Reihen und Spalten addiert' }
+    ]),
+    representation: representation('area', difficulty, 'unit-squares', content.displayLabels.area, { rows: figure.rows, columns: figure.columns, cells: [...figure.cells], answerLabel: String(answer) }, ['answerLabel'])
+  })
+}
+
+function perimeter(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().planeGeometry
+  const figure = unitFigure(random, difficulty)
+  const cells = [...figure.cells]
+  const answer = perimeterInUnitEdges(figure.rows, figure.columns, cells)
+  const areaValue = areaInUnitSquares(figure.rows, figure.columns, cells)
+  const taskPrompt = 'Wie viele Längeneinheiten ist der vollständig markierte Außenrand lang?'
+  const values = {
+    taskPrompt,
+    answer,
+    rows: figure.rows,
+    columns: figure.columns,
+    figureKey: figure.cells.join('')
+  }
+  return withMetadata({
+    ...base('perimeter', seed, difficulty, values),
+    ...contentFor('perimeter', values, difficulty),
+    typeId: difficulty === 3 ? 'perimeter-irregular-path' : 'perimeter-rectangle-path',
+    subskillId: difficulty === 3 ? 'perimeter-irregular' : 'perimeter-trace-border',
+    answerMode: 'choice',
+    correctAnswer: String(answer),
+    options: numberOptions(random, answer, [
+      { value: answer - 2, misconception: 'Eine Randseite ausgelassen' },
+      { value: answer + 2, misconception: 'Eine Innenkante mitgezählt' },
+      { value: areaValue, misconception: 'Einheitsquadrate statt Randkanten gezählt' }
+    ]),
+    representation: representation('perimeter', difficulty, 'perimeter-path', content.displayLabels.perimeter, { rows: figure.rows, columns: figure.columns, cells, answerLabel: String(answer) }, ['answerLabel'])
+  })
+}
+
 function bodyViews(seed: number, difficulty: Difficulty): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().spatialViews
@@ -1940,6 +2105,10 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'time': return time(seed, difficulty)
     case 'mass': return measurementQuantity('mass', seed, difficulty)
     case 'capacity': return measurementQuantity('capacity', seed, difficulty)
+    case 'plane-shapes': return planeShapes(seed, difficulty)
+    case 'patterns': return patterns(seed, difficulty)
+    case 'area': return area(seed, difficulty)
+    case 'perimeter': return perimeter(seed, difficulty)
   }
 }
 

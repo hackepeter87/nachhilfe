@@ -353,6 +353,60 @@ describe('MathRepresentation Größen', () => {
   })
 })
 
+describe('MathRepresentation ebene Geometrie', () => {
+  it('zeigt eine zerlegte Figur ohne die gesuchte Antwort vorwegzunehmen', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'shape-grid', visibility: 'always', label: 'Ebene Figur',
+      values: { mode: 'decompose', shapeType: 'rectangle', partCount: 4, answerLabel: '4' },
+      valueRoles: { knownValues: ['mode', 'shapeType', 'partCount'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /4 sichtbaren Teilen.*Antwort bleibt unbekannt/ })).toBeVisible()
+    expect(container.querySelector('.shape-outline--parts-4')).toBeVisible()
+    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+  })
+
+  it('zeigt den vollständigen Musterstreifen mit offener Fortsetzung', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'pattern-strip', visibility: 'always', label: 'Muster',
+      values: { sequenceCount: 5, blockLength: 2, symbol0: 'Kreis', symbol1: 'Quadrat', symbol2: 'Kreis', symbol3: 'Quadrat', symbol4: 'Kreis', answerLabel: 'Quadrat' },
+      valueRoles: { knownValues: ['sequenceCount', 'blockLength', 'symbol0', 'symbol1', 'symbol2', 'symbol3', 'symbol4'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Kreis, Quadrat, Kreis, Quadrat, Kreis.*Fortsetzung bleibt unbekannt/ })).toBeVisible()
+    expect(container.querySelectorAll('.pattern-sequence .pattern-symbol')).toHaveLength(6)
+    expect(container).not.toHaveTextContent('Fortsetzung: Quadrat')
+  })
+
+  it.each([
+    ['unit-squares', 'Anzahl der Einheitsquadrate bleibt unbekannt'],
+    ['perimeter-path', 'Randlänge bleibt unbekannt']
+  ] as const)('maskiert bei %s das numerische Ergebnis', (kind, description) => {
+    const representation: ExerciseRepresentation = {
+      kind, visibility: 'always', label: 'Rasterfigur',
+      values: { rows: 2, columns: 3, cells: [1, 1, 1, 1, 1, 1], answerLabel: kind === 'unit-squares' ? '6' : '10' },
+      valueRoles: { knownValues: ['rows', 'columns', 'cells'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
+    expect(screen.getByRole('img', { name: new RegExp(description) })).toBeVisible()
+    expect(container.querySelectorAll('.unit-cell--filled')).toHaveLength(6)
+    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: ['answerLabel'] }
+    }} />)
+    expect(container.querySelector('.quantity-result')).toHaveTextContent(`Ergebnis: ${kind === 'unit-squares' ? '6' : '10'}`)
+  })
+
+  it('lehnt eine nicht zusammenhängende Rasterfigur sichtbar ab', () => {
+    render(<RuntimeMathRepresentation representation={{
+      kind: 'unit-squares', visibility: 'always', label: 'Ungültige Figur',
+      values: { rows: 2, columns: 2, cells: [1, 0, 0, 1], answerLabel: '2' },
+      valueRoles: { knownValues: ['rows', 'columns', 'cells'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige oder getrennte Felder')
+  })
+})
+
 describe('MathRepresentation mathematische Rollen', () => {
   it('maskiert das Ziel eines Rechenstrichs und deckt es kontrolliert auf', () => {
     const representation: ExerciseRepresentation = {

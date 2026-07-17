@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(16)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.17.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(17)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.18.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -277,6 +277,13 @@ describe('versionierter Aufgabenkatalog', () => {
     const missingCorrectOption = structuredClone(readPublicCatalog()) as TaskCatalog
     missingCorrectOption.quantityContent.capacity.referenceEstimates[0]!.options = ['10 ml', '50 ml', '500 ml']
     expect(validateTaskCatalog(missingCorrectOption)).toBe(false)
+  })
+
+  it('validiert die verwendeten Geometriebezeichnungen und eindeutigen Mustersymbole', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    expect(catalog.planeGeometry.shapeLabels.square).toBe('Quadrat')
+    catalog.planeGeometry.patternSymbols[3] = catalog.planeGeometry.patternSymbols[0]
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('validiert Körpervorlagen, Stufen und feste Blickrichtungen', () => {

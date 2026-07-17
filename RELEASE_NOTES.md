@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Ebene Figuren, Muster, Fläche und Umfang 0.19.0
+
+- Die neuen adaptiven Kompetenzen `plane-shapes`, `patterns`, `area` und `perimeter` trennen Form, Regelmäßigkeit, Bedeckung und Randlänge fachlich.
+- Drei wirksame Stufen führen von Grundform, AB-Muster und kleinen Rechtecken zu Zusammensetzung, komplexerem Musterblock und unregelmäßigen zusammenhängenden Rasterfiguren.
+- Katalog 0.18.0 und Schema 17 ergänzen `planeGeometry`, vollständige Kompetenzakten und mobile Bezeichnungen. Rastervalidierung, Zusammenhang, Fläche und Randberechnung bleiben reine TypeScript-Logik.
+- Fläche und Umfang werden erst nach fünf Figurenversuchen und Lernwert 60 ausgewählt. Fehler führen zu einer leichteren verwandten, nicht identischen Aufgabe.
+- Außenform, Folge, Einheitsfelder und Randkanten sind bekannte Lerninformationen; Formname, Fortsetzung und Zahlenwert bleiben bis zur richtigen Antwort unbekannt.
+- Formeln, Maßstab, freie Konstruktion und komplex zusammengesetzte Umfänge bleiben ausgeschlossen. Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 333 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und 18 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.19.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Zeit, Masse und Rauminhalt 0.18.0
 
 - Die neuen adaptiven Kompetenzen `time`, `mass` und `capacity` führen von vertrauten Angaben über Ergänzen zu einfachen Zeitspannen, Summen und Unterschieden.

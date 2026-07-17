@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.17.0',
-    schemaVersion: 16,
-    appVersion: '0.18.0'
+    catalogVersion: '0.18.0',
+    schemaVersion: 17,
+    appVersion: '0.19.0'
   })
 
   await page.reload()
@@ -278,6 +278,129 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
   expect(seen).toEqual(new Set(['time', 'mass', 'capacity']))
+})
+
+test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'plane-shapes', 'patterns'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+  await onboard(page, 'Form')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+  const seen = new Set<string>()
+  for (let focus = 0; focus < 2; focus += 1) {
+    await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+    await expect(page.locator('.quantity-result')).toHaveText(/\?$/)
+    const shape = page.locator('.shape-visual')
+    if (await shape.isVisible().catch(() => false)) {
+      seen.add('plane-shapes')
+      const outline = shape.locator('.shape-outline')
+      const answer = await outline.evaluate((element) => element.classList.contains('shape-outline--square') ? 'Quadrat' : element.classList.contains('shape-outline--rectangle') ? 'Rechteck' : 'Dreieck')
+      await page.getByRole('button', { name: answer, exact: true }).click()
+      expect(await page.locator('.session-page').evaluate((element) => {
+        const bounds = element.getBoundingClientRect()
+        return bounds.left >= 0 && bounds.right <= window.innerWidth
+      })).toBe(true)
+      await page.screenshot({ path: testInfo.outputPath('ebene-figur-375x812.png'), fullPage: true })
+    } else {
+      seen.add('patterns')
+      const sequence = page.locator('.pattern-sequence .pattern-symbol:not(.pattern-symbol--unknown)')
+      const count = await sequence.count()
+      const answer = await sequence.nth(count - 2).evaluate((element) => element.classList.contains('pattern-symbol--kreis') ? 'Kreis' : element.classList.contains('pattern-symbol--quadrat') ? 'Quadrat' : element.classList.contains('pattern-symbol--dreieck') ? 'Dreieck' : 'Stern')
+      await page.getByRole('button', { name: answer, exact: true }).click()
+      expect(await page.locator('.session-page').evaluate((element) => {
+        const bounds = element.getBoundingClientRect()
+        return bounds.left >= 0 && bounds.right <= window.innerWidth
+      })).toBe(true)
+      await page.screenshot({ path: testInfo.outputPath('muster-375x812.png'), fullPage: true })
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+  expect(seen).toEqual(new Set(['plane-shapes', 'patterns']))
+})
+
+test('Fläche und Umfang nutzen bekannte Raster, aber maskieren das Ergebnis', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'area', 'perimeter'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+  await onboard(page, 'Raster')
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('mathe-reise')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('progress', 'readwrite')
+      transaction.objectStore('progress').put({
+        skillId: 'plane-shapes', attempts: 5, correctAnswers: 4, hintsUsed: 0,
+        lastPracticedAt: '2026-07-17T10:00:00.000Z', difficulty: 2,
+        learningPhase: 'independent-practice', mastery: 60, recentErrors: 0,
+        correctStreak: 2, lastVariantKey: null, status: 'practicing', subskills: {}
+      })
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+    database.close()
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map((registration) => registration.unregister()))
+    const cacheNames = await caches.keys()
+    await Promise.all(cacheNames.map((name) => caches.delete(name)))
+  })
+  await page.reload()
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+  const seen = new Set<string>()
+  for (let focus = 0; focus < 2; focus += 1) {
+    const grid = page.locator('.unit-grid-visual')
+    await expect(grid).toBeVisible()
+    await expect(grid.locator('.quantity-result')).toHaveText('Ergebnis: ?')
+    await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+    let answer: number
+    if (await grid.evaluate((element) => element.classList.contains('unit-grid-visual--area'))) {
+      seen.add('area')
+      answer = await grid.locator('.unit-cell--filled').count()
+      await page.screenshot({ path: testInfo.outputPath('flaeche-375x812.png'), fullPage: true })
+    } else {
+      seen.add('perimeter')
+      answer = await grid.locator('.unit-cell--filled').evaluateAll((cells) => cells.reduce((sum, cell) => sum + ['top', 'right', 'bottom', 'left'].filter((edge) => cell.classList.contains(`unit-cell--edge-${edge}`)).length, 0))
+      await page.screenshot({ path: testInfo.outputPath('umfang-375x812.png'), fullPage: true })
+    }
+    await page.getByRole('button', { name: String(answer), exact: true }).click()
+    await expect(grid.locator('.quantity-result')).toHaveText(`Ergebnis: ${answer}`)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    if (focus === 1) {
+      await page.setViewportSize({ width: 812, height: 375 })
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    }
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+  expect(seen).toEqual(new Set(['area', 'perimeter']))
 })
 
 test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt', async ({ page }, testInfo) => {

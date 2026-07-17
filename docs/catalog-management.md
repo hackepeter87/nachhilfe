@@ -25,15 +25,15 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 
 ```json
 {
-  "schemaVersion": 16,
-  "catalogVersion": "0.17.0",
+  "schemaVersion": 17,
+  "catalogVersion": "0.18.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review"
 }
 ```
 
-Schema 16 ergänzt Zeit sowie katalogisierte Bezugsgrößen für Masse und Rauminhalt in `quantityContent`. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
+Schema 17 ergänzt `planeGeometry` für Figuren-, Muster-, Flächen- und Umfangsbezeichnungen; die mathematische Rasterlogik bleibt in TypeScript. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
 
 - `schemaVersion` bezeichnet die technische JSON-Struktur. Eine inkompatible Änderung erfordert kompatiblen Anwendungscode.
 - `catalogVersion` bezeichnet die fachliche Inhaltsversion und folgt SemVer.
@@ -96,8 +96,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build --platform linux/amd64 -t mathe-reise:0.17.0 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.17.0
+docker build --platform linux/amd64 -t mathe-reise:0.19.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.19.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.

@@ -28,7 +28,11 @@ export const SKILL_IDS = [
   'combinatorics',
   'time',
   'mass',
-  'capacity'
+  'capacity',
+  'plane-shapes',
+  'patterns',
+  'area',
+  'perimeter'
 ] as const
 
 export type SkillId = typeof SKILL_IDS[number]
@@ -57,7 +61,7 @@ export interface AnswerOption {
   misconception?: string
 }
 
-export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper' | 'data-display' | 'chance-display' | 'combination-display' | 'clock' | 'mass-scale' | 'capacity-vessel'
+export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper' | 'data-display' | 'chance-display' | 'combination-display' | 'clock' | 'mass-scale' | 'capacity-vessel' | 'shape-grid' | 'pattern-strip' | 'unit-squares' | 'perimeter-path'
 
 export interface NumberLineJump {
   from: number

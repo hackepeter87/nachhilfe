@@ -30,7 +30,7 @@ import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisp
 import { isValidCombinationTemplate, isValidProbabilityTemplate, type CombinationTemplate, type ProbabilityTemplate } from '../domain/chance'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 16
+export const CATALOG_SCHEMA_VERSION = 17
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -458,6 +458,13 @@ export interface ChanceContent {
   combinationTemplates: CombinationTemplate[]
 }
 
+export interface PlaneGeometryContent {
+  entryRationale: string
+  shapeLabels: Record<'square' | 'rectangle' | 'triangle', string>
+  displayLabels: Record<'shape' | 'pattern' | 'area' | 'perimeter', string>
+  patternSymbols: [string, string, string, string]
+}
+
 export interface TaskCatalog extends CatalogMetadata {
   representationPolicy: RepresentationPolicy
   fieldUsage: Record<'representationPolicy' | 'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
@@ -481,6 +488,7 @@ export interface TaskCatalog extends CatalogMetadata {
   spatialFolding: SpatialFoldingContent
   dataAndCharts: DataAndChartsContent
   chanceContent: ChanceContent
+  planeGeometry: PlaneGeometryContent
 }
 
 type FetchCatalog = (input: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>
@@ -692,6 +700,16 @@ function isChanceContent(value: unknown): value is ChanceContent {
     [1, 2, 3].every((difficulty) => probabilityTemplates.some((template) => (template as ProbabilityTemplate).difficulty === difficulty) && combinationTemplates.some((template) => (template as CombinationTemplate).difficulty === difficulty))
 }
 
+function isPlaneGeometryContent(value: unknown): value is PlaneGeometryContent {
+  if (!isRecord(value) || !isNonEmptyString(value.entryRationale) || !isRecord(value.shapeLabels) || !isRecord(value.displayLabels)) return false
+  const shapeLabels = value.shapeLabels
+  const displayLabels = value.displayLabels
+  if (!['square', 'rectangle', 'triangle'].every((key) => isNonEmptyString(shapeLabels[key]))) return false
+  if (!['shape', 'pattern', 'area', 'perimeter'].every((key) => isNonEmptyString(displayLabels[key]))) return false
+  return Array.isArray(value.patternSymbols) &&
+    JSON.stringify(value.patternSymbols) === JSON.stringify(['Kreis', 'Quadrat', 'Dreieck', 'Stern'])
+}
+
 const REQUIREMENT_FIELDS = [
   'requiresNeighborIdentification',
   'requiresRepresentationChoice',
@@ -901,7 +919,8 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) ||
     !isSpatialViewsContent(value.spatialViews) || !isSpatialRotationsContent(value.spatialRotations) ||
-    !isSpatialFoldingContent(value.spatialFolding) || !isDataAndChartsContent(value.dataAndCharts) || !isChanceContent(value.chanceContent)) return false
+    !isSpatialFoldingContent(value.spatialFolding) || !isDataAndChartsContent(value.dataAndCharts) || !isChanceContent(value.chanceContent) ||
+    !isPlaneGeometryContent(value.planeGeometry)) return false
   return hasOnlyKnownPlaceholders(value)
 }
 

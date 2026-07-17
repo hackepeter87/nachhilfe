@@ -53,7 +53,11 @@ describe('mathematische Rollen aller Darstellungen', () => {
       combinatorics: ['combinationCount'],
       time: ['answerLabel'],
       mass: ['answerLabel'],
-      capacity: ['answerLabel']
+      capacity: ['answerLabel'],
+      'plane-shapes': ['answerLabel'],
+      patterns: ['answerLabel'],
+      area: ['answerLabel'],
+      perimeter: ['answerLabel']
     }
     for (const [skillId, expected] of Object.entries(expectedUnknowns)) {
       const exercise = generateExercise(skillId as (typeof SKILL_IDS)[number], 42, 1)
