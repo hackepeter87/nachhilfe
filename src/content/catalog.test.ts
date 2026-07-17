@@ -24,8 +24,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(5)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.6.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(6)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.7.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -38,7 +38,7 @@ describe('versionierter Aufgabenkatalog', () => {
   })
 
   it.each([
-    ['schemaVersion', 6],
+    ['schemaVersion', 5],
     ['catalogVersion', 'keine-version'],
     ['catalogId', ''],
     ['status', 'review'],
@@ -130,15 +130,27 @@ describe('versionierter Aufgabenkatalog', () => {
     })
   })
 
-  it('ordnet Sachaufgaben einer Mengenbeziehung und vorlagenspezifischen Fragen zu', () => {
+  it('ordnet Sachaufgaben intern korrekt zu und liefert konkrete Modellierungsoptionen', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     const operationByRelationship = { join: '+', combine: '+', separate: '−', compare: '−', complement: '−', 'equal-groups': '·', sharing: ':' }
     catalog.wordProblems.forEach((template) => {
       expect(template.operation).toBe(operationByRelationship[template.relationship as keyof typeof operationByRelationship])
       expect(new Set([template.question, ...template.questionDistractors]).size).toBe(3)
-      expect(new Set([template.relationshipLabel, ...template.relationshipDistractors]).size).toBe(3)
+      expect(new Set([template.situation, ...template.situationDistractors]).size).toBe(3)
+      expect(new Set([template.modelType, ...template.modelDistractors]).size).toBe(3)
+      expect(new Set([template.equation, ...template.equationDistractors]).size).toBe(3)
       expect(template.plausibility.options.filter((option) => option.correct)).toHaveLength(1)
     })
+    expect(catalog.wordProblemSteps.modellingProgression.map((stage) => stage.stage)).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(JSON.stringify(catalog.wordProblemSteps)).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
+  })
+
+  it('fördert keine einfache Schlüsselwortregel', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const withZusammen = catalog.wordProblems.filter((template) => /zusammen/i.test(template.story))
+    expect(new Set(withZusammen.map((template) => template.operation))).toEqual(new Set(['+', '·']))
+    const withMehr = catalog.wordProblems.filter((template) => /mehr/i.test(template.story))
+    expect(withMehr.some((template) => template.relationship === 'compare' && template.operation === '−')).toBe(true)
   })
 
   it('hält alle Laufzeitkompetenzen aktiv und vorbereitete Themen unsichtbar', () => {

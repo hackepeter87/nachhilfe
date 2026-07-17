@@ -14,6 +14,17 @@ async function finishCurrentRound(page: Page) {
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
       continue
     }
+    const modelContinue = page.getByRole('button', { name: 'Weiter zur Rechnung' })
+    if (await modelContinue.isVisible().catch(() => false)) {
+      await modelContinue.click()
+      continue
+    }
+    const guidedNumberInput = page.getByLabel('Dein Ergebnis')
+    if (await guidedNumberInput.isVisible().catch(() => false)) {
+      await guidedNumberInput.fill('9999')
+      await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
+      continue
+    }
     const numberInput = page.getByLabel('Deine Antwort')
     if (await numberInput.isVisible().catch(() => false)) {
       await numberInput.fill('9999')
@@ -80,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.6.0',
-    schemaVersion: 5,
-    appVersion: '0.8.0'
+    catalogVersion: '0.7.0',
+    schemaVersion: 6,
+    appVersion: '0.9.0'
   })
 
   await page.reload()
@@ -146,6 +157,54 @@ test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt',
   expect(counts.totalPoints).toBe(counts.groups * counts.pointsPerGroup[0]!)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('punktgruppen-375x812.png'), fullPage: true })
+})
+
+test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen Rechnung', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as {
+      skills: Array<{ id: string; releaseStatus: string }>
+      wordProblems: Array<{ id: string }>
+    }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'word-problem'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    catalog.wordProblems = catalog.wordProblems.filter((template) => template.id === 'shells-addition')
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Modell')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    const input = page.getByLabel('Deine Antwort')
+    await input.fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  await expect(page.getByText('1. Was wird gesucht?')).toBeVisible()
+  await expect(page.getByText(/Mengenbeziehung|Welche Rechenart/i)).toHaveCount(0)
+  await page.getByRole('button', { name: 'Wie viele Muscheln hat Mila jetzt?' }).click()
+  await page.getByRole('button', { name: /^Mila hat zuerst/ }).click()
+  const model = page.getByRole('img', { name: /neue Gesamtmenge unbekannt/i })
+  await expect(model).toBeVisible()
+  await expect(model).toContainText('?')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('sachaufgabe-modell-375x812.png'), fullPage: true })
+  await page.getByRole('button', { name: 'Weiter zur Rechnung' }).click()
+  const equationButton = page.getByRole('button', { name: /^\d+ \+ \d+ = \?$/ })
+  const equation = await equationButton.textContent()
+  if (!equation) throw new Error('Passende Rechnung fehlt')
+  const [first, second] = equation.match(/\d+/g)?.map(Number) ?? []
+  if (first === undefined || second === undefined) throw new Error('Rechnung ist nicht lesbar')
+  await equationButton.click()
+  await page.getByLabel('Dein Ergebnis').fill(String(first + second))
+  await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
+  await page.getByRole('button', { name: `Mila hat jetzt ${first + second} Muscheln.` }).click()
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click()
 })
 
 test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', async ({ page }, testInfo) => {

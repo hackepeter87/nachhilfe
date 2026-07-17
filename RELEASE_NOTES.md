@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Sachaufgaben als Modellierungsprozess 0.9.0
+
+- Sachaufgaben beginnen mit der konkret gesuchten Größe und der Handlung der Geschichte. Technische Kategorien wie „Mengenbeziehung“ und eine isolierte Rechenartauswahl sind aus dem Kinderablauf entfernt.
+- Stufe 1 untersucht ein sichtbares unbekanntenhaltiges Modell; Stufe 2 und 3 wählen genau ein passendes Balken- oder Gruppenbild aus drei konkreten Darstellungen. Das Modell steht immer vor der Gleichung.
+- Balkenmodelle zeigen nur bekannte Größen und markieren die gesuchte Größe mit `?`. Veränderung, Teil-Ganzes, Vergleich, Ergänzen und zwei aufeinanderfolgende Veränderungen besitzen eigene Darstellungen.
+- Gruppenmodelle unterscheiden eine unbekannte Gesamtzahl von einer unbekannten Gruppengröße. Das Kind berechnet Ergebnisse anschließend selbst über eine Zahleneingabe statt über Ergebnis-Multiple-Choice.
+- Der zentrale Katalog steigt auf Version 0.7.0 und Schema 6. Vorlagen enthalten konkrete Situationen, relevante Alternativen, Modelltypen, Modellalternativen, Gleichungen, Gleichungsalternativen und eine dokumentierte siebenstufige Modellierungsfolge; Mathematik und Rendering bleiben in TypeScript.
+- Generator-, Katalog-, Komponenten- und Mobile-E2E-Tests prüfen Reihenfolge, eindeutige Modelle, unbekannte Ergebnisdarstellung, Gegenbeispiele zu Schlüsselwortregeln, eigene Berechnung und mobile Bedienbarkeit.
+
+Der Katalog bleibt `ready-for-review`. Eine Freigabe durch eine Lehrkraft, Unterrichtserprobung und ein echter iPhone-Test sind weiterhin nicht dokumentiert. Automatisierte Konsistenzprüfungen belegen keine pädagogische Wirksamkeit.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 174 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und fünf Playwright-Szenarien jeweils gegen Vite Preview und den Container. Die vollständige Runde lief nach Reload und Offline-Neustart; der neue Sachaufgabentest prüfte bei `375 x 812` die Reihenfolge von Suchgröße, Handlung, unbekanntenhaltigem Modell, Gleichung und eigener Berechnung ohne horizontales Overflow. Das OCI-Image `mathe-reise:0.9.0` und `mathe-reise:local` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Podman war nicht installiert und wurde nicht als ausgeführt behauptet.
+
 ## Größen und Messen 0.8.0
 
 - Geld ist als produktive Kompetenz aktiviert: ganze Euro mit sichtbaren Münzgruppen, gemischte Euro-/Cent-Beträge und Wechselgeld aus 10 Euro. Alle Rechnungen erfolgen intern exakt in Cent.

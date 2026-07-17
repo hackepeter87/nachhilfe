@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.6.0',
-      schemaVersion: 5,
-      appVersion: '0.8.0'
+      catalogVersion: '0.7.0',
+      schemaVersion: 6,
+      appVersion: '0.9.0'
     })
   })
 
@@ -29,14 +29,14 @@ describe('Sitzungsplanung', () => {
       const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
 
       const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
-      nextCatalog.catalogVersion = '0.6.1'
+      nextCatalog.catalogVersion = '0.7.1'
       nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.6.0')
+      expect(runningSession.catalogVersion).toBe('0.7.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
-      expect(nextSession.catalogVersion).toBe('0.6.1')
+      expect(nextSession.catalogVersion).toBe('0.7.1')
     } finally {
       setTaskCatalog(originalCatalog)
     }

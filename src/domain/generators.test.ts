@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, mirrorGrid, roundToUnit } from './generators'
-import { getTaskCatalog } from '../content/catalog'
+import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
 
 const skills: SkillId[] = [
@@ -21,7 +21,8 @@ describe('deterministische Aufgabengeneratoren', () => {
       expect(first.options.filter((option) => option.value === first.correctAnswer)).toHaveLength(1)
     }
     first.steps?.forEach((step) => {
-      expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
+      if (step.options) expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
+      else expect(['number', 'continue']).toContain(step.interaction)
     })
   })
 
@@ -197,7 +198,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
-  it('hält alle Sachaufgabenschritte eindeutig und rechnerisch konsistent', () => {
+  it('führt Sachaufgaben vom Gesuchten über das Modell zur eigenen Rechnung', () => {
     for (const difficulty of [1, 2, 3] as const) {
       for (let seed = 1; seed <= 200; seed += 1) {
         const exercise = generateExercise('word-problem', seed, difficulty)
@@ -210,13 +211,39 @@ describe('deterministische Aufgabengeneratoren', () => {
         const expected = secondOperation === '+' ? intermediate + third : secondOperation === '−' ? intermediate - third : intermediate
         expect(Number(exercise.variant.values.intermediate)).toBe(intermediate)
         expect(Number(exercise.variant.values.result)).toBe(expected)
-        const expectedSteps = difficulty === 1 ? 5 : difficulty === 2 ? 7 : secondOperation ? 10 : 8
+        const expectedSteps = difficulty < 3 ? 6 : secondOperation ? 10 : 8
         expect(exercise.steps).toHaveLength(expectedSteps)
         expect(exercise.prompt).not.toMatch(/\{\w+\}/)
-        expect(exercise.steps?.some((step) => step.id === 'relationship')).toBe(true)
+        const ids = exercise.steps?.map((step) => step.id) ?? []
+        expect(ids[0]).toBe('question')
+        expect(ids).not.toContain('relationship')
+        expect(ids).not.toContain('operation')
+        expect(ids.indexOf('model')).toBeLessThan(ids.indexOf('equation'))
+        expect(ids.indexOf('equation')).toBeLessThan(ids.indexOf('calculate'))
+        const calculationStep = exercise.steps?.find((step) => step.id === 'calculate')
+        expect(calculationStep?.interaction).toBe('number')
+        expect(calculationStep?.options).toBeUndefined()
+        expect(exercise.steps?.map((step) => step.prompt).join(' ')).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
+        const modelStep = exercise.steps?.find((step) => step.id === 'model')
+        expect(modelStep).toBeDefined()
+        if (!modelStep) throw new Error('Modellschritt fehlt')
+        if (difficulty === 1) {
+          expect(modelStep.interaction).toBe('continue')
+          expect(modelStep.representation?.values).not.toHaveProperty('result')
+          expect(modelStep.representation?.values).not.toHaveProperty('intermediate')
+        } else {
+          expect(modelStep.options).toHaveLength(3)
+          expect(new Set(modelStep.options?.map((option) => option.value)).size).toBe(3)
+          expect(modelStep.options?.filter((option) => option.value === modelStep.correctAnswer)).toHaveLength(1)
+          modelStep.options?.forEach((option) => {
+            expect(option.representation?.values).not.toHaveProperty('result')
+            expect(option.representation?.values).not.toHaveProperty('intermediate')
+            if (option.value === 'equal-groups-share') expect(option.representation?.values).not.toHaveProperty('size')
+          })
+        }
         exercise.steps?.forEach((step) => {
-          expect(step.options.length).toBeGreaterThanOrEqual(3)
-          expect(step.options.length).toBeLessThanOrEqual(4)
+          if (!step.options) return
+          expect(step.options).toHaveLength(3)
           expect(new Set(step.options.map((option) => option.value)).size).toBe(step.options.length)
           expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
         })
@@ -254,14 +281,12 @@ describe('deterministische Aufgabengeneratoren', () => {
       const questionStep = exercise.steps?.find((step) => step.id === 'question')
       expect(questionStep).toBeDefined()
       if (!questionStep) throw new Error('Frageschritt fehlt')
-      const expectedQuestions = [template.question, ...template.questionDistractors].map((question) =>
-        question.replaceAll('{first}', String(exercise.variant.values.first)).replaceAll('{second}', String(exercise.variant.values.second))
-      )
-      expect(new Set(questionStep.options.map((option) => option.value))).toEqual(new Set(expectedQuestions))
+      const expectedQuestions = [template.question, ...template.questionDistractors].map((question) => renderCatalogText(question, exercise.variant.values))
+      expect(new Set(questionStep.options?.map((option) => option.value))).toEqual(new Set(expectedQuestions))
       const plausibility = exercise.steps?.find((step) => step.id === 'plausibility')
       expect(plausibility).toBeDefined()
       if (!plausibility) throw new Error('Plausibilitätsschritt fehlt')
-      expect(plausibility.options.filter((option) => option.value === plausibility.correctAnswer)).toHaveLength(1)
+      expect(plausibility.options?.filter((option) => option.value === plausibility.correctAnswer)).toHaveLength(1)
       plausibilityAnswers.add(plausibility.correctAnswer)
     }
     expect(plausibilityAnswers.size).toBeGreaterThan(2)
@@ -284,7 +309,7 @@ describe('deterministische Aufgabengeneratoren', () => {
   it.each([
     'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
     'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-    'addition-1000', 'subtraction-1000', 'complement-1000', 'word-problem'
+    'addition-1000', 'subtraction-1000', 'complement-1000'
   ] as SkillId[])('macht die didaktischen Stufen bei %s wirksam', (skill) => {
     const easy = generateExercise(skill, 315, 1)
     const medium = generateExercise(skill, 315, 2)
@@ -293,6 +318,15 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(easy.representation?.visibility).toBe('always')
     expect(medium.representation?.visibility).toBe('hint')
     expect(hard.representation).toBeUndefined()
+  })
+
+  it('steigert bei Sachaufgaben die selbstständige Modellwahl', () => {
+    const easy = generateExercise('word-problem', 315, 1)
+    const medium = generateExercise('word-problem', 315, 2)
+    const hard = generateExercise('word-problem', 315, 3)
+    expect(easy.steps?.find((step) => step.id === 'model')).toMatchObject({ interaction: 'continue', representation: expect.any(Object) })
+    expect(medium.steps?.find((step) => step.id === 'model')?.options).toHaveLength(3)
+    expect(hard.steps?.find((step) => step.id === 'relevant')).toBeDefined()
   })
 
   it('vergrößert das Symmetrieraster und stärkt die Distraktoren stufenweise', () => {
@@ -354,8 +388,9 @@ describe('deterministische Aufgabengeneratoren', () => {
           expect(bridge).not.toBe(first)
           expect(bridge).not.toBe(answer)
           exercise.steps?.forEach((step) => {
-            expect(new Set(step.options.map((option) => option.value)).size).toBe(step.options.length)
-            expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
+            expect(step.options).toBeDefined()
+            expect(new Set(step.options?.map((option) => option.value)).size).toBe(step.options?.length)
+            expect(step.options?.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
           })
         }
       }
@@ -431,7 +466,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     const multiStep = exercises.filter((exercise) => exercise.variant.values.secondOperation)
     expect(multiStep.length).toBeGreaterThan(0)
     multiStep.forEach((exercise) => {
-      expect(exercise.steps?.map((step) => step.id)).toContain('second-operation')
+      expect(exercise.steps?.map((step) => step.id)).toContain('second-equation')
       expect(exercise.steps?.map((step) => step.id)).toContain('final-calculation')
       expect(exercise.prompt).not.toMatch(/\{\w+\}/)
       expect(exercise.steps?.every((step) => !step.prompt.match(/\{\w+\}/))).toBe(true)

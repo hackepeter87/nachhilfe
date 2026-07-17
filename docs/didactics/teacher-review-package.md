@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit `npm run dev`; der Container mit `docker run --rm -p 8080:8080 mathe-reise:0.8.0`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.8.0`.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit `npm run dev`; der Container mit `docker run --rm -p 8080:8080 mathe-reise:0.9.0`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.9.0`.
 
 ## Förderziel
 

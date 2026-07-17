@@ -41,6 +41,7 @@ export interface AnswerOption {
   value: string
   label: string
   grid?: number[][]
+  representation?: ExerciseRepresentation
   misconception?: string
 }
 
@@ -70,7 +71,10 @@ export interface ExerciseRepresentation {
 export interface ExerciseStep {
   id: string
   prompt: string
-  options: AnswerOption[]
+  interaction?: 'choice' | 'number' | 'continue'
+  options?: AnswerOption[]
+  representation?: ExerciseRepresentation
+  continueLabel?: string
   correctAnswer: string
   errorFeedback: string
   successFeedback: string

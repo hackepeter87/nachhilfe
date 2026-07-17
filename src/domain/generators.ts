@@ -1,6 +1,7 @@
 import { integer, pick, seededRandom, shuffle } from './random'
 import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, ExerciseStep, SkillId } from './types'
 import { getSkillContent, getTaskCatalog, renderCatalogText } from '../content/catalog'
+import type { WordModelType } from '../content/catalog'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -96,7 +97,7 @@ function withMetadata(exercise: Exercise): Exercise {
       representation: exercise.representation?.kind ?? 'none',
       distractorSources: [
         ...(exercise.options ?? []),
-        ...(exercise.steps?.flatMap((step) => step.options) ?? [])
+        ...(exercise.steps?.flatMap((step) => step.options ?? []) ?? [])
       ].filter((option) => option.misconception).map((option) => option.misconception!)
     }
   }
@@ -444,6 +445,45 @@ function rounding(seed: number, difficulty: Difficulty, unit: 10 | 100): Exercis
   return createRoundingExercise(number, unit, seed, difficulty)
 }
 
+function wordModelRepresentation(
+  modelType: WordModelType,
+  values: Record<string, number | string>,
+  label: string
+): ExerciseRepresentation {
+  const kind = modelType.startsWith('equal-groups') ? 'groups' : 'bar-model'
+  const first = Number(values.first)
+  const second = Number(values.second)
+  const suppliedTotal = Number(values.total)
+  return {
+    kind,
+    visibility: 'always',
+    label,
+    values: {
+      modelType,
+      first,
+      second,
+      third: values.third,
+      total: suppliedTotal > 0 ? suppliedTotal : modelType === 'equal-groups-share' ? second : first,
+      groups: first,
+      ...(modelType === 'equal-groups-share' ? {} : { size: second })
+    }
+  }
+}
+
+function wordModelOptions(
+  random: () => number,
+  correct: WordModelType,
+  distractors: [WordModelType, WordModelType],
+  values: Record<string, number | string>
+): AnswerOption[] {
+  return shuffle(random, [correct, ...distractors].map((modelType) => ({
+    value: modelType,
+    label: '',
+    representation: wordModelRepresentation(modelType, values, 'Darstellung der Geschichte'),
+    misconception: modelType === correct ? undefined : 'Mengen im Bild anders als in der Geschichte angeordnet'
+  }))).map((option, index) => ({ ...option, label: `Bild ${String.fromCharCode(65 + index)}` }))
+}
+
 function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const random = seededRandom(seed)
   const catalog = getTaskCatalog()
@@ -465,108 +505,107 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const question = renderCatalogText(template.question, templateValues)
   const relevant = renderCatalogText(template.relevant, templateValues)
   const answerSentence = renderCatalogText(template.answer, templateValues)
-  const operationHint = template.operationHint
-  const values = { first, second, third, total, intermediate, result, operation: template.operation, secondOperation: template.secondOperation ?? '', story, answerSentence, operationHint, question, irrelevant, relationship: template.relationshipLabel, templateId: template.id }
-  const steps: ExerciseStep[] = []
-  if (difficulty >= 2) {
-    steps.push({
-      id: 'question',
-      prompt: renderCatalogText(stepsContent.questionPrompt, values),
-      options: textOptions(random, question, template.questionDistractors.map((text) => ({
-        value: renderCatalogText(text, values), misconception: 'Nebendetail statt gesuchter Menge'
-      }))),
-      correctAnswer: question,
-      errorFeedback: stepsContent.questionError,
-      successFeedback: stepsContent.questionSuccess
-    })
+  const equation = renderCatalogText(template.equation, templateValues)
+  const secondEquation = template.secondEquation ? renderCatalogText(template.secondEquation, templateValues) : ''
+  const modelHint = renderCatalogText(template.modelHint, templateValues)
+  const values = {
+    first, second, third, total, intermediate, result,
+    operation: template.operation,
+    secondOperation: template.secondOperation ?? '',
+    story, answerSentence, question, irrelevant, equation, secondEquation, modelHint,
+    templateId: template.id
   }
+  const steps: ExerciseStep[] = []
   steps.push({
+    id: 'question',
+    prompt: renderCatalogText(stepsContent.questionPrompt, values),
+    options: textOptions(random, question, template.questionDistractors.map((text) => ({
+      value: renderCatalogText(text, values), misconception: 'Bekannte Angabe statt gesuchter Menge gewählt'
+    }))),
+    correctAnswer: question,
+    errorFeedback: stepsContent.questionError,
+    successFeedback: stepsContent.questionSuccess
+  })
+  if (difficulty === 3) {
+    steps.push({
       id: 'relevant',
       prompt: renderCatalogText(stepsContent.relevantPrompt, values),
-      options: textOptions(random, relevant, stepsContent.relevantDistractors.map((text) => ({
-        value: renderCatalogText(text, values), misconception: 'Nur eine Zahl oder keine Beziehung beachtet'
+      options: textOptions(random, relevant, template.relevantDistractors.map((text) => ({
+        value: renderCatalogText(text, values), misconception: 'Wichtige Handlung oder benötigte Menge ausgelassen'
       }))),
       correctAnswer: relevant,
       errorFeedback: renderCatalogText(stepsContent.relevantError, values),
       successFeedback: renderCatalogText(stepsContent.relevantSuccess, values)
-    },
-    {
-      id: 'relationship',
-      prompt: stepsContent.relationshipPrompt,
-      options: textOptions(random, template.relationshipLabel, template.relationshipDistractors.map((label) => ({
-        value: label, misconception: 'Andere Mengenbeziehung gewählt'
-      }))),
-      correctAnswer: template.relationshipLabel,
-      errorFeedback: stepsContent.relationshipError,
-      successFeedback: stepsContent.relationshipSuccess
-    },
-    {
-      id: 'operation',
-      prompt: renderCatalogText(stepsContent.operationPrompt, values),
-      options: stepsContent.operationOptions,
-      correctAnswer: template.operation,
-      errorFeedback: template.operationError,
-      successFeedback: stepsContent.operationSuccess
-    })
-  if (difficulty >= 2) {
-    const correctModel = template.representation === 'bar-model' ? stepsContent.barModelLabel : stepsContent.groupsLabel
-    const otherModel = template.representation === 'bar-model' ? stepsContent.groupsLabel : stepsContent.barModelLabel
-    steps.push({
-      id: 'representation',
-      prompt: stepsContent.representationPrompt,
-      options: textOptions(random, correctModel, [
-        { value: otherModel, misconception: 'Darstellung passt nicht zur Mengenbeziehung' },
-        { value: stepsContent.noModelLabel, misconception: 'Zahlen ohne sichtbare Beziehung' }
-      ]),
-      correctAnswer: correctModel,
-      errorFeedback: stepsContent.representationError,
-      successFeedback: stepsContent.representationSuccess
     })
   }
   steps.push({
+    id: 'situation',
+    prompt: stepsContent.situationPrompt,
+    options: textOptions(random, renderCatalogText(template.situation, values), template.situationDistractors.map((text) => ({
+      value: renderCatalogText(text, values), misconception: 'Handlung oder gesuchte Menge anders als in der Geschichte gedeutet'
+    }))),
+    correctAnswer: renderCatalogText(template.situation, values),
+    errorFeedback: renderCatalogText(stepsContent.situationError, values),
+    successFeedback: stepsContent.situationSuccess
+  })
+  const model = wordModelRepresentation(template.modelType, values, 'Passendes Mengenbild mit offener gesuchter Größe')
+  if (difficulty === 1) {
+    steps.push({
+      id: 'model',
+      interaction: 'continue',
+      prompt: stepsContent.modelExplorePrompt,
+      representation: model,
+      continueLabel: stepsContent.modelContinueLabel,
+      correctAnswer: 'continue',
+      errorFeedback: stepsContent.modelError,
+      successFeedback: stepsContent.modelSuccess
+    })
+  } else {
+    steps.push({
+      id: 'model',
+      prompt: stepsContent.modelPrompt,
+      options: wordModelOptions(random, template.modelType, template.modelDistractors, values),
+      correctAnswer: template.modelType,
+      errorFeedback: stepsContent.modelError,
+      successFeedback: stepsContent.modelSuccess
+    })
+  }
+  steps.push({
+    id: 'equation',
+    prompt: stepsContent.equationPrompt,
+    options: textOptions(random, equation, template.equationDistractors.map((text) => ({
+      value: renderCatalogText(text, values), misconception: 'Rechnung beschreibt ein anderes Mengenbild'
+    }))),
+    correctAnswer: equation,
+    errorFeedback: renderCatalogText(template.equationError, values),
+    successFeedback: stepsContent.equationSuccess
+  }, {
       id: 'calculate',
+      interaction: 'number',
       prompt: renderCatalogText(stepsContent.calculatePrompt, values),
-      options: numberOptions(random, intermediate, [
-        { value: Math.max(0, intermediate - 1), misconception: 'Rechenfehler um eins' },
-        { value: intermediate + 1, misconception: 'Rechenfehler um eins' },
-        { value: template.operation === '−' ? first + second : Math.abs(first - second), misconception: 'Unpassende Rechenart verwendet' }
-      ]),
       correctAnswer: String(intermediate),
       errorFeedback: stepsContent.calculateError,
       successFeedback: stepsContent.calculateSuccess
     })
   if (template.secondOperation) {
     steps.push({
-      id: 'second-operation',
-      prompt: renderCatalogText(stepsContent.secondOperationPrompt, values),
-      options: stepsContent.operationOptions,
-      correctAnswer: template.secondOperation,
-      errorFeedback: renderCatalogText(stepsContent.secondOperationError, values),
-      successFeedback: stepsContent.secondOperationSuccess
+      id: 'second-equation',
+      prompt: renderCatalogText(stepsContent.secondEquationPrompt, values),
+      options: textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
+        value: renderCatalogText(text, values), misconception: 'Zweite Veränderung in die falsche Richtung gerechnet'
+      }))),
+      correctAnswer: secondEquation,
+      errorFeedback: renderCatalogText(stepsContent.secondEquationError, values),
+      successFeedback: stepsContent.secondEquationSuccess
     }, {
       id: 'final-calculation',
+      interaction: 'number',
       prompt: renderCatalogText(stepsContent.finalCalculationPrompt, values),
-      options: numberOptions(random, result, [
-        { value: Math.max(0, result - 1), misconception: 'Rechenfehler um eins' },
-        { value: result + 1, misconception: 'Rechenfehler um eins' },
-        { value: template.secondOperation === '−' ? intermediate + third : Math.max(0, intermediate - third), misconception: 'Zweite Rechenart verwechselt' }
-      ]),
       correctAnswer: String(result),
       errorFeedback: stepsContent.finalCalculationError,
       successFeedback: stepsContent.finalCalculationSuccess
     })
   }
-  steps.push({
-      id: 'check',
-      prompt: stepsContent.checkPrompt,
-      options: textOptions(random, answerSentence, [
-        { value: renderCatalogText(template.answer, { ...templateValues, result: Math.max(0, result - 1) }), misconception: 'Antwortsatz mit falschem Ergebnis' },
-        { value: renderCatalogText(template.answer, { ...templateValues, result: result + 2 }), misconception: 'Antwortsatz mit falschem Ergebnis' }
-      ]),
-      correctAnswer: answerSentence,
-      errorFeedback: stepsContent.checkError,
-      successFeedback: stepsContent.checkSuccess
-    })
   if (difficulty === 3) {
     const plausibilityOptions = template.plausibility.options.map((option) => ({
       value: renderCatalogText(option.label, values),
@@ -583,11 +622,17 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
       successFeedback: stepsContent.plausibilitySuccess
     })
   }
-  const barValues = template.operation === '−'
-    ? { first: result, second, total: first }
-    : template.operation === ':'
-      ? { first: result, second: first, total }
-      : { first, second, total: result }
+  steps.push({
+    id: 'check',
+    prompt: stepsContent.checkPrompt,
+    options: textOptions(random, answerSentence, [
+      { value: renderCatalogText(template.answer, { ...templateValues, result: Math.max(0, result - 1) }), misconception: 'Antwortsatz mit falschem Ergebnis' },
+      { value: renderCatalogText(template.answer, { ...templateValues, result: result + 2 }), misconception: 'Antwortsatz mit falschem Ergebnis' }
+    ]),
+    correctAnswer: answerSentence,
+    errorFeedback: stepsContent.checkError,
+    successFeedback: stepsContent.checkSuccess
+  })
   return withMetadata({
     ...base('word-problem', seed, difficulty, values),
     ...contentFor('word-problem', values, difficulty),
@@ -596,9 +641,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     answerMode: 'guided-word',
     correctAnswer: answerSentence,
     steps,
-    representation: representation('word-problem', difficulty, template.representation, template.representation === 'bar-model' ? 'Balkenmodell' : 'Gleich große Gruppen', {
-      ...barValues, question: 'Welche Menge wird gesucht?', groups: first, size: second, relation: template.relationship
-    })
+    representation: model
   })
 }
 

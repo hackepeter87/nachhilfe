@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.6.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.7.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -158,12 +158,12 @@ Stand: Katalogversion 0.6.0. Die Stufen beschreiben die produktive Heuristik von
 
 ### Geführte Sachaufgaben
 
-- **Vorkenntnisse:** Grundrechenarten, Mengenbeziehungen und kurze Texte sinnverstehend lesen.
-- **Stufe 1:** wichtige Angaben, Mengenbeziehung, Rechenart, Ergebnis und Antwortsatz mit sichtbarer Darstellung auswählen.
-- **Stufe 2:** zusätzlich Frage und Darstellung auswählen; Zusammenfassen, Vergleichen und Ergänzen kommen hinzu.
-- **Stufe 3 / MVP-Ziel:** unwichtige Angabe, gleich große Gruppen, erste zweischrittige Situationen und vorlagenspezifische Plausibilitätsprüfung.
-- **Erhöhen / Zurückstufen:** Handlung, Rechnung und Antwort konsistent / Frage, Beziehung oder relevante Angaben verwechseln.
-- **Hilfe / Transfer:** beziehungsspezifischer Hinweis und passendes Modell / Geschichte mit anderer Darstellung erklären.
+- **Vorkenntnisse:** Grundvorstellungen zu den vier Rechenarten und kurze Texte sinnverstehend lesen.
+- **Stufe 1:** gesuchte Größe und Handlung klären; ein sichtbares Modell mit `?` untersuchen, passende Rechnung wählen und Ergebnis selbst eingeben.
+- **Stufe 2:** aus drei konkreten Balken- oder Gruppenbildern genau das zur Geschichte passende wählen; Rechnung und Antwort selbst verbinden.
+- **Stufe 3 / MVP-Ziel:** unwichtige Angabe unterscheiden, Modell auswählen, Ergebnis plausibilisieren und ausgewählte zweischrittige Situationen nacheinander bearbeiten.
+- **Erhöhen / Zurückstufen:** Suchgröße, Modell, Rechnung und Antwort konsistent / Handlung oder offene Größe verwechseln beziehungsweise Hilfebedarf.
+- **Hilfe / Transfer:** bekannte Mengen und `?` im Modell lokalisieren / dieselbe mathematische Handlung mit einer anderen Geschichte erklären.
 - **Später:** komplexere mehrstufige Situationen; Geld und Längen werden seit 0.8 als eigenständige Größenkompetenzen geübt.
 
 ### Symmetrie

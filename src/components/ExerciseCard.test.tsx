@@ -91,7 +91,7 @@ describe('ExerciseCard', () => {
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     expect(exercise.steps?.map((step) => step.id)).toEqual(['bridge', 'result'])
     for (const step of exercise.steps ?? []) {
-      const option = step.options.find((candidate) => candidate.value === step.correctAnswer)
+      const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
       if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
       await user.click(screen.getByRole('button', { name: option.label }))
     }
@@ -107,9 +107,16 @@ describe('ExerciseCard', () => {
     if (!exercise) throw new Error('Keine zweischrittige Sachaufgabe erzeugt')
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     for (const step of exercise.steps ?? []) {
-      const option = step.options.find((candidate) => candidate.value === step.correctAnswer)
-      if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
-      await user.click(screen.getByRole('button', { name: option.label }))
+      if (step.interaction === 'number') {
+        await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
+        await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+      } else if (step.interaction === 'continue') {
+        await user.click(screen.getByRole('button', { name: step.continueLabel ?? 'Weiter' }))
+      } else {
+        const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
+        if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
+        await user.click(screen.getByText(option.label))
+      }
     }
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))

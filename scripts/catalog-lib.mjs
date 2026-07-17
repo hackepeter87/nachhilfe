@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 5
+export const CATALOG_SCHEMA_VERSION = 6
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -17,7 +17,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
-  'length', 'firstLength', 'secondLength', 'answerLength'
+  'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -123,13 +123,21 @@ function validateSkill(skill, numberRange) {
 function validateWordProblem(template, numberRange) {
   if (!isRecord(template)) fail('Sachaufgabenvorlage ist kein Objekt')
   const context = `wordProblems.${String(template.id)}`
-  for (const field of ['id', 'story', 'question', 'relationshipLabel', 'relevant', 'answer', 'operationHint', 'operationError']) requireText(template, field, context)
+  for (const field of ['id', 'story', 'question', 'situation', 'relevant', 'answer', 'modelHint', 'equation', 'equationError']) requireText(template, field, context)
   if (!['join', 'separate', 'combine', 'compare', 'complement', 'equal-groups', 'sharing'].includes(template.relationship)) fail(`${context}.relationship ist ungültig`)
   if (!['+', '−', '·', ':'].includes(template.operation)) fail(`${context}.operation ist ungültig`)
   const expectedOperation = { join: '+', combine: '+', separate: '−', compare: '−', complement: '−', 'equal-groups': '·', sharing: ':' }[template.relationship]
   if (expectedOperation !== template.operation) fail(`${context}.operation passt nicht zur Mengenbeziehung`)
   if (![1, 2, 3].includes(template.minDifficulty)) fail(`${context}.minDifficulty ist ungültig`)
-  if (!['bar-model', 'groups'].includes(template.representation)) fail(`${context}.representation ist ungültig`)
+  const modelTypes = ['change-increase', 'change-decrease', 'part-whole', 'comparison', 'missing-part', 'equal-groups-total', 'equal-groups-share', 'increase-then-decrease', 'decrease-then-increase']
+  if (!modelTypes.includes(template.modelType)) fail(`${context}.modelType ist ungültig`)
+  const expectedModel = {
+    join: template.secondOperation ? 'increase-then-decrease' : 'change-increase',
+    separate: template.secondOperation ? 'decrease-then-increase' : 'change-decrease',
+    combine: 'part-whole', compare: 'comparison', complement: 'missing-part',
+    'equal-groups': 'equal-groups-total', sharing: 'equal-groups-share'
+  }[template.relationship]
+  if (expectedModel !== template.modelType) fail(`${context}.modelType passt nicht zur Geschichte`)
   for (const field of ['firstRange', 'secondRange']) {
     const range = template[field]
     if (!isRecord(range) || !Number.isInteger(range.min) || !Number.isInteger(range.max) || range.min < numberRange.min || range.max > numberRange.max || range.min > range.max) {
@@ -143,15 +151,26 @@ function validateWordProblem(template, numberRange) {
       template.thirdRange.min < numberRange.min || template.thirdRange.max > numberRange.max || template.thirdRange.min > template.thirdRange.max) {
       fail(`${context} hat einen unvollständigen zweiten Rechenschritt`)
     }
-    if (!template.story.includes('{third}') || template.minDifficulty !== 3) fail(`${context} muss den zweiten Schritt als Stufe 3 ausweisen`)
+    if (!template.story.includes('{third}') || template.minDifficulty !== 3 || !isText(template.secondEquation) ||
+      !Array.isArray(template.secondEquationDistractors) || template.secondEquationDistractors.length !== 2 || !template.secondEquationDistractors.every(isText)) {
+      fail(`${context} muss den zweiten Schritt als Stufe 3 vollständig ausweisen`)
+    }
+    requireUnique([template.secondEquation, ...template.secondEquationDistractors], `${context} zweite Rechnungen`)
+  } else if (template.secondEquation !== undefined || template.secondEquationDistractors !== undefined) {
+    fail(`${context} enthält unerwartete Daten für einen zweiten Rechenschritt`)
   }
   if (!template.story.includes('{first}') || !template.answer.includes('{result}') ||
     (template.relationship === 'sharing' ? !template.story.includes('{total}') : !template.story.includes('{second}'))) fail(`${context} enthält nicht alle benötigten Platzhalter`)
-  for (const field of ['questionDistractors', 'relationshipDistractors']) {
+  for (const field of ['questionDistractors', 'situationDistractors', 'relevantDistractors', 'equationDistractors']) {
     if (!Array.isArray(template[field]) || template[field].length !== 2 || !template[field].every(isText)) fail(`${context}.${field} ist ungültig`)
   }
   requireUnique([template.question, ...template.questionDistractors], `${context} Fragen`)
-  requireUnique([template.relationshipLabel, ...template.relationshipDistractors], `${context} Mengenbeziehungen`)
+  requireUnique([template.situation, ...template.situationDistractors], `${context} Situationen`)
+  requireUnique([template.relevant, ...template.relevantDistractors], `${context} wichtige Angaben`)
+  requireUnique([template.equation, ...template.equationDistractors], `${context} Rechnungen`)
+  if (!Array.isArray(template.modelDistractors) || template.modelDistractors.length !== 2 ||
+    !template.modelDistractors.every((model) => modelTypes.includes(model))) fail(`${context}.modelDistractors ist ungültig`)
+  requireUnique([template.modelType, ...template.modelDistractors], `${context} Darstellungen`)
   if (!isRecord(template.plausibility) || !isText(template.plausibility.prompt) || !Array.isArray(template.plausibility.options) || template.plausibility.options.length !== 3) {
     fail(`${context}.plausibility ist ungültig`)
   }
@@ -234,17 +253,14 @@ export function validateCatalog(catalog) {
   requireUnique(catalog.wordProblems.map((template) => template.id), 'Sachaufgaben-IDs')
   catalog.wordProblems.forEach((template) => validateWordProblem(template, numberRange))
   if (!isRecord(catalog.wordProblemSteps)) fail('wordProblemSteps fehlt')
-  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'relationshipPrompt', 'relationshipError', 'relationshipSuccess', 'operationPrompt', 'operationSuccess', 'representationPrompt', 'representationError', 'representationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'secondOperationPrompt', 'secondOperationError', 'secondOperationSuccess', 'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
+  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'situationPrompt', 'situationError', 'situationSuccess', 'modelPrompt', 'modelExplorePrompt', 'modelContinueLabel', 'modelError', 'modelSuccess', 'equationPrompt', 'equationError', 'equationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'secondEquationPrompt', 'secondEquationError', 'secondEquationSuccess', 'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
     requireText(catalog.wordProblemSteps, field, 'wordProblemSteps')
   }
-  const operationOptions = catalog.wordProblemSteps.operationOptions
-  if (!Array.isArray(operationOptions) || operationOptions.length !== 4) fail('operationOptions muss vier Optionen enthalten')
-  requireUnique(operationOptions.map((option) => option.value), 'operationOptions Werte')
-  requireUnique(operationOptions.map((option) => option.label), 'operationOptions Beschriftungen')
-  for (const field of ['relevantDistractors']) {
-    const values = catalog.wordProblemSteps[field]
-    if (!Array.isArray(values) || values.length !== 2 || !values.every(isText)) fail(`wordProblemSteps.${field} ist ungültig`)
-    requireUnique(values, `wordProblemSteps.${field}`)
+  const progressionIds = ['understand-story', 'identify-unknown', 'choose-model', 'form-equation', 'calculate', 'check-result', 'answer-in-context']
+  if (!Array.isArray(catalog.wordProblemSteps.modellingProgression) || catalog.wordProblemSteps.modellingProgression.length !== progressionIds.length ||
+    !catalog.wordProblemSteps.modellingProgression.every((stage, index) => isRecord(stage) && stage.stage === index + 1 &&
+      stage.id === progressionIds[index] && isText(stage.childPrompt) && isText(stage.purpose))) {
+    fail('wordProblemSteps.modellingProgression ist unvollständig')
   }
   validateSymmetry(catalog.symmetry)
   validatePlaceholders(catalog)

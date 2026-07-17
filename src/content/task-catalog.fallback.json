@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 5,
-  "catalogVersion": "0.6.0",
+  "schemaVersion": 6,
+  "catalogVersion": "0.7.0",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-16",
+  "releasedAt": "2026-07-17",
   "status": "ready-for-review",
   "numberRange": {
     "min": 0,
@@ -1654,18 +1654,18 @@
       "id": "word-problem",
       "label": "Sachaufgabe",
       "curriculumArea": "Größen und Messen / Sachsituationen",
-      "supportGoal": "Wichtige Angaben erkennen, eine passende Rechenart wählen und einen Antwortsatz prüfen.",
+      "supportGoal": "Eine Geschichte verstehen, die gesuchte Größe bestimmen, ein passendes Mengenbild wählen und daraus Rechnung und Antwort entwickeln.",
       "misconceptions": [
-        "Nur eine Zahl wird verwendet.",
-        "Die Rechenart passt nicht zur Veränderung der Menge."
+        "Eine Rechenart wird nur aus einem einzelnen Schlüsselwort abgeleitet.",
+        "Ein Balkenbild wird gelesen, ohne bekannte und gesuchte Größen zu unterscheiden."
       ],
       "hints": [
-        "Unterstreiche im Kopf die beiden Mengen.",
-        "{operationHint}"
+        "Kläre zuerst: Was ist bekannt und was wird gesucht?",
+        "{modelHint}"
       ],
       "prompt": "{story}",
       "errorFeedback": "Gehe die Geschichte Schritt für Schritt durch.",
-      "explanation": "{first} {operation} {second} = {result}. {answerSentence}",
+      "explanation": "{equation} {answerSentence}",
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
@@ -1675,11 +1675,11 @@
       "processCompetencies": [
         {
           "id": "modelling",
-          "elicitedBy": "Das Kind ordnet die Sachsituation einer Mengenbeziehung und einer Rechnung zu."
+          "elicitedBy": "Das Kind übersetzt die Handlung schrittweise in gesuchte Größe, Mengenbild, Rechnung und Antwort."
         },
         {
           "id": "representing",
-          "elicitedBy": "Ab Stufe 2 wählt das Kind eine passende Darstellung der Mengenbeziehung."
+          "elicitedBy": "Das Kind wählt oder untersucht ein Mengenbild, das nur bekannte Größen und die Unbekannte zeigt."
         },
         {
           "id": "communicating",
@@ -1697,13 +1697,13 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Wichtige Angaben, Mengenbeziehung, Rechnung und Antwortsatz bei sichtbarer Darstellung",
+          "description": "Gesuchte Größe klären, sichtbares unbekanntenhaltiges Mengenbild untersuchen, passende Rechnung wählen und selbst rechnen",
           "numberRange": "Ergebnisse bis 20",
           "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
             "requiresRepresentationChoice": false,
-            "requiresOperationChoice": true,
+            "requiresOperationChoice": false,
             "requiresJustification": false,
             "requiresMultiStepCalculation": false
           },
@@ -1711,7 +1711,7 @@
         },
         {
           "level": 2,
-          "description": "Zusätzlich Frage und Darstellung auswählen; sprachlich verschiedene Beziehungen",
+          "description": "Zusätzlich aus drei konkreten Mengenbildern wählen; sprachlich unterschiedliche, aber kurze Situationen",
           "numberRange": "Ergebnisse bis 100",
           "representation": "hint",
           "requirements": {
@@ -1725,7 +1725,7 @@
         },
         {
           "level": 3,
-          "description": "Zusätzlich unwichtige Angabe und situationsbezogene Plausibilität prüfen",
+          "description": "Zusätzlich wichtige Angaben unterscheiden, Plausibilität prüfen und bei Bedarf zwei Veränderungen modellieren",
           "numberRange": "Ergebnisse bis 100",
           "representation": "none",
           "requirements": {
@@ -1733,15 +1733,15 @@
             "requiresRepresentationChoice": true,
             "requiresOperationChoice": true,
             "requiresJustification": true,
-            "requiresMultiStepCalculation": false
+            "requiresMultiStepCalculation": true
           },
           "learningPhase": "transfer"
         }
       ],
-      "workedExample": "Erst klären: Was verändert sich? Dann passende Darstellung und Rechnung wählen.",
-      "successFeedback": "Du hast Frage, Mengenbeziehung, Rechnung und Antwort richtig verbunden.",
+      "workedExample": "Erst klären: Was wird gesucht? Dann bekannte Mengen in einem Bild ordnen, die Unbekannte mit ? markieren und daraus die Rechnung bilden.",
+      "successFeedback": "Du hast Geschichte, gesuchte Größe, Bild, Rechnung und Antwort passend verbunden.",
       "remediation": {
-        "strategy": "Die Geschichte wird auf zwei Mengen und ihre Beziehung reduziert.",
+        "strategy": "Die Geschichte wird mit bekannten Größen und einer sichtbaren Unbekannten als Balken- oder Gruppenbild aufgebaut.",
         "foundationStrategy": "Baue zuerst die Grundlage von „Sachaufgabe“ mit kleinen Zahlen und sichtbarem Material neu auf.",
         "representation": "Balkenmodell",
         "keepSubskill": true
@@ -2712,7 +2712,6 @@
       "irrelevant": "Ihr Eimer ist blau.",
       "answer": "Mila hat jetzt {result} Muscheln.",
       "minDifficulty": 1,
-      "representation": "bar-model",
       "firstRange": {
         "min": 7,
         "max": 14
@@ -2721,13 +2720,6 @@
         "min": 2,
         "max": 6
       },
-      "operationHint": "Zu Milas Muscheln kommen weitere dazu. Die neue Gesamtmenge wird mit Plus berechnet.",
-      "operationError": "Beide Mengen gehören nacheinander zu Mila. Verbinde sie zu einer größeren Gesamtmenge.",
-      "relationshipLabel": "Eine vorhandene Menge wird durch Hinzufügen größer.",
-      "relationshipDistractors": [
-        "Zwei vorhandene Teilmengen bilden zusammen ein Ganzes.",
-        "Zwei Mengen werden über ihren Unterschied verglichen."
-      ],
       "questionDistractors": [
         "Wie viele Muscheln hatte Mila zuerst?",
         "Wie viele Muscheln findet Mila am Strand?"
@@ -2748,7 +2740,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Mila hat zuerst {first} Muscheln. Danach kommen {second} neue Muscheln zu ihrer Sammlung.",
+      "situationDistractors": [
+        "Alle {first} und {second} Muscheln waren schon von Anfang an in Milas Eimer.",
+        "Mila gibt von ihren {first} Muscheln {second} weg."
+      ],
+      "relevantDistractors": [
+        "Nur die {first} Muscheln vom Anfang",
+        "Die Farbe des Eimers und die {second} neuen Muscheln"
+      ],
+      "modelType": "change-increase",
+      "modelDistractors": [
+        "part-whole",
+        "change-decrease"
+      ],
+      "modelHint": "Zeige zuerst Milas Anfangsmenge. Hänge die neu gefundenen Muscheln an; das neue Ganze bleibt unbekannt.",
+      "equation": "{first} + {second} = ?",
+      "equationDistractors": [
+        "{first} − {second} = ?",
+        "{second} − {first} = ?"
+      ],
+      "equationError": "Im Bild wird Milas Menge größer: Zur Anfangsmenge kommt die neue Menge hinzu."
     },
     {
       "id": "pencils-subtraction",
@@ -2760,7 +2773,6 @@
       "irrelevant": "Die Kiste steht auf einem Tisch.",
       "answer": "{result} Buntstifte bleiben in der Kiste.",
       "minDifficulty": 1,
-      "representation": "bar-model",
       "firstRange": {
         "min": 12,
         "max": 20
@@ -2769,13 +2781,6 @@
         "min": 2,
         "max": 8
       },
-      "operationHint": "Von der Anfangsmenge werden Stifte weggenommen. Die verbleibende Menge wird mit Minus berechnet.",
-      "operationError": "Die herausgenommenen Stifte gehören danach nicht mehr zur Menge in der Kiste.",
-      "relationshipLabel": "Von einer Anfangsmenge wird ein Teil weggenommen.",
-      "relationshipDistractors": [
-        "Ein fehlender Teil eines Ganzen wird ergänzt.",
-        "Mehrere gleich große Gruppen werden zusammengefasst."
-      ],
       "questionDistractors": [
         "Wie viele Buntstifte lagen zuerst in der Kiste?",
         "Wie viele Buntstifte werden herausgenommen?"
@@ -2796,7 +2801,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Am Anfang liegen {first} Buntstifte in der Kiste. {second} davon werden herausgenommen; gesucht ist der Rest in der Kiste.",
+      "situationDistractors": [
+        "Zu den {first} Buntstiften werden {second} weitere in die Kiste gelegt.",
+        "Zwei Kisten mit {first} und {second} Buntstiften werden verglichen."
+      ],
+      "relevantDistractors": [
+        "Nur die {second} herausgenommenen Buntstifte",
+        "Der Tisch und die {first} Buntstifte"
+      ],
+      "modelType": "change-decrease",
+      "modelDistractors": [
+        "change-increase",
+        "comparison"
+      ],
+      "modelHint": "Beginne mit dem ganzen Balken für {first}. Markiere {second} als herausgenommen und lasse den verbleibenden Teil mit ? offen.",
+      "equation": "{first} − {second} = ?",
+      "equationDistractors": [
+        "{first} + {second} = ?",
+        "{second} − {first} = ?"
+      ],
+      "equationError": "Die herausgenommenen Stifte gehören danach nicht mehr zur Menge in der Kiste."
     },
     {
       "id": "books-combine",
@@ -2808,22 +2834,14 @@
       "irrelevant": "Das Regal hat drei Bretter.",
       "answer": "Zusammen stehen dort {result} Bücher.",
       "minDifficulty": 2,
-      "representation": "bar-model",
       "firstRange": {
-        "min": 20,
+        "min": 36,
         "max": 60
       },
       "secondRange": {
         "min": 10,
         "max": 35
       },
-      "operationHint": "Tierbücher und Weltraumbücher sind zwei Teile derselben Gesamtmenge.",
-      "operationError": "Hier verändert sich nichts. Zwei Teilmengen werden zu einer Gesamtmenge zusammengefasst.",
-      "relationshipLabel": "Zwei vorhandene Teilmengen bilden zusammen ein Ganzes.",
-      "relationshipDistractors": [
-        "Eine Menge wird durch Hinzufügen verändert.",
-        "Zwei Mengen werden über ihren Unterschied verglichen."
-      ],
       "questionDistractors": [
         "Wie viele Tierbücher stehen im Regal?",
         "Wie viele Weltraumbücher stehen im Regal?"
@@ -2844,7 +2862,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "{first} Tierbücher und {second} Weltraumbücher sind zwei Teile desselben Buchbestands. Gesucht ist das Ganze.",
+      "situationDistractors": [
+        "Von {first} Büchern werden {second} aus dem Regal genommen.",
+        "Die beiden Buchsorten bleiben getrennt und nur ihr Unterschied wird gesucht."
+      ],
+      "relevantDistractors": [
+        "Nur die {first} Tierbücher",
+        "Die drei Regalbretter und die {second} Weltraumbücher"
+      ],
+      "modelType": "part-whole",
+      "modelDistractors": [
+        "comparison",
+        "change-decrease"
+      ],
+      "modelHint": "Lege beide bekannten Buchteile nebeneinander. Der Balken für alle Bücher bleibt mit ? offen.",
+      "equation": "{first} + {second} = ?",
+      "equationDistractors": [
+        "{first} − {second} = ?",
+        "{first} + {first} = ?"
+      ],
+      "equationError": "Nichts wird weggenommen. Beide bekannten Buchsorten gehören zum gesuchten Ganzen."
     },
     {
       "id": "stickers-compare",
@@ -2856,7 +2895,6 @@
       "irrelevant": "Lias Album ist grün.",
       "answer": "Noah hat {result} Sticker mehr.",
       "minDifficulty": 2,
-      "representation": "bar-model",
       "firstRange": {
         "min": 35,
         "max": 80
@@ -2865,13 +2903,6 @@
         "min": 10,
         "max": 30
       },
-      "operationHint": "Gesucht ist der Unterschied zwischen Noahs und Lias Stickerzahl.",
-      "operationError": "Vergleiche beide Mengen: Ziehe die kleinere Stickerzahl von der größeren ab.",
-      "relationshipLabel": "Zwei Mengen werden über ihren Unterschied verglichen.",
-      "relationshipDistractors": [
-        "Zwei Teilmengen werden zu einer Gesamtmenge zusammengefasst.",
-        "Von einer Anfangsmenge wird ein Teil weggenommen."
-      ],
       "questionDistractors": [
         "Wie viele Sticker hat Noah?",
         "Wie viele Sticker hat Lia?"
@@ -2892,7 +2923,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Noahs {first} Sticker und Lias {second} Sticker bleiben unverändert. Gesucht ist nur der Abstand zwischen beiden Mengen.",
+      "situationDistractors": [
+        "Noah gibt Lia {second} von seinen Stickern.",
+        "Noahs und Lias Sticker werden zu einer gemeinsamen Sammlung zusammengelegt."
+      ],
+      "relevantDistractors": [
+        "Nur Noahs {first} Sticker",
+        "Die grüne Farbe des Albums und Lias {second} Sticker"
+      ],
+      "modelType": "comparison",
+      "modelDistractors": [
+        "part-whole",
+        "missing-part"
+      ],
+      "modelHint": "Lege die beiden Balken am gleichen Startpunkt an. Der überstehende Teil des längeren Balkens ist gesucht und bleibt ?.",
+      "equation": "{first} − {second} = ?",
+      "equationDistractors": [
+        "{first} + {second} = ?",
+        "{second} − {first} = ?"
+      ],
+      "equationError": "Beide Mengen bleiben bestehen. Gesucht ist, um wie viel die größere Menge die kleinere überragt."
     },
     {
       "id": "seats-complement",
@@ -2904,7 +2956,6 @@
       "irrelevant": "Der Bus ist gelb.",
       "answer": "Es sind noch {result} Plätze frei.",
       "minDifficulty": 2,
-      "representation": "bar-model",
       "firstRange": {
         "min": 40,
         "max": 80
@@ -2913,13 +2964,6 @@
         "min": 12,
         "max": 35
       },
-      "operationHint": "Besetzte und freie Plätze ergeben zusammen alle Sitzplätze. Gesucht ist der fehlende Teil.",
-      "operationError": "Die freien Plätze sind der fehlende Teil zwischen den besetzten Plätzen und allen Sitzplätzen.",
-      "relationshipLabel": "Zu einem bekannten Teil wird der fehlende Teil des Ganzen gesucht.",
-      "relationshipDistractors": [
-        "Zwei Mengen werden nur über ihren Unterschied verglichen.",
-        "Mehrere gleich große Gruppen werden zusammengefasst."
-      ],
       "questionDistractors": [
         "Wie viele Sitzplätze hat der Bus insgesamt?",
         "Wie viele Plätze sind besetzt?"
@@ -2940,7 +2984,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Alle {first} Sitzplätze bestehen aus {second} besetzten Plätzen und den noch unbekannten freien Plätzen.",
+      "situationDistractors": [
+        "Der Bus bekommt zu seinen {first} Plätzen noch {second} neue Plätze.",
+        "Zwei Busse mit {first} und {second} Plätzen werden miteinander verglichen."
+      ],
+      "relevantDistractors": [
+        "Nur die {second} besetzten Plätze",
+        "Die gelbe Farbe des Busses und alle {first} Sitzplätze"
+      ],
+      "modelType": "missing-part",
+      "modelDistractors": [
+        "comparison",
+        "part-whole"
+      ],
+      "modelHint": "Der ganze Balken steht für {first} Plätze. Ein Teil mit {second} ist bekannt; der andere Teil bleibt ?.",
+      "equation": "{first} − {second} = ?",
+      "equationDistractors": [
+        "{first} + {second} = ?",
+        "{second} − {first} = ?"
+      ],
+      "equationError": "Besetzte und freie Plätze bilden zusammen alle Plätze. Du suchst den noch fehlenden Teil."
     },
     {
       "id": "teams-equal-groups",
@@ -2952,7 +3017,6 @@
       "irrelevant": "Ein Team trägt rote Bänder.",
       "answer": "Zusammen sind es {result} Kinder.",
       "minDifficulty": 3,
-      "representation": "groups",
       "firstRange": {
         "min": 2,
         "max": 6
@@ -2961,13 +3025,6 @@
         "min": 2,
         "max": 8
       },
-      "operationHint": "Jedes Team hat gleich viele Kinder. Gleich große Gruppen lassen sich mit Mal zusammenfassen.",
-      "operationError": "Die Kinderzahl pro Team wird für jedes Team gleich oft genommen.",
-      "relationshipLabel": "Mehrere gleich große Gruppen bilden zusammen die Gesamtmenge.",
-      "relationshipDistractors": [
-        "Zwei verschiedene Teilmengen bilden ein Ganzes.",
-        "Von einer Anfangsmenge wird ein Teil weggenommen."
-      ],
       "questionDistractors": [
         "Wie viele Teams gibt es?",
         "Wie viele Kinder sind in einem Team?"
@@ -2988,7 +3045,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Es gibt {first} gleich große Teams. In jedem Team sind {second} Kinder; gesucht ist die Zahl aller Kinder.",
+      "situationDistractors": [
+        "{first} Kinder werden gleichmäßig auf {second} Teams verteilt.",
+        "Ein Team mit {first} Kindern und ein Team mit {second} Kindern werden verglichen."
+      ],
+      "relevantDistractors": [
+        "Nur die {first} Teams",
+        "Die roten Bänder und die {second} Kinder je Team"
+      ],
+      "modelType": "equal-groups-total",
+      "modelDistractors": [
+        "comparison",
+        "part-whole"
+      ],
+      "modelHint": "Zeige {first} gleich große Gruppen mit je {second} Punkten. Die Gesamtzahl bleibt mit ? offen.",
+      "equation": "{first} · {second} = ?",
+      "equationDistractors": [
+        "{first} + {second} = ?",
+        "{first} : {second} = ?"
+      ],
+      "equationError": "Die Gruppe mit {second} Kindern kommt genau {first}-mal vor."
     },
     {
       "id": "cards-sharing",
@@ -3000,7 +3078,6 @@
       "irrelevant": "Die Karten haben verschiedene Farben.",
       "answer": "Jedes Kind bekommt {result} Karten.",
       "minDifficulty": 2,
-      "representation": "groups",
       "firstRange": {
         "min": 2,
         "max": 6
@@ -3009,13 +3086,6 @@
         "min": 2,
         "max": 8
       },
-      "operationHint": "Die Gesamtmenge wird in {first} gleich große Gruppen verteilt. Deshalb passt Geteilt.",
-      "operationError": "Gesucht ist die Größe einer von {first} gleich großen Gruppen.",
-      "relationshipLabel": "Eine Gesamtmenge wird gleichmäßig auf mehrere Gruppen verteilt.",
-      "relationshipDistractors": [
-        "Mehrere gleich große Gruppen werden zu einer Gesamtmenge zusammengefasst.",
-        "Von einer Anfangsmenge wird ein Teil weggenommen."
-      ],
       "questionDistractors": [
         "Wie viele Karten werden insgesamt verteilt?",
         "Auf wie viele Kinder werden die Karten verteilt?"
@@ -3036,7 +3106,28 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Alle {total} Karten werden ohne Rest auf {first} Kinder verteilt. Gesucht ist die gleich große Menge für ein Kind.",
+      "situationDistractors": [
+        "{first} Gruppen mit je {total} Karten werden zusammengezählt.",
+        "Von den {total} Karten werden nur {first} Karten weggenommen."
+      ],
+      "relevantDistractors": [
+        "Nur die {total} Karten",
+        "Die Farben der Karten und die {first} Kinder"
+      ],
+      "modelType": "equal-groups-share",
+      "modelDistractors": [
+        "equal-groups-total",
+        "part-whole"
+      ],
+      "modelHint": "Zeige den bekannten Vorrat von {total} Punkten und {first} gleich große leere Gruppen. Die Größe einer Gruppe bleibt ?.",
+      "equation": "{total} : {first} = ?",
+      "equationDistractors": [
+        "{total} − {first} = ?",
+        "{total} + {first} = ?"
+      ],
+      "equationError": "Die bekannte Gesamtmenge wird in {first} gleich große Teile aufgeteilt."
     },
     {
       "id": "library-arrivals-and-loans",
@@ -3048,7 +3139,6 @@
       "relevant": "{first} Bücher, {second} neue Bücher und {third} ausgeliehene Bücher",
       "answer": "Nun stehen {result} Bücher im Regal.",
       "minDifficulty": 3,
-      "representation": "bar-model",
       "firstRange": {
         "min": 30,
         "max": 60
@@ -3061,13 +3151,6 @@
         "min": 3,
         "max": 12
       },
-      "operationHint": "Zuerst kommen Bücher dazu. Berechne diese neue Menge, bevor Bücher ausgeliehen werden.",
-      "operationError": "Im ersten Schritt wird die Büchermenge größer.",
-      "relationshipLabel": "Eine Menge wird zuerst größer und danach wieder kleiner.",
-      "relationshipDistractors": [
-        "Eine Gesamtmenge wird gleichmäßig verteilt.",
-        "Zwei unveränderte Mengen werden nur verglichen."
-      ],
       "questionDistractors": [
         "Wie viele Bücher kommen neu dazu?",
         "Wie viele Bücher werden ausgeliehen?"
@@ -3088,7 +3171,33 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Die Büchermenge wird zuerst um {second} größer und danach um {third} kleiner. Gesucht ist der Bestand nach beiden Veränderungen.",
+      "situationDistractors": [
+        "Die Büchermenge wird zuerst um {second} kleiner und danach um {third} größer.",
+        "Die drei Zahlen sind unveränderte Buchgruppen, die nur miteinander verglichen werden."
+      ],
+      "relevantDistractors": [
+        "Nur die {first} Bücher am Anfang und die {second} neuen Bücher",
+        "Nur die {third} ausgeliehenen Bücher"
+      ],
+      "modelType": "increase-then-decrease",
+      "modelDistractors": [
+        "decrease-then-increase",
+        "part-whole"
+      ],
+      "modelHint": "Zeige vom Startbalken aus zuerst das angefügte Stück {second} und danach das entfernte Stück {third}. Beide Zwischenwerte bleiben offen.",
+      "equation": "{first} + {second} = ?",
+      "equationDistractors": [
+        "{first} − {second} = ?",
+        "{second} − {first} = ?"
+      ],
+      "equationError": "Die ersten {second} Bücher kommen zum Anfangsbestand hinzu.",
+      "secondEquation": "{intermediate} − {third} = ?",
+      "secondEquationDistractors": [
+        "{intermediate} + {third} = ?",
+        "{third} − {intermediate} = ?"
+      ]
     },
     {
       "id": "stickers-give-and-receive",
@@ -3100,7 +3209,6 @@
       "relevant": "{first} Aufkleber, {second} verschenkte und {third} neue Aufkleber",
       "answer": "Danach hat Mira {result} Aufkleber.",
       "minDifficulty": 3,
-      "representation": "bar-model",
       "firstRange": {
         "min": 35,
         "max": 80
@@ -3113,13 +3221,6 @@
         "min": 3,
         "max": 15
       },
-      "operationHint": "Zuerst werden Aufkleber weggegeben. Berechne den Rest, bevor neue dazukommen.",
-      "operationError": "Im ersten Schritt wird die Aufklebermenge kleiner.",
-      "relationshipLabel": "Eine Menge wird zuerst kleiner und danach wieder größer.",
-      "relationshipDistractors": [
-        "Mehrere gleich große Gruppen werden zusammengefasst.",
-        "Zwei Mengen werden nur nach ihrem Unterschied verglichen."
-      ],
       "questionDistractors": [
         "Wie viele Aufkleber verschenkt Mira?",
         "Wie viele neue Aufkleber bekommt Mira?"
@@ -3140,69 +3241,111 @@
             "correct": false
           }
         ]
-      }
+      },
+      "situation": "Miras Aufklebermenge wird zuerst um {second} kleiner und danach um {third} größer. Gesucht ist die Menge nach beiden Veränderungen.",
+      "situationDistractors": [
+        "Miras Aufklebermenge wird zuerst um {second} größer und danach um {third} kleiner.",
+        "Die drei Zahlen sind unveränderte Sammlungen, die zusammengelegt werden."
+      ],
+      "relevantDistractors": [
+        "Nur die {first} Aufkleber am Anfang und die {second} verschenkten",
+        "Nur die {third} neu bekommenen Aufkleber"
+      ],
+      "modelType": "decrease-then-increase",
+      "modelDistractors": [
+        "increase-then-decrease",
+        "part-whole"
+      ],
+      "modelHint": "Zeige am Startbalken zuerst das entfernte Stück {second} und danach das neu angefügte Stück {third}. Beide Zwischenwerte bleiben offen.",
+      "equation": "{first} − {second} = ?",
+      "equationDistractors": [
+        "{first} + {second} = ?",
+        "{second} − {first} = ?"
+      ],
+      "equationError": "Die verschenkten Aufkleber werden zuerst vom Anfangsbestand weggenommen.",
+      "secondEquation": "{intermediate} + {third} = ?",
+      "secondEquationDistractors": [
+        "{intermediate} − {third} = ?",
+        "{third} − {intermediate} = ?"
+      ]
     }
   ],
   "wordProblemSteps": {
-    "relevantPrompt": "Welche Angaben sind wichtig?",
-    "relevantDistractors": [
-      "Nur die Zahl {first}",
-      "Es gibt keine wichtigen Zahlen"
-    ],
-    "relevantError": "Für die Lösung brauchst du alle Mengen, die sich in der Geschichte verändern.",
-    "relevantSuccess": "Genau, diese Angaben helfen dir durch die ganze Geschichte.",
-    "operationPrompt": "Welche Rechenart passt?",
-    "operationOptions": [
+    "modellingProgression": [
       {
-        "value": "+",
-        "label": "Plus (+): Teilmengen oder eine hinzugefügte Menge verbinden"
+        "stage": 1,
+        "id": "understand-story",
+        "childPrompt": "Lies die Geschichte und stell dir die Handlung vor.",
+        "purpose": "Die Situation wird als Handlung verstanden, bevor Zahlen verknüpft werden."
       },
       {
-        "value": "−",
-        "label": "Minus (−): Unterschied oder fehlenden Teil bestimmen"
+        "stage": 2,
+        "id": "identify-unknown",
+        "childPrompt": "Was wird gesucht?",
+        "purpose": "Die unbekannte Größe wird konkret benannt."
       },
       {
-        "value": "·",
-        "label": "Mal (·): mehrere gleich große Gruppen zusammenfassen"
+        "stage": 3,
+        "id": "choose-model",
+        "childPrompt": "Welches Bild passt zur Geschichte?",
+        "purpose": "Bekannte Mengen und Unbekannte werden räumlich geordnet."
       },
       {
-        "value": ":",
-        "label": "Geteilt (:): eine Menge gleichmäßig verteilen"
+        "stage": 4,
+        "id": "form-equation",
+        "childPrompt": "Welche Rechnung passt zum Bild?",
+        "purpose": "Die Darstellung wird in mathematische Schreibweise übersetzt."
+      },
+      {
+        "stage": 5,
+        "id": "calculate",
+        "childPrompt": "Rechne selbst.",
+        "purpose": "Das Ergebnis wird eigenständig berechnet."
+      },
+      {
+        "stage": 6,
+        "id": "check-result",
+        "childPrompt": "Kann das Ergebnis zur Geschichte passen?",
+        "purpose": "Das Ergebnis wird an der Situation geprüft."
+      },
+      {
+        "stage": 7,
+        "id": "answer-in-context",
+        "childPrompt": "Welcher Antwortsatz passt?",
+        "purpose": "Das Ergebnis wird wieder auf die Geschichte bezogen."
       }
     ],
-    "additionError": "Prüfe, ob Teilmengen verbunden werden oder eine Menge größer wird.",
-    "subtractionError": "Prüfe, ob ein Unterschied, ein Rest oder ein fehlender Teil gesucht wird.",
-    "operationSuccess": "Diese Rechenart passt zur Geschichte.",
-    "calculatePrompt": "Rechne: {first} {operation} {second} = ?",
-    "calculateError": "Rechne die beiden wichtigen Zahlen noch einmal.",
-    "calculateSuccess": "Die Rechnung stimmt.",
-    "secondOperationPrompt": "Nun hast du {intermediate}. Welche Rechenart passt für die Veränderung um {third}?",
-    "secondOperationError": "Achte auf die zweite Handlung: Wird die Menge größer oder kleiner?",
-    "secondOperationSuccess": "Die zweite Rechenart passt zur Veränderung.",
-    "finalCalculationPrompt": "Rechne weiter: {intermediate} {secondOperation} {third} = ?",
-    "finalCalculationError": "Nutze dein Zwischenergebnis {intermediate} und die zweite Veränderung {third}.",
-    "finalCalculationSuccess": "Du hast beide Rechenschritte richtig verbunden.",
+    "questionPrompt": "Was wird gesucht?",
+    "questionError": "Lies die Frage am Ende noch einmal: Welche Menge kennst du noch nicht?",
+    "questionSuccess": "Du weißt jetzt, welche Menge gesucht wird.",
+    "relevantPrompt": "Welche Angaben brauchst du für die ganze Geschichte?",
+    "relevantError": "Prüfe jede Handlung: Welche Mengen sind bekannt und welche Angabe verändert nichts?",
+    "relevantSuccess": "Diese Angaben brauchst du für das Modell.",
+    "situationPrompt": "Was passiert in der Geschichte?",
+    "situationError": "Stell dir die Handlung ohne Rechnung vor: Was ist zuerst da, was verändert sich und was bleibt gleich?",
+    "situationSuccess": "Du hast die Handlung der Geschichte erfasst.",
+    "modelPrompt": "Welches Bild passt zur Geschichte?",
+    "modelExplorePrompt": "Dieses Bild zeigt die Geschichte. Wo stehen bekannte Mengen und wo ist die gesuchte Menge mit ? markiert?",
+    "modelContinueLabel": "Weiter zur Rechnung",
+    "modelError": "Achte darauf, welche Mengen bekannt sind und welcher Teil im Bild mit ? offenbleiben muss.",
+    "modelSuccess": "Das Bild ordnet die bekannten Mengen und lässt genau das Gesuchte offen.",
+    "equationPrompt": "Welche Rechnung passt zum Bild?",
+    "equationError": "Lies das Bild von den bekannten Mengen bis zum ?. Die Zeichen müssen genau diese Handlung beschreiben.",
+    "equationSuccess": "Diese Rechnung beschreibt das Bild.",
+    "calculatePrompt": "Rechne selbst: {equation}",
+    "calculateError": "Nutze die Rechnung aus dem vorherigen Schritt und rechne noch einmal.",
+    "calculateSuccess": "Dein Ergebnis passt zur Rechnung.",
+    "secondEquationPrompt": "Welche Rechnung beschreibt die zweite Veränderung?",
+    "secondEquationError": "Beginne mit deinem Zwischenergebnis. Wird die Menge im zweiten Teil größer oder kleiner?",
+    "secondEquationSuccess": "Die zweite Rechnung setzt die Geschichte richtig fort.",
+    "finalCalculationPrompt": "Rechne den zweiten Schritt selbst: {secondEquation}",
+    "finalCalculationError": "Nutze das Zwischenergebnis und die zweite Veränderung.",
+    "finalCalculationSuccess": "Du hast beide Veränderungen nacheinander berechnet.",
     "checkPrompt": "Welcher Antwortsatz passt?",
-    "checkError": "Der Antwortsatz muss zu deinem Rechenergebnis passen.",
-    "checkSuccess": "Rechnung und Antwort passen zusammen.",
-    "additionHint": "Es kommt etwas dazu. Die Menge wird größer.",
-    "subtractionHint": "Es geht etwas weg. Die Menge wird kleiner.",
-    "questionPrompt": "Welche Frage soll beantwortet werden?",
-    "questionError": "Suche den Satz, der nach einer unbekannten Menge fragt.",
-    "questionSuccess": "Du hast erkannt, was gesucht wird.",
-    "multiplicationError": "Prüfe, ob mehrere gleich große Gruppen zusammengefasst werden.",
-    "multiplicationHint": "Gleich große Gruppen kannst du mit einer Malaufgabe zusammenfassen.",
-    "representationPrompt": "Welche Darstellung passt zur Beziehung?",
-    "barModelLabel": "Balkenmodell für Teil und Ganzes",
-    "groupsLabel": "Bild mit gleich großen Gruppen",
-    "noModelLabel": "Eine zufällige Zahlenliste",
-    "representationError": "Die Darstellung muss zeigen, wie die Mengen zusammenhängen.",
-    "representationSuccess": "Diese Darstellung macht die Beziehung sichtbar.",
-    "plausibilityError": "Vergleiche das Ergebnis noch einmal mit den Mengen aus der Geschichte.",
-    "plausibilitySuccess": "Du hast nicht nur gerechnet, sondern das Ergebnis auch geprüft.",
-    "relationshipPrompt": "Welche Mengenbeziehung beschreibt die Geschichte?",
-    "relationshipError": "Achte darauf, was mit den Mengen geschieht und welche Menge gesucht wird.",
-    "relationshipSuccess": "Diese Mengenbeziehung passt zur Geschichte."
+    "checkError": "Der Satz muss genau die gesuchte Größe mit deinem Ergebnis nennen.",
+    "checkSuccess": "Ergebnis und Antwort passen zur Geschichte.",
+    "plausibilityError": "Vergleiche dein Ergebnis mit Anfang, Veränderung und gesuchter Menge.",
+    "plausibilitySuccess": "Du hast geprüft, ob dein Ergebnis zur Geschichte passen kann."
   },
   "symmetry": {
     "optionLabels": [

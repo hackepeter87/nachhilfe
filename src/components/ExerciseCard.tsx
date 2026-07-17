@@ -22,6 +22,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   const [stepIndex, setStepIndex] = useState(0)
 
   const currentStep = exercise.steps?.[stepIndex]
+  const currentInteraction = currentStep?.interaction ?? 'choice'
 
   const showNextHint = () => {
     setHintsShown((current) => Math.min(2, current + 1))
@@ -77,21 +78,30 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
 
   const submitNumber = (event: FormEvent) => {
     event.preventDefault()
-    if (answer.trim()) checkRegularAnswer(answer)
+    if (!answer.trim()) return
+    if (currentStep && currentInteraction === 'number') checkStepAnswer(answer)
+    else checkRegularAnswer(answer)
+  }
+
+  const continueStep = () => {
+    if (!currentStep) return
+    setMessage(currentStep.successFeedback)
+    if (stepIndex === (exercise.steps?.length ?? 1) - 1) setAnswerState('correct')
+    else setStepIndex((current) => current + 1)
   }
 
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
     return (
-      <div className={exercise.answerMode === 'symmetry' ? 'symmetry-options' : 'answer-options'}>
+      <div className={currentStep?.options?.some((option) => option.representation) ? 'answer-options model-options' : exercise.answerMode === 'symmetry' ? 'symmetry-options' : 'answer-options'}>
         {options.map((option) => (
           <button
-            className={exercise.answerMode === 'symmetry' ? 'symmetry-option' : 'answer-option'}
+            className={option.representation ? 'answer-option model-option' : exercise.answerMode === 'symmetry' ? 'symmetry-option' : 'answer-option'}
             key={option.value}
             type="button"
             onClick={() => currentStep ? checkStepAnswer(option.value) : checkRegularAnswer(option.value)}
           >
-            {option.grid ? <GridPicture grid={option.grid} label={option.label} /> : option.label}
+            {option.grid ? <GridPicture grid={option.grid} label={option.label} /> : option.representation ? <><span>{option.label}</span><MathRepresentation representation={option.representation} /></> : option.label}
           </button>
         ))}
       </div>
@@ -105,7 +115,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         <h2 id="exercise-title">{exercise.prompt}</h2>
       </div>
 
-      {exercise.representation && (exercise.representation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
+      {exercise.answerMode !== 'guided-word' && exercise.representation && (exercise.representation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
         <MathRepresentation representation={exercise.representation} />
       )}
 
@@ -115,7 +125,18 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
             {exercise.steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
           </div>
           <h3>{stepIndex + 1}. {currentStep.prompt}</h3>
-          {renderOptions()}
+          {currentStep.representation && <MathRepresentation representation={currentStep.representation} />}
+          {currentInteraction === 'choice' && renderOptions()}
+          {currentInteraction === 'continue' && <button className="primary-button" type="button" onClick={continueStep}>{currentStep.continueLabel ?? 'Weiter'}</button>}
+          {currentInteraction === 'number' && (
+            <form className="number-answer" onSubmit={submitNumber}>
+              <label htmlFor="guided-number-answer">Dein Ergebnis</label>
+              <div className="number-row">
+                <input id="guided-number-answer" inputMode="numeric" pattern="[0-9]*" autoComplete="off" value={answer} onChange={(event) => setAnswer(event.target.value.replace(/[^0-9]/g, '').slice(0, 4))} />
+                <button className="icon-button icon-button--primary" type="submit" aria-label="Ergebnis prüfen" title="Ergebnis prüfen"><Send aria-hidden="true" /></button>
+              </div>
+            </form>
+          )}
         </div>
       )}
 

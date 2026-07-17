@@ -2,7 +2,7 @@ import fallbackCatalogJson from './task-catalog.fallback.json'
 import { SKILL_IDS, type LearningPhase, type SkillId } from '../domain/types'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 5
+export const CATALOG_SCHEMA_VERSION = 6
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -155,6 +155,17 @@ export interface StrategySteps {
   }
 }
 
+export type WordModelType =
+  | 'change-increase'
+  | 'change-decrease'
+  | 'part-whole'
+  | 'comparison'
+  | 'missing-part'
+  | 'equal-groups-total'
+  | 'equal-groups-share'
+  | 'increase-then-decrease'
+  | 'decrease-then-increase'
+
 export interface WordProblemTemplate {
   id: string
   relationship: 'join' | 'separate' | 'combine' | 'compare' | 'complement' | 'equal-groups' | 'sharing'
@@ -162,18 +173,24 @@ export interface WordProblemTemplate {
   story: string
   question: string
   questionDistractors: [string, string]
-  relationshipLabel: string
-  relationshipDistractors: [string, string]
+  situation: string
+  situationDistractors: [string, string]
   relevant: string
+  relevantDistractors: [string, string]
   irrelevant?: string
   answer: string
   minDifficulty: 1 | 2 | 3
-  representation: 'bar-model' | 'groups'
-  operationHint: string
-  operationError: string
+  modelType: WordModelType
+  modelDistractors: [WordModelType, WordModelType]
+  modelHint: string
+  equation: string
+  equationDistractors: [string, string]
+  equationError: string
   firstRange: { min: number; max: number }
   secondRange: { min: number; max: number }
   secondOperation?: '+' | '−'
+  secondEquation?: string
+  secondEquationDistractors?: [string, string]
   thirdRange?: { min: number; max: number }
   plausibility: {
     prompt: string
@@ -186,34 +203,35 @@ export interface WordProblemTemplate {
 }
 
 export interface WordProblemSteps {
+  modellingProgression: Array<{
+    stage: 1 | 2 | 3 | 4 | 5 | 6 | 7
+    id: 'understand-story' | 'identify-unknown' | 'choose-model' | 'form-equation' | 'calculate' | 'check-result' | 'answer-in-context'
+    childPrompt: string
+    purpose: string
+  }>
   questionPrompt: string
   questionError: string
   questionSuccess: string
   relevantPrompt: string
-  relevantDistractors: [string, string]
   relevantError: string
   relevantSuccess: string
-  relationshipPrompt: string
-  relationshipError: string
-  relationshipSuccess: string
-  operationPrompt: string
-  operationOptions: Array<{ value: '+' | '−' | '·' | ':'; label: string }>
-  additionError: string
-  subtractionError: string
-  multiplicationError: string
-  operationSuccess: string
-  representationPrompt: string
-  barModelLabel: string
-  groupsLabel: string
-  noModelLabel: string
-  representationError: string
-  representationSuccess: string
+  situationPrompt: string
+  situationError: string
+  situationSuccess: string
+  modelPrompt: string
+  modelExplorePrompt: string
+  modelContinueLabel: string
+  modelError: string
+  modelSuccess: string
+  equationPrompt: string
+  equationError: string
+  equationSuccess: string
   calculatePrompt: string
   calculateError: string
   calculateSuccess: string
-  secondOperationPrompt: string
-  secondOperationError: string
-  secondOperationSuccess: string
+  secondEquationPrompt: string
+  secondEquationError: string
+  secondEquationSuccess: string
   finalCalculationPrompt: string
   finalCalculationError: string
   finalCalculationSuccess: string
@@ -222,9 +240,6 @@ export interface WordProblemSteps {
   checkSuccess: string
   plausibilityError: string
   plausibilitySuccess: string
-  additionHint: string
-  subtractionHint: string
-  multiplicationHint: string
 }
 
 export interface SymmetryTemplate {
@@ -267,7 +282,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
-  'length', 'firstLength', 'secondLength', 'answerLength'
+  'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -314,6 +329,10 @@ function hasValidRequirements(value: unknown): boolean {
 
 const LEARNING_PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
 const CONTENT_STATUSES: ContentStatus[] = ['draft', 'ready-for-review', 'active', 'disabled']
+const WORD_MODEL_TYPES: WordModelType[] = [
+  'change-increase', 'change-decrease', 'part-whole', 'comparison', 'missing-part',
+  'equal-groups-total', 'equal-groups-share', 'increase-then-decrease', 'decrease-then-increase'
+]
 
 function isLearningPhase(value: unknown): value is CatalogLearningPhase {
   return isRecord(value) && LEARNING_PHASES.includes(value.id as LearningPhase) && isNonEmptyString(value.goal) &&
@@ -358,15 +377,30 @@ function isSkill(value: unknown, numberRange: { min: number; max: number }): val
 function isWordProblem(value: unknown, numberRange: { min: number; max: number }): value is WordProblemTemplate {
   if (!isRecord(value) || !isNonEmptyString(value.id) || !['+', '−', '·', ':'].includes(value.operation as string)) return false
   if (!['join', 'separate', 'combine', 'compare', 'complement', 'equal-groups', 'sharing'].includes(value.relationship as string)) return false
-  if (![value.story, value.question, value.relationshipLabel, value.relevant, value.answer, value.operationHint, value.operationError].every(isNonEmptyString)) return false
+  if (![value.story, value.question, value.situation, value.relevant, value.answer, value.modelHint, value.equation, value.equationError].every(isNonEmptyString)) return false
   if (!Array.isArray(value.questionDistractors) || value.questionDistractors.length !== 2 || !value.questionDistractors.every(isNonEmptyString)) return false
-  if (!Array.isArray(value.relationshipDistractors) || value.relationshipDistractors.length !== 2 || !value.relationshipDistractors.every(isNonEmptyString)) return false
-  if (new Set([value.question, ...value.questionDistractors]).size !== 3 || new Set([value.relationshipLabel, ...value.relationshipDistractors]).size !== 3) return false
-  if (![1, 2, 3].includes(value.minDifficulty as number) || !['bar-model', 'groups'].includes(value.representation as string)) return false
+  if (!Array.isArray(value.situationDistractors) || value.situationDistractors.length !== 2 || !value.situationDistractors.every(isNonEmptyString)) return false
+  if (!Array.isArray(value.relevantDistractors) || value.relevantDistractors.length !== 2 || !value.relevantDistractors.every(isNonEmptyString)) return false
+  if (!Array.isArray(value.equationDistractors) || value.equationDistractors.length !== 2 || !value.equationDistractors.every(isNonEmptyString)) return false
+  if (new Set([value.question, ...value.questionDistractors]).size !== 3 || new Set([value.situation, ...value.situationDistractors]).size !== 3 ||
+    new Set([value.relevant, ...value.relevantDistractors]).size !== 3 || new Set([value.equation, ...value.equationDistractors]).size !== 3) return false
+  if (![1, 2, 3].includes(value.minDifficulty as number) || !WORD_MODEL_TYPES.includes(value.modelType as WordModelType)) return false
+  if (!Array.isArray(value.modelDistractors) || value.modelDistractors.length !== 2 || !value.modelDistractors.every((model) => WORD_MODEL_TYPES.includes(model as WordModelType)) ||
+    new Set([value.modelType, ...value.modelDistractors]).size !== 3) return false
+  const expectedModel: Record<WordProblemTemplate['relationship'], WordModelType> = {
+    join: value.secondOperation ? 'increase-then-decrease' : 'change-increase',
+    separate: value.secondOperation ? 'decrease-then-increase' : 'change-decrease',
+    combine: 'part-whole', compare: 'comparison', complement: 'missing-part',
+    'equal-groups': 'equal-groups-total', sharing: 'equal-groups-share'
+  }
+  if (expectedModel[value.relationship as WordProblemTemplate['relationship']] !== value.modelType) return false
   if (!isRange(value.firstRange, numberRange) || !isRange(value.secondRange, numberRange)) return false
   const hasSecondStep = value.secondOperation !== undefined || value.thirdRange !== undefined
   if (hasSecondStep && (!['+', '−'].includes(value.secondOperation as string) || !isRange(value.thirdRange, numberRange))) return false
-  if (hasSecondStep && (!(value.story as string).includes('{third}') || value.minDifficulty !== 3)) return false
+  if (hasSecondStep && (!(value.story as string).includes('{third}') || value.minDifficulty !== 3 || !isNonEmptyString(value.secondEquation) ||
+    !Array.isArray(value.secondEquationDistractors) || value.secondEquationDistractors.length !== 2 || !value.secondEquationDistractors.every(isNonEmptyString) ||
+    new Set([value.secondEquation, ...value.secondEquationDistractors]).size !== 3)) return false
+  if (!hasSecondStep && (value.secondEquation !== undefined || value.secondEquationDistractors !== undefined)) return false
   if (!(value.story as string).includes('{first}') || !(value.answer as string).includes('{result}')) return false
   if (value.relationship === 'sharing' ? !(value.story as string).includes('{total}') : !(value.story as string).includes('{second}')) return false
   const firstRange = value.firstRange as { min: number; max: number }
@@ -394,23 +428,20 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
   if (!isRecord(value)) return false
   const stringFields = [
     'questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess',
-    'relationshipPrompt', 'relationshipError', 'relationshipSuccess',
-    'operationPrompt', 'additionError', 'subtractionError', 'multiplicationError', 'operationSuccess',
-    'representationPrompt', 'barModelLabel', 'groupsLabel', 'noModelLabel', 'representationError', 'representationSuccess',
+    'situationPrompt', 'situationError', 'situationSuccess',
+    'modelPrompt', 'modelExplorePrompt', 'modelContinueLabel', 'modelError', 'modelSuccess',
+    'equationPrompt', 'equationError', 'equationSuccess',
     'calculatePrompt', 'calculateError', 'calculateSuccess',
-    'secondOperationPrompt', 'secondOperationError', 'secondOperationSuccess',
+    'secondEquationPrompt', 'secondEquationError', 'secondEquationSuccess',
     'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess',
     'checkPrompt', 'checkError', 'checkSuccess',
-    'plausibilityError', 'plausibilitySuccess',
-    'additionHint', 'subtractionHint', 'multiplicationHint'
+    'plausibilityError', 'plausibilitySuccess'
   ]
   if (!stringFields.every((field) => isNonEmptyString(value[field]))) return false
-  if (!Array.isArray(value.relevantDistractors) || value.relevantDistractors.length !== 2 || !value.relevantDistractors.every(isNonEmptyString)) return false
-  if (!Array.isArray(value.operationOptions) || value.operationOptions.length !== 4 || !value.operationOptions.every((option) =>
-    isRecord(option) && ['+', '−', '·', ':'].includes(option.value as string) && isNonEmptyString(option.label)
-  )) return false
-  const operations = value.operationOptions as Array<{ value: string; label: string }>
-  return new Set(operations.map((option) => option.value)).size === 4 && new Set(operations.map((option) => option.label)).size === 4
+  if (!Array.isArray(value.modellingProgression) || value.modellingProgression.length !== 7) return false
+  const progressionIds = ['understand-story', 'identify-unknown', 'choose-model', 'form-equation', 'calculate', 'check-result', 'answer-in-context']
+  return value.modellingProgression.every((stage, index) => isRecord(stage) && stage.stage === index + 1 && stage.id === progressionIds[index] &&
+    isNonEmptyString(stage.childPrompt) && isNonEmptyString(stage.purpose))
 }
 
 export function validateTaskCatalog(value: unknown): value is TaskCatalog {

@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App `0.8.0`, Katalog `0.6.0`, Schema `5`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App `0.9.0`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -14,19 +14,20 @@ Stand: App `0.8.0`, Katalog `0.6.0`, Schema `5`, Status `ready-for-review`. Dies
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.8.0
+## Aktive Veränderungen bis 0.9.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
-- Sachaufgaben: Frage, Angaben, Mengenbeziehung, Rechenart, Darstellung, Ergebnis, Antwortsatz und auf Stufe 3 Plausibilität; neu ist gleichmäßiges Verteilen mit Division ohne Rest.
+- Sachaufgaben: Suchgröße und konkrete Handlung stehen vor einem unbekanntenhaltigen Mengenbild. Erst danach folgen konkrete Gleichung, eigene Zahleneingabe, Plausibilitätsprüfung und Antwortsatz; technische Beziehungskategorien sind nicht mehr Kinderausgabe.
 - Remediation: Nach Erklärung folgt eine leichtere verwandte Aufgabe, auf Stufe 1 eine Grundlagenvariante mit sichtbarer Darstellung.
 - Wiederholung: zeitlicher Abstand ergänzt Lernwert und Fehlergewicht; eine identische Variante wird nicht direkt wiederholt.
 - Rechnen bis 1000: Einer- und Zehnerübergänge führen über eine ausgewählte volle Zwischenzahl und ein getrennt geprüftes Ergebnis; Subtraktion entbündelt höchstens an einer Stelle.
-- Sachrechnen: Zwei kurze Vorlagen verbinden erstmals zwei Handlungen. Zwischenergebnis, zweite Rechenart und Endergebnis werden getrennt geprüft.
+- Sachrechnen: Zwei kurze Vorlagen verbinden zwei Handlungen. Zwischenergebnis, zweite konkrete Gleichung und Endergebnis werden getrennt und per Zahleneingabe geprüft.
 - Lernphasen: Der gespeicherte Phasenstand bestimmt jetzt die Generatorschwierigkeit und Sichtbarkeit der Darstellung, nicht nur eine Metadatenangabe.
 - Geld: Stufe 1 zählt ganze Euro in einer geprüften Münzdarstellung, Stufe 2 verbindet Euro und Cent, Stufe 3 bestimmt Wechselgeld aus 10 Euro ohne vorweggenommene Darstellung.
 - Längen: Stufe 1 liest eine Zentimeter-Messstrecke, Stufe 2 wechselt zwischen Metern und Zentimetern, Stufe 3 addiert oder vergleicht Längen mit gemeinsamer Einheit.
 - Katalogschema 5: `quantityContent` liefert fachliche Aufgaben-, Erklärungs- und Darstellungsbegriffe für beide Größenkompetenzen; Mathematik und Einheitenprüfung bleiben in TypeScript.
+- Katalogschema 6: Sachaufgaben definieren konkrete Situationen, Modelltypen, Modellalternativen, Gleichungen und eine siebenstufig dokumentierte Modellierungsfolge; Rendering und Mathematik bleiben in TypeScript.
 
 ## Bewusst deaktiviert
 
