@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(8)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.10.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(9)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.11.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -239,6 +239,14 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(catalog.quantityContent.money.coinsLabel).toContain('Münz')
     expect(catalog.quantityContent.lengths.equivalenceLabel).toBe('1 m = 100 cm')
     catalog.quantityContent.lengths.equivalenceLabel = ''
+    expect(validateTaskCatalog(catalog)).toBe(false)
+  })
+
+  it('validiert Körpervorlagen, Stufen und feste Blickrichtungen', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    expect(catalog.spatialViews.templates.map((template) => template.difficulty)).toEqual(expect.arrayContaining([1, 2, 3]))
+    expect(catalog.spatialViews.directionLabels).toEqual(expect.objectContaining({ front: expect.any(String), right: expect.any(String), top: expect.any(String) }))
+    catalog.spatialViews.templates[0]!.heights = [1]
     expect(validateTaskCatalog(catalog)).toBe(false)
   })
 

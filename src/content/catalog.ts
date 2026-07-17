@@ -11,9 +11,10 @@ import {
   type SymmetryAxis,
   type SymmetryAxisPosition
 } from '../domain/symmetry'
+import { isValidCubeBuilding, type CubeBuilding, type CubeViewDirection } from '../domain/cubeViews'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 8
+export const CATALOG_SCHEMA_VERSION = 9
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -316,6 +317,20 @@ export interface SymmetryGuidance {
   successFeedback: string
 }
 
+export interface CubeBuildingTemplate extends CubeBuilding {
+  id: string
+  difficulty: 1 | 2 | 3
+}
+
+export interface SpatialViewsContent {
+  entryRationale: string
+  prompt: string
+  optionLabels: [string, string, string]
+  directionLabels: Record<CubeViewDirection, string>
+  directionGuidance: Record<CubeViewDirection, string>
+  templates: CubeBuildingTemplate[]
+}
+
 export interface TaskCatalog extends CatalogMetadata {
   fieldUsage: Record<'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
   numberRange: { min: number; max: number }
@@ -333,6 +348,7 @@ export interface TaskCatalog extends CatalogMetadata {
     progression: SymmetryProgressionPhase[]
     templates: SymmetryTemplate[]
   }
+  spatialViews: SpatialViewsContent
 }
 
 type FetchCatalog = (input: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>
@@ -352,7 +368,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -411,6 +427,30 @@ function isSymmetryContent(value: unknown): value is TaskCatalog['symmetry'] {
     const wrongAxis = reflectGrid(template.grid, template.axis === 'vertical' ? 'horizontal' : 'vertical')
     return new Set([correct, shift, wrongAxis].map((grid) => JSON.stringify(grid))).size === 3
   })
+}
+
+function isSpatialViewsContent(value: unknown): value is SpatialViewsContent {
+  if (!isRecord(value) || !isNonEmptyString(value.entryRationale) || !isNonEmptyString(value.prompt)) return false
+  if (!Array.isArray(value.optionLabels) || value.optionLabels.length !== 3 || !value.optionLabels.every(isNonEmptyString) || new Set(value.optionLabels).size !== 3) return false
+  const directions: CubeViewDirection[] = ['front', 'right', 'top']
+  if (!isRecord(value.directionLabels) || !isRecord(value.directionGuidance)) return false
+  const labels = value.directionLabels
+  const guidance = value.directionGuidance
+  if (!directions.every((direction) => isNonEmptyString(labels[direction]) && isNonEmptyString(guidance[direction]))) return false
+  if (!Array.isArray(value.templates) || value.templates.length < 6) return false
+  const ids = value.templates.map((template) => isRecord(template) ? template.id : undefined)
+  if (new Set(ids).size !== value.templates.length) return false
+  const difficulties = new Set<number>()
+  if (!value.templates.every((candidate) => {
+    if (!isRecord(candidate) || !isNonEmptyString(candidate.id) || ![1, 2, 3].includes(candidate.difficulty as number) ||
+      !Number.isInteger(candidate.width) || !Number.isInteger(candidate.depth) || !Array.isArray(candidate.heights)) return false
+    const template = candidate as unknown as CubeBuildingTemplate
+    difficulties.add(template.difficulty)
+    const count = template.heights.reduce((sum, height) => sum + height, 0)
+    const bounds = template.difficulty === 1 ? [2, 3] : template.difficulty === 2 ? [3, 4] : [4, 5]
+    return isValidCubeBuilding(template) && count >= bounds[0]! && count <= bounds[1]!
+  })) return false
+  return [1, 2, 3].every((difficulty) => difficulties.has(difficulty))
 }
 
 const REQUIREMENT_FIELDS = [
@@ -589,7 +629,7 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!['unbundlePrompt', 'unbundleError', 'unbundleSuccess', 'onesPrompt', 'onesError', 'onesSuccess', 'tensPrompt', 'tensError', 'tensSuccess', 'hundredsPrompt', 'hundredsError', 'hundredsSuccess', 'checkPrompt', 'checkError', 'checkSuccess'].every((field) => isNonEmptyString(writtenSubtractionSteps[field]))) return false
   if (!Array.isArray(value.wordProblems) || value.wordProblems.length === 0 || !value.wordProblems.every((template) => isWordProblem(template, numberRange as { min: number; max: number }))) return false
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
-  if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry)) return false
+  if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) || !isSpatialViewsContent(value.spatialViews)) return false
   return hasOnlyKnownPlaceholders(value)
 }
 

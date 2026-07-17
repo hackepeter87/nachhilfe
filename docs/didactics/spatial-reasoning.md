@@ -1,38 +1,38 @@
-# Raumvorstellung
+# Räumliche Lageänderungen
 
 Status: `disabled`. Es gibt keine sichtbaren Aufgaben oder Generatoren.
 
 ## 1. Bezug zum Förderbedarf
-Ansichten und Lageänderungen sollen gedanklich nachvollzogen werden, ohne sprachliche oder grafische Fallen.
+Lageänderungen sollen gedanklich nachvollzogen werden, ohne sprachliche oder grafische Fallen. Körperansichten sind bereits als eigene Kompetenz aktiv.
 ## 2. Lehrplanbereich
 Raum und Form; Darstellen, Argumentieren und Kommunizieren.
 ## 3. Konkretes Lernziel
-Einfache Körperansichten zuordnen und eine einzelne Dreh-, Kipp- oder Faltbewegung vorhersagen.
+Eine einzelne Dreh-, Kipp- oder Faltbewegung vorhersagen.
 ## 4. Voraussetzungen
-Lagebegriffe, ebene Figuren, Würfel und einfache Symmetrie.
+Lagebegriffe, ebene Figuren, Würfel, Körperansichten und einfache Symmetrie.
 ## 5. Typische Fehlvorstellungen
-Drehen wird mit Spiegeln verwechselt; verdeckte Teile fehlen; Betrachterrichtung bleibt unberücksichtigt.
+Drehen wird mit Spiegeln verwechselt; Drehrichtung oder Drehachse werden vertauscht.
 ## 6. Fachliche Kernidee
-Ein Körper bleibt bei Lageänderung gleich; nur seine Orientierung und sichtbare Projektion ändern sich.
+Ein Körper bleibt bei Lageänderung gleich; nur seine Orientierung verändert sich.
 ## 7. Methodischer Zugang
-Reales/virtuelles Modell, feste Ansicht, eine Veränderung, anschließend Vorhersage und Kontrolle.
+Festes Ausgangsmodell, genau eine sichtbare Veränderung, anschließend Vorhersage und Kontrolle.
 ## 8. Geeignete Darstellungen
-Kleine Würfelbauwerke, eindeutig markierte Vorderseite, Ansichtenraster und geprüfte Faltvorlage.
+Kleine Würfelbauwerke mit Drehpfeil und geprüfte Faltvorlagen.
 ## 9. Lernprogression
-Ansichten zuordnen, Körper einmal drehen, Würfel einmal kippen, einfache Faltung verfolgen.
+Körper einmal drehen, Würfel einmal kippen, einfache Faltung verfolgen.
 ## 10. Aufgabentypen
-Geplant: Ansicht auswählen, Folgezustand auswählen, einfache Reihenfolge legen.
+Geplant: Folgezustand auswählen und eine einfache Bewegungsreihenfolge legen.
 ## 11. Hilfestufen
 Betrachterposition markieren; unveränderte Merkmale nennen; Bewegung in einen Schritt zerlegen.
 ## 12. Remediation
-Zu einem Zweier- oder Dreierbauwerk und einer einzigen sichtbaren Lageänderung zurückkehren.
+Zu einem bekannten kleinen Bauwerk und einer einzigen sichtbaren Lageänderung zurückkehren.
 ## 13. Transfer
-Ansicht aus neuer Richtung begründen oder Bewegung rückwärts verfolgen.
+Eine Bewegung rückwärts verfolgen und den Ausgangszustand begründen.
 ## 14. Wiederholung
-Ansichten, Kippen und Falten als getrennte Unterkompetenzen behandeln.
+Rotation, Kippen und Falten als getrennte Kompetenzen behandeln.
 ## 15. Erfolgskriterien
 Vor Aktivierung: exakt eine Lösung, geprüfte Geometrie, klare Perspektive und mobile Lesbarkeit.
 ## 16. Grenzen der aktuellen Umsetzung
-Nur Symmetrie ist produktiv; Körperansichten, Kippen und Falten bleiben deaktiviert.
+Körperansichten und Symmetrie sind produktiv; Rotation, Kippen und Falten bleiben deaktiviert.
 ## 17. Punkte für die Gesamtprüfung
 Vor Aktivierung visuelle Konventionen und angemessene räumliche Komplexität prüfen.

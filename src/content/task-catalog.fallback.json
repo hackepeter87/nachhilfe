@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 8,
-  "catalogVersion": "0.10.0",
+  "schemaVersion": 9,
+  "catalogVersion": "0.11.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -3016,6 +3016,161 @@
         "1 Meter wird als 100 Zentimeter verwendet.",
         "Rechenergebnis und Einheit sind konsistent."
       ]
+    },
+    {
+      "id": "body-views",
+      "label": "Körperansichten",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Einfache Würfelgebäude aus einer fest markierten Blickrichtung als Vorder-, rechte Seiten- oder Draufsicht erkennen.",
+      "misconceptions": [
+        "Eine Ansicht wird mit dem ganzen räumlichen Bild verwechselt.",
+        "Hintereinander stehende Würfel werden in der Vorderansicht doppelt gezählt.",
+        "Vorder- und rechte Seitenansicht werden vertauscht."
+      ],
+      "hints": [
+        "Stelle dich gedanklich an die markierte {viewLabel}. Was liegt genau hintereinander?",
+        "Betrachte jede Reihe aus dieser Richtung. Entscheidend ist, wie hoch und wie breit das Gebäude dort erscheint."
+      ],
+      "prompt": "Welche Zeichnung zeigt die {viewLabel}?",
+      "errorFeedback": "Diese Ansicht passt noch nicht. Prüfe zuerst die markierte Blickrichtung und dann jede sichtbare Reihe.",
+      "explanation": "Aus der {viewLabel} werden Würfel, die genau hintereinander stehen, in derselben Rasterspalte dargestellt.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 2,
+        "maxValue": 5
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Das Kind überträgt ein räumlich dargestelltes Würfelgebäude in eine ebene Ansicht."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind berücksichtigt Würfel, die aus einer Blickrichtung hintereinanderliegen."
+        }
+      ],
+      "prerequisites": [
+        "Vorne, rechts und oben unterscheiden",
+        "Raster zeilen- und spaltenweise lesen"
+      ],
+      "representations": [
+        "Fest ausgerichtetes axonometrisches Würfelgebäude",
+        "Ebene Rasteransicht"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Zwei bis drei Würfel; nur Vorderansicht; wenige Höhen und deutliche Richtungsmarkierung",
+          "numberRange": "2 bis 3 sichtbare Würfel",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Drei bis vier Würfel; Vorder- oder rechte Seitenansicht; Würfel können hintereinanderstehen",
+          "numberRange": "3 bis 4 sichtbare Würfel",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Vier bis fünf Würfel; Vorder-, rechte Seiten- oder Draufsicht; ähnliche plausible Ansichten",
+          "numberRange": "4 bis 5 sichtbare Würfel",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Stehen zwei Würfel aus der Vorderansicht genau hintereinander, belegen sie dieselbe Stelle der ebenen Ansicht; nur die größte Stapelhöhe ist sichtbar.",
+      "successFeedback": "Du hast Blickrichtung und sichtbare Würfel richtig verbunden.",
+      "remediation": {
+        "strategy": "Die Blickrichtung wird markiert und das Gebäude Reihe für Reihe betrachtet.",
+        "foundationStrategy": "Kehre zu einem Gebäude aus zwei oder drei Würfeln und nur zur Vorderansicht zurück.",
+        "representation": "Festes Würfelgebäude mit Richtungspfeilen und Rasteransicht",
+        "keepSubskill": false
+      },
+      "transferPrompt": "Beschreibe, warum zwei verschiedene Gebäude aus einer Richtung gleich aussehen können.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Vorne, rechts und oben an einem fest ausgerichteten Gebäude wiedererkennen.",
+          "exerciseTypes": [
+            "body-views:front"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Ein kleines Gebäude Reihe für Reihe in die Vorderansicht übertragen.",
+          "exerciseTypes": [
+            "body-views:front"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Vorderansichten mit sichtbarer Richtungsmarkierung zuordnen.",
+          "exerciseTypes": [
+            "body-views:front"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Zwischen Vorder- und rechter Seitenansicht unterscheiden.",
+          "exerciseTypes": [
+            "body-views:front",
+            "body-views:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Blickrichtungen an variierten Gebäuden sicher zuordnen.",
+          "exerciseTypes": [
+            "body-views:front",
+            "body-views:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Zusätzlich Draufsichten und ähnlichere Ansichten unterscheiden.",
+          "exerciseTypes": [
+            "body-views:front",
+            "body-views:right",
+            "body-views:top"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die gewählte Ansicht entspricht der fest markierten Blickrichtung.",
+        "Hintereinander stehende Würfel werden korrekt auf dieselbe Rasterposition projiziert.",
+        "Vorder-, rechte Seiten- und Draufsicht werden nicht durch Rotation des Gebäudes verwechselt."
+      ]
     }
   ],
   "wordProblems": [
@@ -4270,6 +4425,100 @@
       }
     ]
   },
+  "spatialViews": {
+    "entryRationale": "Die feste Orientierung und vollständig sichtbare Würfel reduzieren die Aufgabe auf das Zuordnen räumlicher Gebäude zu ebenen Ansichten. Freie Rotation und verdeckte Würfel bleiben ausgeschlossen.",
+    "prompt": "Welche Zeichnung zeigt die {viewLabel}?",
+    "optionLabels": [
+      "Ansicht A",
+      "Ansicht B",
+      "Ansicht C"
+    ],
+    "directionLabels": {
+      "front": "Vorderansicht",
+      "right": "Ansicht von rechts",
+      "top": "Draufsicht"
+    },
+    "directionGuidance": {
+      "front": "Blicke vom grünen Pfeil vorne auf jede senkrechte Spalte.",
+      "right": "Blicke vom blauen Pfeil rechts auf jede Reihe des Gebäudes.",
+      "top": "Blicke von oben und markiere jede Grundfläche, auf der mindestens ein Würfel steht."
+    },
+    "templates": [
+      {
+        "id": "front-step-2x1",
+        "difficulty": 1,
+        "width": 2,
+        "depth": 1,
+        "heights": [
+          2,
+          1
+        ]
+      },
+      {
+        "id": "front-step-3x1",
+        "difficulty": 1,
+        "width": 3,
+        "depth": 1,
+        "heights": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "corner-stack-a",
+        "difficulty": 2,
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          2,
+          0
+        ]
+      },
+      {
+        "id": "corner-stack-b",
+        "difficulty": 2,
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          2,
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "offset-stack-3x2",
+        "difficulty": 3,
+        "width": 3,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          1,
+          0,
+          2,
+          0
+        ]
+      },
+      {
+        "id": "stair-path-2x3",
+        "difficulty": 3,
+        "width": 2,
+        "depth": 3,
+        "heights": [
+          1,
+          0,
+          1,
+          1,
+          0,
+          2
+        ]
+      }
+    ]
+  },
   "fieldUsage": {
     "workedExample": "review",
     "remediation": "runtime",
@@ -4287,25 +4536,23 @@
   "preparedTopics": [
     {
       "id": "spatial-reasoning",
-      "label": "Raumvorstellung",
+      "label": "Räumliche Lageänderungen",
       "curriculumArea": "Raum und Form",
-      "supportGoal": "Ansichten, Lageänderungen und einfache Kopfgeometrie an geprüften Modellen verstehen.",
+      "supportGoal": "Lageänderungen und einfache Kopfgeometrie an geprüften Modellen verstehen.",
       "prerequisites": [
         "Lagebegriffe",
         "ebene Figuren erkennen",
         "einfache Symmetrie"
       ],
       "representations": [
-        "Würfelbauwerk",
-        "Ansichtenraster",
+        "Würfelbauwerk mit Drehpfeil",
         "Faltvorlage"
       ],
       "misconceptions": [
         "Drehen wird mit Spiegeln verwechselt.",
-        "Verdeckte Würfel werden nicht berücksichtigt."
+        "Die Drehrichtung wird vertauscht."
       ],
       "progression": [
-        "Ansichten zuordnen",
         "Körper gedanklich drehen",
         "einfache Kippbewegungen verfolgen",
         "Faltungen vorhersagen"

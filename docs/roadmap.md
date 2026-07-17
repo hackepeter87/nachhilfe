@@ -42,7 +42,7 @@ Eine Kompetenz erhält erst `active`, wenn diese vier Pakete abgeschlossen sind.
 
 ## Katalog und Schnittstellen
 
-`SkillId` wird nur pro adaptiv relevantem Fachbereich erweitert. Version 0.11 führt `written-addition`, `guided-number` und `column-calculation` ein und erhöht das Katalogschema deshalb auf 8. Version 0.12 nutzt dieselbe Spalteninfrastruktur. Raumthemen bleiben getrennte Kompetenzen für Ansichten, Rotation und Falten. Daten werden später in Tabellen und Diagramme, Stochastik in Wahrscheinlichkeit und Kombinatorik getrennt. Zeit, Masse und Rauminhalt bleiben eigene adaptive Kompetenzen.
+`SkillId` wird nur pro adaptiv relevantem Fachbereich erweitert. Version 0.11 führt `written-addition`, `guided-number` und `column-calculation` ein und erhöht das Katalogschema deshalb auf 8. Version 0.12 nutzt dieselbe Spalteninfrastruktur. Version 0.13 erhöht das Schema auf 9 und ergänzt `spatialViews` mit geprüften Gebäuden; Projektion und Prüfung bleiben TypeScript. Raumthemen bleiben getrennte Kompetenzen für Ansichten, Rotation und Falten. Daten werden später in Tabellen und Diagramme, Stochastik in Wahrscheinlichkeit und Kombinatorik getrennt. Zeit, Masse und Rauminhalt bleiben eigene adaptive Kompetenzen.
 
 Neue Kompetenzen erhöhen die Katalog-Minor-Version. `schemaVersion` steigt nur bei einer tatsächlich genutzten inkompatiblen Datenstruktur. Der Gesamtkatalog bleibt bis zur Evaluation `ready-for-review`; intern vollständig umgesetzte Kompetenzen stehen auf `active`.
 
@@ -53,7 +53,7 @@ Neue Kompetenzen erhöhen die Katalog-Minor-Version. `schemaVersion` steigt nur 
 - Die drei Stufen unterscheiden sich objektiv in Idee, Unterstützung oder Selbstständigkeit.
 - Fehlvorstellungen, Hinweise, Erklärung, Remediation und leichtere Wiederholung werden getestet.
 - Playwright prüft `375 x 812` und `812 x 375` ohne horizontales Overflow oder Konsolenfehler.
-- 3D-Inhalte verwenden lokal gebündeltes Three.js und erhalten Screenshot- sowie Canvas-Pixelprüfungen.
+- Interaktive 3D-Inhalte verwenden lokal gebündeltes Three.js und erhalten Screenshot- sowie Canvas-Pixelprüfungen. Die Körperansichten 0.13 nutzen bewusst ein statisches axonometrisches SVG-Diagramm; freie 3D-Interaktion gehört erst zu späteren Rotationsaufgaben.
 - Offline-Runde, Reload, IndexedDB, Katalogabgleich, Typecheck, Lint, Tests, Build, E2E und AMD64-Container werden vor jedem Tag geprüft.
 - GHCR veröffentlicht ausschließlich `linux/amd64`.
 

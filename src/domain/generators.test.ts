@@ -3,11 +3,12 @@ import { createRoundingExercise, formatEuro, formatLength, generateExercise, isA
 import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
 import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSide } from './symmetry'
+import { cubeCount, cubeViewKey, isValidCubeBuilding, projectCubeView, type CubeBuilding, type CubeViewDirection } from './cubeViews'
 
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
+  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views'
 ]
 
 describe('deterministische Aufgabengeneratoren', () => {
@@ -462,6 +463,35 @@ describe('deterministische Aufgabengeneratoren', () => {
         if (progressionPhase === 4) expect(relevantSize % 2).toBe(1)
       }
     }
+  })
+
+  it('erzeugt Körperansichten über 1.000 Seeds je Stufe korrekt und eindeutig', () => {
+    const directionsByDifficulty = [new Set<string>(), new Set<string>(), new Set<string>()]
+    const variantsByDifficulty = [new Set<string>(), new Set<string>(), new Set<string>()]
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('body-views', seed, difficulty)
+        const values = exercise.representation?.values
+        const building: CubeBuilding = {
+          width: Number(values?.width), depth: Number(values?.depth),
+          heights: Array.isArray(values?.heights) ? values.heights as number[] : []
+        }
+        const direction = exercise.variant.values.direction as CubeViewDirection
+        directionsByDifficulty[difficulty - 1].add(direction)
+        variantsByDifficulty[difficulty - 1].add(exercise.variant.key)
+        expect(isValidCubeBuilding(building)).toBe(true)
+        expect(cubeCount(building)).toBeGreaterThanOrEqual(difficulty === 1 ? 2 : difficulty === 2 ? 3 : 4)
+        expect(cubeCount(building)).toBeLessThanOrEqual(difficulty === 1 ? 3 : difficulty === 2 ? 4 : 5)
+        expect(exercise.correctAnswer).toBe(cubeViewKey(projectCubeView(building, direction)))
+        expect(exercise.options).toHaveLength(3)
+        expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(3)
+        expect(exercise.options?.filter((option) => option.value === exercise.correctAnswer)).toHaveLength(1)
+      }
+    }
+    expect(directionsByDifficulty[0]).toEqual(new Set(['front']))
+    expect(directionsByDifficulty[1]).toEqual(new Set(['front', 'right']))
+    expect(directionsByDifficulty[2]).toEqual(new Set(['front', 'right', 'top']))
+    variantsByDifficulty.forEach((variants) => expect(variants.size).toBeGreaterThan(1))
   })
 
   it('hält Rechenstrategien bis 1000 im Zahlenraum und fachlich konsistent', () => {

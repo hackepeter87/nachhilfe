@@ -198,3 +198,36 @@ describe('MathRepresentation Größen', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Längenangaben')
   })
 })
+
+describe('MathRepresentation Körperansichten', () => {
+  it('zeichnet jeden Würfel exakt einmal und markiert die feste Orientierung', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'cube-building', visibility: 'always', label: 'Vier Würfel. Vorne und rechts sind markiert.',
+      values: { width: 2, depth: 2, heights: [1, 1, 2, 0] }
+    }} />)
+    expect(screen.getByRole('img', { name: 'Vier Würfel. Vorne und rechts sind markiert.' })).toBeVisible()
+    expect(container.querySelectorAll('.iso-cube')).toHaveLength(4)
+    expect(container).toHaveTextContent('vornerechts')
+  })
+
+  it('stellt eine ebene Ansicht als vollständiges Raster dar', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'cube-view', visibility: 'always', label: 'Ansicht A: Vorderansicht',
+      values: { rows: 2, columns: 2, cells: [1, 0, 1, 1] }
+    }} />)
+    expect(screen.getByRole('img', { name: 'Ansicht A: Vorderansicht' })).toBeVisible()
+    expect(container.querySelectorAll('.cube-view-cell')).toHaveLength(4)
+    expect(container.querySelectorAll('.cube-view-cell--filled')).toHaveLength(3)
+  })
+
+  it('lehnt ungültige Gebäude und Ansichten sichtbar ab', () => {
+    const { rerender } = render(<MathRepresentation representation={{
+      kind: 'cube-building', visibility: 'always', label: 'Ungültig', values: { width: 2, depth: 1, heights: [1] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
+    rerender(<MathRepresentation representation={{
+      kind: 'cube-view', visibility: 'always', label: 'Ungültig', values: { rows: 2, columns: 2, cells: [1, 0] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
+  })
+})

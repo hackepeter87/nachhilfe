@@ -5,6 +5,19 @@ import { generateExercise } from '../domain'
 import { ExerciseCard } from './ExerciseCard'
 
 describe('ExerciseCard', () => {
+  it('lässt eine Körperansicht auswählen und gibt richtungsbezogenes Feedback', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('body-views', 42, 2)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    expect(screen.getByRole('img', { name: /Würfel.*Vorne und rechts sind markiert/i })).toBeVisible()
+    expect(screen.getAllByRole('img', { name: /Ansicht [ABC]/ })).toHaveLength(3)
+    await user.click(screen.getByRole('button', { name: new RegExp(exercise.options?.find((option) => option.value === exercise.correctAnswer)?.label ?? '') }))
+    expect(screen.getByText(exercise.successFeedback)).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'body-views', correct: true }))
+  })
+
   it('zeigt bei Symmetrie die katalogisierte Spiegelachse eindeutig an', () => {
     const exercise = generateExercise('symmetry', 42, 1, 'symmetry-phase-1')
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)

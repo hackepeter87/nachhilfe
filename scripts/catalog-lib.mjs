@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 8
+export const CATALOG_SCHEMA_VERSION = 9
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -18,7 +18,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -267,6 +267,55 @@ function validateSymmetry(symmetry) {
   })
 }
 
+function validateSpatialViews(spatialViews) {
+  if (!isRecord(spatialViews) || !isText(spatialViews.entryRationale) || !isText(spatialViews.prompt) ||
+    !Array.isArray(spatialViews.optionLabels) || spatialViews.optionLabels.length !== 3 || !spatialViews.optionLabels.every(isText)) {
+    fail('spatialViews Grunddaten sind ungültig')
+  }
+  requireUnique(spatialViews.optionLabels, 'spatialViews.optionLabels')
+  for (const direction of ['front', 'right', 'top']) {
+    if (!isText(spatialViews.directionLabels?.[direction]) || !isText(spatialViews.directionGuidance?.[direction])) {
+      fail(`spatialViews ${direction} ist unvollständig`)
+    }
+  }
+  if (!Array.isArray(spatialViews.templates) || spatialViews.templates.length < 6) fail('spatialViews.templates ist unvollständig')
+  requireUnique(spatialViews.templates.map((template) => template.id), 'spatialViews.templates IDs')
+  const difficulties = new Set()
+  spatialViews.templates.forEach((template) => {
+    if (!isRecord(template) || !isText(template.id) || ![1, 2, 3].includes(template.difficulty) ||
+      !Number.isInteger(template.width) || template.width < 2 || template.width > 3 ||
+      !Number.isInteger(template.depth) || template.depth < 1 || template.depth > 3 ||
+      !Array.isArray(template.heights) || template.heights.length !== template.width * template.depth ||
+      !template.heights.every((height) => Number.isInteger(height) && height >= 0 && height <= 2)) fail(`Körpervorlage ${String(template?.id)} ist ungültig`)
+    const cubeCount = template.heights.reduce((sum, height) => sum + height, 0)
+    const [min, max] = template.difficulty === 1 ? [2, 3] : template.difficulty === 2 ? [3, 4] : [4, 5]
+    if (cubeCount < min || cubeCount > max) fail(`Körpervorlage ${template.id} passt nicht zur Schwierigkeit`)
+    const fillsBoundingBox = template.heights.some((height, index) => height > 0 && index % template.width === 0) &&
+      template.heights.some((height, index) => height > 0 && index % template.width === template.width - 1) &&
+      template.heights.slice(0, template.width).some((height) => height > 0) &&
+      template.heights.slice((template.depth - 1) * template.width).some((height) => height > 0)
+    if (!fillsBoundingBox) fail(`Körpervorlage ${template.id} enthält einen unsichtbaren äußeren Rasterrand`)
+    const occupied = template.heights.map((height, index) => height > 0 ? index : -1).filter((index) => index >= 0)
+    const visited = new Set(occupied.slice(0, 1))
+    const queue = [...visited]
+    while (queue.length > 0) {
+      const index = queue.shift()
+      const x = index % template.width
+      const y = Math.floor(index / template.width)
+      for (const [nextX, nextY] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+        const nextIndex = nextY * template.width + nextX
+        if (nextX >= 0 && nextX < template.width && nextY >= 0 && nextY < template.depth && template.heights[nextIndex] > 0 && !visited.has(nextIndex)) {
+          visited.add(nextIndex)
+          queue.push(nextIndex)
+        }
+      }
+    }
+    if (visited.size !== occupied.length) fail(`Körpervorlage ${template.id} ist nicht zusammenhängend`)
+    difficulties.add(template.difficulty)
+  })
+  if (![1, 2, 3].every((difficulty) => difficulties.has(difficulty))) fail('spatialViews braucht Vorlagen für alle drei Stufen')
+}
+
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
@@ -319,6 +368,7 @@ export function validateCatalog(catalog) {
     fail('wordProblemSteps.modellingProgression ist unvollständig')
   }
   validateSymmetry(catalog.symmetry)
+  validateSpatialViews(catalog.spatialViews)
   validatePlaceholders(catalog)
   return catalog
 }

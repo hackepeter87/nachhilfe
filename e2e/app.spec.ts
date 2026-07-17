@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.10.0',
-    schemaVersion: 8,
-    appVersion: '0.12.0'
+    catalogVersion: '0.11.0',
+    schemaVersion: 9,
+    appVersion: '0.13.0'
   })
 
   await page.reload()
@@ -202,6 +202,42 @@ test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async
   expect(axisMetrics.axisColor).not.toBe('rgba(0, 0, 0, 0)')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('symmetrie-achse-375x812.png'), fullPage: true })
+})
+
+test('Körperansichten zeigen Gebäude, Richtungen und drei Raster mobil ohne Overflow', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'body-views'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Würfel')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  await expect(page.getByRole('img', { name: /Würfel.*Vorne und rechts sind markiert/i })).toBeVisible()
+  await expect(page.getByText('vorne')).toBeVisible()
+  await expect(page.getByText('rechts')).toBeVisible()
+  await expect(page.getByRole('img', { name: /Ansicht [ABC]/ })).toHaveCount(3)
+  expect(await page.locator('.iso-cube').count()).toBeGreaterThanOrEqual(2)
+  expect(await page.locator('.iso-cube').count()).toBeLessThanOrEqual(3)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('koerperansichten-375x812.png'), fullPage: true })
+
+  await page.setViewportSize({ width: 812, height: 375 })
+  await expect(page.locator('.cube-building-visual')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('koerperansichten-812x375.png'), fullPage: true })
 })
 
 test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen Rechnung', async ({ page }, testInfo) => {

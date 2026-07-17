@@ -11,6 +11,8 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Nachbarzehner, Nachbarhunderter sowie Runden auf Zehner und Hunderter
 - Additions-, Subtraktions- und Ergänzungsstrategien bis 1000 mit geprüftem Zwischenschritt, Stellenwerttafel oder Rechenstrich
 - Schriftliche Addition bis 1000 ohne oder mit genau einem Übertrag und geführter Spaltendarstellung
+- Schriftliche Subtraktion bis 1000 ohne oder mit genau einer Entbündelung und abschließender Additionsprobe
+- Körperansichten einfacher Würfelgebäude aus zwei bis fünf sichtbaren Würfeln: vorne, rechts und von oben
 - Geführte ein- und zweischrittige Sachaufgaben: gesuchte Größe klären, unbekanntenhaltiges Mengenbild untersuchen oder auswählen, konkrete Rechnung bilden, selbst rechnen und Antwort prüfen
 - Geldbeträge in Euro und Cent mit lokaler Münzdarstellung sowie Wechselgeld aus 10 Euro
 - Längen in Zentimetern und Metern mit Messstrecke, Umrechnung und einfachen Rechnungen
@@ -20,7 +22,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Installierbare PWA mit vollständig vorgehaltenen MVP-Ressourcen
 - OCI-Container mit unprivilegiertem Nginx, Healthcheck und passenden Cache-Regeln
 
-Nicht Bestandteil dieses Stands sind schriftliche Subtraktion, mehrere gleichzeitige Stellenübergänge, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN, Backup, Körperansichten, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md).
+Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, verdeckte Würfel, mentale Würfeldrehungen, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN, Backup, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md).
 
 ## Voraussetzungen
 
@@ -81,10 +83,11 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - Förderziele, Prozesskompetenzen, Vorkenntnisse und typische Fehlvorstellungen
 - sechs Lernphasen, drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
 - zwei Hinweise, gearbeitetes Beispiel, Erklärung, strukturierte Remediation und Transferimpuls
-- überprüfbare Erfolgskriterien, produktive Größenkompetenzen für Geld und Längen sowie eine deaktivierte Vorbereitung für Raumvorstellung
+- überprüfbare Erfolgskriterien, produktive Größenkompetenzen für Geld und Längen, geprüfte Würfelgebäude für Körperansichten sowie eine deaktivierte Vorbereitung für Rotation und Falten
 - kompetenzbezogene Erfolgs- und Fehlertexte sowie Release-Status
 - strukturierte Sachaufgabenvorlagen mit interner Mengenbeziehung, konkreter Handlung, gesuchter Größe, unbekanntenhaltigem Modell, plausiblen Modell- und Gleichungsalternativen sowie Plausibilitätsprüfung
 - fünfphasige Symmetrieprogression mit rechteckigen geraden Einstiegsrastern, expliziter Achsenlage, Figurenkomplexität und Distraktorstrategie
+- Körperansichtsvorlagen mit fester Orientierung, Würfelanzahl, drei Blickrichtungen und stufengerechten Gebäudegrenzen
 
 Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Status `draft`, `ready-for-review`, `active` oder `disabled`. Der Gesamtkatalog steht auf `ready-for-review`; technisch, mathematisch und intern didaktisch geprüfte Laufzeitkompetenzen stehen auf `active`. Das ist keine dokumentierte Freigabe durch eine Lehrkraft.
 
@@ -128,7 +131,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.12.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.13.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -169,6 +172,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.12.0
+## Release-Stand 0.13.0
 
-Version 0.12.0 ergänzt die schriftliche Subtraktion bis 1000 ohne oder mit genau einer Entbündelung. Stufe 2 zeigt die veränderten Stellen erst nach dem eigenen Entbündelungsschritt; Stufe 3 verlangt die Idee selbstständig und schließt mit der Additionsprobe. Die Kompetenz wird erst nach Stellenwert und halbschriftlicher Subtraktion in der selbstständigen Übungsphase ausgewählt. Katalog 0.10.0 nutzt weiterhin Schema 8. GHCR und Compose sind auf linux/amd64 begrenzt. Didaktik, Grenzen und weitere Releasefolge stehen in [docs/didactics/written-subtraction.md](docs/didactics/written-subtraction.md), der [Roadmap](docs/roadmap.md) und [docs/validation-0.6.md](docs/validation-0.6.md). Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.13.0 ergänzt Körperansichten einfacher Würfelgebäude. Stufe 1 nutzt nur die Vorderansicht, Stufe 2 unterscheidet vorne und rechts, Stufe 3 ergänzt die Draufsicht und ähnlichere Distraktoren. Gebäude, didaktische Texte und Stufengrenzen liegen im Katalog 0.11.0; Projektion und Prüfung bleiben in TypeScript. Schema 9 ergänzt die verwendete Struktur `spatialViews`. GHCR und Compose sind auf linux/amd64 begrenzt. Didaktik, Grenzen und weitere Releasefolge stehen in [docs/didactics/body-views.md](docs/didactics/body-views.md), der [Roadmap](docs/roadmap.md) und [docs/validation-0.6.md](docs/validation-0.6.md). Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

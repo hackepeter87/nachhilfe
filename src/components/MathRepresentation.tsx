@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { ExerciseRepresentation } from '../domain'
+import { isValidCubeBuilding, type CubeBuilding, type ExerciseRepresentation } from '../domain'
 
 const isValidGroupValue = (value: number) => Number.isInteger(value) && value >= 1 && value <= 10
 const isNumberLineJump = (value: unknown): value is { from: number; to: number; label: string } =>
@@ -13,6 +13,64 @@ export function MathRepresentation({ representation }: { representation: Exercis
   const values = representation.values
   const textValue = (value: typeof values[string]) => Array.isArray(value) ? '' : value
   const modelType = typeof values.modelType === 'string' ? values.modelType : undefined
+
+  if (representation.kind === 'cube-building') {
+    const building: CubeBuilding = {
+      width: Number(values.width),
+      depth: Number(values.depth),
+      heights: Array.isArray(values.heights) ? values.heights.map(Number) : []
+    }
+    if (!isValidCubeBuilding(building)) {
+      return <div className="math-visual math-visual--error" role="alert">Das Würfelgebäude enthält ungültige Daten.</div>
+    }
+    const cubes = building.heights.flatMap((height, index) => {
+      const x = index % building.width
+      const y = Math.floor(index / building.width)
+      return Array.from({ length: height }, (_, z) => ({ x, y, z }))
+    }).sort((first, second) => (first.x + first.y + first.z) - (second.x + second.y + second.z))
+    const points = (coordinates: Array<[number, number]>) => coordinates.map(([x, y]) => `${x},${y}`).join(' ')
+    return (
+      <div className="math-visual cube-building-visual" role="img" aria-label={representation.label}>
+        <svg aria-hidden="true" viewBox="0 0 280 205">
+          {cubes.map(({ x, y, z }) => {
+            const centerX = 132 + (x - y) * 38
+            const topY = 105 + (x + y) * 20 - z * 38
+            return (
+              <g className="iso-cube" key={`${x}-${y}-${z}`}>
+                <polygon className="cube-face cube-face--left" points={points([[centerX - 38, topY], [centerX, topY + 20], [centerX, topY + 58], [centerX - 38, topY + 38]])} />
+                <polygon className="cube-face cube-face--right" points={points([[centerX, topY + 20], [centerX + 38, topY], [centerX + 38, topY + 38], [centerX, topY + 58]])} />
+                <polygon className="cube-face cube-face--top" points={points([[centerX, topY - 20], [centerX + 38, topY], [centerX, topY + 20], [centerX - 38, topY]])} />
+              </g>
+            )
+          })}
+          <g className="view-direction view-direction--front">
+            <path d="M118 194 L118 169 M110 177 L118 169 L126 177" />
+            <text x="91" y="202">vorne</text>
+          </g>
+          <g className="view-direction view-direction--right">
+            <path d="M264 151 L239 151 M247 143 L239 151 L247 159" />
+            <text x="230" y="174">rechts</text>
+          </g>
+        </svg>
+      </div>
+    )
+  }
+
+  if (representation.kind === 'cube-view') {
+    const rows = Number(values.rows)
+    const columns = Number(values.columns)
+    const cells = Array.isArray(values.cells) ? values.cells.map(Number) : []
+    const valid = Number.isInteger(rows) && rows >= 1 && rows <= 3 && Number.isInteger(columns) && columns >= 1 && columns <= 3 &&
+      cells.length === rows * columns && cells.every((cell) => cell === 0 || cell === 1) && cells.some(Boolean)
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Körperansicht enthält ungültige Daten.</div>
+    return (
+      <div className="math-visual cube-view-visual" role="img" aria-label={representation.label}>
+        <span className="cube-view-grid" aria-hidden="true" style={{ '--view-columns': columns } as CSSProperties}>
+          {cells.map((cell, index) => <i className={cell ? 'cube-view-cell cube-view-cell--filled' : 'cube-view-cell'} key={index} />)}
+        </span>
+      </div>
+    )
+  }
 
   if (representation.kind === 'place-value') {
     return (

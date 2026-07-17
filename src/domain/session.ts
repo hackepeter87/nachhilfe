@@ -19,7 +19,8 @@ const FOCUS_SKILLS: SkillId[] = [
   'written-subtraction',
   'complement-1000',
   'money',
-  'lengths'
+  'lengths',
+  'body-views'
 ]
 
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']

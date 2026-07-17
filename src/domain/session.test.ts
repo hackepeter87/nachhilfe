@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.10.0',
-      schemaVersion: 8,
-      appVersion: '0.12.0'
+      catalogVersion: '0.11.0',
+      schemaVersion: 9,
+      appVersion: '0.13.0'
     })
   })
 
@@ -63,7 +63,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.10.0')
+      expect(runningSession.catalogVersion).toBe('0.11.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -203,5 +203,13 @@ describe('Sitzungsplanung', () => {
     })
     expect(repetition.representation?.visibility).toBe('always')
     expect(repetition.variant.key).not.toBe(original.variant.key)
+  })
+
+  it('führt nach einem Fehler bei Körperansichten auf ein leichteres anderes Gebäude zurück', () => {
+    const original = generateExercise('body-views', 905, 3)
+    const repetition = createRemediationExercise(original, 906)
+    expect(repetition).toMatchObject({ skillId: 'body-views', difficulty: 2 })
+    expect(repetition.variant.key).not.toBe(original.variant.key)
+    expect(Number(repetition.variant.values.cubes)).toBeLessThanOrEqual(4)
   })
 })

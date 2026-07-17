@@ -3,6 +3,7 @@ import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, Exerci
 import { getSkillContent, getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { WordModelType } from '../content/catalog'
 import { createShiftDistractor, flipGrid, mirrorGrid, reflectGrid } from './symmetry'
+import { createCubeViewDistractors, cubeCount, cubeViewKey, projectCubeView, type CubeViewDirection } from './cubeViews'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1241,6 +1242,53 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+function bodyViews(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().spatialViews
+  const candidates = content.templates.filter((template) => template.difficulty === difficulty)
+  if (candidates.length === 0) throw new Error(`Keine Körperansicht-Vorlage für Stufe ${difficulty}.`)
+  const template = pick(random, candidates)
+  const directions: CubeViewDirection[] = difficulty === 1 ? ['front'] : difficulty === 2 ? ['front', 'right'] : ['front', 'right', 'top']
+  const direction = pick(random, directions)
+  const correct = projectCubeView(template, direction)
+  const distractors = createCubeViewDistractors(correct, direction)
+  const viewLabel = content.directionLabels[direction]
+  const values = { viewLabel, direction, cubes: cubeCount(template), templateId: template.id }
+  const shuffled = shuffle<{ grid: number[][]; misconception?: string }>(random, [
+    { grid: correct, misconception: undefined },
+    ...distractors.map((candidate) => ({ grid: candidate.grid, misconception: candidate.misconception }))
+  ])
+  const options = shuffled.map((candidate, index): AnswerOption => ({
+    value: cubeViewKey(candidate.grid),
+    label: content.optionLabels[index]!,
+    misconception: candidate.misconception,
+    representation: {
+      kind: 'cube-view',
+      visibility: 'always',
+      label: `${content.optionLabels[index]}: ${viewLabel}`,
+      values: { rows: candidate.grid.length, columns: candidate.grid[0]!.length, cells: candidate.grid.flat() }
+    }
+  }))
+  const skillContent = contentFor('body-views', values, difficulty)
+  return withMetadata({
+    ...base('body-views', seed, difficulty, values),
+    ...skillContent,
+    prompt: renderCatalogText(content.prompt, values),
+    typeId: 'cube-building-view',
+    subskillId: `body-view-${direction}`,
+    answerMode: 'choice',
+    correctAnswer: cubeViewKey(correct),
+    options,
+    representation: {
+      kind: 'cube-building',
+      visibility: 'always',
+      label: `${cubeCount(template)} Würfel. Vorne und rechts sind markiert.`,
+      values: { width: template.width, depth: template.depth, heights: template.heights }
+    },
+    explanation: `${content.directionGuidance[direction]} ${skillContent.explanation}`
+  })
+}
+
 export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
   switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus)
@@ -1263,6 +1311,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'lengths': return lengths(seed, difficulty)
     case 'word-problem': return wordProblem(seed, difficulty)
     case 'symmetry': return symmetry(seed, difficulty, focus)
+    case 'body-views': return bodyViews(seed, difficulty)
   }
 }
 

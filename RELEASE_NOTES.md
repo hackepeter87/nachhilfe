@@ -1,5 +1,17 @@
 # Mathe-Reise
 
+## Körperansichten 0.13.0
+
+- Die neue Kompetenz `body-views` verbindet fest ausgerichtete Würfelgebäude aus zwei bis fünf sichtbaren Würfeln mit Vorder-, rechter Seiten- und Draufsicht.
+- Drei wirksame Stufen steigern Blickrichtungen, Gebäudekomplexität und Ähnlichkeit der Distraktoren. Freie Rotation und verdeckte Würfel bleiben für spätere Releases ausgeschlossen.
+- Katalog 0.11.0 und Schema 9 enthalten geprüfte Gebäudevorlagen, Richtungsbegriffe und didaktische Grenzen; Projektion, Distraktoren und Validierung bleiben reine TypeScript-Logik.
+- Die mobile Vektordarstellung markiert vorne und rechts eindeutig. Antwortoptionen verwenden gleichartige Raster und ungültige Darstellungsdaten führen zu einem sichtbaren Fehler.
+- Körperansichten werden als eigener Förderbereich adaptiv ausgewählt und benötigen keine künstliche Symmetrie-Sperre. Die statische Darstellung führt keine mentale Drehung vorweg.
+
+Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test wurden nicht durchgeführt. Automatisierte Konsistenzprüfungen belegen keine pädagogische Wirksamkeit.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 218 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und neun Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.13.0` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. Eine Lehrkraftprüfung und ein echter iPhone-Test wurden nicht durchgeführt.
+
 ## Schriftliche Subtraktion 0.12.0
 
 - Die neue Kompetenz written-subtraction führt dreistellige Aufgaben zunächst ohne Entbündelung, dann mit genau einer sichtbaren Zehner-zu-Einer-Entbündelung und schließlich mit einer selbstständigen Entbündelung aus Zehnern oder Hundertern ein.
