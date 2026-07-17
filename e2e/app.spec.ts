@@ -432,6 +432,10 @@ test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', asy
   await expect(page.getByText(/Die Hunderterziffer \d stimmt/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('schriftliche-subtraktion-375x812.png'), fullPage: true })
+  await page.setViewportSize({ width: 812, height: 375 })
+  await expect(column).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('schriftliche-subtraktion-812x375.png'), fullPage: true })
 })
 
 test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', async ({ page }, testInfo) => {
