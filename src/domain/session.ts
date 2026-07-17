@@ -1,42 +1,26 @@
 import { generateExercise } from './generators'
-import { dailySeed, seededRandom } from './random'
+import { dailySeed, seededRandom, shuffle } from './random'
 import { selectionWeight, subskillWeight } from './progress'
 import { getActiveCatalogMetadata, isSkillEnabled } from '../content/catalog'
 import { APP_VERSION } from '../version'
 import type { Difficulty, Exercise, LearningPhase, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId, SkillProgress } from './types'
 
-const FOCUS_SKILLS: SkillId[] = [
-  'place-value',
-  'decompose',
-  'compose',
-  'neighbor-tens',
-  'neighbor-hundreds',
-  'round-tens',
-  'round-hundreds',
-  'addition-1000',
-  'written-addition',
-  'subtraction-1000',
-  'written-subtraction',
-  'complement-1000',
-  'money',
-  'lengths',
-  'body-views',
-  'cube-rotation',
-  'folding',
-  'read-tables',
-  'read-charts',
-  'probability',
-  'combinatorics',
-  'time',
-  'mass',
-  'capacity',
-  'plane-shapes',
-  'patterns',
-  'area',
-  'perimeter'
-]
-
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']
+
+export const FOCUS_DOMAINS = {
+  numbers: [
+    'place-value', 'decompose', 'compose', 'neighbor-tens', 'neighbor-hundreds', 'round-tens',
+    'round-hundreds', 'addition-1000', 'written-addition', 'subtraction-1000',
+    'written-subtraction', 'complement-1000'
+  ],
+  quantities: ['money', 'lengths', 'time', 'mass', 'capacity'],
+  data: ['read-tables', 'read-charts', 'probability', 'combinatorics'],
+  geometry: ['body-views', 'cube-rotation', 'folding', 'plane-shapes', 'patterns', 'area', 'perimeter']
+} as const satisfies Record<string, readonly SkillId[]>
+
+export type FocusDomain = keyof typeof FOCUS_DOMAINS
+
+const FOCUS_SKILLS: SkillId[] = Object.values(FOCUS_DOMAINS).flat()
 
 function weightedIndex(weights: number[], random: () => number): number {
   const total = weights.reduce((sum, weight) => sum + weight, 0)
@@ -93,11 +77,21 @@ function weightedSkills(progress: ProgressMap, seed: number, count: number): Ski
   const random = seededRandom(seed)
   const available = FOCUS_SKILLS.filter((skillId) => isSkillEligible(skillId, progress))
   const selected: SkillId[] = []
+
+  for (const domain of shuffle(random, Object.keys(FOCUS_DOMAINS) as FocusDomain[])) {
+    if (selected.length >= count) break
+    const candidates = FOCUS_DOMAINS[domain].filter((skillId) => available.includes(skillId) && !selected.includes(skillId))
+    if (candidates.length === 0) continue
+    const weights = candidates.map((skill) => selectionWeight(progress[skill]))
+    selected.push(candidates[weightedIndex(weights, random)] as SkillId)
+  }
+
   while (selected.length < count && available.length > 0) {
-    const weights = available.map((skill) => selectionWeight(progress[skill]))
+    const candidates = available.filter((skillId) => !selected.includes(skillId))
+    if (candidates.length === 0) break
+    const weights = candidates.map((skill) => selectionWeight(progress[skill]))
     const index = weightedIndex(weights, random)
-    selected.push(available[index] as SkillId)
-    available.splice(index, 1)
+    selected.push(candidates[index] as SkillId)
   }
   return selected
 }
@@ -223,7 +217,7 @@ export function createSessionPlan(
   releaseMetadata = currentSessionReleaseMetadata()
 ): SessionPlan {
   const warmups = warmupSkills(progress, seed + 17)
-  const focus = weightedSkills(progress, seed + 31, 3)
+  const focus = weightedSkills(progress, seed + 31, 4)
   const skills = [...warmups, ...focus, ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled)]
   const exercises = skills.map((skillId, index) => {
     const skillProgress = progress[skillId]

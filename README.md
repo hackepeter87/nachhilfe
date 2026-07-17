@@ -5,7 +5,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 ## MVP-Funktionen
 
 - Optionales lokales Onboarding mit frei wählbarem Spitznamen
-- Vollständige Mathe-Runden mit sieben Aufgaben und höchstens drei gezielten Wiederholungen
+- Vollständige Mathe-Runden mit acht Aufgaben und höchstens drei gezielten Wiederholungen
 - Adaptive Addition und Subtraktion bis 20 sowie reihenspezifisches Einmaleins und Division ohne Rest
 - Stellenwerte bis 1000, Zerlegen und Zusammensetzen von Zahlen
 - Nachbarzehner, Nachbarhunderter sowie Runden auf Zehner und Hunderter
@@ -13,8 +13,12 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Schriftliche Addition bis 1000 ohne oder mit genau einem Übertrag und geführter Spaltendarstellung
 - Schriftliche Subtraktion bis 1000 ohne oder mit genau einer Entbündelung und abschließender Additionsprobe
 - Körperansichten einfacher Würfelgebäude aus zwei bis fünf sichtbaren Würfeln: vorne, rechts und von oben
+- Kontrollierte 90-Grad-Drehungen bekannter Würfelgebäude sowie einzelne Rasterfaltungen und einfache Faltschnitte
+- Tabellen, Strichlisten, Bild- und Säulendiagramme sowie sichtbare Zufallsexperimente
 - Wahrscheinlichkeit mit sicheren, möglichen und unmöglichen Ereignissen sowie kleinen Häufigkeitsvergleichen
 - Systematisches Zählen von `2×2`- und `3×2`-Kombinationen sowie einer sichtbaren Ausnahme bei `3×3`
+- Uhrzeiten und einfache vorwärts gerichtete Zeitspannen sowie Masse und Rauminhalt bis zur jeweiligen Grundeinheit
+- Ebene Figuren, regelmäßige Muster, Flächen aus Einheitsquadraten und Umfang als vollständig markierte Randlänge
 - Geführte ein- und zweischrittige Sachaufgaben: gesuchte Größe klären, unbekanntenhaltiges Mengenbild untersuchen oder auswählen, konkrete Rechnung bilden, selbst rechnen und Antwort prüfen
 - Geldbeträge in Euro und Cent mit lokaler Münzdarstellung sowie Wechselgeld aus 10 Euro
 - Längen in Zentimetern und Metern mit Messstrecke, Umrechnung und einfachen Rechnungen
@@ -24,7 +28,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Installierbare PWA mit vollständig vorgehaltenen MVP-Ressourcen
 - OCI-Container mit unprivilegiertem Nginx, Healthcheck und passenden Cache-Regeln
 
-Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, verdeckte Würfel, mentale Würfeldrehungen, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN, Backup, Würfelkippen und Falten. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md).
+Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, schriftliche Multiplikation oder Division, verdeckte Würfel, freie Würfeldrehungen, Mehrfachfaltungen, Körpernetze, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN und Backup. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md).
 
 ## Voraussetzungen
 
@@ -51,6 +55,7 @@ npm run typecheck
 npm run lint
 npm test
 npm run catalog:check
+npm run curriculum:check
 npm run build
 ```
 
@@ -61,7 +66,7 @@ Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` diesel
 Für die Browser-Tests wird Chromium einmalig installiert:
 
 ```bash
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run test:e2e
 ```
 
@@ -85,13 +90,14 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - Förderziele, Prozesskompetenzen, Vorkenntnisse und typische Fehlvorstellungen
 - sechs Lernphasen, drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
 - zwei Hinweise, gearbeitetes Beispiel, Erklärung, strukturierte Remediation und Transferimpuls
-- überprüfbare Erfolgskriterien, produktive Größenkompetenzen für Geld und Längen, geprüfte Würfelgebäude für Körperansichten und kontrollierte 90-Grad-Rotation sowie eine deaktivierte Vorbereitung für Kippen und Falten
+- überprüfbare Erfolgskriterien, produktive Größenkompetenzen, geprüfte Würfelgebäude für Körperansichten und kontrollierte 90-Grad-Rotation sowie einzelne Faltungen und Faltschnitte
 - kompetenzbezogene Erfolgs- und Fehlertexte sowie Release-Status
 - strukturierte Sachaufgabenvorlagen mit interner Mengenbeziehung, konkreter Handlung, gesuchter Größe, unbekanntenhaltigem Modell, plausiblen Modell- und Gleichungsalternativen sowie Plausibilitätsprüfung
 - fünfphasige Symmetrieprogression mit rechteckigen geraden Einstiegsrastern, expliziter Achsenlage, Figurenkomplexität und Distraktorstrategie
 - Körperansichtsvorlagen mit fester Orientierung, Würfelanzahl, drei Blickrichtungen und stufengerechten Gebäudegrenzen
 - Rotationsvorlagen mit senkrechter Achse, Links-/Rechtsrichtung, drei wirksamen Stufen und eindeutig unterscheidbaren Folgezuständen
 - die verbindliche Darstellungsrichtlinie mit bekannten, unbekannten und erst nach Erfolg aufgedeckten mathematischen Größen
+- geprüfte Inhalte für Daten, Wahrscheinlichkeit, Zeit, Masse, Rauminhalt und ebene Geometrie
 
 Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Status `draft`, `ready-for-review`, `active` oder `disabled`. Der Gesamtkatalog steht auf `ready-for-review`; technisch, mathematisch und intern didaktisch geprüfte Laufzeitkompetenzen stehen auf `active`. Das ist keine dokumentierte Freigabe durch eine Lehrkraft.
 
@@ -99,7 +105,7 @@ Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtr
 
 Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Metadaten, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App den gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
 
-Der Produktionsbuild scheitert bei einem ungültigen Katalog, `draft`/`disabled` als Gesamtstatus oder abweichenden Artefakten. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Das aktuelle Gesamtmodell und alle Kompetenzwege stehen unter [docs/didactics/](docs/didactics/README.md); die tatsächliche Runtime-Wirkung ist in [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) abgeglichen. Die repositoryweite Maskierung gesuchter Größen ist in [docs/representation-policy.md](docs/representation-policy.md) dokumentiert. Neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
+Der Produktionsbuild scheitert bei einem ungültigen Katalog, `draft`/`disabled` als Gesamtstatus, abweichenden Artefakten oder einer veralteten Curriculum-Matrix. `npm run catalog:build` erzeugt deshalb auch [docs/curriculum-matrix.md](docs/curriculum-matrix.md) aus derselben Quelle. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Das aktuelle Gesamtmodell und alle Kompetenzwege stehen unter [docs/didactics/](docs/didactics/README.md); die tatsächliche Runtime-Wirkung ist in [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) abgeglichen. Die repositoryweite Maskierung gesuchter Größen ist in [docs/representation-policy.md](docs/representation-policy.md) dokumentiert. Neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
 
 ## Container
 
@@ -135,7 +141,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.19.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.20.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -176,6 +182,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.19.0
+## Release-Stand 0.20.0
 
-Version 0.19.0 ergänzt ebene Figuren, Muster, Fläche und Umfang als vier adaptive Kompetenzen. Außenform und Teilung, regelmäßige Symbolblöcke, Einheitsquadrate und vollständig markierte Randwege bilden die mathematische Grundlage. Fläche und Umfang werden bewusst getrennt; Formeln und Maßstab bleiben ausgeschlossen. Katalog 0.18.0 und Schema 17 enthalten die Bezeichnungen und didaktischen Pfade, während Rasterberechnung und Prüfung in TypeScript bleiben. Details stehen in [docs/didactics/plane-geometry.md](docs/didactics/plane-geometry.md), [docs/representation-policy.md](docs/representation-policy.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.20.0 führt keine neue Kompetenz ein. Vier fachliche Fokusgruppen sorgen in jeder vollständigen Runde für Zahlen, Größen, Daten und Geometrie; die adaptive Gewichtung bleibt innerhalb der Gruppen wirksam. Katalog 0.19.0 und Schema 17 werden durch eine automatisch abgeglichene [Curriculum-Matrix](docs/curriculum-matrix.md) ergänzt. Die repositoryweite 1.000-Seed-Abnahme prüft jede aktive Kompetenz auf allen drei Stufen. Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt. Details stehen in [docs/didactics/curricular-integration.md](docs/didactics/curricular-integration.md), [docs/representation-policy.md](docs/representation-policy.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

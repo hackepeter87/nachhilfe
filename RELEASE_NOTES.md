@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Curriculare Integration 0.20.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Eine vollständige Runde enthält weiterhin zwei adaptive Grundaufgaben und jetzt je einen Fokus aus Zahlen, Größen, Daten und Geometrie sowie Sachaufgabe und Symmetrie.
+- Die adaptive Gewichtung wirkt innerhalb jeder Fokusgruppe. Fachliche Voraussetzungen für schriftliches Rechnen, Diagramme, Rotation, Falten, Fläche und Umfang bleiben unverändert wirksam.
+- Katalog 0.19.0 und Schema 17 werden durch `docs/curriculum-matrix.md` ergänzt. `catalog:build` erzeugt öffentliche Datei, Fallback und Matrix aus derselben zentralen Quelle; `catalog:check` erkennt jede Abweichung.
+- Der repositoryweite Integrationslauf erzeugt alle 34 aktiven Kompetenzen auf drei Stufen über jeweils 1.000 Seeds und prüft Lernphase, Anforderungen, Eindeutigkeit, Determinismus und mathematische Rollen.
+- Bekannte, unbekannte und aufgedeckte Werte bleiben für alle bestehenden Darstellungen verbindlich getrennt. Es wurde keine externe pädagogische Wirksamkeit validiert.
+- Lehrkraftprüfung, Unterrichtserprobung und echter iPhone-Test sind nicht erfolgt und bleiben in #58 und #59 offen. Der unabhängige Katalogkanal aus #38 bleibt nachgelagert.
+
+Lokal erfolgreich geprüft wurden Katalog- und Curriculum-Matrix-Abgleich, Typecheck, Lint, 335 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und 18 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Der Integrationslauf erzeugte dabei 102.000 Aufgabenvarianten. Das AMD64-Image `mathe-reise:0.20.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Ebene Figuren, Muster, Fläche und Umfang 0.19.0
 
 - Die neuen adaptiven Kompetenzen `plane-shapes`, `patterns`, `area` und `perimeter` trennen Form, Regelmäßigkeit, Bedeckung und Randlänge fachlich.

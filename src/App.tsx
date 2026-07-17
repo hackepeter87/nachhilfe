@@ -351,9 +351,9 @@ export default function App() {
           <Compass aria-hidden="true" />
           <span>Mathe-Reise</span>
         </button>
-        <span className="task-count">{exerciseIndex + 1} / {session?.exercises.length ?? 7}</span>
+        <span className="task-count">{exerciseIndex + 1} / {session?.exercises.length ?? 8}</span>
       </header>
-      <div className="session-progress" aria-hidden="true"><span style={{ width: `${((exerciseIndex + 1) / (session?.exercises.length ?? 7)) * 100}%` }} /></div>
+      <div className="session-progress" aria-hidden="true"><span style={{ width: `${((exerciseIndex + 1) / (session?.exercises.length ?? 8)) * 100}%` }} /></div>
       {currentExercise && <ExerciseCard key={currentExercise.id} exercise={currentExercise} onComplete={completeExercise} />}
     </main>
   )

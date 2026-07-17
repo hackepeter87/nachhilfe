@@ -3,6 +3,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { buildCatalogArtifacts, catalogPaths, checkCatalogArtifacts, parseAndValidateCatalog } from './catalog-lib.mjs'
+import { checkCurriculumMatrix, curriculumMatrixPath, renderCurriculumMatrix } from './curriculum-matrix.mjs'
 
 const temporaryDirectories = []
 
@@ -27,13 +28,26 @@ afterEach(() => {
 })
 
 describe('Katalog-Buildpipeline', () => {
+  it('erzeugt für jede aktive Kompetenz eine vollständige Curriculum-Matrix', () => {
+    const catalog = sourceCatalog()
+    const matrix = renderCurriculumMatrix(catalog)
+    expect(checkCurriculumMatrix()).toBe(true)
+    expect(fs.readFileSync(curriculumMatrixPath, 'utf8')).toBe(matrix)
+    for (const skill of catalog.skills.filter((candidate) => candidate.releaseStatus === 'active')) {
+      expect(matrix).toContain(`| \`${skill.id}\` |`)
+      expect(matrix).toContain(skill.supportGoal)
+      expect(matrix).toContain(skill.remediation.strategy.replaceAll('|', '\\|'))
+      expect(skill.difficultyLevels).toHaveLength(3)
+    }
+  })
+
   it('enthält vollständige didaktische Themenpfade', () => {
     const root = path.resolve(path.dirname(catalogPaths.source), '../../..')
     const directory = path.join(root, 'docs/didactics')
     const files = [
       'addition.md', 'subtraction.md', 'multiplication.md', 'division.md', 'place-value.md',
       'decompose-compose.md', 'neighbor-numbers.md', 'rounding.md', 'word-problems.md', 'symmetry.md',
-      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md', 'probability-combinatorics.md', 'time-mass-capacity.md', 'plane-geometry.md'
+      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md', 'probability-combinatorics.md', 'time-mass-capacity.md', 'plane-geometry.md', 'curricular-integration.md'
     ]
     for (const file of files) {
       const text = fs.readFileSync(path.join(directory, file), 'utf8')
@@ -45,7 +59,7 @@ describe('Katalog-Buildpipeline', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
       schemaVersion: 17,
-      catalogVersion: '0.18.0',
+      catalogVersion: '0.19.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })

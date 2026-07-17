@@ -1,22 +1,27 @@
 import { describe, expect, it } from 'vitest'
-import { createRemediationExercise, createRepetitionExercise, createSessionPlan, isSkillEligible } from './session'
+import { createRemediationExercise, createRepetitionExercise, createSessionPlan, FOCUS_DOMAINS, isSkillEligible } from './session'
 import { createSkillProgress } from './progress'
 import { generateExercise } from './generators'
 import { FALLBACK_TASK_CATALOG, getTaskCatalog, setTaskCatalog } from '../content/catalog'
 
 describe('Sitzungsplanung', () => {
-  it('erstellt sieben Aufgaben mit Grundlagen, Transfer und Symmetrie', () => {
+  it('erstellt acht Aufgaben mit Grundlagen, vier Fokusbereichen, Sachaufgabe und Symmetrie', () => {
     const session = createSessionPlan({}, 12_345)
-    expect(session.exercises).toHaveLength(7)
+    expect(session.exercises).toHaveLength(8)
     expect(session.exercises.slice(0, 2).every((exercise) => ['addition', 'subtraction', 'multiplication', 'division'].includes(exercise.skillId))).toBe(true)
+    const focusSkills = session.exercises.slice(2, 6).map((exercise) => exercise.skillId)
+    for (const domainSkills of Object.values(FOCUS_DOMAINS)) {
+      const skills: readonly (typeof focusSkills)[number][] = domainSkills
+      expect(focusSkills.some((skillId) => skills.includes(skillId))).toBe(true)
+    }
     expect(session.exercises.at(-2)?.skillId).toBe('word-problem')
     expect(session.exercises.at(-1)?.skillId).toBe('symmetry')
-    expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
+    expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.18.0',
+      catalogVersion: '0.19.0',
       schemaVersion: 17,
-      appVersion: '0.19.0'
+      appVersion: '0.20.0'
     })
   })
 
@@ -63,7 +68,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.18.0')
+      expect(runningSession.catalogVersion).toBe('0.19.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {

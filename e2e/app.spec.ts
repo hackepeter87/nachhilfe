@@ -1,8 +1,18 @@
 import { expect, test, type Page } from '@playwright/test'
 
-async function finishCurrentRound(page: Page) {
+async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => void) {
+  const reportedExercises = new Set<string>()
   for (let action = 0; action < 80; action += 1) {
     if (await page.getByText('Etappe geschafft').isVisible().catch(() => false)) return
+    const panel = page.locator('.exercise-panel')
+    if (await panel.isVisible().catch(() => false)) {
+      const exerciseId = await panel.getAttribute('data-exercise-id')
+      const skillId = await panel.getAttribute('data-skill-id')
+      if (exerciseId && skillId && !reportedExercises.has(exerciseId)) {
+        reportedExercises.add(exerciseId)
+        onExercise?.(skillId)
+      }
+    }
     const continueWithHelp = page.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ })
     if (await continueWithHelp.isVisible().catch(() => false)) {
       await continueWithHelp.click()
@@ -66,7 +76,15 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   await expect.poll(() => page.evaluate(() => navigator.serviceWorker?.ready.then(() => true))).toBe(true)
   await expect(page.getByText('Offline bereit')).toBeVisible()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  await finishCurrentRound(page)
+  const firstRoundSkills = new Set<string>()
+  await finishCurrentRound(page, (skillId) => firstRoundSkills.add(skillId))
+  const focusDomains = {
+    numbers: ['place-value', 'decompose', 'compose', 'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000'],
+    quantities: ['money', 'lengths', 'time', 'mass', 'capacity'],
+    data: ['read-tables', 'read-charts', 'probability', 'combinatorics'],
+    geometry: ['body-views', 'cube-rotation', 'folding', 'plane-shapes', 'patterns', 'area', 'perimeter']
+  }
+  for (const skills of Object.values(focusDomains)) expect(skills.some((skillId) => firstRoundSkills.has(skillId))).toBe(true)
   await page.getByRole('button', { name: 'Mein Denken' }).click()
   await expect(page.getByText('1', { exact: true }).first()).toBeVisible()
   const completedSessionMetadata = await page.evaluate(async () => {
@@ -91,9 +109,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.18.0',
+    catalogVersion: '0.19.0',
     schemaVersion: 17,
-    appVersion: '0.19.0'
+    appVersion: '0.20.0'
   })
 
   await page.reload()

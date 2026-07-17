@@ -1,7 +1,7 @@
 {
   "name": "mathe-reise",
   "private": true,
-  "version": "0.19.0",
+  "version": "0.20.0",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -10,6 +10,8 @@
     "catalog:validate": "node scripts/catalog.mjs validate",
     "catalog:build": "node scripts/catalog.mjs build",
     "catalog:check": "node scripts/catalog.mjs check",
+    "curriculum:build": "node scripts/curriculum-matrix.mjs build",
+    "curriculum:check": "node scripts/curriculum-matrix.mjs check",
     "prebuild": "npm run catalog:check",
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.19.0. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.19.0, sobald der Release-Workflow für `v0.19.0` erfolgreich gelaufen ist. Die Gesamtprüfung ist für Version 0.20 vorgesehen.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.20.0. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.20.0, sobald der Release-Workflow für `v0.20.0` erfolgreich gelaufen ist. Dieses Paket bereitet die Gesamtprüfung vor; eine tatsächliche Prüfung ist noch nicht dokumentiert.
 
 ## Förderziel
 
@@ -10,7 +10,7 @@ Mathe-Reise unterstützt ein etwa neunjähriges Kind am Ende der Klasse 3 dabei,
 
 ## Behandelte Themen
 
-Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, schriftliche Addition/Subtraktion mit genau einem Übergang, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, fünfphasige Raster-Symmetrie, Geld, Längen, fest orientierte Körperansichten, kontrollierte 90-Grad-Würfelrotation und einzelne Faltungen samt einfachem Faltschnitt. Freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze bleiben deaktiviert.
+Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, schriftliche Addition/Subtraktion mit genau einem Übergang, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, fünfphasige Raster-Symmetrie, Geld, Längen, Zeit, Masse, Rauminhalt, Tabellen, Diagramme, Wahrscheinlichkeit, Kombinatorik, ebene Figuren, Muster, Fläche, Umfang, fest orientierte Körperansichten, kontrollierte 90-Grad-Würfelrotation und einzelne Faltungen samt einfachem Faltschnitt. Freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze bleiben deaktiviert.
 
 ## Methodischer Aufbau
 

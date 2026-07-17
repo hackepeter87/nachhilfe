@@ -175,7 +175,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   }
 
   return (
-    <section className="exercise-panel" aria-labelledby="exercise-title" data-exercise-id={exercise.id} ref={panelRef}>
+    <section className="exercise-panel" aria-labelledby="exercise-title" data-exercise-id={exercise.id} data-skill-id={exercise.skillId} ref={panelRef}>
       <div className="exercise-heading">
         <span className="eyebrow">{exercise.title}</span>
         <h2 id="exercise-title" ref={headingRef} tabIndex={-1}>{exercise.prompt}</h2>

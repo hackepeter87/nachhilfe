@@ -17,7 +17,7 @@ Schriftliche Addition und Subtraktion folgen direkt aufeinander, weil beide Stel
 | 0.17 | Wahrscheinlichkeit und Kombinatorik | sicher/möglich/unmöglich; einfache Zufallsversuche; wenige Kombinationen systematisch bestimmen | Bruchwahrscheinlichkeiten |
 | 0.18 | Zeit, Masse und Rauminhalt | Uhrzeiten, einfache Zeitspannen, g/kg und ml/l mit Bezugsgrößen | Dezimalzahlen, Millimeter, Kilometer |
 | 0.19 | Ebene Figuren, Muster, Fläche und Umfang | erkennen, zerlegen, zusammensetzen; Einheitsquadrate; Umfang als Randlänge | Formeln, Maßstab |
-| 0.20 | Curriculare Integration und Gesamtevaluation | gemischter Transfer, Curriculum-Matrix, iPhone-Test und Gesamtbewertung durch eine Lehrkraft | Wirksamkeitsbehauptung ohne Erprobung |
+| 0.20 | Curriculare Integration | gemischter Transfer, Curriculum-Matrix und vollständige technische Gesamtprüfung | Wirksamkeitsbehauptung ohne Erprobung; Lehrkraft- und echter iPhone-Test bleiben bis zur tatsächlichen Durchführung offen |
 
 ## Fachliche Abhängigkeiten
 
@@ -59,6 +59,6 @@ Neue Kompetenzen erhöhen die Katalog-Minor-Version. `schemaVersion` steigt nur 
 
 ## Evaluation und Nachlauf
 
-Die offenen Issues zur Lehrkraftprüfung und zum echten iPhone-Test gehören zu 0.20. Die Lehrkraft bewertet das zusammenhängende Curriculum, keine Einzelreleases. Ergebnisse führen zu Korrektur-Issues und gegebenenfalls `0.20.x`. Der unabhängige Katalogkanal bleibt nachgelagert.
+Die offenen Issues zur Lehrkraftprüfung und zum echten iPhone-Test bleiben über den technischen 0.20-Abschluss hinaus offen, falls keine geeignete Lehrkraft beziehungsweise kein echtes Gerät verfügbar ist. Die Lehrkraft bewertet das zusammenhängende Curriculum, keine Einzelreleases. Ergebnisse führen zu Korrektur-Issues und gegebenenfalls `0.20.x`. Der unabhängige Katalogkanal bleibt nachgelagert.
 
 Nach 0.20 folgen schriftliche Multiplikation und Division, mehrere Überträge und Entbündelungen, komplexere Geld- und Größenaufgaben, Millimeter, Kilometer, Körpernetze und weitere Klasse-4-Inhalte.

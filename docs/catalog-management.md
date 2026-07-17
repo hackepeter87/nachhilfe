@@ -15,9 +15,10 @@ content/catalogs/nrw-klasse3-foerderkern/catalog.json
 ```text
 public/content/task-catalog.json
 src/content/task-catalog.fallback.json
+docs/curriculum-matrix.md
 ```
 
-Der öffentliche Katalog wird beim Start geladen. Der zweite Katalog wird in das App-Bundle eingebettet und ist der geprüfte Rückfall, wenn die öffentliche Datei fehlt oder ungültig ist. Beide Artefakte werden nicht manuell bearbeitet. `npm run catalog:check` schlägt fehl, wenn eines davon von der Quelle abweicht.
+Der öffentliche Katalog wird beim Start geladen. Der zweite Katalog wird in das App-Bundle eingebettet und ist der geprüfte Rückfall, wenn die öffentliche Datei fehlt oder ungültig ist. Die Matrix verknüpft jede aktive Kompetenz mit Lernziel, Stufen, Darstellungen, Fehlvorstellungen, Remediation und Tests. Alle drei Artefakte werden nicht manuell bearbeitet. `npm run catalog:check` schlägt fehl, wenn eines davon von der Quelle abweicht.
 
 ## Metadaten und Status
 
@@ -26,7 +27,7 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 ```json
 {
   "schemaVersion": 17,
-  "catalogVersion": "0.18.0",
+  "catalogVersion": "0.19.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review"
@@ -68,6 +69,7 @@ Die Lehrkraft muss kein JSON bearbeiten. Ihre Rückmeldung wird im Issue dokumen
 npm run catalog:validate  # zentrale Quelle fachlich-strukturell prüfen
 npm run catalog:build     # öffentliche und eingebettete Artefakte erzeugen
 npm run catalog:check     # Artefakte und Produktionsstatus abgleichen
+npm run curriculum:check  # automatisch erzeugte Kompetenzmatrix separat prüfen
 ```
 
 Die Validierung prüft Metadaten, bekannte und eindeutige Kompetenz-IDs, Pflichtfelder, Platzhalter, Zahlenbereiche, Sachaufgaben, Symmetrievarianten und eindeutige Optionen. `npm run build` führt `catalog:check` automatisch vor Vite aus. CI führt dieselbe Prüfung explizit aus.
@@ -96,8 +98,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build --platform linux/amd64 -t mathe-reise:0.19.0 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.19.0
+docker build --platform linux/amd64 -t mathe-reise:0.20.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.20.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.
