@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 7,
-  "catalogVersion": "0.8.0",
+  "schemaVersion": 8,
+  "catalogVersion": "0.9.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -2103,6 +2103,162 @@
       ]
     },
     {
+      "id": "written-addition",
+      "label": "Schriftlich addieren",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Summanden stellengerecht untereinander schreiben und eine schriftliche Addition bis 1000 mit höchstens einem Übertrag verständig ausführen.",
+      "misconceptions": [
+        "Einer, Zehner und Hunderter werden nicht stellengerecht ausgerichtet.",
+        "Der Übertrag wird vergessen oder in derselben Spalte noch einmal addiert.",
+        "Eine zweistellige Spaltensumme wird vollständig in die Ergebniszeile geschrieben."
+      ],
+      "hints": [
+        "Beginne rechts bei den Einern und rechne immer nur eine Spalte.",
+        "Schreibe von einer zweistelligen Spaltensumme nur die Einerziffer unten. Den neuen Zehner merkst du in der nächsten Spalte."
+      ],
+      "prompt": "Rechne {first} + {second} schriftlich.",
+      "errorFeedback": "Prüfe die aktuelle Spalte. Die Einer stehen unter den Einern, die Zehner unter den Zehnern und die Hunderter unter den Hundertern.",
+      "explanation": "Rechne von rechts nach links spaltenweise. Ein neuer Zehner oder Hunderter wird genau einmal in der nächsten Spalte mitgerechnet. So ergibt sich {answer}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 100,
+        "maxValue": 999
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Stellenwerttafel und Spaltendarstellung zeigen denselben Rechenvorgang."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind erklärt, warum ein Übertrag in der nächsten Stelle mitgerechnet wird."
+        },
+        {
+          "id": "communicating",
+          "elicitedBy": "Die einzelnen Spaltenschritte werden in der richtigen Reihenfolge beschrieben."
+        }
+      ],
+      "prerequisites": [
+        "Stellenwerte bis 1000 mindestens in der selbstständigen Übungsphase",
+        "Halbschriftliche Addition bis 1000 mindestens in der selbstständigen Übungsphase"
+      ],
+      "representations": [
+        "Stellenwerttafel",
+        "Spaltendarstellung"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Dreistellige Summanden ohne Übertrag; Spalten und Stellenbezeichnungen sind sichtbar",
+          "numberRange": "100 bis 999",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Genau ein Einer-zu-Zehner-Übertrag; der Übertrag wird als eigener Schritt sichtbar gemacht",
+          "numberRange": "100 bis 999",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Genau ein selbstständiger Übertrag von den Einern oder Zehnern; Spaltendarstellung erst als Hilfe",
+          "numberRange": "100 bis 999",
+          "representation": "hint",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
+        }
+      ],
+      "workedExample": "Bei 265 + 318 werden zuerst 5 + 8 gerechnet. 13 bedeutet: 3 Einer unten und 1 Zehner als Übertrag in die nächste Spalte.",
+      "successFeedback": "Du hast die Stellen nacheinander richtig addiert.",
+      "remediation": {
+        "strategy": "Bearbeite eine leichtere Aufgabe mit sichtbarer Spaltendarstellung und nur einem markierten Stellenwechsel.",
+        "foundationStrategy": "Ordne zuerst beide Zahlen in Hunderter, Zehner und Einer und rechne eine Aufgabe ohne Übertrag.",
+        "representation": "Stellenwerttafel mit Spaltendarstellung",
+        "keepSubskill": false
+      },
+      "transferPrompt": "Erkläre, in welcher Spalte der Übertrag entsteht und warum er in der nächsten Spalte steht.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Summanden in Hunderter, Zehner und Einer zerlegen und stellengerecht anordnen.",
+          "exerciseTypes": [
+            "written-addition:no-carry"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Spaltendarstellung und Stellenwerttafel als denselben Rechenvorgang verstehen.",
+          "exerciseTypes": [
+            "written-addition:no-carry"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Ohne Übertrag von rechts nach links spaltenweise addieren.",
+          "exerciseTypes": [
+            "written-addition:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Einen sichtbaren Einer-zu-Zehner-Übertrag korrekt notieren und einmal mitrechnen.",
+          "exerciseTypes": [
+            "written-addition:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Genau einen Übertrag selbstständig erkennen und ausführen.",
+          "exerciseTypes": [
+            "written-addition:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Den Übertrag anhand des Stellenwerts begründen und das Ergebnis überschlagen.",
+          "exerciseTypes": [
+            "written-addition:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Summanden stehen stellengerecht untereinander.",
+        "Jede Spalte wird von rechts nach links genau einmal bearbeitet.",
+        "Ein Übertrag wird in der folgenden Spalte genau einmal mitgerechnet.",
+        "Das Ergebnis bleibt im Zahlenraum bis 1000."
+      ]
+    },
+    {
       "id": "subtraction-1000",
       "label": "Subtrahieren bis 1000",
       "curriculumArea": "Zahlen und Operationen",
@@ -4054,6 +4210,20 @@
       "resultPrompt": "Wie lautet das Ergebnis nach dem restlichen Schritt?",
       "resultError": "Rechne von {bridge} nur noch den übrigen Teil weiter.",
       "resultSuccess": "Der Teilschritt führt sicher zum Ergebnis {answer}."
+    },
+    "writtenAddition": {
+      "onesPrompt": "Wie viele Einer stehen in der Ergebnisspalte?",
+      "onesError": "Rechne nur die beiden Einer. Ist die Summe zweistellig, kommt nur ihre Einerziffer nach unten.",
+      "onesSuccess": "Die Einerziffer {onesResult} stimmt.",
+      "carryPrompt": "Wie viele Zehner werden in die nächste Spalte übertragen?",
+      "carryError": "Zehn Einer werden zu genau einem Zehner gebündelt.",
+      "carrySuccess": "Der Übertrag {carry} steht in der Zehnerspalte.",
+      "tensPrompt": "Wie viele Zehner stehen in der Ergebnisspalte?",
+      "tensError": "Addiere die Zehner. Rechne einen sichtbaren Übertrag genau einmal mit.",
+      "tensSuccess": "Die Zehnerziffer {tensResult} stimmt.",
+      "hundredsPrompt": "Wie viele Hunderter stehen in der Ergebnisspalte?",
+      "hundredsError": "Addiere die Hunderter und einen möglichen Übertrag aus der Zehnerspalte.",
+      "hundredsSuccess": "Die Hunderterziffer {hundredsResult} stimmt."
     }
   }
 }

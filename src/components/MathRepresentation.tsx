@@ -27,6 +27,47 @@ export function MathRepresentation({ representation }: { representation: Exercis
     )
   }
 
+  if (representation.kind === 'column-calculation') {
+    const first = Number(values.first)
+    const second = Number(values.second)
+    const carry = Number(values.carry)
+    const carryColumn = values.carryColumn
+    const onesCarry = first % 10 + second % 10 >= 10 ? 1 : 0
+    const tensCarry = Math.floor(first / 10) % 10 + Math.floor(second / 10) % 10 + onesCarry >= 10 ? 1 : 0
+    const visibleCarryMatches = carry === 0 ||
+      (onesCarry + tensCarry === 1 && (onesCarry === 1 ? carryColumn === 'tens' : carryColumn === 'hundreds'))
+    const valid = Number.isInteger(first) && first >= 100 && first <= 999 &&
+      Number.isInteger(second) && second >= 100 && second <= 999 && first + second <= 999 &&
+      values.operation === '+' && (carry === 0 || carry === 1) &&
+      ['none', 'tens', 'hundreds'].includes(String(carryColumn)) && visibleCarryMatches
+    if (!valid) {
+      return <div className="math-visual math-visual--error" role="alert">Die Spaltendarstellung enthält ungültige Rechendaten.</div>
+    }
+    const digits = (value: number) => [Math.floor(value / 100), Math.floor(value / 10) % 10, value % 10]
+    const firstDigits = digits(first)
+    const secondDigits = digits(second)
+    const carryIndex = carryColumn === 'hundreds' ? 0 : carryColumn === 'tens' ? 1 : -1
+    const description = carry === 1
+      ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. Das Ergebnis ist noch offen.`
+      : `Schriftliche Addition ${first} plus ${second}. Das Ergebnis ist noch offen.`
+    return (
+      <div className="math-visual column-calculation" role="img" aria-label={description}>
+        <div className="column-row column-row--headers" aria-hidden="true"><span>H</span><span>Z</span><span>E</span></div>
+        <div className="column-row column-row--carry" aria-hidden="true">
+          {firstDigits.map((_, index) => <span key={index}>{carry === 1 && carryIndex === index ? '1' : ''}</span>)}
+        </div>
+        <div className="column-equation" aria-hidden="true">
+          <span className="column-operation" />
+          <div className="column-row">{firstDigits.map((digit, index) => <strong key={index}>{digit}</strong>)}</div>
+          <span className="column-operation">+</span>
+          <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{digit}</strong>)}</div>
+          <span className="column-operation" />
+          <div className="column-row column-row--result">{firstDigits.map((_, index) => <strong key={index}>?</strong>)}</div>
+        </div>
+      </div>
+    )
+  }
+
   if (representation.kind === 'number-line') {
     const start = Number(values.start)
     const end = Number(values.end)

@@ -11,6 +11,7 @@ export const SKILL_IDS = [
   'round-tens',
   'round-hundreds',
   'addition-1000',
+  'written-addition',
   'subtraction-1000',
   'complement-1000',
   'money',
@@ -22,7 +23,7 @@ export const SKILL_IDS = [
 export type SkillId = typeof SKILL_IDS[number]
 
 export type Difficulty = 1 | 2 | 3
-export type AnswerMode = 'number' | 'choice' | 'guided-choice' | 'guided-word' | 'symmetry'
+export type AnswerMode = 'number' | 'choice' | 'guided-choice' | 'guided-number' | 'guided-word' | 'symmetry'
 
 export type LearningPhase =
   | 'activate'
@@ -45,7 +46,7 @@ export interface AnswerOption {
   misconception?: string
 }
 
-export type RepresentationKind = 'place-value' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length'
+export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length'
 
 export interface NumberLineJump {
   from: number

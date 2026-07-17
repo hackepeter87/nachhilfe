@@ -792,6 +792,105 @@ function addition1000(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+function writtenAdditionSteps(values: Record<string, number | string>, difficulty: Difficulty): ExerciseStep[] {
+  const content = getTaskCatalog().strategySteps.writtenAddition
+  const step = (
+    id: string,
+    prompt: string,
+    correctAnswer: number,
+    errorFeedback: string,
+    successFeedback: string
+  ): ExerciseStep => ({
+    id,
+    interaction: 'number',
+    prompt: renderCatalogText(prompt, values),
+    correctAnswer: String(correctAnswer),
+    errorFeedback: renderCatalogText(errorFeedback, values),
+    successFeedback: renderCatalogText(successFeedback, values)
+  })
+  const steps = [
+    step('ones', content.onesPrompt, Number(values.onesResult), content.onesError, content.onesSuccess)
+  ]
+  if (difficulty === 2) {
+    steps.push(step('carry', content.carryPrompt, Number(values.carry), content.carryError, content.carrySuccess))
+  }
+  steps.push(
+    step('tens', content.tensPrompt, Number(values.tensResult), content.tensError, content.tensSuccess),
+    step('hundreds', content.hundredsPrompt, Number(values.hundredsResult), content.hundredsError, content.hundredsSuccess)
+  )
+  return steps
+}
+
+function writtenAddition(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  let firstHundreds: number
+  let firstTens: number
+  let firstOnes: number
+  let secondHundreds: number
+  let secondTens: number
+  let secondOnes: number
+  let carryColumn = 'none'
+
+  if (difficulty === 1) {
+    firstHundreds = integer(random, 2, 6)
+    secondHundreds = integer(random, 1, 9 - firstHundreds)
+    firstTens = integer(random, 1, 8)
+    secondTens = integer(random, 1, 9 - firstTens)
+    firstOnes = integer(random, 1, 8)
+    secondOnes = integer(random, 1, 9 - firstOnes)
+  } else if (difficulty === 2 || random() < 0.5) {
+    carryColumn = 'tens'
+    firstHundreds = integer(random, 2, 6)
+    secondHundreds = integer(random, 1, 8 - firstHundreds)
+    firstTens = integer(random, 0, 7)
+    secondTens = integer(random, 0, 8 - firstTens)
+    firstOnes = integer(random, 5, 9)
+    secondOnes = integer(random, 10 - firstOnes, 9)
+  } else {
+    carryColumn = 'hundreds'
+    firstHundreds = integer(random, 2, 6)
+    secondHundreds = integer(random, 1, 8 - firstHundreds)
+    firstTens = integer(random, 5, 9)
+    secondTens = integer(random, 10 - firstTens, 9)
+    firstOnes = integer(random, 0, 8)
+    secondOnes = integer(random, 0, 9 - firstOnes)
+  }
+
+  const first = firstHundreds * 100 + firstTens * 10 + firstOnes
+  const second = secondHundreds * 100 + secondTens * 10 + secondOnes
+  const answer = first + second
+  const values = {
+    first,
+    second,
+    answer,
+    onesResult: answer % 10,
+    tensResult: Math.floor(answer / 10) % 10,
+    hundredsResult: Math.floor(answer / 100),
+    carry: difficulty === 1 ? 0 : 1,
+    carryColumn
+  }
+  return withMetadata({
+    ...base('written-addition', seed, difficulty, values),
+    ...contentFor('written-addition', values, difficulty),
+    typeId: 'written-addition-to-1000',
+    subskillId: difficulty === 1
+      ? 'written-addition-no-carry'
+      : carryColumn === 'tens'
+        ? 'written-addition-ones-carry'
+        : 'written-addition-tens-carry',
+    answerMode: 'guided-number',
+    correctAnswer: String(answer),
+    steps: writtenAdditionSteps(values, difficulty),
+    representation: representation('written-addition', difficulty, 'column-calculation', 'Schriftliche Addition in der Stellenwerttafel', {
+      first,
+      second,
+      operation: '+',
+      carry: difficulty === 2 ? 1 : 0,
+      carryColumn
+    })
+  })
+}
+
 function subtraction1000(seed: number, difficulty: Difficulty): Exercise {
   const random = seededRandom(seed)
   let first: number
@@ -1055,6 +1154,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'round-tens': return rounding(seed, difficulty, 10)
     case 'round-hundreds': return rounding(seed, difficulty, 100)
     case 'addition-1000': return addition1000(seed, difficulty)
+    case 'written-addition': return writtenAddition(seed, difficulty)
     case 'subtraction-1000': return subtraction1000(seed, difficulty)
     case 'complement-1000': return complement1000(seed, difficulty)
     case 'money': return money(seed, difficulty)

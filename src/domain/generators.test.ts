@@ -7,7 +7,7 @@ import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSid
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-  'addition-1000', 'subtraction-1000', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
+  'addition-1000', 'written-addition', 'subtraction-1000', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
 ]
 
 describe('deterministische Aufgabengeneratoren', () => {
@@ -264,6 +264,49 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(easyRounding.steps).toBeUndefined()
     expect(mediumRounding.steps?.map((step) => step.id)).toEqual(['neighbors', 'round-result'])
     expect(hardRounding.steps?.map((step) => step.id)).toEqual(['neighbors', 'round-result', 'round-reason'])
+  })
+
+  it('erzeugt schriftliche Additionen mit genau der vorgesehenen Zahl von Überträgen', () => {
+    const carryCount = (first: number, second: number) => {
+      const onesCarry = first % 10 + second % 10 >= 10 ? 1 : 0
+      const tensCarry = Math.floor(first / 10) % 10 + Math.floor(second / 10) % 10 + onesCarry >= 10 ? 1 : 0
+      return onesCarry + tensCarry
+    }
+    const hardSubskills = new Set<string>()
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('written-addition', seed, difficulty)
+        const first = Number(exercise.variant.values.first)
+        const second = Number(exercise.variant.values.second)
+        const answer = Number(exercise.correctAnswer)
+        expect(answer).toBe(first + second)
+        expect(answer).toBeLessThanOrEqual(999)
+        expect(carryCount(first, second)).toBe(difficulty === 1 ? 0 : 1)
+        expect(exercise.answerMode).toBe('guided-number')
+        expect(exercise.steps?.filter((step) => step.interaction === 'number')).toHaveLength(difficulty === 2 ? 4 : 3)
+        expect(exercise.steps?.find((step) => step.id === 'ones')?.correctAnswer).toBe(String(answer % 10))
+        expect(exercise.steps?.find((step) => step.id === 'tens')?.correctAnswer).toBe(String(Math.floor(answer / 10) % 10))
+        expect(exercise.steps?.find((step) => step.id === 'hundreds')?.correctAnswer).toBe(String(Math.floor(answer / 100)))
+        if (difficulty === 2) {
+          expect(exercise.subskillId).toBe('written-addition-ones-carry')
+          expect(exercise.steps?.find((step) => step.id === 'carry')?.correctAnswer).toBe('1')
+        }
+        if (difficulty === 3) hardSubskills.add(exercise.subskillId ?? '')
+      }
+    }
+    expect(hardSubskills).toEqual(new Set(['written-addition-ones-carry', 'written-addition-tens-carry']))
+  })
+
+  it('macht die drei Stufen der schriftlichen Addition objektiv verschieden', () => {
+    const easy = generateExercise('written-addition', 315, 1)
+    const medium = generateExercise('written-addition', 315, 2)
+    const hard = generateExercise('written-addition', 315, 3)
+    expect(easy.representation?.visibility).toBe('always')
+    expect(easy.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds'])
+    expect(medium.representation?.visibility).toBe('always')
+    expect(medium.steps?.map((step) => step.id)).toEqual(['ones', 'carry', 'tens', 'hundreds'])
+    expect(hard.representation?.visibility).toBe('hint')
+    expect(hard.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds'])
   })
 
   it('liefert eine konkrete Remediation mit leichterer verwandter Aufgabe', () => {

@@ -50,10 +50,10 @@ describe('App-Ablauf', () => {
     await user.click(await screen.findByRole('button', { name: 'Weiter zur Mathe-Reise' }))
     await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
 
-    expect(screen.getByText('nrw-klasse3-foerderkern 0.8.0')).not.toBeVisible()
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.9.0')).not.toBeVisible()
     await user.click(screen.getByLabelText('Versionsinformationen öffnen'))
-    expect(screen.getByText('nrw-klasse3-foerderkern 0.8.0')).toBeVisible()
-    expect(screen.getByText('0.10.1')).toBeVisible()
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.9.0')).toBeVisible()
+    expect(screen.getByText('0.11.0')).toBeVisible()
     expect(screen.getByText('ready-for-review')).toBeVisible()
   })
 

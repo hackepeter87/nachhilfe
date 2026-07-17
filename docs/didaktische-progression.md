@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.8.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.9.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -144,6 +144,16 @@ Stand: Katalogversion 0.8.0. Die Stufen beschreiben die produktive Heuristik von
 - **Hilfe / Transfer:** nur die betroffene Stelle verändern / Aufgabe als Ergänzung kontrollieren.
 - **Später:** mehrere Entbündelungen und schriftliche Darstellung.
 
+### Schriftliche Addition bis 1000
+
+- **Vorkenntnisse:** Stellenwert und halbschriftliche Addition bis 1000 jeweils mindestens in `independent-practice`.
+- **Stufe 1:** dreistellige Summanden ohne Übertrag; H-Z-E-Spalten sind von Anfang an sichtbar.
+- **Stufe 2:** genau ein Einer-zu-Zehner-Übertrag; seine Bündelung wird als eigener Schritt eingegeben und sichtbar notiert.
+- **Stufe 3 / Ziel 0.11:** genau ein Übertrag von Einern oder Zehnern wird selbstständig erkannt; die Spaltendarstellung erscheint erst als Hilfe.
+- **Erhöhen / Zurückstufen:** Spaltenfolge und Übertrag sicher / Stellen versetzen, Übertrag vergessen oder doppelt zählen.
+- **Hilfe / Transfer:** von rechts nach links spaltenweise bündeln / Entstehung des Übertrags erklären und Ergebnis überschlagen.
+- **Später:** mehrere Überträge; schriftliche Subtraktion folgt in Version 0.12.
+
 ### Ergänzen bis zur vollen Zahl
 
 - **Vorkenntnisse:** Abstände am Zahlenstrahl und Ergänzen bis 20.
@@ -196,4 +206,4 @@ Stand: Katalogversion 0.8.0. Die Stufen beschreiben die produktive Heuristik von
 
 ## Bewusst offene Förderbereiche
 
-Millimeter/Kilometer, komplexe Kaufsituationen, schriftliche Rechenverfahren, mehrere Stellenübergänge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen, Grenzwerttests und eine menschliche didaktische Prüfung.
+Millimeter/Kilometer, komplexe Kaufsituationen, schriftliche Subtraktion, mehrere Stellenübergänge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.

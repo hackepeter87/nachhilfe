@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App `0.10.1`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App `0.11.0`, Katalog `0.9.0`, Schema `8`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -15,7 +15,7 @@ Stand: App `0.10.1`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Die
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.10.1
+## Aktive Veränderungen bis 0.11.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -32,10 +32,11 @@ Stand: App `0.10.1`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Die
 - Sachaufgabenmodell 0.9.1: Veränderungsbalken verwenden die tatsächlichen Mengenverhältnisse; positives Zwischenfeedback ist grün, Korrekturfeedback bleibt rot.
 - Katalogschema 7: Symmetrie trennt Rasterdimension, relevante Parität, Achsenposition, Figurenkomplexität und Distraktorähnlichkeit. Gerade Raster bilden den Einstieg; Achsen durch Zellen werden erst im sicheren Transfer aktiv.
 - Symmetrie-UI 0.10.0: Die grüne Achse ist in Vorlage und Optionen sichtbar. Achsen zwischen Zellen sind durchgezogen, spätere Achsen durch Zellen gestrichelt.
+- Katalogschema 8 und App 0.11.0: Schriftliche Addition verwendet drei wirksame Stufen, geführte Zahlenschritte und eine ergebnisoffene H-Z-E-Spaltendarstellung. Die adaptive Auswahl prüft zuvor Stellenwert und halbschriftliche Addition.
 
 ## Bewusst deaktiviert
 
-Raumvorstellung bleibt unter `preparedTopics` methodisch vorbereitet und steht auf `disabled`. Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Übergänge, schriftliche Verfahren, Körperansichten, Kippen und Falten werden ebenfalls nicht als aktiv dargestellt.
+Raumvorstellung bleibt unter `preparedTopics` methodisch vorbereitet und steht auf `disabled`. Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Übergänge, schriftliche Subtraktion, Körperansichten, Kippen und Falten werden ebenfalls nicht als aktiv dargestellt.
 
 ## Menschliche Gesamtprüfung
 

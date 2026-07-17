@@ -14,6 +14,7 @@ const FOCUS_SKILLS: SkillId[] = [
   'round-tens',
   'round-hundreds',
   'addition-1000',
+  'written-addition',
   'subtraction-1000',
   'complement-1000',
   'money',
@@ -32,9 +33,31 @@ function weightedIndex(weights: number[], random: () => number): number {
   return weights.length - 1
 }
 
+const PHASE_ORDER: LearningPhase[] = [
+  'activate',
+  'understand',
+  'guided-practice',
+  'independent-practice',
+  'automate',
+  'transfer'
+]
+
+function hasReachedPhase(progress: SkillProgress | undefined, minimum: LearningPhase): boolean {
+  return Boolean(progress && PHASE_ORDER.indexOf(progress.learningPhase) >= PHASE_ORDER.indexOf(minimum))
+}
+
+export function isSkillEligible(skillId: SkillId, progress: ProgressMap): boolean {
+  if (!isSkillEnabled(skillId)) return false
+  if (skillId === 'written-addition') {
+    return hasReachedPhase(progress['place-value'], 'independent-practice') &&
+      hasReachedPhase(progress['addition-1000'], 'independent-practice')
+  }
+  return true
+}
+
 function weightedSkills(progress: ProgressMap, seed: number, count: number): SkillId[] {
   const random = seededRandom(seed)
-  const available = FOCUS_SKILLS.filter(isSkillEnabled)
+  const available = FOCUS_SKILLS.filter((skillId) => isSkillEligible(skillId, progress))
   const selected: SkillId[] = []
   while (selected.length < count && available.length > 0) {
     const weights = available.map((skill) => selectionWeight(progress[skill]))
@@ -108,7 +131,10 @@ function applyLearningPhase(exercise: Exercise, phase: LearningPhase): Exercise 
     ...exercise,
     learningPhase: phase,
     representation: exercise.representation
-      ? { ...exercise.representation, visibility: showRepresentation ? 'always' : 'hint' }
+      ? {
+          ...exercise.representation,
+          visibility: exercise.representation.visibility === 'always' || showRepresentation ? 'always' : 'hint'
+        }
       : exercise.representation,
     testMetadata: { ...exercise.testMetadata, learningPhase: phase }
   }

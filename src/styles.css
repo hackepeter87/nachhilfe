@@ -536,6 +536,56 @@ p {
 .place-column strong { font-size: 1.45rem; }
 .place-column--highlight { border-color: #df6b3d; background: #fff3ec; }
 
+.column-calculation {
+  width: min(100%, 260px);
+  margin-inline: auto;
+  padding: 14px 18px 18px;
+  background: #f4f8f5;
+}
+
+.column-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(38px, 1fr));
+  text-align: center;
+}
+
+.column-row--headers {
+  margin-left: 28px;
+  color: #557060;
+  font-size: .76rem;
+  font-weight: 800;
+}
+
+.column-row--carry {
+  min-height: 24px;
+  margin-left: 28px;
+  color: #a54828;
+  font-weight: 900;
+}
+
+.column-equation {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+}
+
+.column-operation {
+  font-size: 1.45rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.column-equation .column-row strong {
+  min-width: 0;
+  padding: 5px;
+  font-size: 1.5rem;
+}
+
+.column-row--result {
+  border-top: 3px solid var(--ink);
+  color: var(--green-dark);
+}
+
 .number-line-track {
   position: relative;
   height: 4px;

@@ -108,6 +108,27 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('führt die schriftliche Addition spaltenweise aus und gibt spaltenspezifisches Feedback', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('written-addition', 42, 2)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    expect(screen.getByRole('img', { name: /schriftliche Addition/i })).toBeVisible()
+    const firstStep = exercise.steps?.[0]
+    if (!firstStep) throw new Error('Einerschritt fehlt')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), firstStep.correctAnswer === '9' ? '8' : '9')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(screen.getByText(firstStep.errorFeedback)).toBeVisible()
+
+    for (const step of exercise.steps ?? []) {
+      await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
+      await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    }
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'written-addition', correct: false }))
+  })
+
   it('führt eine zweischrittige Sachaufgabe bis zum Antwortsatz', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

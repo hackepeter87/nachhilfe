@@ -125,7 +125,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         <MathRepresentation representation={exercise.representation} />
       )}
 
-      {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice') && currentStep && answerState === 'answering' && (
+      {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice' || exercise.answerMode === 'guided-number') && currentStep && answerState === 'answering' && (
         <div className="guided-step">
           <div className="step-dots" aria-label={`Schritt ${stepIndex + 1} von ${exercise.steps?.length}`}>
             {exercise.steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}

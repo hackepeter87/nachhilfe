@@ -1,5 +1,14 @@
 # Mathe-Reise
 
+## Schriftliche Addition 0.11.0
+
+- Die neue Kompetenz `written-addition` führt dreistellige Summanden zunächst ohne Übertrag, dann mit einem sichtbaren Einerübertrag und schließlich mit genau einem selbstständig erkannten Einer- oder Zehnerübertrag ein.
+- Die H-Z-E-Spaltendarstellung zeigt Summanden und gegebenenfalls den Übertrag, lässt das Ergebnis aber offen. Zahlenschritte prüfen Einer, Übertrag, Zehner und Hunderter mit spaltenspezifischem Feedback.
+- Die adaptive Sitzungsplanung aktiviert die Kompetenz erst, wenn Stellenwert und halbschriftliche Addition bis 1000 mindestens `independent-practice` erreicht haben.
+- Katalog `0.9.0`, Schema `8`, die Kompetenzakte und die fachliche Roadmap dokumentieren Lernziel, Voraussetzungen, Fehlvorstellungen, Progression, Remediation, Grenzen und Gesamtprüfung in Version 0.20.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 191 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und sieben Playwright-Szenarien jeweils gegen Vite Preview und den AMD64-Container. Das Image `mathe-reise:0.11.0` und `mathe-reise:local` meldet `amd64`, läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und ist `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert; eine Lehrkraftprüfung und ein echter iPhone-Test wurden nicht durchgeführt.
+
 ## AMD64-Containerrelease 0.10.1
 
 - Der GHCR-Publish-Workflow baut neue Release-Images ausschließlich für die tatsächliche DMZ-Zielarchitektur `linux/amd64`.

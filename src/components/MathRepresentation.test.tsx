@@ -41,6 +41,31 @@ describe('MathRepresentation Gruppenbild', () => {
   })
 })
 
+describe('MathRepresentation schriftliche Addition', () => {
+  it('ordnet die Summanden stellengerecht an und verrät das Ergebnis nicht', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'column-calculation',
+      visibility: 'always',
+      label: 'Spaltendarstellung',
+      values: { first: 265, second: 318, operation: '+', carry: 1, carryColumn: 'tens' }
+    }} />)
+    expect(screen.getByRole('img', { name: /265 plus 318.*Übertrag zur Zehnerspalte.*Ergebnis ist noch offen/i })).toBeInTheDocument()
+    expect(container.querySelector('.column-row--result')).toHaveTextContent('???')
+    expect(container.querySelector('.column-row--result')).not.toHaveTextContent('583')
+    expect(container.querySelector('.column-row--carry')).toHaveTextContent('1')
+  })
+
+  it('zeigt ungültige Spaltendaten sichtbar als Fehler', () => {
+    render(<MathRepresentation representation={{
+      kind: 'column-calculation',
+      visibility: 'always',
+      label: 'Spaltendarstellung',
+      values: { first: 900, second: 200, operation: '+', carry: 0, carryColumn: 'none' }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Rechendaten')
+  })
+})
+
 describe('MathRepresentation Sachaufgabenmodelle', () => {
   it('stellt Anfangsmenge und Zuwachs proportional dar', () => {
     const { container } = render(<MathRepresentation representation={{

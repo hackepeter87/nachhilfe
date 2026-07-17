@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createRemediationExercise, createRepetitionExercise, createSessionPlan } from './session'
+import { createRemediationExercise, createRepetitionExercise, createSessionPlan, isSkillEligible } from './session'
 import { createSkillProgress } from './progress'
 import { generateExercise } from './generators'
 import { FALLBACK_TASK_CATALOG, getTaskCatalog, setTaskCatalog } from '../content/catalog'
@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.8.0',
-      schemaVersion: 7,
-      appVersion: '0.10.1'
+      catalogVersion: '0.9.0',
+      schemaVersion: 8,
+      appVersion: '0.11.0'
     })
   })
 
@@ -58,14 +58,14 @@ describe('Sitzungsplanung', () => {
       const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
 
       const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
-      nextCatalog.catalogVersion = '0.8.1'
+      nextCatalog.catalogVersion = '0.9.1'
       nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.8.0')
+      expect(runningSession.catalogVersion).toBe('0.9.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
-      expect(nextSession.catalogVersion).toBe('0.8.1')
+      expect(nextSession.catalogVersion).toBe('0.9.1')
     } finally {
       setTaskCatalog(originalCatalog)
     }
@@ -102,6 +102,15 @@ describe('Sitzungsplanung', () => {
     } finally {
       setTaskCatalog(originalCatalog)
     }
+  })
+
+  it('schaltet schriftliche Addition erst nach beiden fachlichen Voraussetzungen frei', () => {
+    const placeValue = { ...createSkillProgress('place-value'), learningPhase: 'independent-practice' as const }
+    const addition1000 = { ...createSkillProgress('addition-1000'), learningPhase: 'independent-practice' as const }
+    expect(isSkillEligible('written-addition', {})).toBe(false)
+    expect(isSkillEligible('written-addition', { 'place-value': placeValue })).toBe(false)
+    expect(isSkillEligible('written-addition', { 'addition-1000': addition1000 })).toBe(false)
+    expect(isSkillEligible('written-addition', { 'place-value': placeValue, 'addition-1000': addition1000 })).toBe(true)
   })
 
   it('berücksichtigt schwache Grundrechenarten und Unterkompetenzen häufiger', () => {
