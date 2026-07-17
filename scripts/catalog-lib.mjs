@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 12
+export const CATALOG_SCHEMA_VERSION = 13
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -461,7 +461,11 @@ function validateSpatialFolding(spatialFolding) {
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
-  const usageFields = ['workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
+  if (!isRecord(catalog.representationPolicy) ||
+    !['rule', 'knownValues', 'unknownValues', 'revealedValues'].every((field) => isText(catalog.representationPolicy[field]))) {
+    fail('representationPolicy ist unvollständig')
+  }
+  const usageFields = ['representationPolicy', 'workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
   if (!isRecord(catalog.fieldUsage) || !usageFields.every((field) => ['runtime', 'review', 'planned'].includes(catalog.fieldUsage[field]))) fail('fieldUsage ist unvollständig')
   const numberRange = catalog.numberRange
   if (!isRecord(numberRange) || numberRange.min !== 0 || numberRange.max !== 1000) fail('numberRange muss 0 bis 1000 sein')

@@ -28,7 +28,7 @@ import {
 } from '../domain/folding'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 12
+export const CATALOG_SCHEMA_VERSION = 13
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -47,6 +47,13 @@ export interface CatalogMetadata {
   schemaVersion: number
   releasedAt: string
   status: CatalogStatus
+}
+
+export interface RepresentationPolicy {
+  rule: string
+  knownValues: string
+  unknownValues: string
+  revealedValues: string
 }
 
 export interface DifficultyBounds {
@@ -400,7 +407,8 @@ export interface SpatialFoldingContent {
 }
 
 export interface TaskCatalog extends CatalogMetadata {
-  fieldUsage: Record<'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
+  representationPolicy: RepresentationPolicy
+  fieldUsage: Record<'representationPolicy' | 'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
   numberRange: { min: number; max: number }
   skills: CatalogSkill[]
   preparedTopics: PreparedTopic[]
@@ -745,9 +753,12 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (value.catalogId !== TASK_CATALOG_ID) return false
   if (!isNonEmptyString(value.releasedAt) || !/^\d{4}-\d{2}-\d{2}$/.test(value.releasedAt) || Number.isNaN(Date.parse(`${value.releasedAt}T00:00:00Z`))) return false
   if (!CONTENT_STATUSES.includes(value.status as ContentStatus)) return false
+  if (!isRecord(value.representationPolicy)) return false
+  const representationPolicy = value.representationPolicy
+  if (!['rule', 'knownValues', 'unknownValues', 'revealedValues'].every((field) => isNonEmptyString(representationPolicy[field]))) return false
   if (!isRecord(value.fieldUsage)) return false
   const fieldUsage = value.fieldUsage
-  const usageFields = ['workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
+  const usageFields = ['representationPolicy', 'workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
   if (!usageFields.every((field) => ['runtime', 'review', 'planned'].includes(fieldUsage[field] as string))) return false
   const numberRange = value.numberRange
   if (!Number.isInteger(numberRange.min) || !Number.isInteger(numberRange.max) || numberRange.min !== 0 || numberRange.max !== 1000) return false

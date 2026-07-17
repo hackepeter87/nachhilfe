@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 12,
-      catalogVersion: '0.14.0',
+      schemaVersion: 13,
+      catalogVersion: '0.14.1',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -60,6 +60,12 @@ describe('Katalog-Buildpipeline', () => {
     const catalog = sourceCatalog()
     catalog[field] = value
     expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow(message)
+  })
+
+  it('bricht bei fehlender Darstellungsrichtlinie ab', () => {
+    const catalog = sourceCatalog()
+    delete catalog.representationPolicy
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('representationPolicy')
   })
 
   it('lehnt doppelte IDs und unbekannte Platzhalter ab', () => {

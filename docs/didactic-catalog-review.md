@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.15.0, Katalog 0.14.0, Schema 12, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.15.1, Katalog 0.14.1, Schema 13, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -19,10 +19,11 @@ Stand: App 0.15.0, Katalog 0.14.0, Schema 12, Status ready-for-review. Diese Dat
 | `spatialViews` | Runtime | geprüfte Würfelgebäude, Blickrichtungen und Stufengrenzen steuern Projektion und Antwortdarstellungen |
 | `spatialRotations` | Runtime | geprüfte Ausgangsgebäude, 90-Grad-Richtung, Achsenbezeichnung und Stufengrenzen steuern Transformation und Folgezustände |
 | `spatialFolding` | Runtime | Einzelfaltung, Achse, bewegte Papierhälfte und Faltschnittvorlagen steuern Spiegeltransformation und Ergebnisraster |
+| `representationPolicy` | Runtime | alle Renderer trennen bekannte, unbekannte und erst nach Erfolg aufgedeckte Größen |
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.15.0
+## Aktive Veränderungen bis 0.15.1
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -46,6 +47,7 @@ Stand: App 0.15.0, Katalog 0.14.0, Schema 12, Status ready-for-review. Diese Dat
 - App 0.13.1 und Schema 10: Sachaufgaben verwenden eine katalogisierte, einheitliche Runtime-Sequenz. `unknownQuantity` verhindert Ergebnislecks in Balken- und Gruppenmodellen. Neue Aufgaben remounten ihren lokalen Zustand; Fokus, Hover und Touch gelten nicht als Auswahl.
 - App 0.14.0 und Schema 11: `cube-rotation` dreht katalogisierte Gebäude kontrolliert um 90 Grad nach links oder rechts. Achse und Richtung bleiben sichtbar; Ausgangslage, korrekte Drehung und Gegenrichtung müssen paarweise verschieden sein. Die adaptive Auswahl setzt fünf Körperansichtsversuche und Lernwert 60 voraus.
 - App 0.15.0 und Schema 12: `folding` verfolgt einen Punkt bei genau einer gerichteten Faltung und öffnet auf Stufe 3 einen einfachen Faltschnitt. Gerade Raster halten die Achse zwischen Zellen; die adaptive Auswahl setzt Symmetriephase 3 voraus.
+- App 0.15.1 und Schema 13: Jede Darstellung deklariert mathematische Rollen. Rechenstrich, Nachbarzahlen, Ergänzen, Division, Geld und Messstrecke maskieren gesuchte Werte auch in Screenreader-Texten; widersprüchliche Rollen schlagen sichtbar fehl.
 
 ## Bewusst deaktiviert
 

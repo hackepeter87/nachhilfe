@@ -1,14 +1,34 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { ExerciseRepresentation } from '../domain'
-import { MathRepresentation } from './MathRepresentation'
+import { MathRepresentation as RuntimeMathRepresentation } from './MathRepresentation'
+
+type TestRepresentation = Omit<ExerciseRepresentation, 'valueRoles'> & {
+  valueRoles?: ExerciseRepresentation['valueRoles']
+}
+
+function MathRepresentation({ representation }: { representation: TestRepresentation }) {
+  const semanticUnknown = typeof representation.values.unknownQuantity === 'string'
+    ? [representation.values.unknownQuantity]
+    : []
+  const completeRepresentation: ExerciseRepresentation = {
+    ...representation,
+    valueRoles: representation.valueRoles ?? {
+      knownValues: Object.keys(representation.values).filter((key) => !semanticUnknown.includes(key)),
+      unknownValues: semanticUnknown,
+      revealedValues: []
+    }
+  }
+  return <RuntimeMathRepresentation representation={completeRepresentation} />
+}
 
 function groupsRepresentation(groups: number, size: number): ExerciseRepresentation {
   return {
     kind: 'groups',
     visibility: 'always',
     label: 'Geprüftes Gruppenbild',
-    values: { groups, size }
+    values: { groups, size },
+    valueRoles: { knownValues: ['groups', 'size'], unknownValues: [], revealedValues: [] }
   }
 }
 
@@ -177,7 +197,7 @@ describe('MathRepresentation Größen', () => {
     const { container } = render(<MathRepresentation representation={{
       kind: 'money', visibility: 'always', label: 'Münzen', values: { coins: [200, 100, 50, 20], displayedCents: 370 }
     }} />)
-    expect(screen.getByRole('img', { name: 'Münzen: 370 Cent' })).toBeVisible()
+    expect(screen.getByRole('img', { name: 'Münzen: Gesamtbetrag 370 Cent' })).toBeVisible()
     expect(container.querySelectorAll('.coin')).toHaveLength(4)
     expect(container).toHaveTextContent('2 €')
     expect(container).toHaveTextContent('50 ct')
@@ -194,7 +214,7 @@ describe('MathRepresentation Größen', () => {
     render(<MathRepresentation representation={{
       kind: 'length', visibility: 'always', label: 'Messstrecke', values: { lengthCm: 14, maxCm: 20 }
     }} />)
-    expect(screen.getByRole('img', { name: 'Messstrecke: 14 Zentimeter' })).toBeVisible()
+    expect(screen.getByRole('img', { name: 'Messstrecke: Länge 14 Zentimeter' })).toBeVisible()
     expect(screen.getByText('14 cm')).toBeVisible()
     expect(screen.getByText('20 cm')).toBeVisible()
   })
@@ -204,6 +224,109 @@ describe('MathRepresentation Größen', () => {
       kind: 'length', visibility: 'always', label: 'Messstrecke', values: { lengthCm: 21, maxCm: 20 }
     }} />)
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Längenangaben')
+  })
+})
+
+describe('MathRepresentation mathematische Rollen', () => {
+  it('maskiert das Ziel eines Rechenstrichs und deckt es kontrolliert auf', () => {
+    const representation: ExerciseRepresentation = {
+      kind: 'number-line', visibility: 'always', label: 'Addition auf dem Rechenstrich',
+      values: { start: 2, end: 6, marker: 2, jumps: [{ from: 2, to: 6, label: '+4' }] },
+      valueRoles: { knownValues: ['start', 'marker', 'jumps'], unknownValues: ['end'], revealedValues: [] }
+    }
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
+    expect(screen.getByRole('img', { name: /Ende unbekannt/ })).toBeVisible()
+    expect(container.querySelector('.number-line-labels')).toHaveTextContent('2?')
+    expect(container.querySelector('.number-line-labels')).not.toHaveTextContent('6')
+    expect(screen.getByLabelText('Rechenschritt +4 zu einem unbekannten Wert')).toBeVisible()
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: ['end'] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Ende 6/ })).toBeVisible()
+    expect(container.querySelector('.number-line-labels')).toHaveTextContent('26')
+  })
+
+  it('zeigt bei Nachbarzahlen nur die gegebene Zahl, nicht die gesuchten Nachbarn', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: 'Nachbarzehner',
+      values: { start: 560, end: 570, marker: 565, step: 10 },
+      valueRoles: { knownValues: ['marker', 'step'], unknownValues: ['start', 'end'], revealedValues: [] }
+    }} />)
+    expect(container.querySelector('.number-line-labels')).toHaveTextContent('?565?')
+    expect(container.querySelector('.number-line-labels')).not.toHaveTextContent('560')
+    expect(container.querySelector('.number-line-labels')).not.toHaveTextContent('570')
+  })
+
+  it('maskiert gesuchte Geld- und Längenwerte auch für Screenreader', () => {
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={{
+      kind: 'money', visibility: 'always', label: 'Münzen zählen',
+      values: { coins: [200, 100, 50, 20], displayedCents: 370 },
+      valueRoles: { knownValues: ['coins'], unknownValues: ['displayedCents'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Gesamtbetrag unbekannt/ })).toBeVisible()
+    expect(container.querySelector('.money-total')).toHaveTextContent('Gesamt: ?')
+    expect(container).not.toHaveTextContent('370')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      kind: 'money', visibility: 'always', label: 'Münzen zählen',
+      values: { coins: [200, 100, 50, 20], displayedCents: 370 },
+      valueRoles: { knownValues: ['coins'], unknownValues: ['displayedCents'], revealedValues: ['displayedCents'] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Gesamtbetrag 370 Cent/ })).toBeVisible()
+    expect(container.querySelector('.money-total')).toHaveTextContent('Gesamt: 3,70 €')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      kind: 'length', visibility: 'always', label: 'Messstrecke',
+      values: { lengthCm: 14, maxCm: 20 },
+      valueRoles: { knownValues: ['maxCm'], unknownValues: ['lengthCm'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Länge unbekannt/ })).toBeVisible()
+    expect(container.querySelector('.ruler-labels')).toHaveTextContent('0?20 cm')
+    expect(container).not.toHaveTextContent('14 cm')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      kind: 'length', visibility: 'always', label: 'Messstrecke',
+      values: { lengthCm: 14, maxCm: 20 },
+      valueRoles: { knownValues: ['maxCm'], unknownValues: ['lengthCm'], revealedValues: ['lengthCm'] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Länge 14 Zentimeter/ })).toBeVisible()
+    expect(container.querySelector('.ruler-labels')).toHaveTextContent('014 cm20 cm')
+  })
+
+  it('stellt Division als bekannte Gesamtmenge und Gruppengröße ohne Quotient dar', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'groups', visibility: 'always', label: '24 durch 6',
+      values: { modelType: 'division-groups', total: 24, size: 6, groups: 4 },
+      valueRoles: { knownValues: ['modelType', 'total', 'size'], unknownValues: ['groups'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Anzahl der Gruppen unbekannt/ })).toBeVisible()
+    expect(container.querySelectorAll('.sample-group i')).toHaveLength(6)
+    expect(container).toHaveTextContent('Wie viele Gruppen? ?')
+  })
+
+  it('ergänzt eine erfolgreich bearbeitete unbekannte Menge im Balkenmodell', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'bar-model', visibility: 'always', label: 'Wegnehmen',
+      values: { modelType: 'change-decrease', unknownQuantity: 'remaining', first: 15, second: 6, third: 0, total: 15 },
+      valueRoles: {
+        knownValues: ['modelType', 'unknownQuantity', 'first', 'second', 'third', 'total'],
+        unknownValues: ['remaining'],
+        revealedValues: ['remaining']
+      }
+    }} />)
+    expect(screen.getByRole('img', { name: /verbleibende Menge 9/ })).toBeVisible()
+    expect(container.querySelector('.model-unknown')).toHaveTextContent('9')
+    expect(container).toHaveTextContent('übrig: 9')
+  })
+
+  it('weist widersprüchliche Rollen sichtbar zurück', () => {
+    render(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: 'Ungültig', values: { start: 2, end: 6 },
+      valueRoles: { knownValues: ['start', 'end'], unknownValues: ['end'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('widersprüchliche mathematische Rollen')
   })
 })
 

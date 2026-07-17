@@ -112,6 +112,13 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const displayedRepresentation = exercise.representation?.kind === 'column-calculation'
     ? {
         ...exercise.representation,
+        valueRoles: {
+          ...exercise.representation.valueRoles,
+          knownValues: [...new Set([
+            ...exercise.representation.valueRoles.knownValues,
+            'carry', 'unbundle', 'revealedDigits', 'activeColumn'
+          ])]
+        },
         values: {
           ...exercise.representation.values,
           carry: completedStepAnswers.carry ? exercise.representation.values.carry : 0,
@@ -137,6 +144,16 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
         }
       }
     : exercise.representation
+
+  const presentationRepresentation = displayedRepresentation && answerState === 'correct'
+    ? {
+        ...displayedRepresentation,
+        valueRoles: {
+          ...displayedRepresentation.valueRoles,
+          revealedValues: [...displayedRepresentation.valueRoles.unknownValues]
+        }
+      }
+    : displayedRepresentation
 
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
@@ -164,8 +181,8 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
         <h2 id="exercise-title" ref={headingRef} tabIndex={-1}>{exercise.prompt}</h2>
       </div>
 
-      {exercise.answerMode !== 'guided-word' && displayedRepresentation && (displayedRepresentation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
-        <MathRepresentation representation={displayedRepresentation} />
+      {exercise.answerMode !== 'guided-word' && presentationRepresentation && (presentationRepresentation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
+        <MathRepresentation representation={presentationRepresentation} />
       )}
 
       {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice' || exercise.answerMode === 'guided-number') && currentStep && answerState === 'answering' && (

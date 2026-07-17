@@ -96,10 +96,21 @@ function representation(
   difficulty: Difficulty,
   kind: ExerciseRepresentation['kind'],
   label: string,
-  values: ExerciseRepresentation['values']
+  values: ExerciseRepresentation['values'],
+  unknownValues: string[] = []
 ): ExerciseRepresentation | undefined {
   const visibility = getSkillContent(skillId).difficultyLevels[difficulty - 1].representation
-  return visibility === 'none' ? undefined : { kind, visibility, label, values }
+  return visibility === 'none' ? undefined : {
+    kind,
+    visibility,
+    label,
+    values,
+    valueRoles: {
+      knownValues: Object.keys(values).filter((key) => !unknownValues.includes(key)),
+      unknownValues,
+      revealedValues: []
+    }
+  }
 }
 
 function withMetadata(exercise: Exercise): Exercise {
@@ -134,7 +145,7 @@ function addition(seed: number, difficulty: Difficulty, focus?: string): Exercis
     subskillId: bridge ? 'addition-bridge-10' : 'addition-within-10',
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('addition', difficulty, 'number-line', 'Schritte auf dem Rechenstrich', { start: first, end: answer, step: second })
+    representation: representation('addition', difficulty, 'number-line', 'Schritte auf dem Rechenstrich', { start: first, end: answer, marker: first, step: second, jumps: [{ from: first, to: answer, label: `+${second}` }] }, ['end'])
   })
 }
 
@@ -155,7 +166,7 @@ function subtraction(seed: number, difficulty: Difficulty, focus?: string): Exer
     subskillId: bridge ? 'subtraction-bridge-10' : 'subtraction-within-10',
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('subtraction', difficulty, 'number-line', 'Schritte zurück auf dem Rechenstrich', { start: answer, end: first, step: second })
+    representation: representation('subtraction', difficulty, 'number-line', 'Schritte zurück auf dem Rechenstrich', { start: first, end: answer, marker: first, step: second, jumps: [{ from: first, to: answer, label: `−${second}` }] }, ['end'])
   })
 }
 
@@ -174,7 +185,7 @@ function multiplication(seed: number, difficulty: Difficulty, focus?: string): E
     subskillId: `times-${first}`,
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('multiplication', difficulty, 'groups', `${first} gleich große Gruppen`, { groups: first, size: second })
+    representation: representation('multiplication', difficulty, 'groups', `${first} gleich große Gruppen`, { groups: first, size: second, total: answer }, ['total'])
   })
 }
 
@@ -193,7 +204,7 @@ function division(seed: number, difficulty: Difficulty, focus?: string): Exercis
     subskillId: `division-by-${divisor}`,
     answerMode: 'number',
     correctAnswer: String(quotient),
-    representation: representation('division', difficulty, 'groups', `${dividend} Dinge in gleich große Gruppen teilen`, { groups: quotient, size: divisor })
+    representation: representation('division', difficulty, 'groups', `${dividend} Dinge in Gruppen zu je ${divisor} teilen`, { modelType: 'division-groups', total: dividend, size: divisor, groups: quotient }, ['groups'])
   })
 }
 
@@ -345,7 +356,7 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100): Exerci
     typeId: unit === 10 ? 'neighbor-tens' : 'neighbor-hundreds',
     answerMode: 'choice',
     correctAnswer: answer,
-    representation: representation(skillId, difficulty, 'number-line', 'Ausschnitt aus dem Zahlenstrahl', { start: lower, end: upper, marker: number, step: unit }),
+    representation: representation(skillId, difficulty, 'number-line', 'Ausschnitt aus dem Zahlenstrahl', { start: lower, end: upper, marker: number, step: unit }, ['start', 'end']),
     options: textOptions(random, answer, [
       { value: `${Math.max(0, lower - unit)} und ${lower}`, misconception: 'Intervall zu weit links' },
       { value: `${upper} und ${Math.min(1000, upper + unit)}`, misconception: 'Intervall zu weit rechts' },
@@ -471,19 +482,26 @@ function wordModelRepresentation(
   const isSharingStory = sourceModelType === 'equal-groups-share'
   const first = isSharingStory ? sourceTotal : sourceFirst
   const second = isSharingStory ? sourceFirst : sourceSecond
+  const unknownQuantity = WORD_MODEL_UNKNOWN_QUANTITY[modelType]
+  const representationValues: ExerciseRepresentation['values'] = {
+    modelType,
+    unknownQuantity,
+    first,
+    second,
+    third: values.third,
+    total: isSharingStory ? sourceTotal : first,
+    groups: sourceFirst,
+    ...(modelType === 'equal-groups-total' && !isSharingStory ? { size: sourceSecond } : {})
+  }
   return {
     kind,
     visibility: 'always',
     label,
-    values: {
-      modelType,
-      unknownQuantity: WORD_MODEL_UNKNOWN_QUANTITY[modelType],
-      first,
-      second,
-      third: values.third,
-      total: isSharingStory ? sourceTotal : first,
-      groups: sourceFirst,
-      ...(modelType === 'equal-groups-total' && !isSharingStory ? { size: sourceSecond } : {})
+    values: representationValues,
+    valueRoles: {
+      knownValues: Object.keys(representationValues).filter((key) => key !== unknownQuantity),
+      unknownValues: [unknownQuantity],
+      revealedValues: []
     }
   }
 }
@@ -821,7 +839,7 @@ function addition1000(seed: number, difficulty: Difficulty): Exercise {
     representation: representation('addition-1000', difficulty, difficulty === 1 ? 'place-value' : 'number-line', 'Rechenweg in Teilschritten', {
       start: first, end: answer, jumps,
       hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10
-    })
+    }, difficulty === 1 ? ['result'] : ['end'])
   })
 }
 
@@ -920,7 +938,7 @@ function writtenAddition(seed: number, difficulty: Difficulty): Exercise {
       operation: '+',
       carry: difficulty === 2 ? 1 : 0,
       carryColumn
-    })
+    }, ['result'])
   })
 }
 
@@ -972,7 +990,7 @@ function subtraction1000(seed: number, difficulty: Difficulty): Exercise {
     representation: representation('subtraction-1000', difficulty, difficulty === 1 ? 'place-value' : 'number-line', 'Rechenweg in Teilschritten', {
       start: first, end: answer, jumps,
       hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10
-    })
+    }, difficulty === 1 ? ['result'] : ['end'])
   })
 }
 
@@ -1073,7 +1091,7 @@ function writtenSubtraction(seed: number, difficulty: Difficulty): Exercise {
       operation: '−',
       unbundle: difficulty === 1 ? 0 : 1,
       unbundleFrom
-    })
+    }, ['result'])
   })
 }
 
@@ -1097,7 +1115,7 @@ function complement1000(seed: number, difficulty: Difficulty): Exercise {
     subskillId: targetUnit === 10 ? 'complement-next-ten' : 'complement-next-hundred',
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('complement-1000', difficulty, 'number-line', 'Ergänzen auf dem Rechenstrich', { start: first, end: target, jumps })
+    representation: representation('complement-1000', difficulty, 'number-line', 'Ergänzen auf dem Rechenstrich', { start: first, end: target, marker: first, jumps }, ['jumps'])
   })
 }
 
@@ -1189,7 +1207,7 @@ function money(seed: number, difficulty: Difficulty): Exercise {
       paidCents,
       priceLabel: content.priceLabel,
       paidLabel: content.paidLabel
-    })
+    }, difficulty < 3 ? ['displayedCents'] : [])
   })
 }
 
@@ -1270,7 +1288,7 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
     answerMode: 'choice',
     correctAnswer,
     options,
-    representation: representation('lengths', difficulty, 'length', content.rulerLabel, representationValues)
+    representation: representation('lengths', difficulty, 'length', content.rulerLabel, representationValues, difficulty === 1 ? ['lengthCm'] : [])
   })
 }
 
@@ -1298,7 +1316,8 @@ function bodyViews(seed: number, difficulty: Difficulty): Exercise {
       kind: 'cube-view',
       visibility: 'always',
       label: `${content.optionLabels[index]}: ${viewLabel}`,
-      values: { rows: candidate.grid.length, columns: candidate.grid[0]!.length, cells: candidate.grid.flat() }
+      values: { rows: candidate.grid.length, columns: candidate.grid[0]!.length, cells: candidate.grid.flat() },
+      valueRoles: { knownValues: ['rows', 'columns', 'cells'], unknownValues: [], revealedValues: [] }
     }
   }))
   const skillContent = contentFor('body-views', values, difficulty)
@@ -1315,7 +1334,8 @@ function bodyViews(seed: number, difficulty: Difficulty): Exercise {
       kind: 'cube-building',
       visibility: 'always',
       label: `${cubeCount(template)} Würfel. Vorne und rechts sind markiert.`,
-      values: { width: template.width, depth: template.depth, heights: template.heights }
+      values: { width: template.width, depth: template.depth, heights: template.heights },
+      valueRoles: { knownValues: ['width', 'depth', 'heights'], unknownValues: ['view'], revealedValues: [] }
     },
     explanation: `${content.directionGuidance[direction]} ${skillContent.explanation}`
   })
@@ -1351,7 +1371,8 @@ function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exe
         width: candidate.building.width,
         depth: candidate.building.depth,
         heights: candidate.building.heights
-      }
+      },
+      valueRoles: { knownValues: ['width', 'depth', 'heights'], unknownValues: [], revealedValues: [] }
     }
   }))
   const skillContent = contentFor('cube-rotation', values, difficulty)
@@ -1375,7 +1396,8 @@ function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exe
         turn,
         turnLabel,
         axisLabel: content.axisLabel
-      }
+      },
+      valueRoles: { knownValues: ['width', 'depth', 'heights', 'turn', 'turnLabel', 'axisLabel'], unknownValues: ['rotated-building'], revealedValues: [] }
     },
     explanation: `${content.turnGuidance[turn]} ${skillContent.explanation}`
   })
@@ -1426,7 +1448,8 @@ function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise
         showInstruction: 0,
         axisLabel: content.axisLabel,
         foldLabel: content.foldLabels[template.foldSide]
-      }
+      },
+      valueRoles: { knownValues: ['rows', 'columns', 'axis', 'foldSide', 'mode', 'marks', 'showInstruction', 'axisLabel', 'foldLabel'], unknownValues: [], revealedValues: [] }
     }
   }))
   const skillContent = contentFor('folding', values, difficulty)
@@ -1453,7 +1476,8 @@ function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise
         showInstruction: 1,
         axisLabel: content.axisLabel,
         foldLabel: content.foldLabels[template.foldSide]
-      }
+      },
+      valueRoles: { knownValues: ['rows', 'columns', 'axis', 'foldSide', 'mode', 'marks', 'showInstruction', 'axisLabel', 'foldLabel'], unknownValues: ['targetCells'], revealedValues: [] }
     },
     explanation: `${content.modeGuidance[template.mode]} ${skillContent.explanation}`
   })

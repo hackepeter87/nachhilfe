@@ -89,6 +89,7 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - fünfphasige Symmetrieprogression mit rechteckigen geraden Einstiegsrastern, expliziter Achsenlage, Figurenkomplexität und Distraktorstrategie
 - Körperansichtsvorlagen mit fester Orientierung, Würfelanzahl, drei Blickrichtungen und stufengerechten Gebäudegrenzen
 - Rotationsvorlagen mit senkrechter Achse, Links-/Rechtsrichtung, drei wirksamen Stufen und eindeutig unterscheidbaren Folgezuständen
+- die verbindliche Darstellungsrichtlinie mit bekannten, unbekannten und erst nach Erfolg aufgedeckten mathematischen Größen
 
 Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Status `draft`, `ready-for-review`, `active` oder `disabled`. Der Gesamtkatalog steht auf `ready-for-review`; technisch, mathematisch und intern didaktisch geprüfte Laufzeitkompetenzen stehen auf `active`. Das ist keine dokumentierte Freigabe durch eine Lehrkraft.
 
@@ -96,7 +97,7 @@ Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtr
 
 Beim Start lädt `src/content/catalog.ts` den öffentlichen Katalog und prüft ihn mit einer kleinen TypeScript-Validierung. Geprüft werden unter anderem Metadaten, bekannte und vollständige Skill-IDs, Pflichttexte, Hilfen, Wertebereiche, lösbare Sachaufgaben und unterscheidbare Symmetrievarianten. Ist die Datei nicht erreichbar oder fachlich strukturell ungültig, verwendet die App den gebündelten, getesteten Letztstand. Ein ungültiger Austausch-Katalog verhindert daher den App-Start nicht.
 
-Der Produktionsbuild scheitert bei einem ungültigen Katalog, `draft`/`disabled` als Gesamtstatus oder abweichenden Artefakten. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Das aktuelle Gesamtmodell und alle Kompetenzwege stehen unter [docs/didactics/](docs/didactics/README.md); die tatsächliche Runtime-Wirkung ist in [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) abgeglichen. Neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
+Der Produktionsbuild scheitert bei einem ungültigen Katalog, `draft`/`disabled` als Gesamtstatus oder abweichenden Artefakten. Die vollständigen Versions-, Release-, Update- und Rollbackregeln stehen in [docs/catalog-management.md](docs/catalog-management.md). Das aktuelle Gesamtmodell und alle Kompetenzwege stehen unter [docs/didactics/](docs/didactics/README.md); die tatsächliche Runtime-Wirkung ist in [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) abgeglichen. Die repositoryweite Maskierung gesuchter Größen ist in [docs/representation-policy.md](docs/representation-policy.md) dokumentiert. Neue Inhalte werden zusätzlich mit der [didaktischen Review-Checkliste](docs/didaktische-review-checkliste.md) und der PR-Vorlage geprüft.
 
 ## Container
 
@@ -132,7 +133,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.15.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.15.1
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -173,6 +174,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.15.0
+## Release-Stand 0.15.1
 
-Version 0.15.0 ergänzt einzelne Faltungen und einen einfachen Faltschnitt als adaptive Kompetenz. Katalog 0.14.0 und Schema 12 definieren Punktfaltungen, Achsen, bewegte Papierhälften und Faltschnittvorlagen; reine TypeScript-Logik spiegelt Rasterzellen exakt und verwirft uneindeutige Ergebnisse. Gerade Raster halten die Achse zwischen Zellen. Falten wird erst ab Symmetriephase 3 ausgewählt. Mehrfachfaltungen, Körpernetze und Kippen bleiben ausgeschlossen. Details stehen in [docs/didactics/folding.md](docs/didactics/folding.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.15.1 führt für alle mathematischen Darstellungen die Rollen `knownValues`, `unknownValues` und `revealedValues` ein. Rechenstriche, Nachbarzahlen, Division, Geld und Messstrecken nennen gesuchte Größen weder sichtbar noch in zugänglichen Beschreibungen; nach einer richtigen Lösung werden sie kontrolliert ergänzt. Katalog 0.14.1 und Schema 13 machen diese Regel buildwirksam. Der Funktionsumfang von 0.15.0 bleibt unverändert. Details stehen in [docs/representation-policy.md](docs/representation-policy.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

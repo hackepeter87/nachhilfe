@@ -98,6 +98,19 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('deckt eine unbekannte Darstellungsgröße erst nach richtiger Lösung auf', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('addition', 42, 1)
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const endLabel = () => container.querySelector('.number-line-labels span:last-child')
+
+    expect(endLabel()).toHaveTextContent('?')
+    expect(endLabel()).not.toHaveTextContent(exercise.correctAnswer)
+    await user.type(screen.getByLabelText('Deine Antwort'), exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(endLabel()).toHaveTextContent(exercise.correctAnswer)
+  })
+
   it('führt eine mehrschrittige Strategieaufgabe vollständig aus', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
@@ -125,14 +138,14 @@ describe('ExerciseCard', () => {
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
     expect(screen.queryByRole('img', { name: 'Rechenweg in Teilschritten' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /tipp/i }))
-    const representation = screen.getByRole('img', { name: 'Rechenweg in Teilschritten' })
+    const representation = screen.getByRole('img', { name: /Rechenweg in Teilschritten/ })
     expect(representation).toBeVisible()
     const jumps = exercise.representation?.values.jumps
     expect(Array.isArray(jumps)).toBe(true)
     if (!Array.isArray(jumps)) throw new Error('Sprünge fehlen')
     jumps.forEach((jump) => {
       if (typeof jump === 'number') throw new Error('Ungültiger Zahlenstrahlsprung')
-      expect(screen.getByLabelText(`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`)).toBeVisible()
+      expect(screen.getByLabelText(`Rechenschritt ${jump.label} zu einem unbekannten Wert`)).toBeVisible()
     })
   })
 

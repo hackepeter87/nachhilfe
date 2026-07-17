@@ -747,6 +747,7 @@ p {
 .known-pool i { width: 7px; height: 7px; border-radius: 50%; background: #c84f2c; }
 .unknown-groups { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
 .visual-group--unknown { display: grid; place-items: center; color: #19577d; font-size: 1.15rem; font-weight: 900; background: #eef7fb; }
+.sample-group { flex: 0 0 auto; }
 .model-arrow { color: #2876a8; font-size: 1.2rem; font-weight: 900; }
 .math-visual--error { border-color: var(--coral); color: #8d2f20; background: var(--coral-soft); font-weight: 800; }
 
@@ -754,6 +755,7 @@ p {
 .money-context { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; }
 .money-context span { color: #557060; font-size: .82rem; font-weight: 750; }
 .money-context strong { display: block; color: var(--ink); font-size: 1rem; }
+.money-total { text-align: center; color: #244d38; }
 .coin-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .coin {
   display: grid;

@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.14.0',
-    schemaVersion: 12,
-    appVersion: '0.15.0'
+    catalogVersion: '0.14.1',
+    schemaVersion: 13,
+    appVersion: '0.15.1'
   })
 
   await page.reload()
@@ -476,8 +476,9 @@ test('Schriftliche Addition wird nach den Voraussetzungen mobil vollständig bea
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
 
-  const column = page.getByRole('img', { name: /Schriftliche Addition .* Ergebnis ist noch offen/i })
+  const column = page.locator('.column-calculation')
   await expect(column).toBeVisible()
+  await expect(column).toHaveAttribute('aria-label', /Schriftliche Addition .* Ergebnis ist noch offen/i)
   const label = await column.getAttribute('aria-label')
   const [first, second] = label?.match(/\d+/g)?.map(Number) ?? []
   if (first === undefined || second === undefined) throw new Error('Summanden der Spaltendarstellung fehlen')
@@ -562,8 +563,9 @@ test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', asy
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
 
-  const column = page.getByRole('img', { name: /Schriftliche Subtraktion .* Ergebnis ist noch offen/i })
+  const column = page.locator('.column-calculation')
   await expect(column).toBeVisible()
+  await expect(column).toHaveAttribute('aria-label', /Schriftliche Subtraktion .* Ergebnis ist noch offen/i)
   const label = await column.getAttribute('aria-label')
   const [first, second] = label?.match(/\d+/g)?.map(Number) ?? []
   if (first === undefined || second === undefined) throw new Error('Zahlen der Spaltendarstellung fehlen')
@@ -611,12 +613,13 @@ test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', asyn
     if (await page.locator('.money-visual').isVisible().catch(() => false)) {
       moneySeen = true
       expect(await page.locator('.coin').count()).toBeGreaterThan(0)
+      await expect(page.locator('.money-visual')).toHaveAttribute('aria-label', /Gesamtbetrag (?:unbekannt|\d+ Cent)/)
       await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('geld-375x812.png') })
     }
     if (await page.locator('.length-visual').isVisible().catch(() => false)) {
       lengthSeen = true
-      await expect(page.getByRole('img', { name: /Messstrecke.*Zentimeter/ })).toBeVisible()
+      await expect(page.getByRole('img', { name: /Messstrecke.*Länge (?:unbekannt|\d+ Zentimeter)/ })).toBeVisible()
       await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('laenge-375x812.png') })
     }

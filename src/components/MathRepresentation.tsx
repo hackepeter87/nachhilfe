@@ -10,6 +10,12 @@ function coinLabel(cents: number): string {
   return cents >= 100 ? `${cents / 100} €` : `${cents} ct`
 }
 
+function amountLabel(cents: number): string {
+  return cents >= 100
+    ? `${Math.floor(cents / 100)},${String(cents % 100).padStart(2, '0')} €`
+    : `${cents} ct`
+}
+
 function CubeBuildingDiagram({ building, turn, axisLabel, turnLabel }: {
   building: CubeBuilding
   turn?: 'left' | 'right'
@@ -58,10 +64,25 @@ function CubeBuildingDiagram({ building, turn, axisLabel, turnLabel }: {
 
 export function MathRepresentation({ representation }: { representation: ExerciseRepresentation }) {
   const values = representation.values
+  const { knownValues, unknownValues, revealedValues } = representation.valueRoles
+  const known = new Set(knownValues)
+  const unknown = new Set(unknownValues)
+  const revealed = new Set(revealedValues)
+  const hasValidValueRoles = knownValues.length === known.size && unknownValues.length === unknown.size &&
+    revealedValues.length === revealed.size &&
+    knownValues.every((key) => key in values) &&
+    Object.keys(values).every((key) => known.has(key) || unknown.has(key)) &&
+    unknownValues.every((key) => !known.has(key)) &&
+    revealedValues.every((key) => unknown.has(key))
+  if (!hasValidValueRoles) {
+    return <div className="math-visual math-visual--error" role="alert">Die Darstellung enthält widersprüchliche mathematische Rollen.</div>
+  }
+  const isValueVisible = (key: string) => known.has(key) || revealed.has(key)
   const textValue = (value: typeof values[string]) => Array.isArray(value) ? '' : value
   const modelType = typeof values.modelType === 'string' ? values.modelType : undefined
-  const expectedUnknownQuantity = modelType ? WORD_MODEL_UNKNOWN_QUANTITY[modelType as keyof typeof WORD_MODEL_UNKNOWN_QUANTITY] : undefined
-  const hasValidUnknownQuantity = !modelType || Boolean(expectedUnknownQuantity) && expectedUnknownQuantity === values.unknownQuantity
+  const isCatalogWordModel = Boolean(modelType && modelType in WORD_MODEL_UNKNOWN_QUANTITY)
+  const expectedUnknownQuantity = isCatalogWordModel ? WORD_MODEL_UNKNOWN_QUANTITY[modelType as keyof typeof WORD_MODEL_UNKNOWN_QUANTITY] : undefined
+  const hasValidUnknownQuantity = !isCatalogWordModel || Boolean(expectedUnknownQuantity) && expectedUnknownQuantity === values.unknownQuantity
 
   if (representation.kind === 'cube-building') {
     const building: CubeBuilding = {
@@ -152,7 +173,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
         {(['hundreds', 'tens', 'ones'] as const).map((key) => (
           <div className={values.highlight === key ? 'place-column place-column--highlight' : 'place-column'} key={key}>
             <span>{key === 'hundreds' ? 'H' : key === 'tens' ? 'Z' : 'E'}</span>
-            <strong>{textValue(values[key])}</strong>
+            <strong>{isValueVisible(key) ? textValue(values[key]) : '?'}</strong>
           </div>
         ))}
       </div>
@@ -207,13 +228,15 @@ export function MathRepresentation({ representation }: { representation: Exercis
         ? [null, firstDigits[1]! - 1, firstDigits[2]! + 10]
         : [firstDigits[0]! - 1, firstDigits[1]! + 10, null]
       : [null, null, null]
+    const resultVisible = isValueVisible('result')
+    const resultDescription = resultVisible ? `Das Ergebnis ist ${answerDigits.join('')}.` : 'Das Ergebnis ist noch offen.'
     const description = operation === '+'
       ? carry === 1
-        ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. Das Ergebnis ist noch offen.`
-        : `Schriftliche Addition ${first} plus ${second}. Das Ergebnis ist noch offen.`
+        ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. ${resultDescription}`
+        : `Schriftliche Addition ${first} plus ${second}. ${resultDescription}`
       : unbundle === 1
-        ? `Schriftliche Subtraktion ${first} minus ${second}. Eine ${unbundleFrom === 'tens' ? 'Zehnerstelle wird in zehn Einer' : 'Hunderterstelle wird in zehn Zehner'} entbündelt. Das Ergebnis ist noch offen.`
-        : `Schriftliche Subtraktion ${first} minus ${second}. Das Ergebnis ist noch offen.`
+        ? `Schriftliche Subtraktion ${first} minus ${second}. Eine ${unbundleFrom === 'tens' ? 'Zehnerstelle wird in zehn Einer' : 'Hunderterstelle wird in zehn Zehner'} entbündelt. ${resultDescription}`
+        : `Schriftliche Subtraktion ${first} minus ${second}. ${resultDescription}`
     return (
       <div className="math-visual column-calculation" role="img" aria-label={description}>
         <div className="column-row column-row--headers" aria-hidden="true">
@@ -247,8 +270,16 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const marker = Number(values.marker ?? values.target ?? end)
     const positionFor = (value: number) => scaleEnd === scaleStart ? 0 : ((value - scaleStart) / (scaleEnd - scaleStart)) * 100
     const position = Math.max(0, Math.min(100, positionFor(marker)))
+    const startVisible = isValueVisible('start')
+    const endVisible = isValueVisible('end')
+    const markerKey = values.marker !== undefined ? 'marker' : values.target !== undefined ? 'target' : 'end'
+    const markerVisible = isValueVisible(markerKey)
+    const jumpsVisible = isValueVisible('jumps')
+    const scaleStartVisible = scaleStart === start ? startVisible : scaleStart === end ? endVisible : jumpsVisible
+    const scaleEndVisible = scaleEnd === start ? startVisible : scaleEnd === end ? endVisible : jumpsVisible
+    const description = `${representation.label}. Anfang ${startVisible ? start : 'unbekannt'}, Ende ${endVisible ? end : 'unbekannt'}, Markierung ${markerVisible ? marker : 'unbekannt'}.`
     return (
-      <div className="math-visual number-line-visual" role="img" aria-label={representation.label}>
+      <div className="math-visual number-line-visual" role="img" aria-label={description}>
         <div className="number-line-track">
           <span className="number-line-marker" style={{ left: `${position}%` }} />
           {jumps.map((jump, index) => {
@@ -256,20 +287,22 @@ export function MathRepresentation({ representation }: { representation: Exercis
             const to = positionFor(jump.to)
             return (
               <span
-                aria-label={`Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`}
+                aria-label={jumpsVisible && endVisible
+                  ? `Sprung von ${jump.from} bis ${jump.to}: ${jump.label}`
+                  : `Rechenschritt ${jumpsVisible ? jump.label : 'unbekannt'} zu einem unbekannten Wert`}
                 className={jump.to < jump.from ? 'number-line-jump number-line-jump--backward' : 'number-line-jump'}
                 key={`${jump.from}-${jump.to}-${index}`}
                 style={{ left: `${Math.min(from, to)}%`, width: `${Math.abs(to - from)}%` }}
               >
-                {jump.label}
+                {jumpsVisible ? jump.label : '?'}
               </span>
             )
           })}
         </div>
         <div className="number-line-labels">
-          <span>{scaleStart}</span>
-          {marker !== scaleStart && marker !== scaleEnd && <strong>{marker}</strong>}
-          <span>{scaleEnd}</span>
+          <span>{scaleStartVisible ? scaleStart : '?'}</span>
+          {marker !== scaleStart && marker !== scaleEnd && <strong>{markerVisible ? marker : '?'}</strong>}
+          <span>{scaleEndVisible ? scaleEnd : '?'}</span>
         </div>
       </div>
     )
@@ -283,8 +316,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
     if (coins.length === 0 || coins.reduce((sum, coin) => sum + coin, 0) !== displayedCents) {
       return <div className="math-visual math-visual--error" role="alert">Die Gelddarstellung enthält einen ungültigen Betrag.</div>
     }
+    const totalVisible = isValueVisible('displayedCents')
     return (
-      <div className="math-visual money-visual" role="img" aria-label={`${representation.label}: ${displayedCents} Cent`}>
+      <div className="math-visual money-visual" role="img" aria-label={`${representation.label}: Gesamtbetrag ${totalVisible ? `${displayedCents} Cent` : 'unbekannt'}`}>
         {Number(values.priceCents) > 0 && (
           <div className="money-context">
             <span>{textValue(values.priceLabel)} <strong>{Math.floor(Number(values.priceCents) / 100)},{String(Number(values.priceCents) % 100).padStart(2, '0')} €</strong></span>
@@ -294,6 +328,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
         <div className="coin-row" aria-hidden="true">
           {coins.map((coin, index) => <span className={`coin coin--${coin}`} key={`${coin}-${index}`}>{coinLabel(coin)}</span>)}
         </div>
+        <strong className="money-total">Gesamt: {totalVisible ? amountLabel(displayedCents) : '?'}</strong>
       </div>
     )
   }
@@ -305,40 +340,63 @@ export function MathRepresentation({ representation }: { representation: Exercis
       return <div className="math-visual math-visual--error" role="alert">Die Messstrecke enthält ungültige Längenangaben.</div>
     }
     const position = (lengthCm / maxCm) * 100
+    const lengthVisible = isValueVisible('lengthCm')
     return (
-      <div className="math-visual length-visual" role="img" aria-label={`${representation.label}: ${lengthCm} Zentimeter`}>
+      <div className="math-visual length-visual" role="img" aria-label={`${representation.label}: Länge ${lengthVisible ? `${lengthCm} Zentimeter` : 'unbekannt'}`}>
         {values.equivalence && <strong className="length-equivalence">{textValue(values.equivalence)}</strong>}
         <div className="ruler-track">
           <span className="measured-length" style={{ width: `${position}%` }} />
           {Array.from({ length: 11 }, (_, index) => <i aria-hidden="true" key={index} style={{ left: `${index * 10}%` }} />)}
         </div>
-        <div className="ruler-labels"><span>0</span><strong>{lengthCm} cm</strong><span>{maxCm} cm</span></div>
+        <div className="ruler-labels"><span>0</span><strong>{lengthVisible ? `${lengthCm} cm` : '?'}</strong><span>{maxCm} cm</span></div>
       </div>
     )
   }
 
   if (representation.kind === 'groups') {
-    if (modelType && !hasValidUnknownQuantity) {
+    if (isCatalogWordModel && (!hasValidUnknownQuantity || !unknown.has(expectedUnknownQuantity!))) {
       return <div className="math-visual math-visual--error" role="alert">Das Gruppenbild benennt die unbekannte Größe nicht eindeutig.</div>
     }
     const groups = Number(values.groups)
     const size = Number(values.size)
+    if (modelType === 'division-groups') {
+      const total = Number(values.total)
+      if (!Number.isInteger(total) || total < 2 || total > 100 || !isValidGroupValue(size) || !isValidGroupValue(groups) || total / size !== groups) {
+        return <div className="math-visual math-visual--error" role="alert">Das Divisionsbild enthält ungültige Mengenangaben.</div>
+      }
+      const groupsVisible = isValueVisible('groups')
+      return (
+        <div className="math-visual word-model word-groups-model" role="img" aria-label={`${total} Punkte werden in Gruppen mit je ${size} Punkten geteilt. Anzahl der Gruppen ${groupsVisible ? total / size : 'unbekannt'}.`}>
+          <div className="known-pool" aria-hidden="true">
+            <strong>{total} insgesamt</strong>
+            <span>{Array.from({ length: total }, (_, item) => <i key={item} />)}</span>
+          </div>
+          <span className="model-arrow" aria-hidden="true">↓</span>
+          <span className="visual-group sample-group" aria-hidden="true" style={{ '--point-columns': Math.min(size, 5) } as CSSProperties}>
+            {Array.from({ length: size }, (_, item) => <i key={item} />)}
+          </span>
+          <strong>Wie viele Gruppen? {groupsVisible ? total / size : '?'}</strong>
+        </div>
+      )
+    }
     if (modelType === 'equal-groups-share') {
       const total = Number(values.total)
       if (!isValidGroupValue(groups) || !Number.isInteger(total) || total < 2 || total > 100) {
         return <div className="math-visual math-visual--error" role="alert">Das Verteilbild enthält ungültige Mengenangaben.</div>
       }
+      const groupSizeVisible = isValueVisible('group-size')
+      const groupSize = total / groups
       return (
-        <div className="math-visual word-model word-groups-model" role="img" aria-label={`${total} Punkte werden auf ${groups} gleich große Gruppen verteilt. Punkte je Gruppe: unbekannt.`}>
+        <div className="math-visual word-model word-groups-model" role="img" aria-label={`${total} Punkte werden auf ${groups} gleich große Gruppen verteilt. Punkte je Gruppe: ${groupSizeVisible ? groupSize : 'unbekannt'}.`}>
           <div className="known-pool" aria-hidden="true">
             <strong>{total} insgesamt</strong>
             <span>{Array.from({ length: total }, (_, item) => <i key={item} />)}</span>
           </div>
           <span className="model-arrow" aria-hidden="true">↓</span>
           <div className="unknown-groups" aria-hidden="true">
-            {Array.from({ length: groups }, (_, group) => <span className="visual-group visual-group--unknown" key={group}>?</span>)}
+            {Array.from({ length: groups }, (_, group) => <span className="visual-group visual-group--unknown" key={group}>{groupSizeVisible ? groupSize : '?'}</span>)}
           </div>
-          <strong>Wie viele kommen in jede Gruppe?</strong>
+          <strong>Wie viele kommen in jede Gruppe? {groupSizeVisible ? groupSize : '?'}</strong>
         </div>
       )
     }
@@ -350,8 +408,10 @@ export function MathRepresentation({ representation }: { representation: Exercis
       )
     }
     const pointColumns = size <= 5 ? size : 5
+    const totalVisible = isValueVisible('total')
+    const hasUnknownTotal = modelType === 'equal-groups-total' || values.total !== undefined
     return (
-      <div className={modelType === 'equal-groups-total' ? 'math-visual groups-visual word-model' : 'math-visual groups-visual'} role="img" aria-label={`${groups} Gruppen mit je ${size} Punkten. ${modelType === 'equal-groups-total' ? 'Gesamtzahl unbekannt.' : representation.label}`}>
+      <div className={modelType === 'equal-groups-total' ? 'math-visual groups-visual word-model' : 'math-visual groups-visual'} role="img" aria-label={`${groups} Gruppen mit je ${size} Punkten. ${hasUnknownTotal ? `Gesamtzahl ${totalVisible ? groups * size : 'unbekannt'}.` : representation.label}`}>
         {Array.from({ length: groups }, (_, group) => (
           <span
             aria-hidden="true"
@@ -362,13 +422,13 @@ export function MathRepresentation({ representation }: { representation: Exercis
             {Array.from({ length: size }, (_, item) => <i key={item} />)}
           </span>
         ))}
-        {modelType === 'equal-groups-total' && <strong className="groups-question">Insgesamt: ?</strong>}
+        {hasUnknownTotal && <strong className="groups-question">Insgesamt: {totalVisible ? groups * size : '?'}</strong>}
       </div>
     )
   }
 
   if (representation.kind === 'bar-model' && modelType) {
-    if (!hasValidUnknownQuantity) {
+    if (!hasValidUnknownQuantity || !unknown.has(expectedUnknownQuantity!)) {
       return <div className="math-visual math-visual--error" role="alert">Das Balkenmodell benennt die unbekannte Größe nicht eindeutig.</div>
     }
     const first = Number(values.first)
@@ -378,41 +438,56 @@ export function MathRepresentation({ representation }: { representation: Exercis
     if (!Number.isFinite(first) || !Number.isFinite(second) || first < 0 || second < 0) {
       return <div className="math-visual math-visual--error" role="alert">Das Balkenmodell enthält ungültige Mengenangaben.</div>
     }
+    const unknownVisible = isValueVisible(expectedUnknownQuantity!)
+    const unknownResult = modelType === 'change-increase' || modelType === 'part-whole'
+      ? first + second
+      : modelType === 'change-decrease'
+        ? first - second
+        : modelType === 'comparison'
+          ? Math.abs(first - second)
+          : modelType === 'missing-part'
+            ? total - second
+            : modelType === 'increase-then-decrease'
+              ? first + second - third
+              : modelType === 'decrease-then-increase'
+                ? first - second + third
+                : Number.NaN
+    const unknownLabel = unknownVisible && Number.isFinite(unknownResult) ? String(unknownResult) : '?'
     if (modelType === 'change-increase') return (
-      <div className="math-visual word-model change-increase-model" role="img" aria-label={`Anfang ${first}, dazu ${second}, neue Gesamtmenge unbekannt.`}>
+      <div className="math-visual word-model change-increase-model" role="img" aria-label={`Anfang ${first}, dazu ${second}, neue Gesamtmenge ${unknownVisible ? unknownResult : 'unbekannt'}.`}>
         <span className="model-caption">zuerst</span>
         <div className="model-bar model-bar--known-part" style={{ width: `${(first / (first + second)) * 100}%` }}><span>{first}</span></div>
         <span className="model-caption">danach kommt etwas dazu</span>
         <div className="model-bar model-bar--parts" style={{ gridTemplateColumns: `${first}fr ${second}fr` }}><span>{first}</span><span>+ {second}</span></div>
-        <strong>neue Gesamtmenge: ?</strong>
+        <strong>neue Gesamtmenge: {unknownLabel}</strong>
       </div>
     )
     if (modelType === 'change-decrease') return (
-      <div className="math-visual word-model" role="img" aria-label={`Anfang ${first}, weg ${second}, verbleibende Menge unbekannt.`}>
+      <div className="math-visual word-model" role="img" aria-label={`Anfang ${first}, weg ${second}, verbleibende Menge ${unknownVisible ? unknownResult : 'unbekannt'}.`}>
         <span className="model-caption">am Anfang</span><div className="model-bar"><span>{first}</span></div>
-        <span className="model-caption">danach</span><div className="model-bar model-bar--parts"><span className="model-unknown">?</span><span className="model-removed">weg: {second}</span></div>
-        <strong>übrig: ?</strong>
+        <span className="model-caption">danach</span><div className="model-bar model-bar--parts"><span className="model-unknown">{unknownLabel}</span><span className="model-removed">weg: {second}</span></div>
+        <strong>übrig: {unknownLabel}</strong>
       </div>
     )
     if (modelType === 'part-whole') return (
-      <div className="math-visual word-model" role="img" aria-label={`Teile ${first} und ${second}, Ganzes unbekannt.`}>
+      <div className="math-visual word-model" role="img" aria-label={`Teile ${first} und ${second}, Ganzes ${unknownVisible ? unknownResult : 'unbekannt'}.`}>
         <span className="model-caption">zwei bekannte Teile</span><div className="model-bar model-bar--parts"><span>{first}</span><span>{second}</span></div>
-        <strong>Ganzes: ?</strong>
+        <strong>Ganzes: {unknownLabel}</strong>
       </div>
     )
     if (modelType === 'comparison') return (
-      <div className="math-visual word-model comparison-model" role="img" aria-label={`Mengen ${first} und ${second}, Unterschied unbekannt.`}>
+      <div className="math-visual word-model comparison-model" role="img" aria-label={`Mengen ${first} und ${second}, Unterschied ${unknownVisible ? unknownResult : 'unbekannt'}.`}>
         <div><span>Menge A</span><div className="model-bar"><span>{first}</span></div></div>
-        <div><span>Menge B</span><div className="model-bar model-bar--short"><span>{second}</span><span className="model-unknown">?</span></div></div>
-        <strong>Unterschied: ?</strong>
+        <div><span>Menge B</span><div className="model-bar model-bar--short"><span>{second}</span><span className="model-unknown">{unknownLabel}</span></div></div>
+        <strong>Unterschied: {unknownLabel}</strong>
       </div>
     )
     if (modelType === 'missing-part') {
       if (!Number.isFinite(total) || total < second) return <div className="math-visual math-visual--error" role="alert">Das Teil-Ganzes-Modell ist ungültig.</div>
       return (
-        <div className="math-visual word-model" role="img" aria-label={`Ganzes ${total}, bekannter Teil ${second}, fehlender Teil unbekannt.`}>
+        <div className="math-visual word-model" role="img" aria-label={`Ganzes ${total}, bekannter Teil ${second}, fehlender Teil ${unknownVisible ? unknownResult : 'unbekannt'}.`}>
           <span className="model-caption">Ganzes: {total}</span><div className="model-bar"><span>{total}</span></div>
-          <span className="model-caption">bekannter und fehlender Teil</span><div className="model-bar model-bar--parts"><span>{second}</span><span className="model-unknown">?</span></div>
+          <span className="model-caption">bekannter und fehlender Teil</span><div className="model-bar model-bar--parts"><span>{second}</span><span className="model-unknown">{unknownLabel}</span></div>
         </div>
       )
     }
@@ -421,11 +496,11 @@ export function MathRepresentation({ representation }: { representation: Exercis
       const firstChange = modelType === 'increase-then-decrease' ? `+ ${second}` : `− ${second}`
       const secondChange = modelType === 'increase-then-decrease' ? `− ${third}` : `+ ${third}`
       return (
-        <div className="math-visual word-model sequence-model" role="img" aria-label={`Start ${first}, dann ${firstChange}, danach ${secondChange}, Endmenge unbekannt.`}>
+        <div className="math-visual word-model sequence-model" role="img" aria-label={`Start ${first}, dann ${firstChange}, danach ${secondChange}, Endmenge ${unknownVisible ? unknownResult : 'unbekannt'}.`}>
           <span><small>Start</small><strong>{first}</strong></span><b aria-hidden="true">→</b>
           <span><small>1. Veränderung</small><strong>{firstChange}</strong></span><b aria-hidden="true">→</b>
           <span><small>2. Veränderung</small><strong>{secondChange}</strong></span><b aria-hidden="true">→</b>
-          <span><small>Ende</small><strong>?</strong></span>
+          <span><small>Ende</small><strong>{unknownLabel}</strong></span>
         </div>
       )
     }
@@ -435,10 +510,10 @@ export function MathRepresentation({ representation }: { representation: Exercis
   return (
     <div className="math-visual bar-model-visual" role="img" aria-label={representation.label}>
       <div className="bar-segments">
-        <span>{textValue(values.firstLabel ?? values.first)}</span>
-        <span>{textValue(values.secondLabel ?? values.second)}</span>
+        <span>{isValueVisible(values.firstLabel !== undefined ? 'firstLabel' : 'first') ? textValue(values.firstLabel ?? values.first) : '?'}</span>
+        <span>{isValueVisible(values.secondLabel !== undefined ? 'secondLabel' : 'second') ? textValue(values.secondLabel ?? values.second) : '?'}</span>
       </div>
-      <strong>{textValue(values.question) || `Gesucht: ${textValue(values.total) || '?'}`}</strong>
+      <strong>{isValueVisible('question') && textValue(values.question) || `Gesucht: ${isValueVisible('total') ? textValue(values.total) : '?'}`}</strong>
     </div>
   )
 }

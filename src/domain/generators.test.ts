@@ -106,7 +106,10 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(quotient).toBeGreaterThanOrEqual(2)
         expect(quotient).toBeLessThanOrEqual(10)
         expect(divisor * quotient).toBe(dividend)
-        if (difficulty < 3) expect(division.representation?.values).toMatchObject({ groups: quotient, size: divisor })
+        if (difficulty < 3) {
+          expect(division.representation?.values).toMatchObject({ modelType: 'division-groups', total: dividend, size: divisor, groups: quotient })
+          expect(division.representation?.valueRoles.unknownValues).toContain('groups')
+        }
         else expect(division.representation).toBeUndefined()
       }
     }

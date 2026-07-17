@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(12)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.14.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(13)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.14.1')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -54,6 +54,16 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = structuredClone(readPublicCatalog()) as unknown as Record<string, unknown>
     catalog[field] = value
     expect(validateTaskCatalog(catalog)).toBe(false)
+  })
+
+  it('lehnt eine fehlende oder unvollständige Darstellungsrichtlinie ab', () => {
+    const missing = structuredClone(readPublicCatalog()) as unknown as Record<string, unknown>
+    delete missing.representationPolicy
+    expect(validateTaskCatalog(missing)).toBe(false)
+
+    const incomplete = structuredClone(readPublicCatalog()) as TaskCatalog
+    incomplete.representationPolicy.unknownValues = ''
+    expect(validateTaskCatalog(incomplete)).toBe(false)
   })
 
   it('kennt ausschließlich alle produktiven Skill-IDs', () => {
@@ -83,6 +93,7 @@ describe('versionierter Aufgabenkatalog', () => {
   it('klassifiziert didaktische Felder nach ihrer tatsächlichen Verwendung', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     expect(catalog.fieldUsage).toMatchObject({
+      representationPolicy: 'runtime',
       difficultyLevels: 'runtime',
       successFeedback: 'runtime',
       errorFeedback: 'runtime',
@@ -90,6 +101,7 @@ describe('versionierter Aufgabenkatalog', () => {
       processCompetencies: 'review',
       transferPrompt: 'planned'
     })
+    expect(catalog.representationPolicy.rule).toMatch(/Gesuchte Größen.*niemals numerisch/i)
   })
 
   it('behauptet im Erfolgsfeedback keine unbeobachtete Rechenstrategie', () => {

@@ -71,6 +71,11 @@ export interface ExerciseRepresentation {
   visibility: 'always' | 'hint'
   label: string
   values: Record<string, number | string | number[] | NumberLineJump[]>
+  valueRoles: {
+    knownValues: string[]
+    unknownValues: string[]
+    revealedValues: string[]
+  }
 }
 
 export interface ExerciseStep {

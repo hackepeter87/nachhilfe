@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Darstellungen ohne vorweggenommene Lösung 0.15.1
+
+- Jede `ExerciseRepresentation` deklariert `knownValues`, `unknownValues` und `revealedValues`. Der zentrale Renderer verwirft unvollständige, überlappende oder unzulässig aufgedeckte Rollen sichtbar.
+- Rechenstriche maskieren Ziel- und Zwischenwerte, Nachbaraufgaben beide gesuchten Nachbarn und Ergänzungsaufgaben ihre gesuchten Sprünge. Zugängliche Beschreibungen nennen dieselben Werte ebenfalls nicht.
+- Division zeigt Gesamtmenge und bekannte Gruppengröße, aber nicht mehr die gesuchte Anzahl fertig gezeichneter Gruppen. Geld- und Messdarstellungen nennen gesuchte Summen beziehungsweise Längen erst nach richtiger Lösung.
+- Katalog 0.14.1 und Schema 13 ergänzen eine buildwirksame `representationPolicy`. Die Regel, der Repository-Audit und Anforderungen an künftige Darstellungen stehen in `docs/representation-policy.md`.
+- Der mathematische Kompetenzumfang bleibt unverändert. Eine externe Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 261 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und 13 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.15.1` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Falten und Spiegeln 0.15.0
 
 - Die neue Kompetenz `folding` verbindet das bekannte Spiegelprinzip mit genau einer gerichteten Faltung. Stufe 1 verfolgt einen Punkt an einer senkrechten Achse, Stufe 2 wechselt Achse und bewegte Papierhälfte, Stufe 3 öffnet einen einfachen Faltschnitt zu einem symmetrischen Markierungspaar.
