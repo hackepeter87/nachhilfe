@@ -943,6 +943,107 @@ function subtraction1000(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+function writtenSubtractionSteps(values: Record<string, number | string>, difficulty: Difficulty): ExerciseStep[] {
+  const content = getTaskCatalog().strategySteps.writtenSubtraction
+  const step = (
+    id: string,
+    prompt: string,
+    correctAnswer: number,
+    errorFeedback: string,
+    successFeedback: string
+  ): ExerciseStep => ({
+    id,
+    interaction: 'number',
+    prompt: renderCatalogText(prompt, values),
+    correctAnswer: String(correctAnswer),
+    errorFeedback: renderCatalogText(errorFeedback, values),
+    successFeedback: renderCatalogText(successFeedback, values)
+  })
+  const steps: ExerciseStep[] = []
+  if (difficulty === 2) {
+    steps.push(step('unbundle', content.unbundlePrompt, 1, content.unbundleError, content.unbundleSuccess))
+  }
+  steps.push(
+    step('ones', content.onesPrompt, Number(values.onesResult), content.onesError, content.onesSuccess),
+    step('tens', content.tensPrompt, Number(values.tensResult), content.tensError, content.tensSuccess),
+    step('hundreds', content.hundredsPrompt, Number(values.hundredsResult), content.hundredsError, content.hundredsSuccess)
+  )
+  if (difficulty === 3) {
+    steps.push(step('check', content.checkPrompt, Number(values.first), content.checkError, content.checkSuccess))
+  }
+  return steps
+}
+
+function writtenSubtraction(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  let firstHundreds: number
+  let firstTens: number
+  let firstOnes: number
+  let secondHundreds: number
+  let secondTens: number
+  let secondOnes: number
+  let unbundleFrom: 'none' | 'tens' | 'hundreds' = 'none'
+
+  if (difficulty === 1) {
+    firstHundreds = integer(random, 4, 9)
+    secondHundreds = integer(random, 1, firstHundreds - 1)
+    firstTens = integer(random, 1, 9)
+    secondTens = integer(random, 0, firstTens)
+    firstOnes = integer(random, 1, 9)
+    secondOnes = integer(random, 0, firstOnes)
+  } else if (difficulty === 2 || random() < 0.5) {
+    unbundleFrom = 'tens'
+    firstHundreds = integer(random, 4, 9)
+    secondHundreds = integer(random, 1, firstHundreds - 1)
+    firstTens = integer(random, 2, 9)
+    secondTens = integer(random, 0, firstTens - 1)
+    firstOnes = integer(random, 0, 7)
+    secondOnes = integer(random, firstOnes + 1, 9)
+  } else {
+    unbundleFrom = 'hundreds'
+    firstHundreds = integer(random, 3, 9)
+    secondHundreds = integer(random, 1, firstHundreds - 2)
+    firstTens = integer(random, 0, 7)
+    secondTens = integer(random, firstTens + 1, 9)
+    firstOnes = integer(random, 1, 9)
+    secondOnes = integer(random, 0, firstOnes)
+  }
+
+  const first = firstHundreds * 100 + firstTens * 10 + firstOnes
+  const second = secondHundreds * 100 + secondTens * 10 + secondOnes
+  const answer = first - second
+  const values = {
+    first,
+    second,
+    answer,
+    onesResult: answer % 10,
+    tensResult: Math.floor(answer / 10) % 10,
+    hundredsResult: Math.floor(answer / 100),
+    unbundle: difficulty === 1 ? 0 : 1,
+    unbundleFrom
+  }
+  return withMetadata({
+    ...base('written-subtraction', seed, difficulty, values),
+    ...contentFor('written-subtraction', values, difficulty),
+    typeId: 'written-subtraction-to-1000',
+    subskillId: difficulty === 1
+      ? 'written-subtraction-no-unbundling'
+      : unbundleFrom === 'tens'
+        ? 'written-subtraction-ones-unbundling'
+        : 'written-subtraction-tens-unbundling',
+    answerMode: 'guided-number',
+    correctAnswer: String(answer),
+    steps: writtenSubtractionSteps(values, difficulty),
+    representation: representation('written-subtraction', difficulty, 'column-calculation', 'Schriftliche Subtraktion in der Stellenwerttafel', {
+      first,
+      second,
+      operation: '−',
+      unbundle: difficulty === 1 ? 0 : 1,
+      unbundleFrom
+    })
+  })
+}
+
 function complement1000(seed: number, difficulty: Difficulty): Exercise {
   const random = seededRandom(seed)
   const targetUnit = difficulty === 1 ? 10 : 100
@@ -1156,6 +1257,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'addition-1000': return addition1000(seed, difficulty)
     case 'written-addition': return writtenAddition(seed, difficulty)
     case 'subtraction-1000': return subtraction1000(seed, difficulty)
+    case 'written-subtraction': return writtenSubtraction(seed, difficulty)
     case 'complement-1000': return complement1000(seed, difficulty)
     case 'money': return money(seed, difficulty)
     case 'lengths': return lengths(seed, difficulty)

@@ -128,7 +128,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.11.1
+podman pull ghcr.io/hackepeter87/nachhilfe:0.12.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -169,6 +169,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.11.1
+## Release-Stand 0.12.0
 
-Version 0.11.1 führt die schriftliche Addition sichtbar von rechts nach links: richtige Ergebnisziffern erscheinen nacheinander, und der Übertrag wird erst nach der eigenen Eingabe eingeblendet. Version 0.11.0 ergänzte die Kompetenz bis 1000 mit höchstens einem Übertrag. Die Kompetenz wird erst nach Stellenwert und halbschriftlicher Addition in der selbstständigen Übungsphase ausgewählt. Katalog 0.9.0 und Schema 8 bleiben unverändert. GHCR und Compose sind auf `linux/amd64` begrenzt. Didaktik, weitere Releasefolge und offene Gesamtevaluation stehen in [docs/didactics/written-addition.md](docs/didactics/written-addition.md), der [Roadmap](docs/roadmap.md) und [docs/validation-0.6.md](docs/validation-0.6.md). Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.12.0 ergänzt die schriftliche Subtraktion bis 1000 ohne oder mit genau einer Entbündelung. Stufe 2 zeigt die veränderten Stellen erst nach dem eigenen Entbündelungsschritt; Stufe 3 verlangt die Idee selbstständig und schließt mit der Additionsprobe. Die Kompetenz wird erst nach Stellenwert und halbschriftlicher Subtraktion in der selbstständigen Übungsphase ausgewählt. Katalog 0.10.0 nutzt weiterhin Schema 8. GHCR und Compose sind auf linux/amd64 begrenzt. Didaktik, Grenzen und weitere Releasefolge stehen in [docs/didactics/written-subtraction.md](docs/didactics/written-subtraction.md), der [Roadmap](docs/roadmap.md) und [docs/validation-0.6.md](docs/validation-0.6.md). Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

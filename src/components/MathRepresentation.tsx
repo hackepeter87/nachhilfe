@@ -30,23 +30,39 @@ export function MathRepresentation({ representation }: { representation: Exercis
   if (representation.kind === 'column-calculation') {
     const first = Number(values.first)
     const second = Number(values.second)
+    const operation = values.operation
     const carry = Number(values.carry)
     const carryColumn = values.carryColumn
+    const unbundle = Number(values.unbundle)
+    const unbundleFrom = values.unbundleFrom
     const onesCarry = first % 10 + second % 10 >= 10 ? 1 : 0
     const tensCarry = Math.floor(first / 10) % 10 + Math.floor(second / 10) % 10 + onesCarry >= 10 ? 1 : 0
+    const onesUnbundle = first % 10 < second % 10 ? 1 : 0
+    const tensUnbundle = Math.floor(first / 10) % 10 - onesUnbundle < Math.floor(second / 10) % 10 ? 1 : 0
     const visibleCarryMatches = carry === 0 ||
       (onesCarry + tensCarry === 1 && (onesCarry === 1 ? carryColumn === 'tens' : carryColumn === 'hundreds'))
-    const valid = Number.isInteger(first) && first >= 100 && first <= 999 &&
-      Number.isInteger(second) && second >= 100 && second <= 999 && first + second <= 999 &&
-      values.operation === '+' && (carry === 0 || carry === 1) &&
+    const visibleUnbundleMatches = unbundle === 0 ||
+      (onesUnbundle + tensUnbundle === 1 && (onesUnbundle === 1 ? unbundleFrom === 'tens' : unbundleFrom === 'hundreds'))
+    const declaredUnbundleMatches = onesUnbundle + tensUnbundle === 0
+      ? unbundleFrom === 'none'
+      : onesUnbundle === 1
+        ? unbundleFrom === 'tens'
+        : unbundleFrom === 'hundreds'
+    const validBase = Number.isInteger(first) && first >= 100 && first <= 999 &&
+      Number.isInteger(second) && second >= 100 && second <= 999
+    const validAddition = operation === '+' && first + second <= 999 && (carry === 0 || carry === 1) &&
       ['none', 'tens', 'hundreds'].includes(String(carryColumn)) && visibleCarryMatches
+    const validSubtraction = operation === '−' && first > second && (unbundle === 0 || unbundle === 1) &&
+      ['none', 'tens', 'hundreds'].includes(String(unbundleFrom)) && onesUnbundle + tensUnbundle <= 1 &&
+      declaredUnbundleMatches && visibleUnbundleMatches
+    const valid = validBase && (validAddition || validSubtraction)
     if (!valid) {
       return <div className="math-visual math-visual--error" role="alert">Die Spaltendarstellung enthält ungültige Rechendaten.</div>
     }
     const digits = (value: number) => [Math.floor(value / 100), Math.floor(value / 10) % 10, value % 10]
     const firstDigits = digits(first)
     const secondDigits = digits(second)
-    const answerDigits = digits(first + second)
+    const answerDigits = digits(operation === '+' ? first + second : first - second)
     const revealedDigits = Array.isArray(values.revealedDigits) && values.revealedDigits.length === 3 &&
       values.revealedDigits.every((digit, index) => typeof digit === 'number' && Number.isInteger(digit) &&
         (digit === -1 || digit === answerDigits[index]))
@@ -54,21 +70,32 @@ export function MathRepresentation({ representation }: { representation: Exercis
       : [-1, -1, -1]
     const activeColumn = typeof values.activeColumn === 'string' ? values.activeColumn : 'none'
     const carryIndex = carryColumn === 'hundreds' ? 0 : carryColumn === 'tens' ? 1 : -1
-    const description = carry === 1
-      ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. Das Ergebnis ist noch offen.`
-      : `Schriftliche Addition ${first} plus ${second}. Das Ergebnis ist noch offen.`
+    const adjustedDigits: Array<number | null> = unbundle === 1
+      ? unbundleFrom === 'tens'
+        ? [null, firstDigits[1]! - 1, firstDigits[2]! + 10]
+        : [firstDigits[0]! - 1, firstDigits[1]! + 10, null]
+      : [null, null, null]
+    const description = operation === '+'
+      ? carry === 1
+        ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. Das Ergebnis ist noch offen.`
+        : `Schriftliche Addition ${first} plus ${second}. Das Ergebnis ist noch offen.`
+      : unbundle === 1
+        ? `Schriftliche Subtraktion ${first} minus ${second}. Eine ${unbundleFrom === 'tens' ? 'Zehnerstelle wird in zehn Einer' : 'Hunderterstelle wird in zehn Zehner'} entbündelt. Das Ergebnis ist noch offen.`
+        : `Schriftliche Subtraktion ${first} minus ${second}. Das Ergebnis ist noch offen.`
     return (
       <div className="math-visual column-calculation" role="img" aria-label={description}>
         <div className="column-row column-row--headers" aria-hidden="true">
           {['hundreds', 'tens', 'ones'].map((column, index) => <span className={activeColumn === column ? 'column-cell--active' : ''} key={column}>{['H', 'Z', 'E'][index]}</span>)}
         </div>
         <div className="column-row column-row--carry" aria-hidden="true">
-          {firstDigits.map((_, index) => <span className={activeColumn === 'carry' && carryIndex === index ? 'column-cell--active' : ''} key={index}>{carry === 1 && carryIndex === index ? '1' : ''}</span>)}
+          {operation === '+'
+            ? firstDigits.map((_, index) => <span className={activeColumn === 'carry' && carryIndex === index ? 'column-cell--active' : ''} key={index}>{carry === 1 && carryIndex === index ? '1' : ''}</span>)
+            : adjustedDigits.map((digit, index) => <span className={`${activeColumn === 'unbundle' && digit !== null ? 'column-cell--active ' : ''}${digit !== null ? 'column-cell--adjusted' : ''}`} key={index}>{digit}</span>)}
         </div>
         <div className="column-equation" aria-hidden="true">
           <span className="column-operation" />
-          <div className="column-row">{firstDigits.map((digit, index) => <strong key={index}>{digit}</strong>)}</div>
-          <span className="column-operation">+</span>
+          <div className="column-row">{firstDigits.map((digit, index) => <strong className={adjustedDigits[index] !== null ? 'column-cell--source-adjusted' : ''} key={index}>{digit}</strong>)}</div>
+          <span className="column-operation">{operation}</span>
           <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{digit}</strong>)}</div>
           <span className="column-operation" />
           <div className="column-row column-row--result">

@@ -16,6 +16,7 @@ const FOCUS_SKILLS: SkillId[] = [
   'addition-1000',
   'written-addition',
   'subtraction-1000',
+  'written-subtraction',
   'complement-1000',
   'money',
   'lengths'
@@ -51,6 +52,10 @@ export function isSkillEligible(skillId: SkillId, progress: ProgressMap): boolea
   if (skillId === 'written-addition') {
     return hasReachedPhase(progress['place-value'], 'independent-practice') &&
       hasReachedPhase(progress['addition-1000'], 'independent-practice')
+  }
+  if (skillId === 'written-subtraction') {
+    return hasReachedPhase(progress['place-value'], 'independent-practice') &&
+      hasReachedPhase(progress['subtraction-1000'], 'independent-practice')
   }
   return true
 }

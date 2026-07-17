@@ -166,6 +166,67 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('entbündelt bei der schriftlichen Subtraktion sichtbar und rechnet von rechts nach links', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('written-subtraction', 42, 2)
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    const adjustment = () => container.querySelector('.column-row--carry')?.textContent?.trim()
+    const result = () => container.querySelector('.column-row--result')?.textContent
+
+    expect(screen.getByRole('img', { name: /schriftliche Subtraktion/i })).toBeVisible()
+    expect(exercise.steps?.map((step) => step.id)).toEqual(['unbundle', 'ones', 'tens', 'hundreds'])
+    expect(adjustment()).toBe('')
+    expect(result()).toBe('???')
+
+    for (const [index, step] of (exercise.steps ?? []).entries()) {
+      await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
+      await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+      if (index === 0) expect(adjustment()).not.toBe('')
+      if (step.id === 'ones') expect(result()).toMatch(/^\?\?\d$/)
+      if (step.id === 'tens') expect(result()).toMatch(/^\?\d\d$/)
+    }
+    expect(result()).toBe(exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'written-subtraction', correct: true }))
+  })
+
+  it('zeigt bei einer falschen Entbündelung eine konkrete Tauschhilfe', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('written-subtraction', 42, 2)
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const unbundleStep = exercise.steps?.find((step) => step.id === 'unbundle')
+    if (!unbundleStep) throw new Error('Entbündelungsschritt fehlt')
+
+    await user.type(screen.getByLabelText('Dein Ergebnis'), '2')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(screen.getByText(unbundleStep.errorFeedback)).toBeVisible()
+    expect(container.querySelector('.column-row--carry')).toHaveTextContent('')
+
+    await user.type(screen.getByLabelText('Dein Ergebnis'), '1')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(container.querySelector('.column-row--carry')).not.toHaveTextContent('')
+  })
+
+  it('schließt die selbstständige Entbündelung mit einer Additionsprobe ab', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('written-subtraction', 84, 3)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    expect(screen.queryByRole('img', { name: /schriftliche Subtraktion/i })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Ich brauche einen Tipp' }))
+    expect(screen.getByRole('img', { name: /schriftliche Subtraktion.*entbündelt/i })).toBeVisible()
+
+    for (const step of exercise.steps ?? []) {
+      await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
+      await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    }
+    expect(screen.getByText(/Die Probe ergibt wieder/)).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'written-subtraction', correct: true, hintsUsed: 1 }))
+  })
+
   it('führt eine zweischrittige Sachaufgabe bis zum Antwortsatz', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.9.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.10.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -152,7 +152,17 @@ Stand: Katalogversion 0.9.0. Die Stufen beschreiben die produktive Heuristik von
 - **Stufe 3 / Ziel 0.11:** genau ein Übertrag von Einern oder Zehnern wird selbstständig erkannt; die Spaltendarstellung erscheint erst als Hilfe.
 - **Erhöhen / Zurückstufen:** Spaltenfolge und Übertrag sicher / Stellen versetzen, Übertrag vergessen oder doppelt zählen.
 - **Hilfe / Transfer:** von rechts nach links spaltenweise bündeln / Entstehung des Übertrags erklären und Ergebnis überschlagen.
-- **Später:** mehrere Überträge; schriftliche Subtraktion folgt in Version 0.12.
+- **Später:** mehrere Überträge.
+
+### Schriftliche Subtraktion bis 1000
+
+- **Vorkenntnisse:** Stellenwert und halbschriftliche Subtraktion bis 1000 jeweils mindestens in independent-practice.
+- **Stufe 1:** dreistellige Aufgaben ohne Entbündelung; H-Z-E-Spalten sind von Anfang an sichtbar.
+- **Stufe 2:** genau eine Zehner-zu-Einer-Entbündelung wird als eigener Schritt eingegeben; veränderte Stellen erscheinen erst danach.
+- **Stufe 3 / Ziel 0.12:** genau eine Entbündelung aus Zehnern oder Hundertern wird selbstständig erkannt; die Darstellung ist eine Hilfe und eine Additionsprobe schließt die Aufgabe ab.
+- **Erhöhen / Zurückstufen:** Spaltenfolge, Stellenanpassung und Probe sicher / Ziffern vertauschen, abgebende Stelle nicht vermindern oder Entbündelung fortsetzen.
+- **Hilfe / Transfer:** eine linke Einheit in zehn aktuelle Einheiten tauschen / Differenz und Subtrahend zum Minuenden addieren.
+- **Später:** mehrere Entbündelungen, Entbündeln über Nullstellen und freie vollständige Spaltennotation.
 
 ### Ergänzen bis zur vollen Zahl
 
@@ -206,4 +216,4 @@ Stand: Katalogversion 0.9.0. Die Stufen beschreiben die produktive Heuristik von
 
 ## Bewusst offene Förderbereiche
 
-Millimeter/Kilometer, komplexe Kaufsituationen, schriftliche Subtraktion, mehrere Stellenübergänge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.
+Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.

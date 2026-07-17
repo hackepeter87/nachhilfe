@@ -13,6 +13,7 @@ export const SKILL_IDS = [
   'addition-1000',
   'written-addition',
   'subtraction-1000',
+  'written-subtraction',
   'complement-1000',
   'money',
   'lengths',

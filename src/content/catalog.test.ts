@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(8)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.9.0')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.10.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -96,6 +96,20 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     const forbidden = /passend zerlegt|stellenweise gerechnet|richtige Strategie|über den nächsten|passenden .*weg/i
     catalog.skills.forEach((skill) => expect(skill.successFeedback).not.toMatch(forbidden))
+  })
+
+  it('beschreibt die schriftliche Subtraktion als begrenzte Entbündelungsprogression', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const skill = catalog.skills.find((candidate) => candidate.id === 'written-subtraction')!
+    expect(skill.prerequisites.join(' ')).toMatch(/Stellenwerte.*Subtraktion/i)
+    expect(skill.difficultyLevels.map((level) => level.description)).toEqual([
+      expect.stringMatching(/ohne Entbündelung/i),
+      expect.stringMatching(/genau eine.*sichtbar/i),
+      expect.stringMatching(/selbstständig.*Additionsprobe/i)
+    ])
+    expect(skill.misconceptions.join(' ')).toMatch(/kleinere Ziffer.*größeren/i)
+    expect(skill.remediation.foundationStrategy).toMatch(/ohne Entbündelung/i)
+    expect(catalog.strategySteps.writtenSubtraction.checkPrompt).toMatch(/Additionsprobe/i)
   })
 
   it('beschreibt eindeutig lösbare Sachaufgaben', () => {

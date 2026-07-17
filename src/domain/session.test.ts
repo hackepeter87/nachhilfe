@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.9.0',
+      catalogVersion: '0.10.0',
       schemaVersion: 8,
-      appVersion: '0.11.1'
+      appVersion: '0.12.0'
     })
   })
 
@@ -58,14 +58,14 @@ describe('Sitzungsplanung', () => {
       const runningPrompts = runningSession.exercises.map((exercise) => exercise.prompt)
 
       const nextCatalog = structuredClone(FALLBACK_TASK_CATALOG)
-      nextCatalog.catalogVersion = '0.9.1'
+      nextCatalog.catalogVersion = '0.10.1'
       nextCatalog.skills.find((skill) => skill.id === runningSession.exercises[0]?.skillId)!.prompt = 'Neue Fassung: {first}'
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.9.0')
+      expect(runningSession.catalogVersion).toBe('0.10.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
-      expect(nextSession.catalogVersion).toBe('0.9.1')
+      expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
       setTaskCatalog(originalCatalog)
     }
@@ -111,6 +111,15 @@ describe('Sitzungsplanung', () => {
     expect(isSkillEligible('written-addition', { 'place-value': placeValue })).toBe(false)
     expect(isSkillEligible('written-addition', { 'addition-1000': addition1000 })).toBe(false)
     expect(isSkillEligible('written-addition', { 'place-value': placeValue, 'addition-1000': addition1000 })).toBe(true)
+  })
+
+  it('schaltet schriftliche Subtraktion erst nach beiden fachlichen Voraussetzungen frei', () => {
+    const placeValue = { ...createSkillProgress('place-value'), learningPhase: 'independent-practice' as const }
+    const subtraction1000 = { ...createSkillProgress('subtraction-1000'), learningPhase: 'independent-practice' as const }
+    expect(isSkillEligible('written-subtraction', {})).toBe(false)
+    expect(isSkillEligible('written-subtraction', { 'place-value': placeValue })).toBe(false)
+    expect(isSkillEligible('written-subtraction', { 'subtraction-1000': subtraction1000 })).toBe(false)
+    expect(isSkillEligible('written-subtraction', { 'place-value': placeValue, 'subtraction-1000': subtraction1000 })).toBe(true)
   })
 
   it('berücksichtigt schwache Grundrechenarten und Unterkompetenzen häufiger', () => {
@@ -181,6 +190,18 @@ describe('Sitzungsplanung', () => {
     const repetition = createRemediationExercise(original, 902)
     expect(repetition.difficulty).toBe(2)
     expect(repetition.subskillId).toBe(original.subskillId)
+    expect(repetition.variant.key).not.toBe(original.variant.key)
+  })
+
+  it('führt nach einem Fehler bei schriftlicher Subtraktion auf eine sichtbare verwandte Entbündelung zurück', () => {
+    const original = generateExercise('written-subtraction', 903, 3)
+    const repetition = createRemediationExercise(original, 904)
+    expect(repetition).toMatchObject({
+      skillId: 'written-subtraction',
+      difficulty: 2,
+      subskillId: 'written-subtraction-ones-unbundling'
+    })
+    expect(repetition.representation?.visibility).toBe('always')
     expect(repetition.variant.key).not.toBe(original.variant.key)
   })
 })

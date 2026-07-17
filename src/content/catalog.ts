@@ -178,6 +178,23 @@ export interface StrategySteps {
     hundredsError: string
     hundredsSuccess: string
   }
+  writtenSubtraction: {
+    unbundlePrompt: string
+    unbundleError: string
+    unbundleSuccess: string
+    onesPrompt: string
+    onesError: string
+    onesSuccess: string
+    tensPrompt: string
+    tensError: string
+    tensSuccess: string
+    hundredsPrompt: string
+    hundredsError: string
+    hundredsSuccess: string
+    checkPrompt: string
+    checkError: string
+    checkSuccess: string
+  }
 }
 
 export type WordModelType =
@@ -559,15 +576,17 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   const lengthsContent = quantityContent.lengths as Record<string, unknown>
   if (!['countPrompt', 'changePrompt', 'countExplanation', 'changeExplanation', 'coinsLabel', 'priceLabel', 'paidLabel'].every((field) => isNonEmptyString(moneyContent[field]))) return false
   if (!['readPrompt', 'toCentimetersPrompt', 'toMetersPrompt', 'calculationPrompt', 'readExplanation', 'conversionExplanation', 'calculationExplanation', 'rulerLabel', 'equivalenceLabel'].every((field) => isNonEmptyString(lengthsContent[field]))) return false
-  if (!isRecord(value.strategySteps) || !isRecord(value.strategySteps.placeValue) || !isRecord(value.strategySteps.rounding) || !isRecord(value.strategySteps.arithmetic1000) || !isRecord(value.strategySteps.writtenAddition)) return false
+  if (!isRecord(value.strategySteps) || !isRecord(value.strategySteps.placeValue) || !isRecord(value.strategySteps.rounding) || !isRecord(value.strategySteps.arithmetic1000) || !isRecord(value.strategySteps.writtenAddition) || !isRecord(value.strategySteps.writtenSubtraction)) return false
   const placeValueSteps = value.strategySteps.placeValue
   const roundingSteps = value.strategySteps.rounding
   const arithmeticSteps = value.strategySteps.arithmetic1000
   const writtenAdditionSteps = value.strategySteps.writtenAddition
+  const writtenSubtractionSteps = value.strategySteps.writtenSubtraction
   if (!['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess'].every((field) => isNonEmptyString(placeValueSteps[field]))) return false
   if (!['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper'].every((field) => isNonEmptyString(roundingSteps[field]))) return false
   if (!['bridgePrompt', 'bridgeError', 'bridgeSuccess', 'resultPrompt', 'resultError', 'resultSuccess'].every((field) => isNonEmptyString(arithmeticSteps[field]))) return false
   if (!['onesPrompt', 'onesError', 'onesSuccess', 'carryPrompt', 'carryError', 'carrySuccess', 'tensPrompt', 'tensError', 'tensSuccess', 'hundredsPrompt', 'hundredsError', 'hundredsSuccess'].every((field) => isNonEmptyString(writtenAdditionSteps[field]))) return false
+  if (!['unbundlePrompt', 'unbundleError', 'unbundleSuccess', 'onesPrompt', 'onesError', 'onesSuccess', 'tensPrompt', 'tensError', 'tensSuccess', 'hundredsPrompt', 'hundredsError', 'hundredsSuccess', 'checkPrompt', 'checkError', 'checkSuccess'].every((field) => isNonEmptyString(writtenSubtractionSteps[field]))) return false
   if (!Array.isArray(value.wordProblems) || value.wordProblems.length === 0 || !value.wordProblems.every((template) => isWordProblem(template, numberRange as { min: number; max: number }))) return false
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry)) return false

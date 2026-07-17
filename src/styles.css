@@ -563,6 +563,16 @@ p {
   font-weight: 900;
 }
 
+.column-cell--adjusted {
+  color: #a54828;
+}
+
+.column-cell--source-adjusted {
+  color: #6f7d74;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
 .column-equation {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);

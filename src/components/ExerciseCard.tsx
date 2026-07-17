@@ -104,6 +104,9 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         values: {
           ...exercise.representation.values,
           carry: completedStepAnswers.carry ? exercise.representation.values.carry : 0,
+          unbundle: exercise.representation.values.operation === '−' && (exercise.difficulty === 3 || completedStepAnswers.unbundle)
+            ? exercise.representation.values.unbundle
+            : 0,
           revealedDigits: [
             completedStepAnswers.hundreds === undefined ? -1 : Number(completedStepAnswers.hundreds),
             completedStepAnswers.tens === undefined ? -1 : Number(completedStepAnswers.tens),
@@ -117,6 +120,8 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
                 ? 'hundreds'
                 : currentStep?.id === 'carry'
                   ? 'carry'
+                  : currentStep?.id === 'unbundle'
+                    ? 'unbundle'
                   : 'none'
         }
       }

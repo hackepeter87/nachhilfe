@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.9.0',
+    catalogVersion: '0.10.0',
     schemaVersion: 8,
-    appVersion: '0.11.1'
+    appVersion: '0.12.0'
   })
 
   await page.reload()
@@ -346,6 +346,92 @@ test('Schriftliche Addition wird nach den Voraussetzungen mobil vollständig bea
   await expect(page.getByText(/Die Hunderterziffer \d stimmt/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('schriftliche-addition-375x812.png'), fullPage: true })
+})
+
+test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['subtraction', 'written-subtraction'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Entbündeln')
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('mathe-reise')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    const transaction = database.transaction('progress', 'readwrite')
+    const store = transaction.objectStore('progress')
+    const progress = (skillId: string) => ({
+      skillId,
+      attempts: 6,
+      correctAnswers: 5,
+      hintsUsed: 0,
+      lastPracticedAt: '2026-07-17T10:00:00.000Z',
+      difficulty: 2,
+      learningPhase: 'independent-practice',
+      mastery: 70,
+      recentErrors: 0,
+      correctStreak: 2,
+      lastVariantKey: null,
+      status: 'practicing',
+      subskills: {}
+    })
+    store.put(progress('place-value'))
+    store.put(progress('subtraction-1000'))
+    store.put(progress('written-subtraction'))
+    await new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+    database.close()
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map((registration) => registration.unregister()))
+    const cacheNames = await caches.keys()
+    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))
+  })
+  await page.reload()
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+
+  for (let warmup = 0; warmup < 2; warmup += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Subtraktionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first - second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  const column = page.getByRole('img', { name: /Schriftliche Subtraktion .* Ergebnis ist noch offen/i })
+  await expect(column).toBeVisible()
+  const label = await column.getAttribute('aria-label')
+  const [first, second] = label?.match(/\d+/g)?.map(Number) ?? []
+  if (first === undefined || second === undefined) throw new Error('Zahlen der Spaltendarstellung fehlen')
+  const answer = first - second
+  const resultRow = column.locator('.column-row--result')
+  const adjustmentRow = column.locator('.column-row--carry')
+  await expect(resultRow).toHaveText('???')
+  await expect(adjustmentRow).toHaveText('')
+
+  for (const [index, stepAnswer] of [1, answer % 10, Math.floor(answer / 10) % 10, Math.floor(answer / 100)].entries()) {
+    await page.getByLabel('Dein Ergebnis').fill(String(stepAnswer))
+    await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
+    if (index === 0) {
+      await expect(adjustmentRow).not.toHaveText('')
+      await expect(column).toHaveAttribute('aria-label', /entbündelt/)
+    }
+    if (index === 1) await expect(resultRow).toHaveText(`??${answer % 10}`)
+    if (index === 2) await expect(resultRow).toHaveText(`?${String(answer).slice(1)}`)
+  }
+  await expect(resultRow).toHaveText(String(answer))
+  await expect(page.getByText(/Die Hunderterziffer \d stimmt/)).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('schriftliche-subtraktion-375x812.png'), fullPage: true })
 })
 
 test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', async ({ page }, testInfo) => {

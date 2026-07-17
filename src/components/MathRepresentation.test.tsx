@@ -66,6 +66,54 @@ describe('MathRepresentation schriftliche Addition', () => {
   })
 })
 
+describe('MathRepresentation schriftliche Subtraktion', () => {
+  it('zeigt eine Entbündelung als veränderte Stellen und hält das Ergebnis offen', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'column-calculation',
+      visibility: 'always',
+      label: 'Spaltendarstellung',
+      values: { first: 532, second: 218, operation: '−', unbundle: 1, unbundleFrom: 'tens' }
+    }} />)
+    expect(screen.getByRole('img', { name: /532 minus 218.*Zehnerstelle wird in zehn Einer entbündelt.*Ergebnis ist noch offen/i })).toBeVisible()
+    expect(container.querySelector('.column-row--carry')).toHaveTextContent('212')
+    expect(container.querySelectorAll('.column-cell--source-adjusted')).toHaveLength(2)
+    expect(container.querySelector('.column-row--result')).toHaveTextContent('???')
+    expect(container.querySelector('.column-row--result')).not.toHaveTextContent('314')
+  })
+
+  it('stellt eine Aufgabe ohne Entbündelung unverändert dar', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'column-calculation',
+      visibility: 'always',
+      label: 'Spaltendarstellung',
+      values: { first: 764, second: 321, operation: '−', unbundle: 0, unbundleFrom: 'none' }
+    }} />)
+    expect(screen.getByRole('img', { name: /764 minus 321.*Ergebnis ist noch offen/i })).toBeVisible()
+    expect(container.querySelector('.column-row--carry')).toHaveTextContent('')
+    expect(container.querySelector('.column-cell--source-adjusted')).not.toBeInTheDocument()
+  })
+
+  it('lehnt eine Kettenentbündelung sichtbar ab', () => {
+    render(<MathRepresentation representation={{
+      kind: 'column-calculation',
+      visibility: 'always',
+      label: 'Spaltendarstellung',
+      values: { first: 500, second: 237, operation: '−', unbundle: 1, unbundleFrom: 'tens' }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Rechendaten')
+  })
+
+  it('lehnt auch bei verborgener Entbündelung eine falsche Quellstelle ab', () => {
+    render(<MathRepresentation representation={{
+      kind: 'column-calculation',
+      visibility: 'always',
+      label: 'Spaltendarstellung',
+      values: { first: 532, second: 218, operation: '−', unbundle: 0, unbundleFrom: 'hundreds' }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Rechendaten')
+  })
+})
+
 describe('MathRepresentation Sachaufgabenmodelle', () => {
   it('stellt Anfangsmenge und Zuwachs proportional dar', () => {
     const { container } = render(<MathRepresentation representation={{

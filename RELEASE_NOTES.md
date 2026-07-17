@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Schriftliche Subtraktion 0.12.0
+
+- Die neue Kompetenz written-subtraction führt dreistellige Aufgaben zunächst ohne Entbündelung, dann mit genau einer sichtbaren Zehner-zu-Einer-Entbündelung und schließlich mit einer selbstständigen Entbündelung aus Zehnern oder Hundertern ein.
+- Die H-Z-E-Spaltendarstellung hält das Ergebnis offen. Veränderte Stellen erscheinen in Stufe 2 erst nach dem eigenen Entbündelungsschritt; richtige Ergebnisziffern werden anschließend von rechts nach links sichtbar.
+- Stufe 3 schließt mit der Additionsprobe Differenz plus Subtrahend gleich Minuend. Negative Ergebnisse, mehrere Entbündelungen und Entbündeln über Nullstellen bleiben ausgeschlossen.
+- Die adaptive Sitzungsplanung aktiviert die Kompetenz erst, wenn Stellenwert und halbschriftliche Subtraktion bis 1000 mindestens independent-practice erreicht haben.
+- Katalog 0.10.0 nutzt weiterhin Schema 8. Kompetenzakte, Progressionsübersicht, Katalogtexte, Hilfen, Fehlvorstellungen und Remediation sind synchron zur Runtime.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 205 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und acht Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image mathe-reise:0.12.0 läuft als UID 101 mit ausschließlich /tmp als tmpfs, ohne Capabilities und meldet healthy. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. Eine Lehrkraftprüfung und ein echter iPhone-Test wurden nicht durchgeführt.
+
 ## Spaltenfolge und Übertrag 0.11.1
 
 - Ergebnisziffern werden nach korrekter Eingabe von den Einern über die Zehner zu den Hundertern in die Spaltendarstellung übernommen.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 8,
-  "catalogVersion": "0.9.0",
+  "catalogVersion": "0.10.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -2409,6 +2409,164 @@
       ]
     },
     {
+      "id": "written-subtraction",
+      "label": "Schriftlich subtrahieren",
+      "curriculumArea": "Zahlen und Operationen",
+      "supportGoal": "Minuend und Subtrahend stellengerecht anordnen und eine schriftliche Subtraktion bis 1000 mit höchstens einer Entbündelung verständig ausführen und prüfen.",
+      "misconceptions": [
+        "Einer, Zehner und Hunderter werden nicht stellengerecht ausgerichtet.",
+        "Die kleinere Ziffer wird unabhängig von der Rechenrichtung von der größeren abgezogen.",
+        "Nach dem Entbündeln wird die abgebende Stelle nicht um eins vermindert.",
+        "Die Entbündelung wird in einer weiteren Spalte unnötig fortgesetzt."
+      ],
+      "hints": [
+        "Beginne rechts bei den Einern. Reicht die obere Stelle nicht, entbündele genau eine Einheit der linken Nachbarstelle.",
+        "Nach dem Entbündeln besitzt die aktuelle Stelle zehn Einheiten mehr und die linke Nachbarstelle eine Einheit weniger."
+      ],
+      "prompt": "Rechne {first} − {second} schriftlich.",
+      "errorFeedback": "Prüfe nur die aktuelle Spalte. Ziehe die untere Ziffer von der oberen Stellenmenge ab und beachte eine sichtbare Entbündelung.",
+      "explanation": "Rechne von rechts nach links. Beim Entbündeln wird eine Einheit der linken Stelle in zehn Einheiten der aktuellen Stelle getauscht. Die Probe {answer} + {second} ergibt wieder {first}.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 100,
+        "maxValue": 999
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Stellenwerttafel und Spaltendarstellung zeigen dieselbe Entbündelung."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind begründet, warum die abgebende Stelle um eins kleiner und die aktuelle Stelle um zehn größer wird."
+        },
+        {
+          "id": "communicating",
+          "elicitedBy": "Die Spaltenschritte und die Additionsprobe werden in der richtigen Reihenfolge beschrieben."
+        }
+      ],
+      "prerequisites": [
+        "Stellenwerte bis 1000 mindestens in der selbstständigen Übungsphase",
+        "Halbschriftliche Subtraktion bis 1000 mindestens in der selbstständigen Übungsphase"
+      ],
+      "representations": [
+        "Stellenwerttafel",
+        "Spaltendarstellung mit sichtbarer Entbündelung",
+        "Additionsprobe"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Dreistellige Aufgaben ohne Entbündelung; Spalten und Stellenbezeichnungen sind sichtbar",
+          "numberRange": "100 bis 999",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Genau eine Einer-Entbündelung aus der Zehnerstelle; der Tausch wird als eigener sichtbarer Schritt bearbeitet",
+          "numberRange": "100 bis 999",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Genau eine selbstständige Entbündelung aus der Zehner- oder Hunderterstelle; Spaltendarstellung nur als Hilfe und Abschluss mit Additionsprobe",
+          "numberRange": "100 bis 999",
+          "representation": "hint",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "automate"
+        }
+      ],
+      "workedExample": "Bei 532 − 218 reichen 2 Einer nicht für 8 Einer. Ein Zehner wird in 10 Einer entbündelt: Aus 5 H, 3 Z, 2 E werden 5 H, 2 Z, 12 E. Dann wird von rechts nach links gerechnet.",
+      "successFeedback": "Du hast die Stellen nacheinander richtig subtrahiert.",
+      "remediation": {
+        "strategy": "Bearbeite eine leichtere, verwandte Aufgabe mit sichtbarer Entbündelung und markierten Stellen.",
+        "foundationStrategy": "Ordne zuerst beide Zahlen in Hunderter, Zehner und Einer und rechne eine Aufgabe ohne Entbündelung.",
+        "representation": "Stellenwerttafel mit Spaltendarstellung",
+        "keepSubskill": false
+      },
+      "transferPrompt": "Erkläre die Entbündelung und prüfe das Ergebnis mit der passenden Addition.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Minuend und Subtrahend in Hunderter, Zehner und Einer zerlegen und stellengerecht anordnen.",
+          "exerciseTypes": [
+            "written-subtraction:no-unbundling"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Eine Einheit der linken Stelle als zehn Einheiten der aktuellen Stelle verstehen.",
+          "exerciseTypes": [
+            "written-subtraction:visible-unbundling"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Ohne Entbündelung von rechts nach links spaltenweise subtrahieren.",
+          "exerciseTypes": [
+            "written-subtraction:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Eine sichtbare Einer-Entbündelung korrekt ausführen und alle Stellen anpassen.",
+          "exerciseTypes": [
+            "written-subtraction:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Genau eine Entbündelung selbstständig erkennen und mit einer Additionsprobe prüfen.",
+          "exerciseTypes": [
+            "written-subtraction:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Die Entbündelung anhand des Stellenwerts begründen und die Umkehrbeziehung zur Addition nutzen.",
+          "exerciseTypes": [
+            "written-subtraction:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Minuend und Subtrahend stehen stellengerecht untereinander.",
+        "Jede Spalte wird von rechts nach links genau einmal bearbeitet.",
+        "Eine Entbündelung vermindert die linke Nachbarstelle um eins und vergrößert die aktuelle Stelle um zehn.",
+        "Die Additionsprobe aus Differenz und Subtrahend ergibt den Minuenden."
+      ]
+    },
+    {
       "id": "complement-1000",
       "label": "Zur vollen Zahl ergänzen",
       "curriculumArea": "Zahlen und Operationen",
@@ -4224,6 +4382,23 @@
       "hundredsPrompt": "Wie viele Hunderter stehen in der Ergebnisspalte?",
       "hundredsError": "Addiere die Hunderter und einen möglichen Übertrag aus der Zehnerspalte.",
       "hundredsSuccess": "Die Hunderterziffer {hundredsResult} stimmt."
+    },
+    "writtenSubtraction": {
+      "unbundlePrompt": "Wie viele Einheiten der linken Nachbarstelle werden entbündelt?",
+      "unbundleError": "Es wird genau eine Einheit der linken Stelle in zehn Einheiten der aktuellen Stelle getauscht.",
+      "unbundleSuccess": "Genau eine Einheit wird entbündelt. Die veränderten Stellen sind jetzt sichtbar.",
+      "onesPrompt": "Wie viele Einer stehen in der Ergebnisspalte?",
+      "onesError": "Rechne nur die Einer. Falls entbündelt wurde, besitzt die obere Einerstelle zehn Einer mehr.",
+      "onesSuccess": "Die Einerziffer {onesResult} stimmt.",
+      "tensPrompt": "Wie viele Zehner stehen in der Ergebnisspalte?",
+      "tensError": "Rechne die Zehner mit der veränderten oberen Zehnerstelle. Eine abgegebene Stelle ist um eins kleiner.",
+      "tensSuccess": "Die Zehnerziffer {tensResult} stimmt.",
+      "hundredsPrompt": "Wie viele Hunderter stehen in der Ergebnisspalte?",
+      "hundredsError": "Rechne die Hunderter mit der veränderten oberen Hunderterstelle.",
+      "hundredsSuccess": "Die Hunderterziffer {hundredsResult} stimmt.",
+      "checkPrompt": "Additionsprobe: {answer} + {second}. Welche Zahl muss herauskommen?",
+      "checkError": "Addiere Differenz und Subtrahend. Die Probe muss wieder den Minuenden ergeben.",
+      "checkSuccess": "Die Probe ergibt wieder {first}. Deine Subtraktion passt."
     }
   }
 }

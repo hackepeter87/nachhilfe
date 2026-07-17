@@ -8,7 +8,7 @@ export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -299,11 +299,12 @@ export function validateCatalog(catalog) {
   if (!isRecord(catalog.quantityContent) || !isRecord(catalog.quantityContent.money) || !isRecord(catalog.quantityContent.lengths)) fail('quantityContent fehlt')
   for (const field of ['countPrompt', 'changePrompt', 'countExplanation', 'changeExplanation', 'coinsLabel', 'priceLabel', 'paidLabel']) requireText(catalog.quantityContent.money, field, 'quantityContent.money')
   for (const field of ['readPrompt', 'toCentimetersPrompt', 'toMetersPrompt', 'calculationPrompt', 'readExplanation', 'conversionExplanation', 'calculationExplanation', 'rulerLabel', 'equivalenceLabel']) requireText(catalog.quantityContent.lengths, field, 'quantityContent.lengths')
-  if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding) || !isRecord(catalog.strategySteps.arithmetic1000) || !isRecord(catalog.strategySteps.writtenAddition)) fail('strategySteps fehlt')
+  if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding) || !isRecord(catalog.strategySteps.arithmetic1000) || !isRecord(catalog.strategySteps.writtenAddition) || !isRecord(catalog.strategySteps.writtenSubtraction)) fail('strategySteps fehlt')
   for (const field of ['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess']) requireText(catalog.strategySteps.placeValue, field, 'strategySteps.placeValue')
   for (const field of ['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper']) requireText(catalog.strategySteps.rounding, field, 'strategySteps.rounding')
   for (const field of ['bridgePrompt', 'bridgeError', 'bridgeSuccess', 'resultPrompt', 'resultError', 'resultSuccess']) requireText(catalog.strategySteps.arithmetic1000, field, 'strategySteps.arithmetic1000')
   for (const field of ['onesPrompt', 'onesError', 'onesSuccess', 'carryPrompt', 'carryError', 'carrySuccess', 'tensPrompt', 'tensError', 'tensSuccess', 'hundredsPrompt', 'hundredsError', 'hundredsSuccess']) requireText(catalog.strategySteps.writtenAddition, field, 'strategySteps.writtenAddition')
+  for (const field of ['unbundlePrompt', 'unbundleError', 'unbundleSuccess', 'onesPrompt', 'onesError', 'onesSuccess', 'tensPrompt', 'tensError', 'tensSuccess', 'hundredsPrompt', 'hundredsError', 'hundredsSuccess', 'checkPrompt', 'checkError', 'checkSuccess']) requireText(catalog.strategySteps.writtenSubtraction, field, 'strategySteps.writtenSubtraction')
   if (!Array.isArray(catalog.wordProblems) || catalog.wordProblems.length === 0) fail('wordProblems fehlt')
   requireUnique(catalog.wordProblems.map((template) => template.id), 'Sachaufgaben-IDs')
   catalog.wordProblems.forEach((template) => validateWordProblem(template, numberRange))

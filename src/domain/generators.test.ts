@@ -7,7 +7,7 @@ import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSid
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-  'addition-1000', 'written-addition', 'subtraction-1000', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
+  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry'
 ]
 
 describe('deterministische Aufgabengeneratoren', () => {
@@ -307,6 +307,57 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(medium.steps?.map((step) => step.id)).toEqual(['ones', 'carry', 'tens', 'hundreds'])
     expect(hard.representation?.visibility).toBe('hint')
     expect(hard.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds'])
+  })
+
+  it('erzeugt schriftliche Subtraktionen mit höchstens genau einer vorgesehenen Entbündelung', () => {
+    const unbundlings = (first: number, second: number) => {
+      const ones = first % 10 < second % 10 ? 1 : 0
+      const tens = Math.floor(first / 10) % 10 - ones < Math.floor(second / 10) % 10 ? 1 : 0
+      const hundreds = Math.floor(first / 100) - tens < Math.floor(second / 100) ? 1 : 0
+      return { ones, tens, hundreds, count: ones + tens + hundreds }
+    }
+    const hardSubskills = new Set<string>()
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('written-subtraction', seed, difficulty)
+        const first = Number(exercise.variant.values.first)
+        const second = Number(exercise.variant.values.second)
+        const answer = Number(exercise.correctAnswer)
+        const exchanges = unbundlings(first, second)
+        expect(first).toBeGreaterThan(second)
+        expect(answer).toBe(first - second)
+        expect(answer).toBeGreaterThanOrEqual(100)
+        expect(answer).toBeLessThanOrEqual(999)
+        expect(exchanges.count).toBe(difficulty === 1 ? 0 : 1)
+        expect(exchanges.hundreds).toBe(0)
+        expect(exercise.answerMode).toBe('guided-number')
+        expect(exercise.steps?.find((step) => step.id === 'ones')?.correctAnswer).toBe(String(answer % 10))
+        expect(exercise.steps?.find((step) => step.id === 'tens')?.correctAnswer).toBe(String(Math.floor(answer / 10) % 10))
+        expect(exercise.steps?.find((step) => step.id === 'hundreds')?.correctAnswer).toBe(String(Math.floor(answer / 100)))
+        if (difficulty === 2) {
+          expect(exchanges.ones).toBe(1)
+          expect(exercise.subskillId).toBe('written-subtraction-ones-unbundling')
+          expect(exercise.steps?.find((step) => step.id === 'unbundle')?.correctAnswer).toBe('1')
+        }
+        if (difficulty === 3) {
+          hardSubskills.add(exercise.subskillId ?? '')
+          expect(exercise.steps?.find((step) => step.id === 'check')?.correctAnswer).toBe(String(first))
+        }
+      }
+    }
+    expect(hardSubskills).toEqual(new Set(['written-subtraction-ones-unbundling', 'written-subtraction-tens-unbundling']))
+  })
+
+  it('macht die drei Stufen der schriftlichen Subtraktion objektiv verschieden', () => {
+    const easy = generateExercise('written-subtraction', 315, 1)
+    const medium = generateExercise('written-subtraction', 315, 2)
+    const hard = generateExercise('written-subtraction', 315, 3)
+    expect(easy.representation?.visibility).toBe('always')
+    expect(easy.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds'])
+    expect(medium.representation?.visibility).toBe('always')
+    expect(medium.steps?.map((step) => step.id)).toEqual(['unbundle', 'ones', 'tens', 'hundreds'])
+    expect(hard.representation?.visibility).toBe('hint')
+    expect(hard.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds', 'check'])
   })
 
   it('liefert eine konkrete Remediation mit leichterer verwandter Aufgabe', () => {
