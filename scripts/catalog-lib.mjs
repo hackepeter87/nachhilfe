@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 14
+export const CATALOG_SCHEMA_VERSION = 15
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts', 'probability', 'combinatorics'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -485,6 +485,42 @@ function validateDataAndCharts(dataAndCharts) {
   })
 }
 
+function validateChanceContent(chanceContent) {
+  if (!isRecord(chanceContent)) fail('chanceContent fehlt')
+  for (const key of ['sure', 'possible', 'impossible']) if (!isText(chanceContent.classificationLabels?.[key])) fail(`chanceContent.classificationLabels.${key} fehlt`)
+  for (const key of ['first', 'equal', 'second']) if (!isText(chanceContent.comparisonLabels?.[key])) fail(`chanceContent.comparisonLabels.${key} fehlt`)
+  for (const key of ['bag', 'coin', 'die', 'spinner']) if (!isText(chanceContent.experimentLabels?.[key])) fail(`chanceContent.experimentLabels.${key} fehlt`)
+  for (const field of ['combinationCountPrompt', 'excludedLabel']) requireText(chanceContent, field, 'chanceContent')
+  if (!Array.isArray(chanceContent.probabilityTemplates) || chanceContent.probabilityTemplates.length < 9) fail('chanceContent.probabilityTemplates ist unvollständig')
+  requireUnique(chanceContent.probabilityTemplates.map((template) => template.id), 'chanceContent.probabilityTemplates IDs')
+  chanceContent.probabilityTemplates.forEach((template) => {
+    for (const field of ['id', 'title', 'question']) requireText(template, field, `chanceContent.probabilityTemplates.${template.id}`)
+    if (![1, 2, 3].includes(template.difficulty) || !['bag', 'coin', 'die', 'spinner'].includes(template.experimentType) ||
+      !Array.isArray(template.outcomes) || template.outcomes.length < 2 || template.outcomes.length > 8 || !template.outcomes.every(isText) ||
+      !Array.isArray(template.eventA) || template.eventA.length === 0 || !template.eventA.every(isText)) {
+      fail(`chanceContent.probabilityTemplates.${template.id} ist ungültig`)
+    }
+    if (template.difficulty === 3 && (!template.eventA.every((entry) => template.outcomes.includes(entry)) || !Array.isArray(template.eventB) || template.eventB.length === 0 || !template.eventB.every((entry) => template.outcomes.includes(entry)) || !isText(template.eventALabel) || !isText(template.eventBLabel))) {
+      fail(`chanceContent.probabilityTemplates.${template.id} braucht zwei Vergleichsereignisse`)
+    }
+    if (template.difficulty !== 3 && template.eventB !== undefined) fail(`chanceContent.probabilityTemplates.${template.id} vergleicht zu früh`)
+  })
+  if (!Array.isArray(chanceContent.combinationTemplates) || chanceContent.combinationTemplates.length < 6) fail('chanceContent.combinationTemplates ist unvollständig')
+  requireUnique(chanceContent.combinationTemplates.map((template) => template.id), 'chanceContent.combinationTemplates IDs')
+  chanceContent.combinationTemplates.forEach((template) => {
+    for (const field of ['id', 'title', 'firstLabel', 'secondLabel', 'question']) requireText(template, field, `chanceContent.combinationTemplates.${template.id}`)
+    if (![1, 2, 3].includes(template.difficulty) || !Array.isArray(template.firstOptions) || !Array.isArray(template.secondOptions) ||
+      !template.firstOptions.every(isText) || !template.secondOptions.every(isText) || new Set(template.firstOptions).size !== template.firstOptions.length || new Set(template.secondOptions).size !== template.secondOptions.length) {
+      fail(`chanceContent.combinationTemplates.${template.id} ist ungültig`)
+    }
+    const product = template.firstOptions.length * template.secondOptions.length
+    if (template.difficulty === 1 && (product !== 4 || template.excludedPair)) fail(`chanceContent.combinationTemplates.${template.id} verletzt Stufe 1`)
+    if (template.difficulty === 2 && (product !== 6 || template.excludedPair)) fail(`chanceContent.combinationTemplates.${template.id} verletzt Stufe 2`)
+    if (template.difficulty === 3 && (product !== 9 || !Array.isArray(template.excludedPair) || !template.firstOptions.includes(template.excludedPair[0]) || !template.secondOptions.includes(template.excludedPair[1]))) fail(`chanceContent.combinationTemplates.${template.id} verletzt Stufe 3`)
+  })
+  if (![1, 2, 3].every((difficulty) => chanceContent.probabilityTemplates.some((template) => template.difficulty === difficulty) && chanceContent.combinationTemplates.some((template) => template.difficulty === difficulty))) fail('chanceContent deckt nicht alle Stufen ab')
+}
+
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
@@ -565,6 +601,7 @@ export function validateCatalog(catalog) {
   validateSpatialRotations(catalog.spatialRotations)
   validateSpatialFolding(catalog.spatialFolding)
   validateDataAndCharts(catalog.dataAndCharts)
+  validateChanceContent(catalog.chanceContent)
   validatePlaceholders(catalog)
   return catalog
 }

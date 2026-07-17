@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.15.0',
-    schemaVersion: 14,
-    appVersion: '0.16.0'
+    catalogVersion: '0.16.0',
+    schemaVersion: 15,
+    appVersion: '0.17.0'
   })
 
   await page.reload()
@@ -157,6 +157,63 @@ test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral'
   await page.setViewportSize({ width: 812, height: 375 })
   await expect(page.locator('.data-display')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'probability', 'combinatorics'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Zufall')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  const seen = new Set<string>()
+  for (let focus = 0; focus < 2; focus += 1) {
+    const chance = page.locator('.chance-display')
+    const combinations = page.locator('.combination-display')
+    await expect(chance.or(combinations).first()).toBeVisible()
+    await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+    if (await chance.isVisible().catch(() => false)) {
+      seen.add('probability')
+      await expect(chance).toHaveAttribute('aria-label', /Mögliche gleich große Felder oder Ergebnisse/)
+      const outcomes = await chance.locator('.chance-outcomes span').allTextContents()
+      expect(outcomes.length).toBeGreaterThanOrEqual(2)
+      const prompt = await page.locator('.exercise-heading h2').textContent()
+      const event = ['rot', 'blau', 'grün', 'gelb'].find((color) => prompt?.toLowerCase().includes(color))
+      if (!event) throw new Error('Das Ereignis der Beutelaufgabe ist nicht lesbar.')
+      const matches = outcomes.filter((outcome) => outcome.toLowerCase().includes(event)).length
+      const answer = matches === 0 ? 'unmöglich' : matches === outcomes.length ? 'sicher' : 'möglich'
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wahrscheinlichkeit-375x812.png'), fullPage: true })
+      await page.getByRole('button', { name: answer, exact: true }).click()
+    } else {
+      seen.add('combinatorics')
+      await expect(combinations).toHaveAttribute('aria-label', /Die Anzahl bleibt unbekannt/)
+      expect(await combinations.locator('.combination-cell').count()).toBeGreaterThanOrEqual(4)
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('kombinatorik-375x812.png'), fullPage: true })
+      await page.getByRole('button', { name: '4', exact: true }).click()
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    if (focus === 1) {
+      await page.setViewportSize({ width: 812, height: 375 })
+      await expect(page.locator('.exercise-panel')).toBeVisible()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    }
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+  expect(seen).toEqual(new Set(['probability', 'combinatorics']))
 })
 
 test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt', async ({ page }, testInfo) => {

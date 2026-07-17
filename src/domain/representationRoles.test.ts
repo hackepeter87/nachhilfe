@@ -48,7 +48,9 @@ describe('mathematische Rollen aller Darstellungen', () => {
       'written-subtraction': ['result'],
       'complement-1000': ['jumps'],
       money: ['displayedCents'],
-      lengths: ['lengthCm']
+      lengths: ['lengthCm'],
+      probability: ['classification'],
+      combinatorics: ['combinationCount']
     }
     for (const [skillId, expected] of Object.entries(expectedUnknowns)) {
       const exercise = generateExercise(skillId as (typeof SKILL_IDS)[number], 42, 1)

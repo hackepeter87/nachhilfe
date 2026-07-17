@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Wahrscheinlichkeit und Kombinatorik 0.17.0
+
+- Die neuen adaptiven Kompetenzen `probability` und `combinatorics` führen von sichtbaren Ergebnisräumen über bekannte Zufallsgeräte zu Häufigkeitsvergleichen sowie von `2×2`-Paarungen zu `3×3` mit genau einer Ausnahme.
+- Alle drei Ereignisklassen und beide Vergleichsrichtungen sind katalogisiert. Gleich große Ergebnisfelder werden gezählt; Brüche oder Prozentangaben bleiben ausgeschlossen.
+- Katalog 0.16.0 und Schema 15 ergänzen zehn Zufalls- und sechs Kombinationsvorlagen. Klassifikation, Häufigkeitsvergleich, systematisches Zählen und Lösungsprüfung bleiben in TypeScript.
+- Die mobile Runtime zeigt Ergebnisfelder und Auswahlmengen vollständig. Klassifikation und Anzahl sind mathematische unbekannte Rollen und werden nicht vorweggenommen.
+- Bruchwahrscheinlichkeiten, Baumdiagramme, große Ergebnisräume und empirische Versuchsreihen bleiben ausgeschlossen. Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 289 Unit-/Komponententests, Produktionsbuild und 15 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.17.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Daten und Diagramme 0.16.0
 
 - Die neuen adaptiven Kompetenzen `read-tables` und `read-charts` führen von direktem Tabellenlesen über Strichlisten und Bilddiagramme zu Vergleichen, fehlenden Werten und dem Darstellungswechsel Tabelle zu Säulendiagramm.

@@ -33,7 +33,7 @@ describe('Katalog-Buildpipeline', () => {
     const files = [
       'addition.md', 'subtraction.md', 'multiplication.md', 'division.md', 'place-value.md',
       'decompose-compose.md', 'neighbor-numbers.md', 'rounding.md', 'word-problems.md', 'symmetry.md',
-      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md'
+      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md', 'probability-combinatorics.md'
     ]
     for (const file of files) {
       const text = fs.readFileSync(path.join(directory, file), 'utf8')
@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 14,
-      catalogVersion: '0.15.0',
+      schemaVersion: 15,
+      catalogVersion: '0.16.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })

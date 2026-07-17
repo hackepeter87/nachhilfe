@@ -24,7 +24,9 @@ const FOCUS_SKILLS: SkillId[] = [
   'cube-rotation',
   'folding',
   'read-tables',
-  'read-charts'
+  'read-charts',
+  'probability',
+  'combinatorics'
 ]
 
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']
@@ -128,6 +130,8 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
   if (skillId === 'read-charts') {
     return difficulty === 1 ? 'pictogram-read-one-to-one' : difficulty === 2 ? 'bar-compare-values' : 'table-to-bar-match'
   }
+  if (skillId === 'probability') return difficulty === 1 ? 'chance-classify-visible' : difficulty === 2 ? 'chance-classify-experiment' : 'chance-compare-frequency'
+  if (skillId === 'combinatorics') return difficulty === 3 ? 'combinations-one-exclusion' : 'combinations-systematic'
   const candidates = skillId === 'addition'
     ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])
     : skillId === 'subtraction'

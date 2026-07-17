@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 14,
-  "catalogVersion": "0.15.0",
+  "schemaVersion": 15,
+  "catalogVersion": "0.16.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -3801,6 +3801,315 @@
         "Vergleichsfragen besitzen genau einen eindeutigen Unterschied.",
         "Bei Darstellungswechseln stimmt genau eine Option in allen Kategorien überein."
       ]
+    },
+    {
+      "id": "probability",
+      "label": "Zufall einschätzen",
+      "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
+      "supportGoal": "Ereignisse bei überschaubaren Zufallsversuchen als sicher, möglich oder unmöglich einordnen und Häufigkeiten ohne Bruchrechnung vergleichen.",
+      "misconceptions": [
+        "Möglich wird mit sicher verwechselt.",
+        "Ein gewünschtes Ergebnis wird für wahrscheinlicher gehalten.",
+        "Die Größe eines Symbols wird statt der Anzahl möglicher Felder verglichen.",
+        "Gleich häufige Ereignisse werden wegen ihrer Lage als verschieden eingeschätzt."
+      ],
+      "hints": [
+        "Zähle alle sichtbaren möglichen Ergebnisse und prüfe, ob das gesuchte Ergebnis darunter ist.",
+        "Sicher heißt: Es passt immer. Unmöglich heißt: Es passt nie. Dazwischen ist es möglich."
+      ],
+      "prompt": "Untersuche den Zufallsversuch und entscheide passend.",
+      "errorFeedback": "Prüfe jedes mögliche Ergebnis einzeln. Passt die Aussage immer, manchmal oder nie?",
+      "explanation": "Ein Ereignis ist sicher, wenn alle möglichen Ergebnisse passen, möglich, wenn mindestens eines passt, und unmöglich, wenn keines passt.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 8
+      },
+      "processCompetencies": [
+        {
+          "id": "reasoning",
+          "elicitedBy": "Die Einordnung wird aus der vollständigen sichtbaren Ergebnismenge begründet."
+        },
+        {
+          "id": "representing",
+          "elicitedBy": "Beutel, Münze, Würfel und Drehscheibe werden als endliche Ergebnismengen gelesen."
+        }
+      ],
+      "prerequisites": [
+        "Gegenstände und Symbole sicher zählen",
+        "gleich und verschieden unterscheiden"
+      ],
+      "representations": [
+        "Beutel mit sichtbarem Inhalt",
+        "Münze und Würfel mit vollständigen Ergebnissen",
+        "Drehscheibe mit gleich großen Feldern"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "An einem sichtbaren Beutel sicher, möglich und unmöglich unterscheiden",
+          "numberRange": "zwei bis fünf sichtbare Gegenstände",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Ereignisse bei Münze, Würfel oder Drehscheibe anhand aller Ergebnisse einordnen",
+          "numberRange": "zwei bis sechs gleichberechtigte Ergebnisse",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Zwei Ereignisse nach der Anzahl passender gleich großer Felder vergleichen",
+          "numberRange": "höchstens acht sichtbare Felder",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Im Beutel liegen nur rote Steine. Rot zu ziehen ist sicher, blau zu ziehen ist unmöglich. Bei roten und blauen Steinen ist rot möglich, aber nicht sicher.",
+      "successFeedback": "Du hast alle möglichen Ergebnisse passend berücksichtigt.",
+      "remediation": {
+        "strategy": "Streiche gedanklich jedes Ergebnis, das nicht zur Aussage passt, und vergleiche die verbleibende Anzahl.",
+        "foundationStrategy": "Kehre zu einem Beutel mit deutlich sichtbaren Gegenständen zurück und prüfe immer, manchmal oder nie.",
+        "representation": "Beutel mit vollständig sichtbarem Inhalt",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Erkläre mit eigenen Worten, warum möglich nicht dasselbe wie sicher ist.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Sichere und unmögliche Alltagsergebnisse benennen.",
+          "exerciseTypes": [
+            "probability:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Alle möglichen Ergebnisse eines Versuchs als Grundlage verstehen.",
+          "exerciseTypes": [
+            "probability:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Beutelereignisse einordnen.",
+          "exerciseTypes": [
+            "probability:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Wechselnde Zufallsgeräte systematisch prüfen.",
+          "exerciseTypes": [
+            "probability:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Sicher, möglich und unmöglich zuverlässig unterscheiden.",
+          "exerciseTypes": [
+            "probability:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Zwei Ereignisse anhand gleich großer Felder vergleichen.",
+          "exerciseTypes": [
+            "probability:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Alle möglichen Ergebnisse sind vollständig sichtbar.",
+        "Die Einordnung folgt ausschließlich der Ergebnismenge.",
+        "Vergleiche verwenden gleich große Felder und keine Bruchzahlen.",
+        "Jede Aufgabe besitzt genau eine korrekte Einordnung."
+      ]
+    },
+    {
+      "id": "combinatorics",
+      "label": "Möglichkeiten finden",
+      "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
+      "supportGoal": "Kleine Kombinationen aus zwei unabhängigen Auswahlgruppen systematisch erfassen und eine klar markierte Einschränkung berücksichtigen.",
+      "misconceptions": [
+        "Möglichkeiten werden doppelt gezählt.",
+        "Eine Auswahl wird ausgelassen.",
+        "Optionen derselben Gruppe werden miteinander kombiniert.",
+        "Eine ausgeschlossene Kombination wird trotzdem mitgezählt."
+      ],
+      "hints": [
+        "Beginne mit der ersten Möglichkeit links und verbinde sie nacheinander mit jeder Möglichkeit rechts.",
+        "Prüfe danach die nächste Möglichkeit links. So fehlt keine Kombination und keine wird doppelt gezählt."
+      ],
+      "prompt": "Bestimme systematisch, wie viele verschiedene Möglichkeiten es gibt.",
+      "errorFeedback": "Ordne jede Möglichkeit der ersten Gruppe nacheinander jeder Möglichkeit der zweiten Gruppe zu.",
+      "explanation": "Jede Möglichkeit der ersten Gruppe wird genau einmal mit jeder erlaubten Möglichkeit der zweiten Gruppe verbunden.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 9
+      },
+      "processCompetencies": [
+        {
+          "id": "problem-solving",
+          "elicitedBy": "Eine geordnete Strategie verhindert Auslassen und Doppelzählung."
+        },
+        {
+          "id": "representing",
+          "elicitedBy": "Zwei Auswahlgruppen und ein leeres Kombinationstableau strukturieren den Ergebnisraum."
+        }
+      ],
+      "prerequisites": [
+        "Sicheres Zählen bis 10",
+        "zwei Merkmale unterscheiden",
+        "kleines Einmaleins als mögliche Kontrollstrategie"
+      ],
+      "representations": [
+        "Zwei geordnete Auswahlreihen",
+        "Leeres Kombinationstableau",
+        "Sichtbar ausgeschlossene Paarung"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Zwei Möglichkeiten mit zwei Möglichkeiten vollständig verbinden",
+          "numberRange": "2 mal 2, keine Einschränkung",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Drei Möglichkeiten mit zwei Möglichkeiten systematisch erfassen",
+          "numberRange": "3 mal 2, keine Einschränkung",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Drei Möglichkeiten mit drei Möglichkeiten erfassen und genau eine ausgeschlossene Paarung abziehen",
+          "numberRange": "3 mal 3, eine sichtbare Einschränkung",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Zwei T-Shirts und zwei Hosen ergeben vier Kombinationen: Jedes T-Shirt passt einmal zu jeder Hose.",
+      "successFeedback": "Du hast den kleinen Ergebnisraum vollständig erfasst.",
+      "remediation": {
+        "strategy": "Halte eine Möglichkeit links fest und gehe rechts der Reihe nach durch. Wechsle erst danach links weiter.",
+        "foundationStrategy": "Beginne erneut mit genau zwei Möglichkeiten in jeder Gruppe und ohne Einschränkung.",
+        "representation": "Zwei Auswahlreihen mit leerem 2-mal-2-Tableau",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Beschreibe eine Reihenfolge, mit der du keine Möglichkeit vergisst.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Zwei Auswahlgruppen unterscheiden.",
+          "exerciseTypes": [
+            "combinatorics:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Eine Paarung als je eine Wahl aus beiden Gruppen verstehen.",
+          "exerciseTypes": [
+            "combinatorics:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Vier Möglichkeiten geordnet zählen.",
+          "exerciseTypes": [
+            "combinatorics:foundation"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Sechs Möglichkeiten ohne Doppelzählung bestimmen.",
+          "exerciseTypes": [
+            "combinatorics:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Kleine Ergebnisräume systematisch erfassen.",
+          "exerciseTypes": [
+            "combinatorics:practice"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Eine sichtbare Einschränkung korrekt berücksichtigen.",
+          "exerciseTypes": [
+            "combinatorics:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Jede Kombination enthält genau eine Option aus jeder Gruppe.",
+        "Keine erlaubte Kombination wird ausgelassen oder doppelt gezählt.",
+        "Eine Einschränkung ist sichtbar und eindeutig.",
+        "Der Ergebnisraum bleibt bei höchstens neun Paarungen."
+      ]
     }
   ],
   "wordProblems": [
@@ -5764,6 +6073,323 @@
         ],
         "unitLabel": "Kinder",
         "symbolLabel": "Sportpunkt"
+      }
+    ]
+  },
+  "chanceContent": {
+    "classificationLabels": {
+      "sure": "sicher",
+      "possible": "möglich",
+      "impossible": "unmöglich"
+    },
+    "comparisonLabels": {
+      "first": "Das erste Ereignis kommt häufiger vor.",
+      "equal": "Beide Ereignisse kommen gleich häufig vor.",
+      "second": "Das zweite Ereignis kommt häufiger vor."
+    },
+    "experimentLabels": {
+      "bag": "Beutel",
+      "coin": "Münze",
+      "die": "Würfel",
+      "spinner": "Drehscheibe"
+    },
+    "combinationCountPrompt": "Wie viele verschiedene erlaubte Möglichkeiten gibt es?",
+    "excludedLabel": "Diese Paarung ist nicht erlaubt",
+    "probabilityTemplates": [
+      {
+        "id": "bag-sure-red",
+        "difficulty": 1,
+        "experimentType": "bag",
+        "title": "Steine im Beutel",
+        "outcomes": [
+          "rot",
+          "rot",
+          "rot"
+        ],
+        "question": "Einen roten Stein zu ziehen ist ...",
+        "eventA": [
+          "rot"
+        ]
+      },
+      {
+        "id": "bag-possible-blue",
+        "difficulty": 1,
+        "experimentType": "bag",
+        "title": "Steine im Beutel",
+        "outcomes": [
+          "rot",
+          "blau",
+          "rot",
+          "blau"
+        ],
+        "question": "Einen blauen Stein zu ziehen ist ...",
+        "eventA": [
+          "blau"
+        ]
+      },
+      {
+        "id": "bag-impossible-green",
+        "difficulty": 1,
+        "experimentType": "bag",
+        "title": "Steine im Beutel",
+        "outcomes": [
+          "rot",
+          "blau",
+          "rot"
+        ],
+        "question": "Einen grünen Stein zu ziehen ist ...",
+        "eventA": [
+          "grün"
+        ]
+      },
+      {
+        "id": "coin-head",
+        "difficulty": 2,
+        "experimentType": "coin",
+        "title": "Münzwurf",
+        "outcomes": [
+          "Kopf",
+          "Zahl"
+        ],
+        "question": "Beim einmaligen Wurf Kopf zu erhalten ist ...",
+        "eventA": [
+          "Kopf"
+        ]
+      },
+      {
+        "id": "die-even",
+        "difficulty": 2,
+        "experimentType": "die",
+        "title": "Würfelwurf",
+        "outcomes": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "question": "Eine gerade Zahl zu würfeln ist ...",
+        "eventA": [
+          "2",
+          "4",
+          "6"
+        ]
+      },
+      {
+        "id": "spinner-impossible-yellow",
+        "difficulty": 2,
+        "experimentType": "spinner",
+        "title": "Drehscheibe",
+        "outcomes": [
+          "rot",
+          "blau",
+          "rot",
+          "grün"
+        ],
+        "question": "Auf Gelb zu landen ist ...",
+        "eventA": [
+          "gelb"
+        ]
+      },
+      {
+        "id": "spinner-red-blue",
+        "difficulty": 3,
+        "experimentType": "spinner",
+        "title": "Drehscheibe",
+        "outcomes": [
+          "rot",
+          "rot",
+          "rot",
+          "blau"
+        ],
+        "question": "Vergleiche Rot und Blau.",
+        "eventA": [
+          "rot"
+        ],
+        "eventB": [
+          "blau"
+        ],
+        "eventALabel": "Rot",
+        "eventBLabel": "Blau"
+      },
+      {
+        "id": "coin-equal",
+        "difficulty": 3,
+        "experimentType": "coin",
+        "title": "Münzwurf",
+        "outcomes": [
+          "Kopf",
+          "Zahl"
+        ],
+        "question": "Vergleiche Kopf und Zahl.",
+        "eventA": [
+          "Kopf"
+        ],
+        "eventB": [
+          "Zahl"
+        ],
+        "eventALabel": "Kopf",
+        "eventBLabel": "Zahl"
+      },
+      {
+        "id": "die-even-high",
+        "difficulty": 3,
+        "experimentType": "die",
+        "title": "Würfelwurf",
+        "outcomes": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "question": "Vergleiche gerade Zahlen und Zahlen größer als 4.",
+        "eventA": [
+          "2",
+          "4",
+          "6"
+        ],
+        "eventB": [
+          "5",
+          "6"
+        ],
+        "eventALabel": "gerade Zahl",
+        "eventBLabel": "größer als 4"
+      },
+      {
+        "id": "spinner-blue-red",
+        "difficulty": 3,
+        "experimentType": "spinner",
+        "title": "Drehscheibe",
+        "outcomes": [
+          "rot",
+          "blau",
+          "blau",
+          "blau"
+        ],
+        "question": "Vergleiche Rot und Blau.",
+        "eventA": [
+          "rot"
+        ],
+        "eventB": [
+          "blau"
+        ],
+        "eventALabel": "Rot",
+        "eventBLabel": "Blau"
+      }
+    ],
+    "combinationTemplates": [
+      {
+        "id": "clothes-2x2",
+        "difficulty": 1,
+        "title": "Kleidung zusammenstellen",
+        "firstLabel": "T-Shirt",
+        "firstOptions": [
+          "grün",
+          "blau"
+        ],
+        "secondLabel": "Hose",
+        "secondOptions": [
+          "kurz",
+          "lang"
+        ],
+        "question": "Wie viele Outfits kannst du zusammenstellen?"
+      },
+      {
+        "id": "breakfast-2x2",
+        "difficulty": 1,
+        "title": "Frühstück wählen",
+        "firstLabel": "Getränk",
+        "firstOptions": [
+          "Milch",
+          "Tee"
+        ],
+        "secondLabel": "Obst",
+        "secondOptions": [
+          "Apfel",
+          "Banane"
+        ],
+        "question": "Wie viele Frühstücke sind möglich?"
+      },
+      {
+        "id": "ice-cream-3x2",
+        "difficulty": 2,
+        "title": "Eis zusammenstellen",
+        "firstLabel": "Sorte",
+        "firstOptions": [
+          "Vanille",
+          "Erdbeere",
+          "Schoko"
+        ],
+        "secondLabel": "Streusel",
+        "secondOptions": [
+          "bunt",
+          "Schoko"
+        ],
+        "question": "Wie viele Eis-Kombinationen sind möglich?"
+      },
+      {
+        "id": "routes-2x3",
+        "difficulty": 2,
+        "title": "Weg zur Insel",
+        "firstLabel": "Boot",
+        "firstOptions": [
+          "rot",
+          "blau"
+        ],
+        "secondLabel": "Anleger",
+        "secondOptions": [
+          "Nord",
+          "Mitte",
+          "Süd"
+        ],
+        "question": "Wie viele verschiedene Wege sind möglich?"
+      },
+      {
+        "id": "craft-3x3-excluded",
+        "difficulty": 3,
+        "title": "Anhänger gestalten",
+        "firstLabel": "Form",
+        "firstOptions": [
+          "Kreis",
+          "Stern",
+          "Herz"
+        ],
+        "secondLabel": "Farbe",
+        "secondOptions": [
+          "rot",
+          "blau",
+          "gelb"
+        ],
+        "question": "Wie viele erlaubte Anhänger sind möglich?",
+        "excludedPair": [
+          "Stern",
+          "gelb"
+        ]
+      },
+      {
+        "id": "sandwich-3x3-excluded",
+        "difficulty": 3,
+        "title": "Brot belegen",
+        "firstLabel": "Brot",
+        "firstOptions": [
+          "hell",
+          "dunkel",
+          "Korn"
+        ],
+        "secondLabel": "Belag",
+        "secondOptions": [
+          "Käse",
+          "Gurke",
+          "Ei"
+        ],
+        "question": "Wie viele erlaubte Brote sind möglich?",
+        "excludedPair": [
+          "dunkel",
+          "Ei"
+        ]
       }
     ]
   }

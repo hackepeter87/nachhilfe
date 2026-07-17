@@ -16,6 +16,7 @@ import {
 } from './cubeViews'
 import { createFoldingOutcomes, foldingCellsKey, type FoldingTemplate } from './folding'
 import { createDataDistractors, sameDataValues, varyDataValues, type DataDisplayType, type DataSetTemplate } from './dataDisplays'
+import { classifyEvent, combinationCount, compareEventFrequency, type CombinationTemplate, type ProbabilityTemplate } from './chance'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1676,6 +1677,86 @@ function readCharts(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+function chanceRepresentation(template: ProbabilityTemplate): ExerciseRepresentation {
+  const values: ExerciseRepresentation['values'] = {
+    experimentType: template.experimentType,
+    title: template.title,
+    outcomeCount: template.outcomes.length
+  }
+  template.outcomes.forEach((outcome, index) => { values[`outcome${index}`] = outcome })
+  if (template.eventALabel) values.eventALabel = template.eventALabel
+  if (template.eventBLabel) values.eventBLabel = template.eventBLabel
+  return {
+    kind: 'chance-display', visibility: 'always', label: `${getTaskCatalog().chanceContent.experimentLabels[template.experimentType]}: ${template.title}`,
+    values, valueRoles: { knownValues: Object.keys(values), unknownValues: ['classification'], revealedValues: [] }
+  }
+}
+
+function probability(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().chanceContent
+  const templates = content.probabilityTemplates.filter((template) => template.difficulty === difficulty)
+  const template = pick(random, templates)
+  const generatedValues = { templateId: template.id, experimentType: template.experimentType, outcomeCount: template.outcomes.length }
+  const generatedContent = contentFor('probability', generatedValues, difficulty)
+  const correctAnswer = difficulty === 3
+    ? compareEventFrequency(template.outcomes, template.eventA, template.eventB ?? [])
+    : classifyEvent(template.outcomes, template.eventA)
+  const labels = difficulty === 3 ? content.comparisonLabels : content.classificationLabels
+  return withMetadata({
+    ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
+    prompt: template.question,
+    typeId: difficulty === 3 ? 'compare-events' : `classify-${template.experimentType}`,
+    subskillId: difficulty === 1 ? 'chance-classify-visible' : difficulty === 2 ? 'chance-classify-experiment' : 'chance-compare-frequency',
+    answerMode: 'choice', correctAnswer,
+    options: shuffle(random, Object.entries(labels).map(([value, label]) => ({ value, label }))),
+    representation: chanceRepresentation(template)
+  })
+}
+
+function combinationRepresentation(template: CombinationTemplate): ExerciseRepresentation {
+  const values: ExerciseRepresentation['values'] = {
+    title: template.title,
+    firstLabel: template.firstLabel,
+    firstCount: template.firstOptions.length,
+    secondLabel: template.secondLabel,
+    secondCount: template.secondOptions.length,
+    excludedLabel: getTaskCatalog().chanceContent.excludedLabel
+  }
+  template.firstOptions.forEach((option, index) => { values[`first${index}`] = option })
+  template.secondOptions.forEach((option, index) => { values[`second${index}`] = option })
+  if (template.excludedPair) {
+    values.excludedFirst = template.excludedPair[0]
+    values.excludedSecond = template.excludedPair[1]
+  }
+  return {
+    kind: 'combination-display', visibility: 'always', label: template.title, values,
+    valueRoles: { knownValues: Object.keys(values), unknownValues: ['combinationCount'], revealedValues: [] }
+  }
+}
+
+function combinatorics(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const templates = getTaskCatalog().chanceContent.combinationTemplates.filter((template) => template.difficulty === difficulty)
+  const template = pick(random, templates)
+  const answer = combinationCount(template)
+  const generatedValues = { templateId: template.id, firstCount: template.firstOptions.length, secondCount: template.secondOptions.length, answer }
+  const generatedContent = contentFor('combinatorics', generatedValues, difficulty)
+  return withMetadata({
+    ...base('combinatorics', seed, difficulty, generatedValues), ...generatedContent,
+    prompt: template.question || getTaskCatalog().chanceContent.combinationCountPrompt,
+    typeId: difficulty === 1 ? 'combinations-2x2' : difficulty === 2 ? 'combinations-3x2' : 'combinations-with-exclusion',
+    subskillId: difficulty === 3 ? 'combinations-one-exclusion' : 'combinations-systematic',
+    answerMode: 'choice', correctAnswer: String(answer),
+    options: numberOptions(random, answer, [
+      { value: answer - 1, misconception: 'Eine erlaubte Möglichkeit ausgelassen' },
+      { value: answer + 1, misconception: 'Eine Möglichkeit doppelt gezählt oder die Ausnahme mitgezählt' },
+      { value: template.firstOptions.length + template.secondOptions.length, misconception: 'Auswahlmöglichkeiten addiert statt Paarungen gebildet' }
+    ]),
+    representation: combinationRepresentation(template)
+  })
+}
+
 export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
   switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus)
@@ -1703,6 +1784,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'folding': return folding(seed, difficulty, focus)
     case 'read-tables': return readTables(seed, difficulty)
     case 'read-charts': return readCharts(seed, difficulty)
+    case 'probability': return probability(seed, difficulty)
+    case 'combinatorics': return combinatorics(seed, difficulty)
   }
 }
 

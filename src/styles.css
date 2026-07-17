@@ -727,6 +727,26 @@ p {
 .model-option .bar-chart { height: 112px; gap: 3px; }
 .model-option .bar-chart-column > b { font-size: .58rem; }
 
+.chance-display, .combination-display { display: grid; gap: 12px; text-align: center; }
+.chance-display > strong, .combination-display > strong { color: #244d38; }
+.chance-outcomes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.chance-outcomes span { display: grid; place-items: center; min-width: 48px; min-height: 48px; padding: 6px 9px; border: 2px solid #78a88d; border-radius: 8px; background: #fff; font-size: .72rem; font-weight: 800; }
+.chance-outcomes i { color: #2876a8; font-size: 1rem; font-style: normal; }
+.chance-display--bag .chance-outcomes { padding: 14px; border: 3px solid #947348; border-radius: 8px 8px 28px 28px; background: #fff9eb; }
+.chance-display--coin .chance-outcomes span { border-radius: 50%; }
+.chance-display--spinner .chance-outcomes span { border-color: #2876a8; border-radius: 18px 5px 18px 5px; }
+.chance-display > p { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; font-size: .8rem; }
+.chance-display > p span { color: #557060; }
+.combination-groups { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.combination-groups section { display: grid; gap: 5px; min-width: 0; }
+.combination-groups section b { color: #557060; font-size: .72rem; }
+.combination-groups section span { overflow-wrap: anywhere; padding: 6px; border: 1px solid #78a88d; border-radius: 4px; background: #fff; font-size: .76rem; font-weight: 800; }
+.combination-sign { color: #2876a8; font-size: 1.2rem; font-weight: 900; }
+.combination-grid { --combination-columns: 2; display: grid; grid-template-columns: repeat(var(--combination-columns), minmax(26px, 42px)); justify-content: center; gap: 4px; }
+.combination-cell { aspect-ratio: 1; border: 2px dashed #8eb3a2; background: #fff; }
+.combination-cell--blocked { display: grid; place-items: center; border-style: solid; border-color: #bd7658; color: #9a4e28; background: #fff0e9; font-weight: 900; }
+.combination-display small { color: #7c3f22; font-weight: 800; }
+
 .bar-segments { display: grid; grid-template-columns: 2fr 1fr; min-height: 48px; margin-bottom: 10px; }
 .bar-segments span { display: grid; place-items: center; border: 1px solid #315d45; background: #dceee3; font-weight: 800; }
 .bar-segments span + span { background: #ffe5d7; }

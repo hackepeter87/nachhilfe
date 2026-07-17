@@ -27,9 +27,10 @@ import {
   type FoldingTemplate
 } from '../domain/folding'
 import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisplays'
+import { isValidCombinationTemplate, isValidProbabilityTemplate, type CombinationTemplate, type ProbabilityTemplate } from '../domain/chance'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 14
+export const CATALOG_SCHEMA_VERSION = 15
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -418,6 +419,16 @@ export interface DataAndChartsContent {
   templates: DataSetTemplate[]
 }
 
+export interface ChanceContent {
+  classificationLabels: Record<'sure' | 'possible' | 'impossible', string>
+  comparisonLabels: Record<'first' | 'equal' | 'second', string>
+  experimentLabels: Record<'bag' | 'coin' | 'die' | 'spinner', string>
+  combinationCountPrompt: string
+  excludedLabel: string
+  probabilityTemplates: ProbabilityTemplate[]
+  combinationTemplates: CombinationTemplate[]
+}
+
 export interface TaskCatalog extends CatalogMetadata {
   representationPolicy: RepresentationPolicy
   fieldUsage: Record<'representationPolicy' | 'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
@@ -440,6 +451,7 @@ export interface TaskCatalog extends CatalogMetadata {
   spatialRotations: SpatialRotationsContent
   spatialFolding: SpatialFoldingContent
   dataAndCharts: DataAndChartsContent
+  chanceContent: ChanceContent
 }
 
 type FetchCatalog = (input: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>
@@ -630,6 +642,24 @@ function isDataAndChartsContent(value: unknown): value is DataAndChartsContent {
   if (!['wrongRow', 'wrongDifference', 'wrongCompletion', 'wrongPictogram', 'wrongBarDifference', 'swappedCategories', 'changedValue'].every((key) => isNonEmptyString(distractorFeedback[key]))) return false
   if (!Array.isArray(value.templates) || value.templates.length < 6 || !value.templates.every(isValidDataSetTemplate)) return false
   return new Set(value.templates.map((template) => (template as DataSetTemplate).id)).size === value.templates.length
+}
+
+function isChanceContent(value: unknown): value is ChanceContent {
+  if (!isRecord(value) || !isRecord(value.classificationLabels) || !isRecord(value.comparisonLabels) || !isRecord(value.experimentLabels) ||
+    !isNonEmptyString(value.combinationCountPrompt) || !isNonEmptyString(value.excludedLabel)) return false
+  const classificationLabels = value.classificationLabels
+  const comparisonLabels = value.comparisonLabels
+  const experimentLabels = value.experimentLabels
+  if (!['sure', 'possible', 'impossible'].every((key) => isNonEmptyString(classificationLabels[key]))) return false
+  if (!['first', 'equal', 'second'].every((key) => isNonEmptyString(comparisonLabels[key]))) return false
+  if (!['bag', 'coin', 'die', 'spinner'].every((key) => isNonEmptyString(experimentLabels[key]))) return false
+  if (!Array.isArray(value.probabilityTemplates) || value.probabilityTemplates.length < 9 || !value.probabilityTemplates.every(isValidProbabilityTemplate)) return false
+  if (!Array.isArray(value.combinationTemplates) || value.combinationTemplates.length < 6 || !value.combinationTemplates.every(isValidCombinationTemplate)) return false
+  const probabilityTemplates = value.probabilityTemplates
+  const combinationTemplates = value.combinationTemplates
+  return new Set(probabilityTemplates.map((template) => (template as ProbabilityTemplate).id)).size === probabilityTemplates.length &&
+    new Set(combinationTemplates.map((template) => (template as CombinationTemplate).id)).size === combinationTemplates.length &&
+    [1, 2, 3].every((difficulty) => probabilityTemplates.some((template) => (template as ProbabilityTemplate).difficulty === difficulty) && combinationTemplates.some((template) => (template as CombinationTemplate).difficulty === difficulty))
 }
 
 const REQUIREMENT_FIELDS = [
@@ -828,7 +858,7 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) ||
     !isSpatialViewsContent(value.spatialViews) || !isSpatialRotationsContent(value.spatialRotations) ||
-    !isSpatialFoldingContent(value.spatialFolding) || !isDataAndChartsContent(value.dataAndCharts)) return false
+    !isSpatialFoldingContent(value.spatialFolding) || !isDataAndChartsContent(value.dataAndCharts) || !isChanceContent(value.chanceContent)) return false
   return hasOnlyKnownPlaceholders(value)
 }
 

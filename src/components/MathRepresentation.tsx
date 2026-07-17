@@ -261,6 +261,53 @@ export function MathRepresentation({ representation }: { representation: Exercis
     )
   }
 
+  if (representation.kind === 'chance-display') {
+    const experimentType = String(values.experimentType)
+    const outcomeCount = Number(values.outcomeCount)
+    const outcomes = Array.from({ length: outcomeCount }, (_, index) => values[`outcome${index}`])
+    const valid = ['bag', 'coin', 'die', 'spinner'].includes(experimentType) && Number.isInteger(outcomeCount) && outcomeCount >= 2 && outcomeCount <= 8 && outcomes.every((outcome) => typeof outcome === 'string' && outcome.length > 0)
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Der Zufallsversuch enthält ungültige Ergebnisse.</div>
+    const description = `${representation.label}. Mögliche gleich große Felder oder Ergebnisse: ${outcomes.join(', ')}.`
+    return (
+      <div className={`math-visual chance-display chance-display--${experimentType}`} role="img" aria-label={description}>
+        <strong>{textValue(values.title)}</strong>
+        <div className="chance-outcomes" aria-hidden="true">
+          {outcomes.map((outcome, index) => <span key={`${outcome}-${index}`}><i>{experimentType === 'die' ? '□' : experimentType === 'coin' ? '○' : '●'}</i>{String(outcome)}</span>)}
+        </div>
+        {values.eventALabel && values.eventBLabel && <p><b>{textValue(values.eventALabel)}</b><span>vergleichen mit</span><b>{textValue(values.eventBLabel)}</b></p>}
+      </div>
+    )
+  }
+
+  if (representation.kind === 'combination-display') {
+    const firstCount = Number(values.firstCount)
+    const secondCount = Number(values.secondCount)
+    const firstOptions = Array.from({ length: firstCount }, (_, index) => values[`first${index}`])
+    const secondOptions = Array.from({ length: secondCount }, (_, index) => values[`second${index}`])
+    const valid = Number.isInteger(firstCount) && firstCount >= 2 && firstCount <= 3 && Number.isInteger(secondCount) && secondCount >= 2 && secondCount <= 3 &&
+      [...firstOptions, ...secondOptions].every((option) => typeof option === 'string' && option.length > 0)
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Kombinationsdarstellung ist unvollständig.</div>
+    const excluded = values.excludedFirst && values.excludedSecond ? `${values.excludedFirst} mit ${values.excludedSecond}` : ''
+    const description = `${representation.label}. ${values.firstLabel}: ${firstOptions.join(', ')}. ${values.secondLabel}: ${secondOptions.join(', ')}.${excluded ? ` Nicht erlaubt: ${excluded}.` : ''} Die Anzahl bleibt unbekannt.`
+    return (
+      <div className="math-visual combination-display" role="img" aria-label={description}>
+        <strong>{textValue(values.title)}</strong>
+        <div className="combination-groups" aria-hidden="true">
+          <section><b>{textValue(values.firstLabel)}</b>{firstOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
+          <span className="combination-sign">×</span>
+          <section><b>{textValue(values.secondLabel)}</b>{secondOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
+        </div>
+        <div className="combination-grid" aria-hidden="true" style={{ '--combination-columns': secondCount } as CSSProperties}>
+          {firstOptions.flatMap((first) => secondOptions.map((second) => {
+            const blocked = first === values.excludedFirst && second === values.excludedSecond
+            return <span className={blocked ? 'combination-cell combination-cell--blocked' : 'combination-cell'} key={`${first}-${second}`}>{blocked ? '×' : ''}</span>
+          }))}
+        </div>
+        {excluded && <small>{textValue(values.excludedLabel)}: {excluded}</small>}
+      </div>
+    )
+  }
+
   if (representation.kind === 'data-display') {
     const displayType = String(values.displayType)
     const categories = [values.category0, values.category1, values.category2]

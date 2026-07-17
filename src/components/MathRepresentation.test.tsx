@@ -61,6 +61,58 @@ describe('MathRepresentation Gruppenbild', () => {
   })
 })
 
+describe('MathRepresentation Zufall und Kombinationen', () => {
+  it('zeigt nur bekannte Versuchsergebnisse und keine vorweggenommene Klassifikation', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'chance-display', visibility: 'always', label: 'Beutel: Farbsteine',
+      values: { experimentType: 'bag', title: 'Farbsteine', outcomeCount: 3, outcome0: 'rot', outcome1: 'rot', outcome2: 'blau' },
+      valueRoles: { knownValues: ['experimentType', 'title', 'outcomeCount', 'outcome0', 'outcome1', 'outcome2'], unknownValues: ['classification'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /rot, rot, blau/ })).toBeVisible()
+    expect(container.querySelectorAll('.chance-outcomes span')).toHaveLength(3)
+    expect(container).not.toHaveTextContent(/sicher|möglich|unmöglich/i)
+  })
+
+  it.each([
+    [2, 2, 0, 4],
+    [3, 2, 0, 6],
+    [3, 3, 1, 9]
+  ])('stellt %i mal %i Kombinationen mit %i sichtbarer Ausnahme vollständig dar', (firstCount, secondCount, blockedCount, cells) => {
+    const first = ['rot', 'blau', 'grün'].slice(0, firstCount)
+    const second = ['Kreis', 'Stern', 'Herz'].slice(0, secondCount)
+    const values: ExerciseRepresentation['values'] = {
+      title: 'Auswahl', firstLabel: 'Farbe', firstCount, secondLabel: 'Form', secondCount, excludedLabel: 'Nicht erlaubt'
+    }
+    first.forEach((entry, index) => { values[`first${index}`] = entry })
+    second.forEach((entry, index) => { values[`second${index}`] = entry })
+    if (blockedCount) {
+      values.excludedFirst = first[2]!
+      values.excludedSecond = second[2]!
+    }
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'combination-display', visibility: 'always', label: 'Auswahl', values,
+      valueRoles: { knownValues: Object.keys(values), unknownValues: ['combinationCount'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Die Anzahl bleibt unbekannt/ })).toBeVisible()
+    expect(container.querySelectorAll('.combination-cell')).toHaveLength(cells)
+    expect(container.querySelectorAll('.combination-cell--blocked')).toHaveLength(blockedCount)
+    expect(container).not.toHaveTextContent(new RegExp(`\\b${cells - blockedCount}\\b`))
+  })
+
+  it('weist unvollständige Zufalls- und Kombinationsdaten sichtbar zurück', () => {
+    const { rerender } = render(<RuntimeMathRepresentation representation={{
+      kind: 'chance-display', visibility: 'always', label: 'Ungültig', values: { experimentType: 'bag', outcomeCount: 1, outcome0: 'rot' },
+      valueRoles: { knownValues: ['experimentType', 'outcomeCount', 'outcome0'], unknownValues: ['classification'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Ergebnisse')
+    rerender(<RuntimeMathRepresentation representation={{
+      kind: 'combination-display', visibility: 'always', label: 'Ungültig', values: { firstCount: 1, secondCount: 2 },
+      valueRoles: { knownValues: ['firstCount', 'secondCount'], unknownValues: ['combinationCount'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('unvollständig')
+  })
+})
+
 describe('MathRepresentation schriftliche Addition', () => {
   it('ordnet die Summanden stellengerecht an und verrät das Ergebnis nicht', () => {
     const { container } = render(<MathRepresentation representation={{
