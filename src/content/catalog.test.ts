@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(13)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.14.1')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(14)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.15.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -64,6 +64,12 @@ describe('versionierter Aufgabenkatalog', () => {
     const incomplete = structuredClone(readPublicCatalog()) as TaskCatalog
     incomplete.representationPolicy.unknownValues = ''
     expect(validateTaskCatalog(incomplete)).toBe(false)
+  })
+
+  it('lehnt unvollständige fachliche Texte für Daten und Diagramme ab', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    catalog.dataAndCharts.prompts.tableRead = ''
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('kennt ausschließlich alle produktiven Skill-IDs', () => {

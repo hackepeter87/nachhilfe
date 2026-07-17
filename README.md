@@ -133,7 +133,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.15.1
+podman pull ghcr.io/hackepeter87/nachhilfe:0.16.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -174,6 +174,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.15.1
+## Release-Stand 0.16.0
 
-Version 0.15.1 führt für alle mathematischen Darstellungen die Rollen `knownValues`, `unknownValues` und `revealedValues` ein. Rechenstriche, Nachbarzahlen, Division, Geld und Messstrecken nennen gesuchte Größen weder sichtbar noch in zugänglichen Beschreibungen; nach einer richtigen Lösung werden sie kontrolliert ergänzt. Katalog 0.14.1 und Schema 13 machen diese Regel buildwirksam. Der Funktionsumfang von 0.15.0 bleibt unverändert. Details stehen in [docs/representation-policy.md](docs/representation-policy.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.16.0 ergänzt adaptives Tabellen- und Diagrammlesen. Tabellen und Strichlisten bilden den Einstieg; Bild- und Säulendiagramme werden erst nach tragfähigem Tabellenlesen ausgewählt. Fehlende Werte bleiben bis zur richtigen Lösung maskiert. Katalog 0.15.0 und Schema 14 enthalten sechs geprüfte Datensätze und die didaktischen Stufen. Details stehen in [docs/didactics/data-tables-charts.md](docs/didactics/data-tables-charts.md), [docs/representation-policy.md](docs/representation-policy.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

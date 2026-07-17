@@ -33,7 +33,7 @@ describe('Katalog-Buildpipeline', () => {
     const files = [
       'addition.md', 'subtraction.md', 'multiplication.md', 'division.md', 'place-value.md',
       'decompose-compose.md', 'neighbor-numbers.md', 'rounding.md', 'word-problems.md', 'symmetry.md',
-      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md'
+      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md', 'data-tables-charts.md'
     ]
     for (const file of files) {
       const text = fs.readFileSync(path.join(directory, file), 'utf8')
@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 13,
-      catalogVersion: '0.14.1',
+      schemaVersion: 14,
+      catalogVersion: '0.15.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -66,6 +66,12 @@ describe('Katalog-Buildpipeline', () => {
     const catalog = sourceCatalog()
     delete catalog.representationPolicy
     expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('representationPolicy')
+  })
+
+  it('bricht bei fehlenden Daten- und Diagrammtexten ab', () => {
+    const catalog = sourceCatalog()
+    catalog.dataAndCharts.distractorFeedback.changedValue = ''
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('dataAndCharts.distractorFeedback.changedValue')
   })
 
   it('lehnt doppelte IDs und unbekannte Platzhalter ab', () => {

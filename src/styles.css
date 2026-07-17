@@ -703,6 +703,30 @@ p {
 .number-line-labels strong { color: #b94c24; }
 .number-line-visual p { margin: 10px 0 0; font-weight: 700; text-align: center; }
 
+.data-display { display: grid; gap: 12px; overflow: hidden; background: #f8fbf9; }
+.data-display-title { text-align: center; color: #244d38; }
+.data-table { width: 100%; border-collapse: collapse; background: #fff; font-size: .88rem; }
+.data-table th, .data-table td { padding: 8px; border: 1px solid #aec6b8; text-align: left; }
+.data-table thead th, .data-table tfoot th, .data-table tfoot td { background: #e7f1eb; font-weight: 850; }
+.data-table td { width: 34%; text-align: center; font-weight: 850; }
+.data-value--unknown { color: #19577d; background: repeating-linear-gradient(135deg, #eef7fb, #eef7fb 7px, #d8edf6 7px, #d8edf6 14px); font-size: 1.1rem; }
+.tally-list, .pictogram { display: grid; gap: 8px; }
+.tally-row, .pictogram-row { display: grid; grid-template-columns: minmax(74px, .8fr) minmax(0, 1.4fr); align-items: center; gap: 8px; }
+.tally-row > span:first-child, .pictogram-row > span:first-child { overflow-wrap: anywhere; font-size: .78rem; font-weight: 800; }
+.tally-marks { display: flex; flex-wrap: wrap; gap: 4px; min-height: 24px; padding: 4px; border-bottom: 1px solid #aec6b8; }
+.tally-mark { width: 3px; height: 22px; background: #285f4e; transform: rotate(0); }
+.tally-mark--fifth { margin-left: -18px; width: 24px; height: 3px; transform: rotate(-48deg) translate(-2px, 8px); transform-origin: center; }
+.pictogram-row > span:last-child { display: flex; flex-wrap: wrap; gap: 5px; }
+.pictogram-row i { width: 13px; height: 13px; border: 2px solid #2876a8; border-radius: 50%; background: #d8edf6; }
+.data-display small { color: #557060; font-weight: 750; text-align: center; }
+.bar-chart { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 8px; height: 150px; padding: 8px 6px 0; border-bottom: 3px solid #315d45; }
+.bar-chart-column { display: grid; grid-template-rows: 20px minmax(0, 1fr) 28px; align-items: end; height: 100%; min-width: 0; text-align: center; }
+.bar-chart-column > span { align-self: start; font-size: .72rem; font-weight: 850; }
+.bar-chart-column > i { display: block; align-self: end; width: min(78%, 48px); max-height: 100%; min-height: 8px; margin-inline: auto; border: 1px solid #23664e; background: #8fc5ae; }
+.bar-chart-column > b { align-self: center; overflow: hidden; font-size: .66rem; line-height: 1.05; text-overflow: ellipsis; white-space: nowrap; }
+.model-option .bar-chart { height: 112px; gap: 3px; }
+.model-option .bar-chart-column > b { font-size: .58rem; }
+
 .bar-segments { display: grid; grid-template-columns: 2fr 1fr; min-height: 48px; margin-bottom: 10px; }
 .bar-segments span { display: grid; place-items: center; border: 1px solid #315d45; background: #dceee3; font-weight: 800; }
 .bar-segments span + span { background: #ffe5d7; }

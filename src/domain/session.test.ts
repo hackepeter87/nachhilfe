@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.14.1',
-      schemaVersion: 13,
-      appVersion: '0.15.1'
+      catalogVersion: '0.15.0',
+      schemaVersion: 14,
+      appVersion: '0.16.0'
     })
   })
 
@@ -63,7 +63,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.14.1')
+      expect(runningSession.catalogVersion).toBe('0.15.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -236,5 +236,13 @@ describe('Sitzungsplanung', () => {
     expect(repetition.variant.key).not.toBe(original.variant.key)
     expect(Number(repetition.variant.values.cubes)).toBeLessThanOrEqual(4)
     expect(repetition.representation?.kind).toBe('cube-rotation')
+  })
+
+  it('schaltet Diagramme erst nach tragfähigem Tabellenlesen frei', () => {
+    const tables = createSkillProgress('read-tables')
+    expect(isSkillEligible('read-charts', {})).toBe(false)
+    expect(isSkillEligible('read-charts', { 'read-tables': { ...tables, attempts: 4, mastery: 90 } })).toBe(false)
+    expect(isSkillEligible('read-charts', { 'read-tables': { ...tables, attempts: 5, mastery: 59 } })).toBe(false)
+    expect(isSkillEligible('read-charts', { 'read-tables': { ...tables, attempts: 5, mastery: 60 } })).toBe(true)
   })
 })

@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Daten und Diagramme 0.16.0
+
+- Die neuen adaptiven Kompetenzen `read-tables` und `read-charts` führen von direktem Tabellenlesen über Strichlisten und Bilddiagramme zu Vergleichen, fehlenden Werten und dem Darstellungswechsel Tabelle zu Säulendiagramm.
+- Diagramme werden erst nach mindestens fünf Tabellenversuchen und Lernwert 60 ausgewählt. Schwierigkeit entsteht durch Vergleich, Ergänzen und Darstellungswechsel, nicht bloß durch größere Zahlen.
+- Katalog 0.15.0 und Schema 14 ergänzen sechs geprüfte Datensätze sowie verbindliche Beschriftungen. Berechnung, Variation, Eindeutigkeit und Distraktoren bleiben in TypeScript.
+- Die mobile Runtime rendert Tabellen, gebündelte Strichlisten, 1:1-Bilddiagramme und gleich skalierte Säulen. Fehlende Werte bleiben bis zur richtigen Lösung maskiert.
+- Kreisdiagramme, manipulierte Achsen, freie Diagrammerstellung und eigene Datenerhebungen bleiben ausgeschlossen. Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 276 Unit-/Komponententests, Produktionsbuild und 14 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.16.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Darstellungen ohne vorweggenommene Lösung 0.15.1
 
 - Jede `ExerciseRepresentation` deklariert `knownValues`, `unknownValues` und `revealedValues`. Der zentrale Renderer verwirft unvollständige, überlappende oder unzulässig aufgedeckte Rollen sichtbar.

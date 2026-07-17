@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 13,
-  "catalogVersion": "0.14.1",
+  "schemaVersion": 14,
+  "catalogVersion": "0.15.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -3492,6 +3492,315 @@
         "Beim Aufklappen eines einfachen Faltschnitts erscheinen genau zwei symmetrische Markierungen.",
         "Mehrfachfaltungen und Körpernetze werden nicht erzeugt."
       ]
+    },
+    {
+      "id": "read-tables",
+      "label": "Tabellen und Strichlisten",
+      "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
+      "supportGoal": "Daten aus übersichtlichen Tabellen und Strichlisten entnehmen, vergleichen und einen fehlenden Wert aus einer bekannten Gesamtzahl bestimmen.",
+      "misconceptions": [
+        "Zeile und Spalte werden vertauscht.",
+        "Bei einer Strichliste wird der Fünferblock als vier einzelne Striche gelesen.",
+        "Beim Vergleich wird die größere Anzahl genannt statt des Unterschieds.",
+        "Ein fehlender Tabellenwert wird geschätzt, ohne die bekannte Gesamtzahl zu nutzen."
+      ],
+      "hints": [
+        "Suche zuerst die passende Zeile und lies dann nur den Wert in dieser Zeile.",
+        "Bei einem fehlenden Wert: Addiere die bekannten Werte und ergänze bis zur Gesamtzahl."
+      ],
+      "prompt": "Lies die Daten genau und beantworte die Frage.",
+      "errorFeedback": "Prüfe noch einmal, welche Zeile gefragt ist und was die Zahl dort bedeutet.",
+      "explanation": "Eine Tabelle ordnet jeder Kategorie genau einen Wert zu. Strichlisten bündeln fünf Striche übersichtlich zu einem Fünferblock.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 36
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Kategorien und Häufigkeiten werden zwischen Tabelle und Strichliste verbunden."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Vergleiche und fehlende Werte werden aus den dargestellten Daten begründet."
+        }
+      ],
+      "prerequisites": [
+        "Zahlen bis 40 lesen",
+        "Kategorien unterscheiden",
+        "Addieren und Ergänzen im kleinen Zahlenraum"
+      ],
+      "representations": [
+        "Zweispaltige Tabelle",
+        "Strichliste mit Fünferbündelung"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Einen direkt sichtbaren Tabellenwert zu einer genannten Kategorie ablesen",
+          "numberRange": "drei Kategorien, Werte 2 bis 12",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Zwei Werte in einer Strichliste vergleichen und den Unterschied bestimmen",
+          "numberRange": "drei Kategorien, Unterschied 1 bis 10",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Einen verdeckten Tabellenwert aus zwei bekannten Werten und der Gesamtzahl ergänzen",
+          "numberRange": "drei Kategorien, Gesamtzahl bis 36",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "In der Zeile Äpfel steht 7. Dann wurden 7 Äpfel gezählt. Fehlt ein Wert bei insgesamt 15 und sind 6 sowie 4 bekannt, fehlen 5.",
+      "successFeedback": "Du hast die Daten passend zur Frage gelesen.",
+      "remediation": {
+        "strategy": "Markiere gedanklich nur die gesuchte Zeile. Bei einer Differenz lege die kleinere Anzahl unter die größere.",
+        "foundationStrategy": "Beginne mit einer einfachen Tabelle und lies einen direkt sichtbaren Wert ab.",
+        "representation": "Tabelle mit drei klar getrennten Zeilen",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Erkläre, wie du einen fehlenden Wert findest, wenn die Gesamtzahl bekannt ist.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Kategorien und Werte in einer Tabelle benennen.",
+          "exerciseTypes": [
+            "read-tables:read"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Eine Tabellenzeile als zusammengehörige Information verstehen.",
+          "exerciseTypes": [
+            "read-tables:read"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Direkte Werte mit sichtbarer Tabelle ablesen.",
+          "exerciseTypes": [
+            "read-tables:read"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Strichlisten sicher lesen und Werte vergleichen.",
+          "exerciseTypes": [
+            "read-tables:compare"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Tabellen- und Strichlistenwerte zügig zuordnen.",
+          "exerciseTypes": [
+            "read-tables:compare"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Einen fehlenden Wert aus einer Gesamtzahl begründet ergänzen.",
+          "exerciseTypes": [
+            "read-tables:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Jede Kategorie besitzt genau einen eindeutigen Wert.",
+        "Fünferblöcke in Strichlisten werden korrekt gebündelt.",
+        "Vergleichsfragen besitzen genau einen positiven Unterschied.",
+        "Fehlende Werte sind aus Gesamtzahl und bekannten Werten eindeutig bestimmbar."
+      ]
+    },
+    {
+      "id": "read-charts",
+      "label": "Bild- und Säulendiagramme",
+      "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
+      "supportGoal": "Häufigkeiten aus Bild- und Säulendiagrammen lesen, vergleichen und eine zu denselben Daten passende Darstellung auswählen.",
+      "misconceptions": [
+        "Ein Symbol wird mit einer beliebigen statt der angegebenen Einheit verbunden.",
+        "Die Höhe einer Säule wird nach ihrer Fläche statt an der Skala gelesen.",
+        "Kategorien werden beim Vergleich vertauscht.",
+        "Eine ähnlich aussehende Darstellung wird gewählt, obwohl Werte vertauscht sind."
+      ],
+      "hints": [
+        "Ordne zuerst jede Kategorie ihrer Säule oder Symbolreihe zu.",
+        "Beim Darstellungswechsel müssen alle drei Werte in derselben Reihenfolge übereinstimmen."
+      ],
+      "prompt": "Lies das Diagramm und beantworte die Frage.",
+      "errorFeedback": "Vergleiche Kategorie und Höhe beziehungsweise Symbolzahl noch einmal.",
+      "explanation": "Diagramme stellen dieselben Daten anders dar. Entscheidend sind Kategorie, Wert und eine gleichmäßige Skala.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 12
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Dieselben Daten werden zwischen Tabelle, Bild- und Säulendiagramm übertragen."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind begründet Vergleiche anhand der dargestellten Werte statt anhand der Bildfläche."
+        }
+      ],
+      "prerequisites": [
+        "Mindestens fünf Tabellenversuche",
+        "Tabellenwerte sicher zuordnen",
+        "Zahlen bis 12 lesen"
+      ],
+      "representations": [
+        "Bilddiagramm mit Schlüssel 1 Symbol = 1",
+        "Säulendiagramm mit Nullpunkt und gleichmäßiger Skala",
+        "Tabelle als Ausgangsdarstellung"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Einen Wert in einem Bilddiagramm mit dem Schlüssel 1 Symbol = 1 ablesen",
+          "numberRange": "drei Kategorien, 2 bis 12 Symbole",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Zwei Säulen an einer gleichmäßigen Skala vergleichen und ihren Unterschied bestimmen",
+          "numberRange": "drei Kategorien, Werte 2 bis 12",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Zu einer Tabelle das einzige Säulendiagramm mit vollständig gleichen Werten auswählen",
+          "numberRange": "drei Kategorien, drei plausible Diagramme",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Zeigt die Säule Bücher den Wert 8 und Spiele den Wert 5, sind es 3 Bücher mehr. Beim Wechsel von der Tabelle müssen 8 und 5 unverändert bleiben.",
+      "successFeedback": "Du hast Kategorie und dargestellten Wert richtig verbunden.",
+      "remediation": {
+        "strategy": "Fahre Kategorie für Kategorie von der Beschriftung zur Säule oder Symbolreihe und lies den Wert am Nullpunkt beginnend ab.",
+        "foundationStrategy": "Kehre zu einer Tabelle mit denselben drei Kategorien zurück und ordne die Werte direkt zu.",
+        "representation": "Bilddiagramm mit einem Symbol pro Einheit und sichtbarem Schlüssel",
+        "keepSubskill": false
+      },
+      "transferPrompt": "Erkläre, woran du erkennst, dass Tabelle und Diagramm wirklich dieselben Daten zeigen.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Kategorien und Symbolschlüssel benennen.",
+          "exerciseTypes": [
+            "read-charts:read"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Symbolzahl beziehungsweise Säulenhöhe als Häufigkeit verstehen.",
+          "exerciseTypes": [
+            "read-charts:read"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Werte aus einem Bilddiagramm ablesen.",
+          "exerciseTypes": [
+            "read-charts:read"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Säulenwerte vergleichen und Unterschiede bestimmen.",
+          "exerciseTypes": [
+            "read-charts:compare"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bild- und Säulendiagramme sicher lesen.",
+          "exerciseTypes": [
+            "read-charts:compare"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Eine passende Darstellung zu gegebenen Tabellendaten auswählen.",
+          "exerciseTypes": [
+            "read-charts:transfer"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Bilddiagramme verwenden ausschließlich den sichtbaren Schlüssel 1 Symbol = 1.",
+        "Säulendiagramme beginnen bei 0 und verwenden eine gleichmäßige ganzzahlige Skala.",
+        "Vergleichsfragen besitzen genau einen eindeutigen Unterschied.",
+        "Bei Darstellungswechseln stimmt genau eine Option in allen Kategorien überein."
+      ]
     }
   ],
   "wordProblems": [
@@ -5330,5 +5639,132 @@
       "checkError": "Addiere Differenz und Subtrahend. Die Probe muss wieder den Minuenden ergeben.",
       "checkSuccess": "Die Probe ergibt wieder {first}. Deine Subtraktion passt."
     }
+  },
+  "dataAndCharts": {
+    "entryRationale": "Tabellen reduzieren die Darstellungsanforderung und bilden deshalb den Einstieg. Erst nach sicherem Zuordnen folgen Strichliste, Bilddiagramm, Säulendiagramm und der Wechsel zwischen Darstellungen.",
+    "valueLabel": "Anzahl",
+    "totalLabel": "Insgesamt",
+    "missingLabel": "fehlt",
+    "displayLabels": {
+      "table": "Tabelle",
+      "tally": "Strichliste",
+      "pictogram": "Bilddiagramm",
+      "bar": "Säulendiagramm"
+    },
+    "prompts": {
+      "tableRead": "Wie viele {unitLabel} gehören zu „{category}“?",
+      "tallyCompare": "Wie viele {unitLabel} mehr zeigt „{larger}“ als „{smaller}“?",
+      "tableMissing": "Insgesamt sind es {total} {unitLabel}. Welcher Wert fehlt bei „{category}“?",
+      "pictogramRead": "Wie viele {unitLabel} zeigt das Bilddiagramm bei „{category}“?",
+      "barCompare": "Um wie viele {unitLabel} ist die Säule „{larger}“ höher als „{smaller}“?",
+      "representationMatch": "Welches Säulendiagramm zeigt genau dieselben Daten wie die Tabelle?"
+    },
+    "distractorFeedback": {
+      "wrongRow": "Benachbarte Tabellenzeile oder Nachbarwert gelesen",
+      "wrongDifference": "Größeren Einzelwert statt Unterschied gelesen",
+      "wrongCompletion": "Bekannten Wert übernommen oder falsch bis zur Gesamtzahl ergänzt",
+      "wrongPictogram": "Symbole einer anderen Kategorie oder einen Nachbarwert gezählt",
+      "wrongBarDifference": "Säulenhöhe statt Unterschied genannt",
+      "swappedCategories": "Zwei Kategorien vertauscht",
+      "changedValue": "Einen Säulenwert verändert"
+    },
+    "templates": [
+      {
+        "id": "fruit-votes",
+        "title": "Lieblingsobst",
+        "categories": [
+          "Apfel",
+          "Banane",
+          "Birne"
+        ],
+        "baseValues": [
+          4,
+          7,
+          5
+        ],
+        "unitLabel": "Stimmen",
+        "symbolLabel": "Punkt"
+      },
+      {
+        "id": "book-topics",
+        "title": "Ausgeliehene Bücher",
+        "categories": [
+          "Abenteuer",
+          "Tiere",
+          "Wissen"
+        ],
+        "baseValues": [
+          6,
+          3,
+          8
+        ],
+        "unitLabel": "Bücher",
+        "symbolLabel": "Buchzeichen"
+      },
+      {
+        "id": "weather-days",
+        "title": "Wettertage",
+        "categories": [
+          "Sonne",
+          "Wolken",
+          "Regen"
+        ],
+        "baseValues": [
+          5,
+          4,
+          2
+        ],
+        "unitLabel": "Tage",
+        "symbolLabel": "Wetterpunkt"
+      },
+      {
+        "id": "school-way",
+        "title": "Schulweg",
+        "categories": [
+          "zu Fuß",
+          "Fahrrad",
+          "Bus"
+        ],
+        "baseValues": [
+          7,
+          5,
+          3
+        ],
+        "unitLabel": "Kinder",
+        "symbolLabel": "Wegpunkt"
+      },
+      {
+        "id": "favorite-colors",
+        "title": "Lieblingsfarben",
+        "categories": [
+          "Blau",
+          "Grün",
+          "Rot"
+        ],
+        "baseValues": [
+          6,
+          4,
+          5
+        ],
+        "unitLabel": "Stimmen",
+        "symbolLabel": "Farbpunkt"
+      },
+      {
+        "id": "sports",
+        "title": "Sport am Nachmittag",
+        "categories": [
+          "Fußball",
+          "Schwimmen",
+          "Tanzen"
+        ],
+        "baseValues": [
+          8,
+          4,
+          6
+        ],
+        "unitLabel": "Kinder",
+        "symbolLabel": "Sportpunkt"
+      }
+    ]
   }
 }

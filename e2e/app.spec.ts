@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.14.1',
-    schemaVersion: 13,
-    appVersion: '0.15.1'
+    catalogVersion: '0.15.0',
+    schemaVersion: 14,
+    appVersion: '0.16.0'
   })
 
   await page.reload()
@@ -124,6 +124,38 @@ test('Landscape bleibt vollständig bedienbar und ohne horizontales Overflow', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await expect(page.locator('.exercise-panel')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'read-tables'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Daten')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  await expect(page.locator('.data-display')).toBeVisible()
+  await expect(page.locator('.data-table, .tally-list')).toBeVisible()
+  await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('daten-375x812.png'), fullPage: true })
+
+  await page.setViewportSize({ width: 812, height: 375 })
+  await expect(page.locator('.data-display')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 

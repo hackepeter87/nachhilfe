@@ -26,9 +26,10 @@ import {
   type FoldingMode,
   type FoldingTemplate
 } from '../domain/folding'
+import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisplays'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 13
+export const CATALOG_SCHEMA_VERSION = 14
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -406,6 +407,17 @@ export interface SpatialFoldingContent {
   templates: FoldingTemplateContent[]
 }
 
+export interface DataAndChartsContent {
+  entryRationale: string
+  valueLabel: string
+  totalLabel: string
+  missingLabel: string
+  displayLabels: Record<'table' | 'tally' | 'pictogram' | 'bar', string>
+  prompts: Record<'tableRead' | 'tallyCompare' | 'tableMissing' | 'pictogramRead' | 'barCompare' | 'representationMatch', string>
+  distractorFeedback: Record<'wrongRow' | 'wrongDifference' | 'wrongCompletion' | 'wrongPictogram' | 'wrongBarDifference' | 'swappedCategories' | 'changedValue', string>
+  templates: DataSetTemplate[]
+}
+
 export interface TaskCatalog extends CatalogMetadata {
   representationPolicy: RepresentationPolicy
   fieldUsage: Record<'representationPolicy' | 'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
@@ -427,6 +439,7 @@ export interface TaskCatalog extends CatalogMetadata {
   spatialViews: SpatialViewsContent
   spatialRotations: SpatialRotationsContent
   spatialFolding: SpatialFoldingContent
+  dataAndCharts: DataAndChartsContent
 }
 
 type FetchCatalog = (input: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>
@@ -446,7 +459,8 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
+  'category', 'larger', 'smaller', 'unitLabel'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -601,6 +615,21 @@ function isSpatialFoldingContent(value: unknown): value is SpatialFoldingContent
     axesByDifficulty.get(1)?.size === 1 && axesByDifficulty.get(1)?.has('vertical') === true &&
     ['vertical', 'horizontal'].every((axis) => axesByDifficulty.get(2)?.has(axis as FoldAxis)) &&
     ['vertical', 'horizontal'].every((axis) => axesByDifficulty.get(3)?.has(axis as FoldAxis))
+}
+
+function isDataAndChartsContent(value: unknown): value is DataAndChartsContent {
+  if (!isRecord(value) || !isNonEmptyString(value.entryRationale) || !isNonEmptyString(value.valueLabel) ||
+    !isNonEmptyString(value.totalLabel) || !isNonEmptyString(value.missingLabel) || !isRecord(value.displayLabels)) return false
+  const displayLabels = value.displayLabels
+  if (!['table', 'tally', 'pictogram', 'bar'].every((key) => isNonEmptyString(displayLabels[key]))) return false
+  if (!isRecord(value.prompts)) return false
+  const prompts = value.prompts
+  if (!['tableRead', 'tallyCompare', 'tableMissing', 'pictogramRead', 'barCompare', 'representationMatch'].every((key) => isNonEmptyString(prompts[key]))) return false
+  if (!isRecord(value.distractorFeedback)) return false
+  const distractorFeedback = value.distractorFeedback
+  if (!['wrongRow', 'wrongDifference', 'wrongCompletion', 'wrongPictogram', 'wrongBarDifference', 'swappedCategories', 'changedValue'].every((key) => isNonEmptyString(distractorFeedback[key]))) return false
+  if (!Array.isArray(value.templates) || value.templates.length < 6 || !value.templates.every(isValidDataSetTemplate)) return false
+  return new Set(value.templates.map((template) => (template as DataSetTemplate).id)).size === value.templates.length
 }
 
 const REQUIREMENT_FIELDS = [
@@ -799,7 +828,7 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) ||
     !isSpatialViewsContent(value.spatialViews) || !isSpatialRotationsContent(value.spatialRotations) ||
-    !isSpatialFoldingContent(value.spatialFolding)) return false
+    !isSpatialFoldingContent(value.spatialFolding) || !isDataAndChartsContent(value.dataAndCharts)) return false
   return hasOnlyKnownPlaceholders(value)
 }
 

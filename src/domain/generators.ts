@@ -15,6 +15,7 @@ import {
   type CubeViewDirection
 } from './cubeViews'
 import { createFoldingOutcomes, foldingCellsKey, type FoldingTemplate } from './folding'
+import { createDataDistractors, sameDataValues, varyDataValues, type DataDisplayType, type DataSetTemplate } from './dataDisplays'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1483,6 +1484,198 @@ function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise
   })
 }
 
+function dataDisplayRepresentation(
+  displayType: DataDisplayType,
+  template: DataSetTemplate,
+  dataValues: number[],
+  label: string,
+  hiddenIndex = -1,
+  total = dataValues.reduce((sum, value) => sum + value, 0),
+  unknownValues: string[] = [],
+  scaleMax = Math.max(...dataValues)
+): ExerciseRepresentation {
+  const displayedValues = hiddenIndex >= 0
+    ? dataValues.map((value, index) => index === hiddenIndex ? -1 : value)
+    : dataValues
+  const values: ExerciseRepresentation['values'] = {
+    displayType,
+    title: template.title,
+    category0: template.categories[0],
+    category1: template.categories[1],
+    category2: template.categories[2],
+    dataValues: displayedValues,
+    unitLabel: template.unitLabel,
+    symbolLabel: template.symbolLabel,
+    totalLabel: getTaskCatalog().dataAndCharts.totalLabel,
+    hiddenIndex,
+    total,
+    scaleMax
+  }
+  if (hiddenIndex >= 0) values.missingValue = dataValues[hiddenIndex]!
+  const hiddenRoles = hiddenIndex >= 0 ? [...unknownValues, 'missingValue'] : unknownValues
+  return {
+    kind: 'data-display',
+    visibility: 'always',
+    label,
+    values,
+    valueRoles: {
+      knownValues: Object.keys(values).filter((key) => key !== 'missingValue'),
+      unknownValues: hiddenRoles,
+      revealedValues: []
+    }
+  }
+}
+
+function dataExerciseValues(template: DataSetTemplate, values: number[], targetIndex: number): Record<string, number | string> {
+  return {
+    templateId: template.id,
+    title: template.title,
+    first: values[0]!,
+    second: values[1]!,
+    third: values[2]!,
+    category: template.categories[targetIndex]!,
+    answer: values[targetIndex]!,
+    unitLabel: template.unitLabel
+  }
+}
+
+function readTables(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().dataAndCharts
+  const template = pick(random, content.templates)
+  const dataValues = varyDataValues(template, seed)
+  const targetIndex = integer(random, 0, 2)
+  const generatedValues = dataExerciseValues(template, dataValues, targetIndex)
+  const generatedContent = contentFor('read-tables', generatedValues, difficulty)
+
+  if (difficulty === 1) {
+    const answer = dataValues[targetIndex]!
+    return withMetadata({
+      ...base('read-tables', seed, difficulty, generatedValues),
+      ...generatedContent,
+      prompt: renderCatalogText(content.prompts.tableRead, generatedValues),
+      typeId: 'table-read',
+      subskillId: 'table-read-value',
+      answerMode: 'choice',
+      correctAnswer: String(answer),
+      options: numberOptions(random, answer, createDataDistractors(answer, dataValues).map((value) => ({ value, misconception: content.distractorFeedback.wrongRow }))),
+      representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`)
+    })
+  }
+
+  const largest = Math.max(...dataValues)
+  const smallest = Math.min(...dataValues)
+  const largestIndex = dataValues.indexOf(largest)
+  const smallestIndex = dataValues.indexOf(smallest)
+  if (difficulty === 2) {
+    const answer = largest - smallest
+    return withMetadata({
+      ...base('read-tables', seed, difficulty, { ...generatedValues, answer, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
+      ...generatedContent,
+      prompt: renderCatalogText(content.prompts.tallyCompare, { ...generatedValues, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
+      typeId: 'tally-compare',
+      subskillId: 'tally-compare-values',
+      answerMode: 'choice',
+      correctAnswer: String(answer),
+      options: numberOptions(random, answer, createDataDistractors(answer, [largest, smallest]).map((value) => ({ value, misconception: content.distractorFeedback.wrongDifference }))),
+      representation: dataDisplayRepresentation('tally', template, dataValues, `${content.displayLabels.tally}: ${template.title}`, -1, largest + smallest, ['difference'])
+    })
+  }
+
+  const total = dataValues.reduce((sum, value) => sum + value, 0)
+  const answer = dataValues[targetIndex]!
+  return withMetadata({
+    ...base('read-tables', seed, difficulty, { ...generatedValues, total }),
+    ...generatedContent,
+    prompt: renderCatalogText(content.prompts.tableMissing, { ...generatedValues, total }),
+    typeId: 'table-missing',
+    subskillId: 'table-complete-total',
+    answerMode: 'choice',
+    correctAnswer: String(answer),
+    options: numberOptions(random, answer, createDataDistractors(answer, dataValues).map((value) => ({ value, misconception: content.distractorFeedback.wrongCompletion }))),
+    representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, targetIndex, total, ['missing-value'])
+  })
+}
+
+function readCharts(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().dataAndCharts
+  const template = pick(random, content.templates)
+  const dataValues = varyDataValues(template, seed)
+  const targetIndex = integer(random, 0, 2)
+  const generatedValues = dataExerciseValues(template, dataValues, targetIndex)
+  const generatedContent = contentFor('read-charts', generatedValues, difficulty)
+
+  if (difficulty === 1) {
+    const answer = dataValues[targetIndex]!
+    return withMetadata({
+      ...base('read-charts', seed, difficulty, generatedValues),
+      ...generatedContent,
+      prompt: renderCatalogText(content.prompts.pictogramRead, generatedValues),
+      typeId: 'pictogram-read',
+      subskillId: 'pictogram-read-one-to-one',
+      answerMode: 'choice',
+      correctAnswer: String(answer),
+      options: numberOptions(random, answer, createDataDistractors(answer, dataValues).map((value) => ({ value, misconception: content.distractorFeedback.wrongPictogram }))),
+      representation: dataDisplayRepresentation('pictogram', template, dataValues, `${content.displayLabels.pictogram}: ${template.title}`)
+    })
+  }
+
+  const largest = Math.max(...dataValues)
+  const smallest = Math.min(...dataValues)
+  const largestIndex = dataValues.indexOf(largest)
+  const smallestIndex = dataValues.indexOf(smallest)
+  if (difficulty === 2) {
+    const answer = largest - smallest
+    return withMetadata({
+      ...base('read-charts', seed, difficulty, { ...generatedValues, answer, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
+      ...generatedContent,
+      prompt: renderCatalogText(content.prompts.barCompare, { ...generatedValues, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
+      typeId: 'bar-compare',
+      subskillId: 'bar-compare-values',
+      answerMode: 'choice',
+      correctAnswer: String(answer),
+      options: numberOptions(random, answer, createDataDistractors(answer, [largest, smallest]).map((value) => ({ value, misconception: content.distractorFeedback.wrongBarDifference }))),
+      representation: dataDisplayRepresentation('bar', template, dataValues, `${content.displayLabels.bar}: ${template.title}`, -1, largest + smallest, ['difference'])
+    })
+  }
+
+  const swapped = [...dataValues] as [number, number, number]
+  const swappablePair = ([[0, 1], [0, 2], [1, 2]] as const).find(([first, second]) => dataValues[first] !== dataValues[second])
+  if (swappablePair) {
+    const [first, second] = swappablePair
+    ;[swapped[first], swapped[second]] = [swapped[second], swapped[first]]
+  } else {
+    swapped[0] = swapped[0] === 12 ? 11 : swapped[0] + 1
+  }
+  const changed: [number, number, number] = [...dataValues] as [number, number, number]
+  changed[2] = changed[2] === 12 ? 11 : changed[2] + 1
+  if (sameDataValues(swapped, dataValues) || sameDataValues(changed, dataValues)) throw new Error('Diagramm-Distraktoren sind nicht unterscheidbar.')
+  const candidates = shuffle(random, [
+    { value: 'same', values: dataValues, misconception: undefined },
+    { value: 'swapped', values: swapped, misconception: content.distractorFeedback.swappedCategories },
+    { value: 'changed', values: changed, misconception: content.distractorFeedback.changedValue }
+  ])
+  const sharedScaleMaximum = Math.max(...candidates.flatMap((candidate) => candidate.values))
+  const options = candidates.map((candidate, index) => ({
+    value: candidate.value,
+    label: `Diagramm ${String.fromCharCode(65 + index)}`,
+    misconception: candidate.misconception,
+    representation: dataDisplayRepresentation('bar', template, candidate.values, `Diagramm ${String.fromCharCode(65 + index)} zu ${template.title}`, -1, candidate.values.reduce((sum, value) => sum + value, 0), [], sharedScaleMaximum)
+  }))
+  return withMetadata({
+    ...base('read-charts', seed, difficulty, generatedValues),
+    ...generatedContent,
+    prompt: content.prompts.representationMatch,
+    typeId: 'representation-match',
+    subskillId: 'table-to-bar-match',
+    answerMode: 'choice',
+    correctAnswer: 'same',
+    options,
+    representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, -1, dataValues.reduce((sum, value) => sum + value, 0), ['matching-display'])
+  })
+}
+
 export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
   switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus)
@@ -1508,6 +1701,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'body-views': return bodyViews(seed, difficulty)
     case 'cube-rotation': return cubeRotation(seed, difficulty, focus)
     case 'folding': return folding(seed, difficulty, focus)
+    case 'read-tables': return readTables(seed, difficulty)
+    case 'read-charts': return readCharts(seed, difficulty)
   }
 }
 

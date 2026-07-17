@@ -1,6 +1,7 @@
 export * from './types'
 export * from './cubeViews'
 export * from './folding'
+export * from './dataDisplays'
 export * from './generators'
 export * from './progress'
 export * from './session'

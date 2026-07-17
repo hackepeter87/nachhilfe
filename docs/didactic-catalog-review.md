@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.15.1, Katalog 0.14.1, Schema 13, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.16.0, Katalog 0.15.0, Schema 14, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -23,7 +23,7 @@ Stand: App 0.15.1, Katalog 0.14.1, Schema 13, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.15.1
+## Aktive Veränderungen bis 0.16.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -48,6 +48,7 @@ Stand: App 0.15.1, Katalog 0.14.1, Schema 13, Status ready-for-review. Diese Dat
 - App 0.14.0 und Schema 11: `cube-rotation` dreht katalogisierte Gebäude kontrolliert um 90 Grad nach links oder rechts. Achse und Richtung bleiben sichtbar; Ausgangslage, korrekte Drehung und Gegenrichtung müssen paarweise verschieden sein. Die adaptive Auswahl setzt fünf Körperansichtsversuche und Lernwert 60 voraus.
 - App 0.15.0 und Schema 12: `folding` verfolgt einen Punkt bei genau einer gerichteten Faltung und öffnet auf Stufe 3 einen einfachen Faltschnitt. Gerade Raster halten die Achse zwischen Zellen; die adaptive Auswahl setzt Symmetriephase 3 voraus.
 - App 0.15.1 und Schema 13: Jede Darstellung deklariert mathematische Rollen. Rechenstrich, Nachbarzahlen, Ergänzen, Division, Geld und Messstrecke maskieren gesuchte Werte auch in Screenreader-Texten; widersprüchliche Rollen schlagen sichtbar fehl.
+- App 0.16.0, Katalog 0.15.0 und Schema 14: Tabellenlesen, Strichlisten, Bild- und Säulendiagramme sind als zwei adaptive Kompetenzen aktiv. Diagramme setzen tragfähiges Tabellenlesen voraus; fehlende Werte bleiben maskiert.
 
 ## Bewusst deaktiviert
 

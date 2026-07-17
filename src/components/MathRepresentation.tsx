@@ -261,6 +261,75 @@ export function MathRepresentation({ representation }: { representation: Exercis
     )
   }
 
+  if (representation.kind === 'data-display') {
+    const displayType = String(values.displayType)
+    const categories = [values.category0, values.category1, values.category2]
+    const storedValues = Array.isArray(values.dataValues) ? values.dataValues : []
+    const hiddenIndex = Number(values.hiddenIndex)
+    const missingVisible = hiddenIndex >= 0 && isValueVisible('missingValue')
+    const dataValues = storedValues.map((value, index) => index === hiddenIndex && missingVisible ? Number(values.missingValue) : Number(value))
+    const valid = ['table', 'tally', 'pictogram', 'bar'].includes(displayType) &&
+      categories.every((category) => typeof category === 'string' && category.length > 0) &&
+      new Set(categories).size === 3 && storedValues.length === 3 &&
+      dataValues.every((value, index) => Number.isInteger(value) && value >= (index === hiddenIndex && !missingVisible ? -1 : 0) && value <= 12) &&
+      Number.isInteger(hiddenIndex) && hiddenIndex >= -1 && hiddenIndex <= 2
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Datendarstellung ist unvollständig.</div>
+
+    const visibleLabel = (index: number) => index === hiddenIndex && !missingVisible ? 'unbekannt' : String(dataValues[index])
+    const description = `${representation.label}. ${categories.map((category, index) => `${category}: ${visibleLabel(index)}`).join(', ')}.`
+    const rows = categories.map((category, index) => ({ category: String(category), value: dataValues[index]!, hidden: index === hiddenIndex && !missingVisible }))
+
+    if (displayType === 'table') {
+      return (
+        <div className="math-visual data-display" role="img" aria-label={description}>
+          <strong className="data-display-title">{textValue(values.title)}</strong>
+          <table className="data-table" aria-hidden="true">
+            <thead><tr><th>Kategorie</th><th>{textValue(values.unitLabel)}</th></tr></thead>
+            <tbody>{rows.map((row) => <tr key={row.category}><th>{row.category}</th><td className={row.hidden ? 'data-value--unknown' : ''}>{row.hidden ? '?' : row.value}</td></tr>)}</tbody>
+            {hiddenIndex >= 0 && <tfoot><tr><th>{textValue(values.totalLabel) || 'Insgesamt'}</th><td>{Number(values.total)}</td></tr></tfoot>}
+          </table>
+        </div>
+      )
+    }
+
+    if (displayType === 'tally') {
+      return (
+        <div className="math-visual data-display" role="img" aria-label={description}>
+          <strong className="data-display-title">{textValue(values.title)}</strong>
+          <div className="tally-list" aria-hidden="true">{rows.map((row) => (
+            <div className="tally-row" key={row.category}><span>{row.category}</span><span className="tally-marks">{Array.from({ length: row.value }, (_, index) => <i className={(index + 1) % 5 === 0 ? 'tally-mark tally-mark--fifth' : 'tally-mark'} key={index} />)}</span></div>
+          ))}</div>
+        </div>
+      )
+    }
+
+    if (displayType === 'pictogram') {
+      return (
+        <div className="math-visual data-display" role="img" aria-label={description}>
+          <strong className="data-display-title">{textValue(values.title)}</strong>
+          <div className="pictogram" aria-hidden="true">{rows.map((row) => (
+            <div className="pictogram-row" key={row.category}><span>{row.category}</span><span>{Array.from({ length: row.value }, (_, index) => <i key={index} />)}</span></div>
+          ))}</div>
+          <small>1 Punkt = 1 {textValue(values.symbolLabel)}</small>
+        </div>
+      )
+    }
+
+    const maximum = Math.max(1, Number(values.scaleMax))
+    return (
+      <div className="math-visual data-display" role="img" aria-label={description}>
+        <strong className="data-display-title">{textValue(values.title)}</strong>
+        <div className="bar-chart" aria-hidden="true">{rows.map((row) => (
+          <div className="bar-chart-column" key={row.category}>
+            <span>{row.value}</span>
+            <i style={{ height: `${Math.max(12, row.value / maximum * 100)}%` }} />
+            <b>{row.category}</b>
+          </div>
+        ))}</div>
+      </div>
+    )
+  }
+
   if (representation.kind === 'number-line') {
     const start = Number(values.start)
     const end = Number(values.end)

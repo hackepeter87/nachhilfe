@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 13
+export const CATALOG_SCHEMA_VERSION = 14
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -18,7 +18,8 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
+  'category', 'larger', 'smaller', 'unitLabel'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -458,6 +459,32 @@ function validateSpatialFolding(spatialFolding) {
   }
 }
 
+function validateDataAndCharts(dataAndCharts) {
+  if (!isRecord(dataAndCharts)) fail('dataAndCharts fehlt')
+  for (const field of ['entryRationale', 'valueLabel', 'totalLabel', 'missingLabel']) requireText(dataAndCharts, field, 'dataAndCharts')
+  for (const display of ['table', 'tally', 'pictogram', 'bar']) {
+    if (!isText(dataAndCharts.displayLabels?.[display])) fail(`dataAndCharts.displayLabels.${display} fehlt`)
+  }
+  for (const prompt of ['tableRead', 'tallyCompare', 'tableMissing', 'pictogramRead', 'barCompare', 'representationMatch']) {
+    if (!isText(dataAndCharts.prompts?.[prompt])) fail(`dataAndCharts.prompts.${prompt} fehlt`)
+  }
+  for (const feedback of ['wrongRow', 'wrongDifference', 'wrongCompletion', 'wrongPictogram', 'wrongBarDifference', 'swappedCategories', 'changedValue']) {
+    if (!isText(dataAndCharts.distractorFeedback?.[feedback])) fail(`dataAndCharts.distractorFeedback.${feedback} fehlt`)
+  }
+  if (!Array.isArray(dataAndCharts.templates) || dataAndCharts.templates.length < 6) fail('dataAndCharts.templates ist unvollständig')
+  requireUnique(dataAndCharts.templates.map((template) => template.id), 'dataAndCharts.templates IDs')
+  dataAndCharts.templates.forEach((template) => {
+    for (const field of ['id', 'title', 'unitLabel', 'symbolLabel']) requireText(template, field, `dataAndCharts.templates.${template.id}`)
+    if (!Array.isArray(template.categories) || template.categories.length !== 3 || !template.categories.every(isText) || new Set(template.categories).size !== 3) {
+      fail(`dataAndCharts.templates.${template.id}.categories ist ungültig`)
+    }
+    if (!Array.isArray(template.baseValues) || template.baseValues.length !== 3 ||
+      !template.baseValues.every((value) => Number.isInteger(value) && value >= 2 && value <= 10)) {
+      fail(`dataAndCharts.templates.${template.id}.baseValues ist ungültig`)
+    }
+  })
+}
+
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
@@ -537,6 +564,7 @@ export function validateCatalog(catalog) {
   validateSpatialViews(catalog.spatialViews)
   validateSpatialRotations(catalog.spatialRotations)
   validateSpatialFolding(catalog.spatialFolding)
+  validateDataAndCharts(catalog.dataAndCharts)
   validatePlaceholders(catalog)
   return catalog
 }

@@ -22,7 +22,9 @@ const FOCUS_SKILLS: SkillId[] = [
   'lengths',
   'body-views',
   'cube-rotation',
-  'folding'
+  'folding',
+  'read-tables',
+  'read-charts'
 ]
 
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']
@@ -66,6 +68,10 @@ export function isSkillEligible(skillId: SkillId, progress: ProgressMap): boolea
   }
   if (skillId === 'folding') {
     return hasReachedPhase(progress.symmetry, 'automate')
+  }
+  if (skillId === 'read-charts') {
+    const tables = progress['read-tables']
+    return Boolean(tables && tables.attempts >= 5 && tables.mastery >= 60)
   }
   return true
 }
@@ -115,6 +121,12 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
   }
   if (skillId === 'folding') {
     return difficulty === 3 ? 'fold-cut-unfold' : 'fold-point'
+  }
+  if (skillId === 'read-tables') {
+    return difficulty === 1 ? 'table-read-value' : difficulty === 2 ? 'tally-compare-values' : 'table-complete-total'
+  }
+  if (skillId === 'read-charts') {
+    return difficulty === 1 ? 'pictogram-read-one-to-one' : difficulty === 2 ? 'bar-compare-values' : 'table-to-bar-match'
   }
   const candidates = skillId === 'addition'
     ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])

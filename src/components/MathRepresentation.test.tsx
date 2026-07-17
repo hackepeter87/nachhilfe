@@ -413,3 +413,38 @@ describe('MathRepresentation Falten', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
   })
 })
+
+describe('MathRepresentation Daten und Diagramme', () => {
+  const base = {
+    displayType: 'table', title: 'Obstwahl', category0: 'Apfel', category1: 'Birne', category2: 'Pflaume',
+    dataValues: [4, -1, 7], unitLabel: 'Stimmen', symbolLabel: 'Stimme', hiddenIndex: 1, total: 17, totalLabel: 'Insgesamt', missingValue: 6
+  }
+
+  it('maskiert einen fehlenden Tabellenwert auch in der zugänglichen Beschreibung', () => {
+    render(<MathRepresentation representation={{
+      kind: 'data-display', visibility: 'always', label: 'Tabelle Obstwahl', values: base,
+      valueRoles: { knownValues: Object.keys(base).filter((key) => key !== 'missingValue'), unknownValues: ['missingValue'], revealedValues: [] }
+    }} />)
+    const visual = screen.getByRole('img', { name: /Birne: unbekannt/i })
+    expect(visual).toHaveTextContent('?')
+    expect(visual).not.toHaveAccessibleName(/Birne: 6/i)
+  })
+
+  it('deckt den fehlenden Wert erst nach erfolgreicher Bearbeitung auf', () => {
+    render(<MathRepresentation representation={{
+      kind: 'data-display', visibility: 'always', label: 'Tabelle Obstwahl', values: base,
+      valueRoles: { knownValues: Object.keys(base).filter((key) => key !== 'missingValue'), unknownValues: ['missingValue'], revealedValues: ['missingValue'] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Birne: 6/i })).toHaveTextContent('6')
+  })
+
+  it.each(['tally', 'pictogram', 'bar'] as const)('rendert %s vollständig', (displayType) => {
+    const values = { ...base, displayType, dataValues: [4, 6, 7], hiddenIndex: -1 }
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'data-display', visibility: 'always', label: `Darstellung ${displayType}`, values,
+      valueRoles: { knownValues: Object.keys(values), unknownValues: [], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Apfel: 4, Birne: 6, Pflaume: 7/i })).toBeVisible()
+    expect(container.querySelector(displayType === 'tally' ? '.tally-list' : displayType === 'pictogram' ? '.pictogram' : '.bar-chart')).toBeInTheDocument()
+  })
+})
