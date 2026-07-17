@@ -1,5 +1,14 @@
 # Mathe-Reise
 
+## AMD64-Containerrelease 0.10.1
+
+- Der GHCR-Publish-Workflow baut neue Release-Images ausschließlich für die tatsächliche DMZ-Zielarchitektur `linux/amd64`.
+- `deploy/compose.yaml` pinnt `0.10.1` und deklariert `platform: linux/amd64`, damit ein unpassender Host nicht stillschweigend per Emulation betrieben wird.
+- README und Podman-Dokumentation beschreiben Architekturprüfung, Pull, Update und Rollback konsistent. Historische Registry-Tags und ihre vorhandenen Manifeste bleiben unverändert.
+- Der fachliche Katalog bleibt unverändert bei Version `0.8.0` und Schema `7`; Lerninhalte, PWA-Cache-Verhalten und lokale Persistenz ändern sich nicht.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 184 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und sechs Playwright-Szenarien jeweils gegen Vite Preview und den AMD64-Container. Das Image `mathe-reise:0.10.1` meldet `linux/amd64`, läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und ist `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert; ein echter iPhone-Test wurde ebenfalls nicht durchgeführt.
+
 ## Didaktische Symmetrieprogression 0.10.0
 
 - Symmetrie beginnt mit geraden rechteckigen Rastern und einer senkrechten Achse zwischen Spalten. Dadurch besitzt jede belegte Zelle genau einen Spiegelpartner; achsenfeste Zellen sind kein gleichzeitiger Sonderfall.

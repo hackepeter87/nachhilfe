@@ -10,15 +10,15 @@ Der Workflow `.github/workflows/publish-container.yml` veröffentlicht nach:
 ghcr.io/hackepeter87/nachhilfe
 ```
 
-Ein Git-Tag wie `v0.10.0` erzeugt die Image-Tags `0.10.0`, `sha-<kurzsha>` und `latest`. Eine manuelle Ausführung über `workflow_dispatch` erzeugt nur das nachvollziehbare SHA-Tag. Normale Pushes auf `main` veröffentlichen kein Image.
+Ein Git-Tag wie `v0.10.1` erzeugt die Image-Tags `0.10.1`, `sha-<kurzsha>` und `latest`. Eine manuelle Ausführung über `workflow_dispatch` erzeugt nur das nachvollziehbare SHA-Tag. Normale Pushes auf `main` veröffentlichen kein Image.
 
 Der Workflow setzt die OCI-Labels für Quelle, Revision, Version, Erstellungszeit, Lizenz, Titel und Beschreibung. Die dynamischen Werte kommen aus Git-Referenz und Build-Metadaten; im Dockerfile ist deshalb keine konkrete App-Version doppelt hinterlegt.
 
-Release-Images enthalten ein Multi-Arch-Manifest für `linux/amd64` und `linux/arm64`. Podman wählt beim Pull automatisch die zum DMZ-Host passende Variante; ein festes `platform`-Feld in der Compose-Datei ist deshalb nicht nötig.
+Release-Images werden ausschließlich für die DMZ-Zielarchitektur `linux/amd64` gebaut. Die Compose-Datei deklariert diese Plattform ausdrücklich, damit eine unpassende Hostarchitektur nicht stillschweigend über Emulation betrieben wird. Historische Tags behalten ihre bereits veröffentlichten Manifeste; erst Releases ab `0.10.1` sind AMD64-only.
 
 ## Voraussetzungen auf dem DMZ-Host
 
-- Linux-Host mit Podman und einem Compose-Provider
+- Linux-Host mit Architektur `x86_64` beziehungsweise `linux/amd64`, Podman und einem Compose-Provider
 - ein eigener unprivilegierter Betriebsbenutzer
 - ausgehender HTTPS-Zugriff auf `ghcr.io`
 - Reverse Proxy mit öffentlichem DNS-Namen und TLS-Zertifikat
@@ -29,6 +29,7 @@ Release-Images enthalten ein Multi-Arch-Manifest für `linux/amd64` und `linux/a
 ```bash
 podman --version
 podman compose version
+uname -m
 ```
 
 Siehe auch die [offizielle Podman-Compose-Dokumentation](https://docs.podman.io/en/latest/markdown/podman-compose.1.html).
@@ -40,7 +41,7 @@ Das erste erfolgreiche Publish legt das Paket in GitHub Container Registry an. F
 Ein öffentliches Paket kann ohne Anmeldung geladen werden:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.10.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.10.1
 ```
 
 Solange das Paket privat ist, erfolgt die Anmeldung mit einem technisch geeigneten GitHub-Token mit `read:packages`. Tokens gehören weder in die Compose-Datei noch in das Repository:
@@ -62,6 +63,7 @@ podman compose -f deploy/compose.yaml ps
 Der Container verwendet:
 
 - `read_only: true`
+- `platform: linux/amd64` passend zum DMZ-Host
 - ausschließlich `/tmp` als 16-MiB-tmpfs mit `noexec` und `nosuid`
 - keine Linux-Capabilities
 - `no-new-privileges`

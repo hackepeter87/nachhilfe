@@ -94,8 +94,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build -t mathe-reise:0.10.0 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.10.0
+docker build --platform linux/amd64 -t mathe-reise:0.10.1 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.10.1
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.

@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App `0.10.0`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App `0.10.1`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -15,7 +15,7 @@ Stand: App `0.10.0`, Katalog `0.8.0`, Schema `7`, Status `ready-for-review`. Die
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.10.0
+## Aktive Veränderungen bis 0.10.1
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.

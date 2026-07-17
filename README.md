@@ -98,7 +98,7 @@ Der Produktionsbuild scheitert bei einem ungültigen Katalog, `draft`/`disabled`
 Das Multi-Stage-Image baut die App mit Node.js 24 und liefert anschließend nur die statischen Dateien über einen unprivilegierten Nginx auf Port `8080` aus. Die Runtime enthält kein Node.js.
 
 ```bash
-docker build -t mathe-reise:local .
+docker build --platform linux/amd64 -t mathe-reise:local .
 docker run --rm --name mathe-reise -p 8080:8080 mathe-reise:local
 ```
 
@@ -116,7 +116,7 @@ npm run test:e2e:container
 Podman verwendet dieselben OCI-Artefakte:
 
 ```bash
-podman build -t mathe-reise:local .
+podman build --platform linux/amd64 -t mathe-reise:local .
 podman run --rm -p 8080:8080 mathe-reise:local
 ```
 
@@ -124,10 +124,10 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 
 ## GHCR und Podman Compose
 
-Versionierte Multi-Arch-Release-Images für `linux/amd64` und `linux/arm64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
+Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.10.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.10.1
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -168,6 +168,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.10.0
+## Release-Stand 0.10.1
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.10.0 beginnt Symmetrie mit geraden rechteckigen Rastern und einer sichtbaren Achse zwischen Zellen; ungerade Raster und achsenfeste Zellen folgen erst im sicheren Transfer. Die didaktischen Annahmen und Grenzen stehen in [docs/didactics/symmetry.md](docs/didactics/symmetry.md); die offene externe Abnahme bleibt in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.10.1 begrenzt GHCR-Veröffentlichung und Compose-Deployment auf die tatsächliche DMZ-Zielarchitektur `linux/amd64`; der fachliche Stand aus 0.10.0 und Katalog 0.8.0 bleiben unverändert. Die didaktischen Annahmen und Grenzen stehen in [docs/didactics/symmetry.md](docs/didactics/symmetry.md); die offene externe Abnahme bleibt in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
