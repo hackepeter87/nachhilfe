@@ -22,6 +22,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   const [message, setMessage] = useState('')
   const [messageKind, setMessageKind] = useState<MessageKind>('success')
   const [stepIndex, setStepIndex] = useState(0)
+  const [completedStepAnswers, setCompletedStepAnswers] = useState<Record<string, string>>({})
 
   const currentStep = exercise.steps?.[stepIndex]
   const currentInteraction = currentStep?.interaction ?? 'choice'
@@ -58,6 +59,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
       registerWrongAnswer(currentStep.errorFeedback)
       return
     }
+    setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: value }))
     setMessage(currentStep.successFeedback)
     setMessageKind('success')
     if (stepIndex === (exercise.steps?.length ?? 1) - 1) {
@@ -96,6 +98,30 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
     else setStepIndex((current) => current + 1)
   }
 
+  const displayedRepresentation = exercise.representation?.kind === 'column-calculation'
+    ? {
+        ...exercise.representation,
+        values: {
+          ...exercise.representation.values,
+          carry: completedStepAnswers.carry ? exercise.representation.values.carry : 0,
+          revealedDigits: [
+            completedStepAnswers.hundreds === undefined ? -1 : Number(completedStepAnswers.hundreds),
+            completedStepAnswers.tens === undefined ? -1 : Number(completedStepAnswers.tens),
+            completedStepAnswers.ones === undefined ? -1 : Number(completedStepAnswers.ones)
+          ],
+          activeColumn: currentStep?.id === 'ones'
+            ? 'ones'
+            : currentStep?.id === 'tens'
+              ? 'tens'
+              : currentStep?.id === 'hundreds'
+                ? 'hundreds'
+                : currentStep?.id === 'carry'
+                  ? 'carry'
+                  : 'none'
+        }
+      }
+    : exercise.representation
+
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
     return (
@@ -121,8 +147,8 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         <h2 id="exercise-title">{exercise.prompt}</h2>
       </div>
 
-      {exercise.answerMode !== 'guided-word' && exercise.representation && (exercise.representation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
-        <MathRepresentation representation={exercise.representation} />
+      {exercise.answerMode !== 'guided-word' && displayedRepresentation && (displayedRepresentation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
+        <MathRepresentation representation={displayedRepresentation} />
       )}
 
       {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice' || exercise.answerMode === 'guided-number') && currentStep && answerState === 'answering' && (

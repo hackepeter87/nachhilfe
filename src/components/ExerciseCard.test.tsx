@@ -129,6 +129,43 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'written-addition', correct: false }))
   })
 
+  it('trägt bei 618 + 226 Ergebnis und Übertrag von rechts nach links ein', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = structuredClone(generateExercise('written-addition', 42, 2))
+    exercise.prompt = 'Rechne 618 + 226 schriftlich.'
+    exercise.correctAnswer = '844'
+    exercise.variant.values = { ...exercise.variant.values, first: 618, second: 226, answer: 844 }
+    exercise.representation = {
+      ...exercise.representation!,
+      values: { first: 618, second: 226, operation: '+', carry: 1, carryColumn: 'tens' }
+    }
+    const answers: Record<string, string> = { ones: '4', carry: '1', tens: '4', hundreds: '8' }
+    exercise.steps = exercise.steps?.map((step) => ({ ...step, correctAnswer: answers[step.id]! }))
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    const result = () => container.querySelector('.column-row--result')?.textContent
+    const carry = () => container.querySelector('.column-row--carry')?.textContent?.trim()
+
+    expect(result()).toBe('???')
+    expect(carry()).toBe('')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), '4')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(result()).toBe('??4')
+    expect(carry()).toBe('')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), '1')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(result()).toBe('??4')
+    expect(carry()).toBe('1')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), '4')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(result()).toBe('?44')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), '8')
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(result()).toBe('844')
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
+
   it('führt eine zweischrittige Sachaufgabe bis zum Antwortsatz', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

@@ -1,6 +1,6 @@
 # Validierung und Konsolidierung 0.6
 
-Stand: App 0.11.0, Katalog 0.9.0, Schema 8. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
+Stand: App 0.11.1, Katalog 0.9.0, Schema 8. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
 
 ## Intern prüfbar
 

@@ -93,7 +93,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
     catalogId: 'nrw-klasse3-foerderkern',
     catalogVersion: '0.9.0',
     schemaVersion: 8,
-    appVersion: '0.11.0'
+    appVersion: '0.11.1'
   })
 
   await page.reload()
@@ -321,17 +321,28 @@ test('Schriftliche Addition wird nach den Voraussetzungen mobil vollständig bea
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
 
-  const column = page.getByRole('img', { name: /Schriftliche Addition .* Übertrag zur Zehnerspalte.*Ergebnis ist noch offen/i })
+  const column = page.getByRole('img', { name: /Schriftliche Addition .* Ergebnis ist noch offen/i })
   await expect(column).toBeVisible()
   const label = await column.getAttribute('aria-label')
   const [first, second] = label?.match(/\d+/g)?.map(Number) ?? []
   if (first === undefined || second === undefined) throw new Error('Summanden der Spaltendarstellung fehlen')
   const answer = first + second
   const stepAnswers = [answer % 10, 1, Math.floor(answer / 10) % 10, Math.floor(answer / 100)]
-  for (const stepAnswer of stepAnswers) {
+  const resultRow = column.locator('.column-row--result')
+  const carryRow = column.locator('.column-row--carry')
+  await expect(resultRow).toHaveText('???')
+  await expect(carryRow).toHaveText('')
+  for (const [index, stepAnswer] of stepAnswers.entries()) {
     await page.getByLabel('Dein Ergebnis').fill(String(stepAnswer))
     await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
+    if (index === 0) {
+      await expect(resultRow).toHaveText(`??${answer % 10}`)
+      await expect(carryRow).toHaveText('')
+    }
+    if (index === 1) await expect(carryRow).toHaveText('1')
+    if (index === 2) await expect(resultRow).toHaveText(`?${String(answer).slice(1)}`)
   }
+  await expect(resultRow).toHaveText(String(answer))
   await expect(page.getByText(/Die Hunderterziffer \d stimmt/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('schriftliche-addition-375x812.png'), fullPage: true })

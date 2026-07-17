@@ -16,7 +16,7 @@ describe('Sitzungsplanung', () => {
       catalogId: 'nrw-klasse3-foerderkern',
       catalogVersion: '0.9.0',
       schemaVersion: 8,
-      appVersion: '0.11.0'
+      appVersion: '0.11.1'
     })
   })
 

@@ -15,7 +15,7 @@ Zehn Einer werden zu einem Zehner und zehn Zehner zu einem Hunderter gebündelt.
 ## 7. Methodischer Zugang
 Stellenwerttafel und Spaltendarstellung zeigen denselben Vorgang. Jede Spalte wird als eigener überprüfbarer Schritt bearbeitet.
 ## 8. Geeignete Darstellungen
-Eine H-Z-E-Spaltendarstellung zeigt beide Summanden, Stellenbezeichnungen und bei Stufe 2 den sichtbaren Übertrag. Das Ergebnis bleibt bis zur Eingabe offen.
+Eine H-Z-E-Spaltendarstellung zeigt beide Summanden und Stellenbezeichnungen. Richtige Ergebnisziffern werden von rechts nach links eingetragen; bei Stufe 2 erscheint der Übertrag erst nach dem eigenen Übertragsschritt. Noch nicht bearbeitete Stellen bleiben offen.
 ## 9. Lernprogression
 Stufe 1 arbeitet ohne Übertrag und mit sichtbaren Stellen. Stufe 2 führt genau einen sichtbaren Einer-zu-Zehner-Übertrag als eigenen Schritt. Stufe 3 verlangt genau einen selbstständigen Übertrag von Einern oder Zehnern und zeigt die Spalte erst als Hilfe.
 ## 10. Aufgabentypen

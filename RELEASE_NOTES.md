@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Spaltenfolge und Übertrag 0.11.1
+
+- Ergebnisziffern werden nach korrekter Eingabe von den Einern über die Zehner zu den Hundertern in die Spaltendarstellung übernommen.
+- Der Übertrag wird nicht mehr vorweggenommen. Er erscheint erst, nachdem das Kind ihn im eigenen Übertragsschritt korrekt bestimmt hat, und wird anschließend in der Zehnerspalte mitgerechnet.
+- Die aktuell bearbeitete Stelle ist sichtbar markiert. Nach dem letzten Schritt steht das vollständig selbst errechnete Ergebnis in der Ergebniszeile.
+- Eine Komponentenregression bildet ausdrücklich `618 + 226 = 844` ab; der Mobile-Test prüft dieselbe schrittweise Darstellung bei `375 x 812`.
+
+Katalog `0.9.0` und Schema `8` bleiben unverändert. Eine Lehrkraftprüfung und ein echter iPhone-Test wurden nicht durchgeführt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 192 Unit-/Komponententests, Produktionsbuild und sieben Playwright-Szenarien jeweils gegen Vite Preview und das AMD64-Image. `mathe-reise:0.11.1` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Podman war nicht installiert.
+
 ## Schriftliche Addition 0.11.0
 
 - Die neue Kompetenz `written-addition` führt dreistellige Summanden zunächst ohne Übertrag, dann mit einem sichtbaren Einerübertrag und schließlich mit genau einem selbstständig erkannten Einer- oder Zehnerübertrag ein.

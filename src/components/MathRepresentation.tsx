@@ -46,15 +46,24 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const digits = (value: number) => [Math.floor(value / 100), Math.floor(value / 10) % 10, value % 10]
     const firstDigits = digits(first)
     const secondDigits = digits(second)
+    const answerDigits = digits(first + second)
+    const revealedDigits = Array.isArray(values.revealedDigits) && values.revealedDigits.length === 3 &&
+      values.revealedDigits.every((digit, index) => typeof digit === 'number' && Number.isInteger(digit) &&
+        (digit === -1 || digit === answerDigits[index]))
+      ? values.revealedDigits as number[]
+      : [-1, -1, -1]
+    const activeColumn = typeof values.activeColumn === 'string' ? values.activeColumn : 'none'
     const carryIndex = carryColumn === 'hundreds' ? 0 : carryColumn === 'tens' ? 1 : -1
     const description = carry === 1
       ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. Das Ergebnis ist noch offen.`
       : `Schriftliche Addition ${first} plus ${second}. Das Ergebnis ist noch offen.`
     return (
       <div className="math-visual column-calculation" role="img" aria-label={description}>
-        <div className="column-row column-row--headers" aria-hidden="true"><span>H</span><span>Z</span><span>E</span></div>
+        <div className="column-row column-row--headers" aria-hidden="true">
+          {['hundreds', 'tens', 'ones'].map((column, index) => <span className={activeColumn === column ? 'column-cell--active' : ''} key={column}>{['H', 'Z', 'E'][index]}</span>)}
+        </div>
         <div className="column-row column-row--carry" aria-hidden="true">
-          {firstDigits.map((_, index) => <span key={index}>{carry === 1 && carryIndex === index ? '1' : ''}</span>)}
+          {firstDigits.map((_, index) => <span className={activeColumn === 'carry' && carryIndex === index ? 'column-cell--active' : ''} key={index}>{carry === 1 && carryIndex === index ? '1' : ''}</span>)}
         </div>
         <div className="column-equation" aria-hidden="true">
           <span className="column-operation" />
@@ -62,7 +71,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
           <span className="column-operation">+</span>
           <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{digit}</strong>)}</div>
           <span className="column-operation" />
-          <div className="column-row column-row--result">{firstDigits.map((_, index) => <strong key={index}>?</strong>)}</div>
+          <div className="column-row column-row--result">
+            {revealedDigits.map((digit, index) => <strong className={activeColumn === ['hundreds', 'tens', 'ones'][index] ? 'column-cell--active' : ''} key={index}>{digit < 0 ? '?' : digit}</strong>)}
+          </div>
         </div>
       </div>
     )
