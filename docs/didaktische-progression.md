@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.12.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.13.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -198,6 +198,24 @@ Stand: Katalogversion 0.12.0. Die Stufen beschreiben die produktive Heuristik vo
 - **Hilfe / Transfer:** zunächst ein Feld mit gleichem Abstand zuordnen / erklären, warum ein Feld auf der Achse stehen bleibt.
 - **Später:** fehlende Hälfte frei ergänzen; Diagonalachsen erst nach eigenständiger fachlicher und mobiler Prüfung.
 
+### Körperansichten
+
+- **Vorkenntnisse:** vorne, rechts und oben sowie Rasterzeilen und -spalten unterscheiden.
+- **Stufe 1:** zwei bis drei sichtbare Würfel und ausschließlich Vorderansichten.
+- **Stufe 2:** drei bis vier Würfel sowie Vorder- oder rechte Seitenansicht.
+- **Stufe 3 / Ziel:** vier bis fünf Würfel, ähnlichere Ansichten und zusätzliche Draufsicht.
+- **Hilfe / Transfer:** reihenweise aus markierter Richtung betrachten / begründen, warum hintereinanderliegende Würfel zusammenfallen.
+
+### Würfelrotation
+
+- **Vorkenntnisse:** mindestens fünf Körperansichtsversuche und Lernwert 60; Links-/Rechtsbegriffe sicher unterscheiden.
+- **Stufe 1:** drei einzelne Würfel, sichtbare senkrechte Achse und ausschließlich eine 90-Grad-Rechtsdrehung.
+- **Stufe 2:** Links- oder Rechtsdrehung und höchstens ein Stapel bei drei bis vier Würfeln.
+- **Stufe 3 / Ziel:** vier bis fünf Würfel in längeren Grundformen und ähnlichere plausible Folgezustände.
+- **Erhöhen / Zurückstufen:** Pfeilrichtung, Nachbarschaften und Stapel sicher erhalten / Gegenrichtung, unveränderte Lage oder verschobene Einzelwürfel wählen.
+- **Hilfe / Transfer:** eine auffällige Ecke um die Achse verfolgen / benennen, welche bisherige Seite danach vorne erscheint.
+- **Später:** freie Rotation, 180-Grad-Folgen, Kippen und Körpernetze.
+
 ## Größen und Messen
 
 ### Geld
@@ -216,4 +234,4 @@ Stand: Katalogversion 0.12.0. Die Stufen beschreiben die produktive Heuristik vo
 
 ## Bewusst offene Förderbereiche
 
-Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, Körperansichten, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.
+Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, freie Rotation, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.

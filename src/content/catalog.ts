@@ -11,10 +11,16 @@ import {
   type SymmetryAxis,
   type SymmetryAxisPosition
 } from '../domain/symmetry'
-import { isValidCubeBuilding, type CubeBuilding, type CubeViewDirection } from '../domain/cubeViews'
+import {
+  createCubeRotationDistractors,
+  isValidCubeBuilding,
+  type CubeBuilding,
+  type CubeTurnDirection,
+  type CubeViewDirection
+} from '../domain/cubeViews'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 10
+export const CATALOG_SCHEMA_VERSION = 11
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -354,6 +360,22 @@ export interface SpatialViewsContent {
   templates: CubeBuildingTemplate[]
 }
 
+export interface CubeRotationTemplate extends CubeBuilding {
+  id: string
+  difficulty: 1 | 2 | 3
+  turn: CubeTurnDirection
+}
+
+export interface SpatialRotationsContent {
+  entryRationale: string
+  prompt: string
+  axisLabel: string
+  optionLabels: [string, string, string]
+  turnLabels: Record<CubeTurnDirection, string>
+  turnGuidance: Record<CubeTurnDirection, string>
+  templates: CubeRotationTemplate[]
+}
+
 export interface TaskCatalog extends CatalogMetadata {
   fieldUsage: Record<'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
   numberRange: { min: number; max: number }
@@ -372,6 +394,7 @@ export interface TaskCatalog extends CatalogMetadata {
     templates: SymmetryTemplate[]
   }
   spatialViews: SpatialViewsContent
+  spatialRotations: SpatialRotationsContent
 }
 
 type FetchCatalog = (input: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>
@@ -391,7 +414,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -474,6 +497,42 @@ function isSpatialViewsContent(value: unknown): value is SpatialViewsContent {
     return isValidCubeBuilding(template) && count >= bounds[0]! && count <= bounds[1]!
   })) return false
   return [1, 2, 3].every((difficulty) => difficulties.has(difficulty))
+}
+
+function isSpatialRotationsContent(value: unknown): value is SpatialRotationsContent {
+  if (!isRecord(value) || !isNonEmptyString(value.entryRationale) || !isNonEmptyString(value.prompt) || !isNonEmptyString(value.axisLabel)) return false
+  if (!Array.isArray(value.optionLabels) || value.optionLabels.length !== 3 || !value.optionLabels.every(isNonEmptyString) || new Set(value.optionLabels).size !== 3) return false
+  const turns: CubeTurnDirection[] = ['left', 'right']
+  if (!isRecord(value.turnLabels) || !isRecord(value.turnGuidance) ||
+    !turns.every((turn) => isNonEmptyString((value.turnLabels as Record<string, unknown>)[turn]) &&
+      isNonEmptyString((value.turnGuidance as Record<string, unknown>)[turn]))) return false
+  if (!Array.isArray(value.templates) || value.templates.length < 6) return false
+  const ids = value.templates.map((template) => isRecord(template) ? template.id : undefined)
+  if (new Set(ids).size !== value.templates.length) return false
+  const difficulties = new Set<number>()
+  const turnsByDifficulty = new Map<number, Set<CubeTurnDirection>>()
+  if (!value.templates.every((candidate) => {
+    if (!isRecord(candidate) || !isNonEmptyString(candidate.id) || ![1, 2, 3].includes(candidate.difficulty as number) ||
+      !turns.includes(candidate.turn as CubeTurnDirection) || !Number.isInteger(candidate.width) ||
+      !Number.isInteger(candidate.depth) || !Array.isArray(candidate.heights)) return false
+    const template = candidate as unknown as CubeRotationTemplate
+    difficulties.add(template.difficulty)
+    const difficultyTurns = turnsByDifficulty.get(template.difficulty) ?? new Set<CubeTurnDirection>()
+    difficultyTurns.add(template.turn)
+    turnsByDifficulty.set(template.difficulty, difficultyTurns)
+    const count = template.heights.reduce((sum, height) => sum + height, 0)
+    const bounds = template.difficulty === 1 ? [3, 3] : template.difficulty === 2 ? [3, 4] : [4, 5]
+    if (!isValidCubeBuilding(template) || count < bounds[0]! || count > bounds[1]!) return false
+    try {
+      createCubeRotationDistractors(template, template.turn)
+      return true
+    } catch {
+      return false
+    }
+  })) return false
+  return [1, 2, 3].every((difficulty) => difficulties.has(difficulty)) &&
+    turnsByDifficulty.get(1)?.size === 1 && turnsByDifficulty.get(1)?.has('right') === true &&
+    [2, 3].every((difficulty) => turns.every((turn) => turnsByDifficulty.get(difficulty)?.has(turn)))
 }
 
 const REQUIREMENT_FIELDS = [
@@ -667,7 +726,8 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!['unbundlePrompt', 'unbundleError', 'unbundleSuccess', 'onesPrompt', 'onesError', 'onesSuccess', 'tensPrompt', 'tensError', 'tensSuccess', 'hundredsPrompt', 'hundredsError', 'hundredsSuccess', 'checkPrompt', 'checkError', 'checkSuccess'].every((field) => isNonEmptyString(writtenSubtractionSteps[field]))) return false
   if (!Array.isArray(value.wordProblems) || value.wordProblems.length === 0 || !value.wordProblems.every((template) => isWordProblem(template, numberRange as { min: number; max: number }))) return false
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
-  if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) || !isSpatialViewsContent(value.spatialViews)) return false
+  if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) ||
+    !isSpatialViewsContent(value.spatialViews) || !isSpatialRotationsContent(value.spatialRotations)) return false
   return hasOnlyKnownPlaceholders(value)
 }
 

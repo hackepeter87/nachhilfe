@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.13.1, Katalog 0.12.0, Schema 10, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.14.0, Katalog 0.13.0, Schema 11, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -17,10 +17,11 @@ Stand: App 0.13.1, Katalog 0.12.0, Schema 10, Status ready-for-review. Diese Dat
 | `wordProblemSteps.modellingProgression` | Review | begründet die acht fachlichen Stationen |
 | `symmetry.progression`, `axisPosition`, `figureComplexity`, `distractorSimilarity` | Runtime | Progressionsphase, Achsenlage, Vorlage, Hilfen und Distraktortransformation ändern sich |
 | `spatialViews` | Runtime | geprüfte Würfelgebäude, Blickrichtungen und Stufengrenzen steuern Projektion und Antwortdarstellungen |
+| `spatialRotations` | Runtime | geprüfte Ausgangsgebäude, 90-Grad-Richtung, Achsenbezeichnung und Stufengrenzen steuern Transformation und Folgezustände |
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.13.1
+## Aktive Veränderungen bis 0.14.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -42,10 +43,11 @@ Stand: App 0.13.1, Katalog 0.12.0, Schema 10, Status ready-for-review. Diese Dat
 - App 0.12.0: Schriftliche Subtraktion arbeitet ohne oder mit genau einer Entbündelung. Stufe 2 macht die veränderten Stellen nach dem eigenen Entbündelungsschritt sichtbar; Stufe 3 verlangt die Entbündelung selbstständig und schließt mit der Additionsprobe.
 - App 0.13.0 und Schema 9: Körperansichten verbinden katalogisierte Gebäude mit berechneter Vorder-, rechter Seiten- und Draufsicht. Die Stufen steigern Blickrichtungen und Gebäudekomplexität; Rotation und verdeckte Würfel bleiben deaktiviert.
 - App 0.13.1 und Schema 10: Sachaufgaben verwenden eine katalogisierte, einheitliche Runtime-Sequenz. `unknownQuantity` verhindert Ergebnislecks in Balken- und Gruppenmodellen. Neue Aufgaben remounten ihren lokalen Zustand; Fokus, Hover und Touch gelten nicht als Auswahl.
+- App 0.14.0 und Schema 11: `cube-rotation` dreht katalogisierte Gebäude kontrolliert um 90 Grad nach links oder rechts. Achse und Richtung bleiben sichtbar; Ausgangslage, korrekte Drehung und Gegenrichtung müssen paarweise verschieden sein. Die adaptive Auswahl setzt fünf Körperansichtsversuche und Lernwert 60 voraus.
 
 ## Bewusst deaktiviert
 
-Räumliche Rotation und Falten bleiben unter `preparedTopics` methodisch vorbereitet und stehen auf `disabled`. Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Übergänge, verdeckte Würfel, Kippen und Falten werden nicht als aktiv dargestellt.
+Kippen und Falten bleiben unter `preparedTopics` methodisch vorbereitet und stehen auf `disabled`. Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Übergänge, verdeckte Würfel, freie Rotation, Kippen und Falten werden nicht als aktiv dargestellt.
 
 ## Menschliche Gesamtprüfung
 

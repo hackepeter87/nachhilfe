@@ -83,11 +83,12 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - Förderziele, Prozesskompetenzen, Vorkenntnisse und typische Fehlvorstellungen
 - sechs Lernphasen, drei konkret beschriebene Schwierigkeitsstufen und zulässige Darstellungen
 - zwei Hinweise, gearbeitetes Beispiel, Erklärung, strukturierte Remediation und Transferimpuls
-- überprüfbare Erfolgskriterien, produktive Größenkompetenzen für Geld und Längen, geprüfte Würfelgebäude für Körperansichten sowie eine deaktivierte Vorbereitung für Rotation und Falten
+- überprüfbare Erfolgskriterien, produktive Größenkompetenzen für Geld und Längen, geprüfte Würfelgebäude für Körperansichten und kontrollierte 90-Grad-Rotation sowie eine deaktivierte Vorbereitung für Kippen und Falten
 - kompetenzbezogene Erfolgs- und Fehlertexte sowie Release-Status
 - strukturierte Sachaufgabenvorlagen mit interner Mengenbeziehung, konkreter Handlung, gesuchter Größe, unbekanntenhaltigem Modell, plausiblen Modell- und Gleichungsalternativen sowie Plausibilitätsprüfung
 - fünfphasige Symmetrieprogression mit rechteckigen geraden Einstiegsrastern, expliziter Achsenlage, Figurenkomplexität und Distraktorstrategie
 - Körperansichtsvorlagen mit fester Orientierung, Würfelanzahl, drei Blickrichtungen und stufengerechten Gebäudegrenzen
+- Rotationsvorlagen mit senkrechter Achse, Links-/Rechtsrichtung, drei wirksamen Stufen und eindeutig unterscheidbaren Folgezuständen
 
 Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Status `draft`, `ready-for-review`, `active` oder `disabled`. Der Gesamtkatalog steht auf `ready-for-review`; technisch, mathematisch und intern didaktisch geprüfte Laufzeitkompetenzen stehen auf `active`. Das ist keine dokumentierte Freigabe durch eine Lehrkraft.
 
@@ -131,7 +132,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.13.1
+podman pull ghcr.io/hackepeter87/nachhilfe:0.14.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -172,6 +173,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.13.1
+## Release-Stand 0.14.0
 
-Version 0.13.1 synchronisiert den bestehenden Sachaufgaben-Lernweg mit Katalog und Runtime. Katalog 0.12.0 und Schema 10 definieren die verbindliche Folge von Suchgröße, wichtigen Angaben, Modell, Rechnung, eigener Berechnung, Plausibilitätsprüfung und Antwortsatz. Zweite Rechenschritte sind die einzige katalogisierte Ausnahme. Modelle benennen die unbekannte Größe explizit und zeigen sie bis zur eigenen Berechnung ausschließlich als `?`. Neue Aufgaben verwerfen ihren gesamten lokalen Zustand; Überschriftenfokus, Hover und Touch erscheinen nicht als Auswahl. Details stehen in [docs/curriculum-runtime-sync-0.13.1.md](docs/curriculum-runtime-sync-0.13.1.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.14.0 ergänzt kontrollierte Würfelrotation als eigene adaptive Kompetenz. Katalog 0.13.0 und Schema 11 definieren Vorlagen, Achse, Richtung, Stufen und Hilfen; reine TypeScript-Logik dreht die Gebäude exakt um 90 Grad und verwirft uneindeutige Folgezustände. Die statische Darstellung zeigt den Ausgangszustand, ohne die mentale Drehung interaktiv vorwegzunehmen. Rotation wird erst nach mindestens fünf Körperansichtsversuchen und Lernwert 60 ausgewählt. Freie Rotation, Kippen und Falten bleiben ausgeschlossen. Details stehen in [docs/didactics/cube-rotation.md](docs/didactics/cube-rotation.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

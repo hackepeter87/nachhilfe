@@ -3,12 +3,12 @@ import { createRoundingExercise, formatEuro, formatLength, generateExercise, isA
 import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
 import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSide } from './symmetry'
-import { cubeCount, cubeViewKey, isValidCubeBuilding, projectCubeView, type CubeBuilding, type CubeViewDirection } from './cubeViews'
+import { cubeBuildingKey, cubeCount, cubeViewKey, isValidCubeBuilding, projectCubeView, rotateCubeBuilding, type CubeBuilding, type CubeTurnDirection, type CubeViewDirection } from './cubeViews'
 
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views'
+  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation'
 ]
 
 describe('deterministische Aufgabengeneratoren', () => {
@@ -519,6 +519,55 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(directionsByDifficulty[1]).toEqual(new Set(['front', 'right']))
     expect(directionsByDifficulty[2]).toEqual(new Set(['front', 'right', 'top']))
     variantsByDifficulty.forEach((variants) => expect(variants.size).toBeGreaterThan(1))
+  })
+
+  it('erzeugt kontrollierte Vierteldrehungen über 1.000 Seeds je Stufe korrekt und eindeutig', () => {
+    const turnsByDifficulty = [new Set<string>(), new Set<string>(), new Set<string>()]
+    const variantsByDifficulty = [new Set<string>(), new Set<string>(), new Set<string>()]
+    for (const difficulty of [1, 2, 3] as const) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('cube-rotation', seed, difficulty)
+        const values = exercise.representation?.values
+        const building: CubeBuilding = {
+          width: Number(values?.width),
+          depth: Number(values?.depth),
+          heights: Array.isArray(values?.heights) ? values.heights as number[] : []
+        }
+        const turn = exercise.variant.values.turn as CubeTurnDirection
+        turnsByDifficulty[difficulty - 1].add(turn)
+        variantsByDifficulty[difficulty - 1].add(exercise.variant.key)
+        expect(exercise.representation?.kind).toBe('cube-rotation')
+        expect(isValidCubeBuilding(building)).toBe(true)
+        expect(cubeCount(building)).toBe(difficulty === 1 ? 3 : difficulty === 2 ? 4 : 5)
+        if (difficulty === 1) expect(Math.max(...building.heights)).toBe(1)
+        expect(exercise.correctAnswer).toBe(cubeBuildingKey(rotateCubeBuilding(building, turn)))
+        expect(exercise.options).toHaveLength(3)
+        expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(3)
+        expect(exercise.options?.filter((option) => option.value === exercise.correctAnswer)).toHaveLength(1)
+        exercise.options?.forEach((option) => {
+          expect(option.representation?.kind).toBe('cube-building')
+          const optionValues = option.representation?.values
+          const optionBuilding: CubeBuilding = {
+            width: Number(optionValues?.width),
+            depth: Number(optionValues?.depth),
+            heights: Array.isArray(optionValues?.heights) ? optionValues.heights as number[] : []
+          }
+          expect(isValidCubeBuilding(optionBuilding)).toBe(true)
+          expect(cubeCount(optionBuilding)).toBe(cubeCount(building))
+          expect(option.value).toBe(cubeBuildingKey(optionBuilding))
+        })
+      }
+    }
+    expect(turnsByDifficulty[0]).toEqual(new Set(['right']))
+    expect(turnsByDifficulty[1]).toEqual(new Set(['left', 'right']))
+    expect(turnsByDifficulty[2]).toEqual(new Set(['left', 'right']))
+    variantsByDifficulty.forEach((variants) => expect(variants.size).toBeGreaterThan(1))
+  })
+
+  it('berücksichtigt unsichere Rotationsrichtungen ohne die Stufenprogression zu verletzen', () => {
+    expect(generateExercise('cube-rotation', 91, 1, 'cube-rotation-left').subskillId).toBe('cube-rotation-right')
+    expect(generateExercise('cube-rotation', 92, 2, 'cube-rotation-left').subskillId).toBe('cube-rotation-left')
+    expect(generateExercise('cube-rotation', 93, 3, 'cube-rotation-right').subskillId).toBe('cube-rotation-right')
   })
 
   it('hält Rechenstrategien bis 1000 im Zahlenraum und fachlich konsistent', () => {

@@ -26,7 +26,7 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 ```json
 {
   "schemaVersion": 10,
-  "catalogVersion": "0.12.0",
+  "catalogVersion": "0.13.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review"
@@ -70,7 +70,7 @@ npm run catalog:check     # Artefakte und Produktionsstatus abgleichen
 
 Die Validierung prüft Metadaten, bekannte und eindeutige Kompetenz-IDs, Pflichtfelder, Platzhalter, Zahlenbereiche, Sachaufgaben, Symmetrievarianten und eindeutige Optionen. `npm run build` führt `catalog:check` automatisch vor Vite aus. CI führt dieselbe Prüfung explizit aus.
 
-Schema 6 ersetzt die frühere kindseitige Auswahl technischer Mengenbeziehungen und Rechenarten durch konkrete `situation`-, `modelType`- und `equation`-Felder. Schema 7 trennt bei Symmetrie Rasterdimension, Progressionsphase, Achsenposition, Figurenkomplexität und Distraktorähnlichkeit. Schema 8 ergänzt katalogisierte Schritte für die schriftliche Addition. Schema 9 ergänzt `spatialViews` mit geprüften Würfelgebäuden und Blickrichtungen. Schema 10 ergänzt die verbindliche Sachaufgabenfolge `runtimeSequence`, die Schwierigkeit der Modellinteraktion und eine achtstufige Progression einschließlich wichtiger Angaben. Generator, Renderer und Validierung müssen gemeinsam mit Schema 10 ausgeliefert werden. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
+Schema 6 ersetzt die frühere kindseitige Auswahl technischer Mengenbeziehungen und Rechenarten durch konkrete `situation`-, `modelType`- und `equation`-Felder. Schema 7 trennt bei Symmetrie Rasterdimension, Progressionsphase, Achsenposition, Figurenkomplexität und Distraktorähnlichkeit. Schema 8 ergänzt katalogisierte Schritte für die schriftliche Addition. Schema 9 ergänzt `spatialViews` mit geprüften Würfelgebäuden und Blickrichtungen. Schema 10 ergänzt die verbindliche Sachaufgabenfolge `runtimeSequence`, die Schwierigkeit der Modellinteraktion und eine achtstufige Progression einschließlich wichtiger Angaben. Schema 11 ergänzt `spatialRotations` mit 90-Grad-Richtung, Achse und geprüften Folgezuständen. Generator, Renderer und Validierung müssen gemeinsam mit der jeweiligen Schemaversion ausgeliefert werden. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
 
 ## Sitzungen und Altdaten
 
@@ -94,8 +94,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build --platform linux/amd64 -t mathe-reise:0.13.1 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.13.1
+docker build --platform linux/amd64 -t mathe-reise:0.14.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.14.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.

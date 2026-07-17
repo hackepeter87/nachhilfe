@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(10)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.12.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(11)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.13.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -256,6 +256,23 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(catalog.spatialViews.templates.map((template) => template.difficulty)).toEqual(expect.arrayContaining([1, 2, 3]))
     expect(catalog.spatialViews.directionLabels).toEqual(expect.objectContaining({ front: expect.any(String), right: expect.any(String), top: expect.any(String) }))
     catalog.spatialViews.templates[0]!.heights = [1]
+    expect(validateTaskCatalog(catalog)).toBe(false)
+  })
+
+  it('validiert Rotationsrichtung, Stufen und drei unterscheidbare Folgezustände', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    expect(catalog.spatialRotations.templates.filter((template) => template.difficulty === 1).every((template) => template.turn === 'right')).toBe(true)
+    expect(new Set(catalog.spatialRotations.templates.filter((template) => template.difficulty === 2).map((template) => template.turn))).toEqual(new Set(['left', 'right']))
+    expect(new Set(catalog.spatialRotations.templates.filter((template) => template.difficulty === 3).map((template) => template.turn))).toEqual(new Set(['left', 'right']))
+
+    const symmetric = catalog.spatialRotations.templates.find((template) => template.difficulty === 2)!
+    symmetric.heights = [1, 1, 1, 1]
+    expect(validateTaskCatalog(catalog)).toBe(false)
+  })
+
+  it('lehnt eine Linksdrehung in der geführten Einstiegsstufe ab', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    catalog.spatialRotations.templates.find((template) => template.difficulty === 1)!.turn = 'left'
     expect(validateTaskCatalog(catalog)).toBe(false)
   })
 

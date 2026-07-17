@@ -141,7 +141,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
     return (
-      <div className={currentStep?.options?.some((option) => option.representation) ? 'answer-options model-options' : exercise.answerMode === 'symmetry' ? 'symmetry-options' : 'answer-options'}>
+      <div className={options.some((option) => option.representation) ? 'answer-options model-options' : exercise.answerMode === 'symmetry' ? 'symmetry-options' : 'answer-options'}>
         {options.map((option) => (
           <button
             className={option.representation ? 'answer-option model-option' : exercise.answerMode === 'symmetry' ? 'symmetry-option' : 'answer-option'}

@@ -228,6 +228,18 @@ describe('MathRepresentation Körperansichten', () => {
     expect(container.querySelectorAll('.cube-view-cell--filled')).toHaveLength(3)
   })
 
+  it('zeigt bei einer Vierteldrehung Achse, Richtung und jeden Würfel genau einmal', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'cube-rotation', visibility: 'always', label: 'Drei Würfel. 90 Grad nach rechts um die senkrechte Achse.',
+      values: { width: 2, depth: 2, heights: [1, 1, 1, 0], turn: 'right', axisLabel: 'senkrechte Drehachse', turnLabel: '90 Grad nach rechts' }
+    }} />)
+    expect(screen.getByRole('img', { name: /90 Grad nach rechts.*senkrechte Achse/i })).toBeVisible()
+    expect(container.querySelectorAll('.iso-cube')).toHaveLength(3)
+    expect(container.querySelector('.rotation-axis')).toBeInTheDocument()
+    expect(container.querySelector('.rotation-turn--right')).toHaveTextContent('90 Grad nach rechts')
+    expect(container).toHaveTextContent('vornerechts')
+  })
+
   it('lehnt ungültige Gebäude und Ansichten sichtbar ab', () => {
     const { rerender } = render(<MathRepresentation representation={{
       kind: 'cube-building', visibility: 'always', label: 'Ungültig', values: { width: 2, depth: 1, heights: [1] }
@@ -235,6 +247,10 @@ describe('MathRepresentation Körperansichten', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
     rerender(<MathRepresentation representation={{
       kind: 'cube-view', visibility: 'always', label: 'Ungültig', values: { rows: 2, columns: 2, cells: [1, 0] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
+    rerender(<MathRepresentation representation={{
+      kind: 'cube-rotation', visibility: 'always', label: 'Ungültig', values: { width: 2, depth: 2, heights: [1, 1, 1, 0], turn: 'oben' }
     }} />)
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
   })

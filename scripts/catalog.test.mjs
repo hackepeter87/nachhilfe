@@ -33,7 +33,7 @@ describe('Katalog-Buildpipeline', () => {
     const files = [
       'addition.md', 'subtraction.md', 'multiplication.md', 'division.md', 'place-value.md',
       'decompose-compose.md', 'neighbor-numbers.md', 'rounding.md', 'word-problems.md', 'symmetry.md',
-      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'spatial-reasoning.md'
+      'addition-subtraction-1000.md', 'written-addition.md', 'written-subtraction.md', 'money.md', 'lengths.md', 'body-views.md', 'cube-rotation.md', 'spatial-reasoning.md'
     ]
     for (const file of files) {
       const text = fs.readFileSync(path.join(directory, file), 'utf8')
@@ -44,8 +44,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 10,
-      catalogVersion: '0.12.0',
+      schemaVersion: 11,
+      catalogVersion: '0.13.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
@@ -113,6 +113,16 @@ describe('Katalog-Buildpipeline', () => {
     const middle = Math.floor(template.grid[0].length / 2)
     template.grid.forEach((row) => { row[middle] = 0 })
     expect(() => parseAndValidateCatalog(JSON.stringify(missingAxisCell))).toThrow('passt nicht zur Progressionsphase')
+  })
+
+  it('lehnt uneindeutige Rotationsvorlagen und eine verfrühte Linksdrehung ab', () => {
+    const symmetric = sourceCatalog()
+    symmetric.spatialRotations.templates.find((template) => template.difficulty === 2).heights = [1, 1, 1, 1]
+    expect(() => parseAndValidateCatalog(JSON.stringify(symmetric))).toThrow('nicht eindeutig')
+
+    const earlyLeft = sourceCatalog()
+    earlyLeft.spatialRotations.templates.find((template) => template.difficulty === 1).turn = 'left'
+    expect(() => parseAndValidateCatalog(JSON.stringify(earlyLeft))).toThrow('Richtungsprogression')
   })
 
   it('erzeugt beide Artefakte deterministisch aus einer Quelle', () => {

@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Würfel und räumliche Rotation 0.14.0
+
+- Die neue Kompetenz `cube-rotation` führt genau eine kontrollierte 90-Grad-Drehung bekannter Würfelgebäude nach links oder rechts um die senkrechte Achse ein. Freie Rotation, Kippen, 180-Grad-Folgen und Falten bleiben ausgeschlossen.
+- Katalog 0.13.0 und Schema 11 ergänzen `spatialRotations` mit Richtungsbegriffen, Achsenbeschreibung, zehn geprüften Vorlagen und drei konkreten Stufen. Der Gesamtkatalog bleibt `ready-for-review`; eine Lehrkraftfreigabe wird nicht behauptet.
+- Reine TypeScript-Domänenlogik dreht Grundfläche und Stapel, erhält Würfelzahl und Nachbarschaften und verwirft Vorlagen, bei denen Ausgangslage, korrekte Drehung und Gegenrichtung nicht paarweise verschieden sind.
+- Stufe 1 nutzt drei einzelne Würfel und nur eine Rechtsdrehung. Stufe 2 ergänzt Links-/Rechtsdrehung und einen Stapel. Stufe 3 verwendet längere Grundformen mit vier bis fünf Würfeln und ähnlichere Fehlzustände.
+- Die mobile SVG-Darstellung zeigt Vorder-/Rechtsmarken, gestrichelte senkrechte Achse und einen eindeutigen Vierteldrehungspfeil. Sie bleibt absichtlich statisch, damit die geforderte mentale Rotation nicht interaktiv vorweggenommen wird.
+- Die adaptive Auswahl setzt mindestens fünf Körperansichtsversuche und Lernwert 60 voraus. Links und rechts werden ab Stufe 2 als fachlich nützliche Unterkompetenzen gewichtet; Fehler führen auf eine leichtere, andere Vorlage zurück.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 238 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und zwölf Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das 56,5-MB-AMD64-Image `mathe-reise:0.14.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test wurden nicht durchgeführt; WebKit ist nur eine Mobile-Safari-Näherung.
+
 ## Curriculum-Runtime-Synchronisation 0.13.1
 
 - Katalog 0.12.0 und Schema 10 definieren für Sachaufgaben eine verbindliche Runtime-Sequenz: gesuchte Größe, wichtige Angaben, Modell, Rechnung, eigene Berechnung, Plausibilität und Antwortsatz. Nur zweischrittige Geschichten ergänzen katalogisiert eine zweite Gleichung und Berechnung.

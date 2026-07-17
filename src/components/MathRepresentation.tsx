@@ -10,6 +10,52 @@ function coinLabel(cents: number): string {
   return cents >= 100 ? `${cents / 100} €` : `${cents} ct`
 }
 
+function CubeBuildingDiagram({ building, turn, axisLabel, turnLabel }: {
+  building: CubeBuilding
+  turn?: 'left' | 'right'
+  axisLabel?: string
+  turnLabel?: string
+}) {
+  const cubes = building.heights.flatMap((height, index) => {
+    const x = index % building.width
+    const y = Math.floor(index / building.width)
+    return Array.from({ length: height }, (_, z) => ({ x, y, z }))
+  }).sort((first, second) => (first.x + first.y + first.z) - (second.x + second.y + second.z))
+  const points = (coordinates: Array<[number, number]>) => coordinates.map(([x, y]) => `${x},${y}`).join(' ')
+  return (
+    <svg aria-hidden="true" viewBox={turn ? '0 0 280 260' : '0 0 280 205'}>
+      {turn && <g className="rotation-axis">
+        <path d="M140 28 L140 178" />
+        <text x="140" y="18" textAnchor="middle">{axisLabel}</text>
+      </g>}
+      {cubes.map(({ x, y, z }) => {
+        const centerX = 132 + (x - y) * 38
+        const topY = 105 + (x + y) * 20 - z * 38
+        return (
+          <g className="iso-cube" key={`${x}-${y}-${z}`}>
+            <polygon className="cube-face cube-face--left" points={points([[centerX - 38, topY], [centerX, topY + 20], [centerX, topY + 58], [centerX - 38, topY + 38]])} />
+            <polygon className="cube-face cube-face--right" points={points([[centerX, topY + 20], [centerX + 38, topY], [centerX + 38, topY + 38], [centerX, topY + 58]])} />
+            <polygon className="cube-face cube-face--top" points={points([[centerX, topY - 20], [centerX + 38, topY], [centerX, topY + 20], [centerX - 38, topY]])} />
+          </g>
+        )
+      })}
+      <g className="view-direction view-direction--front">
+        <path d="M118 194 L118 169 M110 177 L118 169 L126 177" />
+        <text x="91" y="202">vorne</text>
+      </g>
+      <g className="view-direction view-direction--right">
+        <path d="M264 151 L239 151 M247 143 L239 151 L247 159" />
+        <text x="230" y="174">rechts</text>
+      </g>
+      {turn && <g className={`rotation-turn rotation-turn--${turn}`}>
+        <path d={turn === 'right' ? 'M70 218 C100 246 180 246 211 216' : 'M211 218 C180 246 100 246 69 216'} />
+        <path d={turn === 'right' ? 'M199 218 L211 216 L208 229' : 'M81 218 L69 216 L72 229'} />
+        <text x="140" y="256" textAnchor="middle">{turnLabel}</text>
+      </g>}
+    </svg>
+  )
+}
+
 export function MathRepresentation({ representation }: { representation: ExerciseRepresentation }) {
   const values = representation.values
   const textValue = (value: typeof values[string]) => Array.isArray(value) ? '' : value
@@ -26,35 +72,28 @@ export function MathRepresentation({ representation }: { representation: Exercis
     if (!isValidCubeBuilding(building)) {
       return <div className="math-visual math-visual--error" role="alert">Das Würfelgebäude enthält ungültige Daten.</div>
     }
-    const cubes = building.heights.flatMap((height, index) => {
-      const x = index % building.width
-      const y = Math.floor(index / building.width)
-      return Array.from({ length: height }, (_, z) => ({ x, y, z }))
-    }).sort((first, second) => (first.x + first.y + first.z) - (second.x + second.y + second.z))
-    const points = (coordinates: Array<[number, number]>) => coordinates.map(([x, y]) => `${x},${y}`).join(' ')
     return (
       <div className="math-visual cube-building-visual" role="img" aria-label={representation.label}>
-        <svg aria-hidden="true" viewBox="0 0 280 205">
-          {cubes.map(({ x, y, z }) => {
-            const centerX = 132 + (x - y) * 38
-            const topY = 105 + (x + y) * 20 - z * 38
-            return (
-              <g className="iso-cube" key={`${x}-${y}-${z}`}>
-                <polygon className="cube-face cube-face--left" points={points([[centerX - 38, topY], [centerX, topY + 20], [centerX, topY + 58], [centerX - 38, topY + 38]])} />
-                <polygon className="cube-face cube-face--right" points={points([[centerX, topY + 20], [centerX + 38, topY], [centerX + 38, topY + 38], [centerX, topY + 58]])} />
-                <polygon className="cube-face cube-face--top" points={points([[centerX, topY - 20], [centerX + 38, topY], [centerX, topY + 20], [centerX - 38, topY]])} />
-              </g>
-            )
-          })}
-          <g className="view-direction view-direction--front">
-            <path d="M118 194 L118 169 M110 177 L118 169 L126 177" />
-            <text x="91" y="202">vorne</text>
-          </g>
-          <g className="view-direction view-direction--right">
-            <path d="M264 151 L239 151 M247 143 L239 151 L247 159" />
-            <text x="230" y="174">rechts</text>
-          </g>
-        </svg>
+        <CubeBuildingDiagram building={building} />
+      </div>
+    )
+  }
+
+  if (representation.kind === 'cube-rotation') {
+    const building: CubeBuilding = {
+      width: Number(values.width),
+      depth: Number(values.depth),
+      heights: Array.isArray(values.heights) ? values.heights.map(Number) : []
+    }
+    const turn = values.turn === 'left' || values.turn === 'right' ? values.turn : undefined
+    const axisLabel = typeof values.axisLabel === 'string' && values.axisLabel.trim() ? values.axisLabel : undefined
+    const turnLabel = typeof values.turnLabel === 'string' && values.turnLabel.trim() ? values.turnLabel : undefined
+    if (!isValidCubeBuilding(building) || !turn || !axisLabel || !turnLabel) {
+      return <div className="math-visual math-visual--error" role="alert">Die Würfeldrehung enthält ungültige Daten.</div>
+    }
+    return (
+      <div className="math-visual cube-building-visual cube-rotation-visual" role="img" aria-label={representation.label}>
+        <CubeBuildingDiagram building={building} turn={turn} axisLabel={axisLabel} turnLabel={turnLabel} />
       </div>
     )
   }

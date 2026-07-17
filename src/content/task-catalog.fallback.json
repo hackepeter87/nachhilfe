@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 10,
-  "catalogVersion": "0.12.0",
+  "schemaVersion": 11,
+  "catalogVersion": "0.13.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -3171,6 +3171,165 @@
         "Hintereinander stehende Würfel werden korrekt auf dieselbe Rasterposition projiziert.",
         "Vorder-, rechte Seiten- und Draufsicht werden nicht durch Rotation des Gebäudes verwechselt."
       ]
+    },
+    {
+      "id": "cube-rotation",
+      "label": "Würfel drehen",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Ein bekannt dargestelltes Würfelgebäude gedanklich genau 90 Grad nach links oder rechts um die senkrechte Achse drehen und den Folgezustand erkennen.",
+      "misconceptions": [
+        "Das Gebäude bleibt trotz Drehpfeil unverändert.",
+        "Links- und Rechtsdrehung werden vertauscht.",
+        "Drehen wird mit Spiegeln verwechselt.",
+        "Einzelne Würfel werden verschoben, obwohl das ganze Gebäude gemeinsam gedreht wird."
+      ],
+      "hints": [
+        "Verfolge zuerst eine auffällige Ecke. Bei der {turnLabel} dreht sich das ganze Gebäude gemeinsam.",
+        "Stelle dir die gestrichelte Achse wie einen festen Stab vor. Drehe Grundfläche und Stapel genau eine Vierteldrehung in Pfeilrichtung."
+      ],
+      "prompt": "Das Gebäude dreht sich {turnLabel}. Wie steht es danach?",
+      "errorFeedback": "Diese Lage passt noch nicht zur Pfeilrichtung. Prüfe eine auffällige Ecke und drehe dann das ganze Gebäude gemeinsam.",
+      "explanation": "Bei einer Vierteldrehung bleiben alle Würfel miteinander verbunden. Nur ihre Lage zu vorne und rechts ändert sich.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 3,
+        "maxValue": 5
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Das Kind verbindet Ausgangsdiagramm, Drehpfeil und räumlichen Folgezustand."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind erhält Nachbarschaften und Stapelhöhen bei einer Lageänderung."
+        }
+      ],
+      "prerequisites": [
+        "Vorne, rechts und oben sicher unterscheiden",
+        "Einfache Körperansichten an Würfelgebäuden erkennen",
+        "Eine Vierteldrehung nach links und rechts sprachlich unterscheiden"
+      ],
+      "representations": [
+        "Fest ausgerichtetes axonometrisches Würfelgebäude",
+        "Sichtbare senkrechte Drehachse",
+        "Eindeutiger 90-Grad-Drehpfeil",
+        "Drei gleichartig dargestellte Folgezustände"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Drei Würfel ohne Stapel; ausschließlich eine Vierteldrehung nach rechts; deutlich verschiedene Folgezustände",
+          "numberRange": "genau 3 Würfel",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Drei bis vier Würfel mit höchstens einem Stapel; Links- oder Rechtsdrehung; Achse und Richtung bleiben sichtbar",
+          "numberRange": "3 bis 4 Würfel",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Vier bis fünf Würfel in einer längeren Grundform; Links- oder Rechtsdrehung; ähnlichere plausible Folgezustände",
+          "numberRange": "4 bis 5 Würfel",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": true,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Zeigt der Pfeil nach rechts, wird die bisher linke Seite zur neuen Vorderseite; Nachbarschaften und Stapelhöhen bleiben dabei unverändert.",
+      "successFeedback": "Du hast Pfeilrichtung, Ecken und Stapel richtig mitgedreht.",
+      "remediation": {
+        "strategy": "Verfolge nur eine auffällige Ecke und den höchsten Stapel durch die Vierteldrehung.",
+        "foundationStrategy": "Nutze drei einzelne Würfel und eine deutlich markierte Rechtsdrehung. Drehe zuerst nur die L-förmige Grundfläche.",
+        "representation": "Kleines Würfelgebäude mit senkrechter Achse, Vorder-/Rechtsmarken und 90-Grad-Pfeil",
+        "keepSubskill": false
+      },
+      "transferPrompt": "Beschreibe ohne Drehen des Bildschirms, welche Seite bei einer Linksdrehung vorne erscheint.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Drehachse, Pfeilrichtung und unverändertes Gebäude benennen.",
+          "exerciseTypes": [
+            "cube-rotation:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Eine auffällige Ecke bei einer Rechtsdrehung verfolgen.",
+          "exerciseTypes": [
+            "cube-rotation:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Eine einfache L-Grundfläche mit sichtbarer Achse nach rechts drehen.",
+          "exerciseTypes": [
+            "cube-rotation:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Links- und Rechtsdrehung unterscheiden und einen Stapel korrekt mitführen.",
+          "exerciseTypes": [
+            "cube-rotation:left",
+            "cube-rotation:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Bekannte Würfelgebäude nach einer Vierteldrehung sicher wiedererkennen.",
+          "exerciseTypes": [
+            "cube-rotation:left",
+            "cube-rotation:right"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Komplexere Grundformen und ähnlichere Fehlzustände über ein erhaltenes Merkmal unterscheiden.",
+          "exerciseTypes": [
+            "cube-rotation:left",
+            "cube-rotation:right"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Genau eine Antwort entspricht der katalogisierten 90-Grad-Drehung.",
+        "Würfelzahl, Nachbarschaften und Stapelhöhen bleiben erhalten.",
+        "Ausgangslage, korrekte Drehung und entgegengesetzte Drehung sind eindeutig verschieden.",
+        "Die Kompetenz wird erst nach fünf Körperansichtsversuchen und Lernwert 60 adaptiv ausgewählt."
+      ]
     }
   ],
   "wordProblems": [
@@ -4592,6 +4751,164 @@
       }
     ]
   },
+  "spatialRotations": {
+    "entryRationale": "Die Aufgabe trennt feste Körperansichten von einer einzigen Lageänderung. Achse und 90-Grad-Richtung bleiben sichtbar; das Gebäude wird nicht interaktiv gedreht, damit das Kind den Folgezustand gedanklich vorhersagt.",
+    "prompt": "Das Gebäude dreht sich {turnLabel}. Wie steht es danach?",
+    "axisLabel": "senkrechte Drehachse",
+    "optionLabels": [
+      "Gebäude A",
+      "Gebäude B",
+      "Gebäude C"
+    ],
+    "turnLabels": {
+      "left": "90 Grad nach links",
+      "right": "90 Grad nach rechts"
+    },
+    "turnGuidance": {
+      "left": "Bei der Linksdrehung wandert die bisher vordere Seite nach links; alle Würfel drehen sich gemeinsam um die senkrechte Achse.",
+      "right": "Bei der Rechtsdrehung wandert die bisher vordere Seite nach rechts; alle Würfel drehen sich gemeinsam um die senkrechte Achse."
+    },
+    "templates": [
+      {
+        "id": "simple-l-right-a",
+        "difficulty": 1,
+        "turn": "right",
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "simple-l-right-b",
+        "difficulty": 1,
+        "turn": "right",
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "corner-stack-right",
+        "difficulty": 2,
+        "turn": "right",
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          2,
+          0
+        ]
+      },
+      {
+        "id": "corner-stack-left",
+        "difficulty": 2,
+        "turn": "left",
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          2,
+          0
+        ]
+      },
+      {
+        "id": "opposite-corner-right",
+        "difficulty": 2,
+        "turn": "right",
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          2,
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "opposite-corner-left",
+        "difficulty": 2,
+        "turn": "left",
+        "width": 2,
+        "depth": 2,
+        "heights": [
+          2,
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "offset-path-right",
+        "difficulty": 3,
+        "turn": "right",
+        "width": 3,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          1,
+          0,
+          2,
+          0
+        ]
+      },
+      {
+        "id": "offset-path-left",
+        "difficulty": 3,
+        "turn": "left",
+        "width": 3,
+        "depth": 2,
+        "heights": [
+          1,
+          1,
+          1,
+          0,
+          2,
+          0
+        ]
+      },
+      {
+        "id": "stair-path-right",
+        "difficulty": 3,
+        "turn": "right",
+        "width": 2,
+        "depth": 3,
+        "heights": [
+          1,
+          0,
+          1,
+          1,
+          0,
+          2
+        ]
+      },
+      {
+        "id": "stair-path-left",
+        "difficulty": 3,
+        "turn": "left",
+        "width": 2,
+        "depth": 3,
+        "heights": [
+          1,
+          0,
+          1,
+          1,
+          0,
+          2
+        ]
+      }
+    ]
+  },
   "fieldUsage": {
     "workedExample": "review",
     "remediation": "runtime",
@@ -4609,28 +4926,29 @@
   "preparedTopics": [
     {
       "id": "spatial-reasoning",
-      "label": "Räumliche Lageänderungen",
+      "label": "Kippen und Falten",
       "curriculumArea": "Raum und Form",
-      "supportGoal": "Lageänderungen und einfache Kopfgeometrie an geprüften Modellen verstehen.",
+      "supportGoal": "Nach der aktivierten Würfelrotation weitere räumliche Lageänderungen und einfache Faltungen verstehen.",
       "prerequisites": [
         "Lagebegriffe",
         "ebene Figuren erkennen",
-        "einfache Symmetrie"
+        "einfache Symmetrie",
+        "kontrollierte Würfelrotation"
       ],
       "representations": [
-        "Würfelbauwerk mit Drehpfeil",
+        "Würfel mit sichtbarer Kippachse",
         "Faltvorlage"
       ],
       "misconceptions": [
-        "Drehen wird mit Spiegeln verwechselt.",
-        "Die Drehrichtung wird vertauscht."
+        "Kippen wird mit einer Drehung um die senkrechte Achse verwechselt.",
+        "Beim Falten wird die Spiegelbeziehung nicht erhalten."
       ],
       "progression": [
-        "Körper gedanklich drehen",
         "einfache Kippbewegungen verfolgen",
-        "Faltungen vorhersagen"
+        "Faltungen vorhersagen",
+        "eine Faltung wieder öffnen"
       ],
-      "remediation": "Mit einem kleinen sichtbaren Würfelmodell und nur einer Lageänderung beginnen.",
+      "remediation": "Mit genau einer sichtbaren Kipp- oder Faltachse und einem markierten Ausgangspunkt beginnen.",
       "releaseStatus": "disabled"
     }
   ],

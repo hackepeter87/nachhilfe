@@ -18,6 +18,36 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'body-views', correct: true }))
   })
 
+  it('lässt eine Würfeldrehung aus drei neutralen Folgezuständen auswählen', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('cube-rotation', 42, 2, 'cube-rotation-left')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    expect(screen.getByRole('img', { name: /90 Grad nach links.*senkrechte Achse/i })).toBeVisible()
+    expect(screen.getAllByRole('img', { name: /Gebäude [ABC].*nach der Drehung/i })).toHaveLength(3)
+    expect(container.querySelectorAll('.answer-option[data-answer-state="idle"]')).toHaveLength(3)
+    const correct = exercise.options?.find((option) => option.value === exercise.correctAnswer)
+    if (!correct) throw new Error('Die Rotationsaufgabe enthält keine richtige Antwortoption.')
+    await user.click(screen.getByRole('button', { name: new RegExp(correct.label) }))
+    expect(screen.getByText(exercise.successFeedback)).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'cube-rotation', subskillId: 'cube-rotation-left', correct: true }))
+  })
+
+  it('gibt bei unveränderter Lage rotationsbezogene Hilfe statt allgemeinem Feedback', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('cube-rotation', 43, 3)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const unchanged = exercise.options?.find((option) => option.misconception === 'not-rotated')
+    if (!unchanged) throw new Error('Die Rotationsaufgabe enthält keinen Unverändert-Distraktor.')
+
+    await user.click(screen.getByRole('button', { name: new RegExp(unchanged.label) }))
+    expect(screen.getByText(exercise.errorFeedback)).toHaveTextContent(/Pfeilrichtung.*auffällige Ecke/i)
+    await user.click(screen.getByRole('button', { name: /Tipp/i }))
+    expect(screen.getByText(exercise.hints[0].text)).toHaveTextContent(/auffällige Ecke/i)
+  })
+
   it('zeigt bei Symmetrie die katalogisierte Spiegelachse eindeutig an', () => {
     const exercise = generateExercise('symmetry', 42, 1, 'symmetry-phase-1')
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)

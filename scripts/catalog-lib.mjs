@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 10
+export const CATALOG_SCHEMA_VERSION = 11
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -18,7 +18,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -316,6 +316,94 @@ function validateSpatialViews(spatialViews) {
   if (![1, 2, 3].every((difficulty) => difficulties.has(difficulty))) fail('spatialViews braucht Vorlagen für alle drei Stufen')
 }
 
+function validateSpatialRotations(spatialRotations) {
+  if (!isRecord(spatialRotations) || !isText(spatialRotations.entryRationale) || !isText(spatialRotations.prompt) ||
+    !isText(spatialRotations.axisLabel) || !Array.isArray(spatialRotations.optionLabels) ||
+    spatialRotations.optionLabels.length !== 3 || !spatialRotations.optionLabels.every(isText)) {
+    fail('spatialRotations Grunddaten sind ungültig')
+  }
+  requireUnique(spatialRotations.optionLabels, 'spatialRotations.optionLabels')
+  for (const turn of ['left', 'right']) {
+    if (!isText(spatialRotations.turnLabels?.[turn]) || !isText(spatialRotations.turnGuidance?.[turn])) {
+      fail(`spatialRotations ${turn} ist unvollständig`)
+    }
+  }
+  if (!Array.isArray(spatialRotations.templates) || spatialRotations.templates.length < 6) fail('spatialRotations.templates ist unvollständig')
+  requireUnique(spatialRotations.templates.map((template) => template.id), 'spatialRotations.templates IDs')
+  const difficulties = new Set()
+  const turnsByDifficulty = new Map()
+  const key = (building) => `${building.width}x${building.depth}:${building.heights.join(',')}`
+  const everyCubeIsVisible = (building) => {
+    const heightAt = (x, y) => x < 0 || x >= building.width || y < 0 || y >= building.depth ? 0 : building.heights[y * building.width + x]
+    for (let y = 0; y < building.depth; y += 1) for (let x = 0; x < building.width; x += 1) {
+      const height = heightAt(x, y)
+      for (let z = 0; z < height; z += 1) {
+        if (z !== height - 1 && y !== 0 && heightAt(x, y - 1) > z && x !== building.width - 1 && heightAt(x + 1, y) > z) return false
+      }
+    }
+    return true
+  }
+  const rotate = (building, turn) => {
+    const width = building.depth
+    const depth = building.width
+    const heights = Array(width * depth).fill(0)
+    for (let y = 0; y < building.depth; y += 1) for (let x = 0; x < building.width; x += 1) {
+      const nextX = turn === 'right' ? building.depth - 1 - y : y
+      const nextY = turn === 'right' ? x : building.width - 1 - x
+      heights[nextY * width + nextX] = building.heights[y * building.width + x]
+    }
+    return { width, depth, heights }
+  }
+  spatialRotations.templates.forEach((template) => {
+    if (!isRecord(template) || !isText(template.id) || ![1, 2, 3].includes(template.difficulty) ||
+      !['left', 'right'].includes(template.turn) || !Number.isInteger(template.width) || template.width < 2 || template.width > 3 ||
+      !Number.isInteger(template.depth) || template.depth < 1 || template.depth > 3 ||
+      !Array.isArray(template.heights) || template.heights.length !== template.width * template.depth ||
+      !template.heights.every((height) => Number.isInteger(height) && height >= 0 && height <= 2)) {
+      fail(`Rotationsvorlage ${String(template?.id)} ist ungültig`)
+    }
+    const cubeCount = template.heights.reduce((sum, height) => sum + height, 0)
+    const [min, max] = template.difficulty === 1 ? [3, 3] : template.difficulty === 2 ? [3, 4] : [4, 5]
+    if (cubeCount < min || cubeCount > max) fail(`Rotationsvorlage ${template.id} passt nicht zur Schwierigkeit`)
+    const fillsBoundingBox = template.heights.some((height, index) => height > 0 && index % template.width === 0) &&
+      template.heights.some((height, index) => height > 0 && index % template.width === template.width - 1) &&
+      template.heights.slice(0, template.width).some((height) => height > 0) &&
+      template.heights.slice((template.depth - 1) * template.width).some((height) => height > 0)
+    if (!fillsBoundingBox || !everyCubeIsVisible(template)) fail(`Rotationsvorlage ${template.id} enthält unsichtbare Würfel oder äußere Leerränder`)
+    const occupied = template.heights.map((height, index) => height > 0 ? index : -1).filter((index) => index >= 0)
+    const visited = new Set(occupied.slice(0, 1))
+    const queue = [...visited]
+    while (queue.length > 0) {
+      const index = queue.shift()
+      const x = index % template.width
+      const y = Math.floor(index / template.width)
+      for (const [nextX, nextY] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+        const nextIndex = nextY * template.width + nextX
+        if (nextX >= 0 && nextX < template.width && nextY >= 0 && nextY < template.depth && template.heights[nextIndex] > 0 && !visited.has(nextIndex)) {
+          visited.add(nextIndex)
+          queue.push(nextIndex)
+        }
+      }
+    }
+    if (visited.size !== occupied.length) fail(`Rotationsvorlage ${template.id} ist nicht zusammenhängend`)
+    const opposite = template.turn === 'right' ? 'left' : 'right'
+    const correct = rotate(template, template.turn)
+    const oppositeBuilding = rotate(template, opposite)
+    if (!everyCubeIsVisible(correct) || !everyCubeIsVisible(oppositeBuilding)) fail(`Rotationsvorlage ${template.id} wird nach der Drehung nicht vollständig sichtbar`)
+    if (new Set([key(template), key(correct), key(oppositeBuilding)]).size !== 3) {
+      fail(`Rotationsvorlage ${template.id} unterscheidet Ausgangslage und Drehrichtungen nicht eindeutig`)
+    }
+    difficulties.add(template.difficulty)
+    const turns = turnsByDifficulty.get(template.difficulty) ?? new Set()
+    turns.add(template.turn)
+    turnsByDifficulty.set(template.difficulty, turns)
+  })
+  if (![1, 2, 3].every((difficulty) => difficulties.has(difficulty)) || turnsByDifficulty.get(1)?.size !== 1 || !turnsByDifficulty.get(1)?.has('right') ||
+    ![2, 3].every((difficulty) => ['left', 'right'].every((turn) => turnsByDifficulty.get(difficulty)?.has(turn)))) {
+    fail('spatialRotations braucht die katalogisierte Richtungsprogression in allen drei Stufen')
+  }
+}
+
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
@@ -389,6 +477,7 @@ export function validateCatalog(catalog) {
   }
   validateSymmetry(catalog.symmetry)
   validateSpatialViews(catalog.spatialViews)
+  validateSpatialRotations(catalog.spatialRotations)
   validatePlaceholders(catalog)
   return catalog
 }

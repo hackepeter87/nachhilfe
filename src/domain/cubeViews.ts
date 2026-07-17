@@ -1,4 +1,5 @@
 export type CubeViewDirection = 'front' | 'right' | 'top'
+export type CubeTurnDirection = 'left' | 'right'
 export type BinaryGrid = number[][]
 
 export interface CubeBuilding {
@@ -12,8 +13,17 @@ export interface CubeViewDistractor {
   misconception: 'mirrored-orientation' | 'overlooked-cube' | 'wrong-stack-height'
 }
 
+export interface CubeRotationDistractor {
+  building: CubeBuilding
+  misconception: 'not-rotated' | 'opposite-direction'
+}
+
 export function cubeCount(building: CubeBuilding): number {
   return building.heights.reduce((sum, height) => sum + height, 0)
+}
+
+export function cubeBuildingKey(building: CubeBuilding): string {
+  return `${building.width}x${building.depth}:${building.heights.join(',')}`
 }
 
 function heightAt(building: CubeBuilding, x: number, y: number): number {
@@ -95,6 +105,36 @@ export function projectCubeView(building: CubeBuilding, direction: CubeViewDirec
     const y = building.depth - 1 - row
     return Array.from({ length: building.width }, (_, x) => heightAt(building, x, y) > 0 ? 1 : 0)
   })
+}
+
+export function rotateCubeBuilding(building: CubeBuilding, direction: CubeTurnDirection): CubeBuilding {
+  if (!isValidCubeBuilding(building)) throw new RangeError('Das Würfelgebäude ist ungültig.')
+  const width = building.depth
+  const depth = building.width
+  const heights = Array.from({ length: width * depth }, () => 0)
+  for (let y = 0; y < building.depth; y += 1) {
+    for (let x = 0; x < building.width; x += 1) {
+      const nextX = direction === 'right' ? building.depth - 1 - y : y
+      const nextY = direction === 'right' ? x : building.width - 1 - x
+      heights[nextY * width + nextX] = heightAt(building, x, y)
+    }
+  }
+  const rotated = { width, depth, heights }
+  if (!isValidCubeBuilding(rotated)) throw new Error('Die Drehung erzeugt ein ungültiges Würfelgebäude.')
+  return rotated
+}
+
+export function createCubeRotationDistractors(building: CubeBuilding, direction: CubeTurnDirection): [CubeRotationDistractor, CubeRotationDistractor] {
+  const correct = rotateCubeBuilding(building, direction)
+  const opposite = rotateCubeBuilding(building, direction === 'right' ? 'left' : 'right')
+  const keys = [cubeBuildingKey(correct), cubeBuildingKey(building), cubeBuildingKey(opposite)]
+  if (new Set(keys).size !== keys.length) {
+    throw new Error('Das Würfelgebäude unterscheidet Ausgangslage und beide Drehrichtungen nicht eindeutig.')
+  }
+  return [
+    { building, misconception: 'not-rotated' },
+    { building: opposite, misconception: 'opposite-direction' }
+  ]
 }
 
 export function cubeViewKey(grid: BinaryGrid): string {

@@ -530,6 +530,12 @@ p {
 .view-direction--front text { fill: #1f604c; }
 .view-direction--right path { stroke: #27769e; }
 .view-direction--right text { fill: #19577d; }
+.rotation-axis path { fill: none; stroke: #8a5a2b; stroke-width: 3; stroke-dasharray: 7 5; }
+.rotation-axis text { fill: #70451f; font: 800 12px system-ui, sans-serif; letter-spacing: 0; }
+.rotation-turn path { fill: none; stroke: #9a4e28; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.rotation-turn text { fill: #7c3f22; font: 850 14px system-ui, sans-serif; letter-spacing: 0; }
+.cube-rotation-visual { background: #fff9f4; border-color: #e8cdbb; }
+.model-option .cube-building-visual svg { max-height: 180px; }
 
 .cube-view-visual { min-height: 84px; display: grid; place-items: center; background: #f7faf8; }
 .cube-view-grid { --view-columns: 2; display: grid; grid-template-columns: repeat(var(--view-columns), 28px); gap: 3px; padding: 4px; border: 2px solid #6d8b80; background: #fff; }
@@ -1128,6 +1134,10 @@ p {
 
   .answer-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .answer-options.model-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

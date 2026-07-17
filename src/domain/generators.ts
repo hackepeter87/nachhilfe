@@ -3,7 +3,17 @@ import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, Exerci
 import { getSkillContent, getTaskCatalog, renderCatalogText, WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 import type { WordModelType } from '../content/catalog'
 import { createShiftDistractor, flipGrid, mirrorGrid, reflectGrid } from './symmetry'
-import { createCubeViewDistractors, cubeCount, cubeViewKey, projectCubeView, type CubeViewDirection } from './cubeViews'
+import {
+  createCubeRotationDistractors,
+  createCubeViewDistractors,
+  cubeBuildingKey,
+  cubeCount,
+  cubeViewKey,
+  projectCubeView,
+  rotateCubeBuilding,
+  type CubeTurnDirection,
+  type CubeViewDirection
+} from './cubeViews'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1310,6 +1320,66 @@ function bodyViews(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().spatialRotations
+  const requestedTurn = focus === 'cube-rotation-left' ? 'left' : focus === 'cube-rotation-right' ? 'right' : undefined
+  const levelCandidates = content.templates.filter((template) => template.difficulty === difficulty)
+  const focusedCandidates = requestedTurn ? levelCandidates.filter((template) => template.turn === requestedTurn) : levelCandidates
+  const candidates = focusedCandidates.length > 0 ? focusedCandidates : levelCandidates
+  if (candidates.length === 0) throw new Error(`Keine Würfelrotation-Vorlage für Stufe ${difficulty}.`)
+  const template = pick(random, candidates)
+  const turn = template.turn as CubeTurnDirection
+  const correct = rotateCubeBuilding(template, turn)
+  const distractors = createCubeRotationDistractors(template, turn)
+  const turnLabel = content.turnLabels[turn]
+  const values = { turnLabel, turn, cubes: cubeCount(template), templateId: template.id }
+  const shuffled = shuffle<{ building: typeof correct; misconception?: string }>(random, [
+    { building: correct },
+    ...distractors
+  ])
+  const options = shuffled.map((candidate, index): AnswerOption => ({
+    value: cubeBuildingKey(candidate.building),
+    label: content.optionLabels[index]!,
+    misconception: candidate.misconception,
+    representation: {
+      kind: 'cube-building',
+      visibility: 'always',
+      label: `${content.optionLabels[index]}: Würfelgebäude nach der Drehung`,
+      values: {
+        width: candidate.building.width,
+        depth: candidate.building.depth,
+        heights: candidate.building.heights
+      }
+    }
+  }))
+  const skillContent = contentFor('cube-rotation', values, difficulty)
+  return withMetadata({
+    ...base('cube-rotation', seed, difficulty, values),
+    ...skillContent,
+    prompt: renderCatalogText(content.prompt, values),
+    typeId: 'cube-building-quarter-turn',
+    subskillId: `cube-rotation-${turn}`,
+    answerMode: 'choice',
+    correctAnswer: cubeBuildingKey(correct),
+    options,
+    representation: {
+      kind: 'cube-rotation',
+      visibility: 'always',
+      label: `${cubeCount(template)} Würfel. ${turnLabel} um die senkrechte Achse.`,
+      values: {
+        width: template.width,
+        depth: template.depth,
+        heights: template.heights,
+        turn,
+        turnLabel,
+        axisLabel: content.axisLabel
+      }
+    },
+    explanation: `${content.turnGuidance[turn]} ${skillContent.explanation}`
+  })
+}
+
 export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
   switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus)
@@ -1333,6 +1403,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'word-problem': return wordProblem(seed, difficulty)
     case 'symmetry': return symmetry(seed, difficulty, focus)
     case 'body-views': return bodyViews(seed, difficulty)
+    case 'cube-rotation': return cubeRotation(seed, difficulty, focus)
   }
 }
 

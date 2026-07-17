@@ -1,13 +1,13 @@
 # Validierung und Konsolidierung 0.6
 
-Stand: App 0.13.1, Katalog 0.12.0, Schema 10. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
+Stand: App 0.14.0, Katalog 0.13.0, Schema 11. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
 
 ## Intern prüfbar
 
 - Katalogquelle, öffentlicher Katalog und eingebetteter Fallback werden deterministisch abgeglichen.
 - Generator-, Komponenten-, Persistenz-, Mobile-, Offline- und Containerprüfungen sind Bestandteil der Release-Abnahme.
 - Die didaktische Progression und der Runtime-Abgleich nennen nur produktiv wirksame Funktionen.
-- Geld und Längen sind seit 0.8 aktiv. Schriftliche Addition mit höchstens einem Übertrag ist seit 0.11 aktiv; schriftliche Subtraktion mit höchstens einer Entbündelung ist seit 0.12 aktiv. Mehrere gleichzeitige Übergänge, Millimeter/Kilometer und Raumvorstellung bleiben deaktiviert.
+- Geld und Längen sind seit 0.8 aktiv. Schriftliche Addition mit höchstens einem Übertrag ist seit 0.11 aktiv; schriftliche Subtraktion mit höchstens einer Entbündelung ist seit 0.12 aktiv. Körperansichten sind seit 0.13 und kontrollierte 90-Grad-Würfelrotation seit 0.14 aktiv. Mehrere gleichzeitige Übergänge, Millimeter/Kilometer, freie Rotation, Kippen und Falten bleiben deaktiviert.
 
 Die konkreten ausgeführten Befehle und Ergebnisse stehen in den Release Notes. Automatisierte Tests ersetzen keine Unterrichtserprobung.
 

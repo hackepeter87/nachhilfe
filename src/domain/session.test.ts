@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.12.0',
-      schemaVersion: 10,
-      appVersion: '0.13.1'
+      catalogVersion: '0.13.0',
+      schemaVersion: 11,
+      appVersion: '0.14.0'
     })
   })
 
@@ -63,7 +63,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.12.0')
+      expect(runningSession.catalogVersion).toBe('0.13.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -120,6 +120,14 @@ describe('Sitzungsplanung', () => {
     expect(isSkillEligible('written-subtraction', { 'place-value': placeValue })).toBe(false)
     expect(isSkillEligible('written-subtraction', { 'subtraction-1000': subtraction1000 })).toBe(false)
     expect(isSkillEligible('written-subtraction', { 'place-value': placeValue, 'subtraction-1000': subtraction1000 })).toBe(true)
+  })
+
+  it('schaltet Würfelrotation erst nach fünf Körperansichten und Lernwert 60 frei', () => {
+    const bodyViews = createSkillProgress('body-views')
+    expect(isSkillEligible('cube-rotation', {})).toBe(false)
+    expect(isSkillEligible('cube-rotation', { 'body-views': { ...bodyViews, attempts: 4, mastery: 80 } })).toBe(false)
+    expect(isSkillEligible('cube-rotation', { 'body-views': { ...bodyViews, attempts: 5, mastery: 59 } })).toBe(false)
+    expect(isSkillEligible('cube-rotation', { 'body-views': { ...bodyViews, attempts: 5, mastery: 60 } })).toBe(true)
   })
 
   it('berücksichtigt schwache Grundrechenarten und Unterkompetenzen häufiger', () => {
@@ -211,5 +219,14 @@ describe('Sitzungsplanung', () => {
     expect(repetition).toMatchObject({ skillId: 'body-views', difficulty: 2 })
     expect(repetition.variant.key).not.toBe(original.variant.key)
     expect(Number(repetition.variant.values.cubes)).toBeLessThanOrEqual(4)
+  })
+
+  it('führt nach einem Rotationsfehler auf eine leichtere andere Vierteldrehung zurück', () => {
+    const original = generateExercise('cube-rotation', 907, 3)
+    const repetition = createRemediationExercise(original, 908)
+    expect(repetition).toMatchObject({ skillId: 'cube-rotation', difficulty: 2 })
+    expect(repetition.variant.key).not.toBe(original.variant.key)
+    expect(Number(repetition.variant.values.cubes)).toBeLessThanOrEqual(4)
+    expect(repetition.representation?.kind).toBe('cube-rotation')
   })
 })
