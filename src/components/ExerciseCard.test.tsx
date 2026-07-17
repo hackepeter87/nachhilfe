@@ -122,6 +122,23 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('zeigt positives Zwischenfeedback bei Sachaufgaben grün', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('word-problem', 42, 1)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    for (const stepId of ['question', 'situation']) {
+      const step = exercise.steps?.find((candidate) => candidate.id === stepId)
+      const option = step?.options?.find((candidate) => candidate.value === step.correctAnswer)
+      if (!step || !option) throw new Error(`Richtige Option für ${stepId} fehlt`)
+      await user.click(screen.getByRole('button', { name: option.label }))
+    }
+
+    const feedback = screen.getByText(exercise.steps?.find((step) => step.id === 'situation')?.successFeedback ?? '')
+    expect(feedback).toHaveClass('feedback--step-success')
+    expect(feedback).not.toHaveClass('feedback--try')
+  })
+
   it.each(['money', 'lengths'] as const)('lässt eine Größenaufgabe %s vollständig lösen', async (skill) => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

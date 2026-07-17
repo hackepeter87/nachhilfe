@@ -162,9 +162,11 @@ export function MathRepresentation({ representation }: { representation: Exercis
       return <div className="math-visual math-visual--error" role="alert">Das Balkenmodell enthält ungültige Mengenangaben.</div>
     }
     if (modelType === 'change-increase') return (
-      <div className="math-visual word-model" role="img" aria-label={`Anfang ${first}, dazu ${second}, neue Gesamtmenge unbekannt.`}>
-        <span className="model-caption">zuerst</span><div className="model-bar"><span>{first}</span></div>
-        <span className="model-caption">danach kommt etwas dazu</span><div className="model-bar model-bar--parts"><span>{first}</span><span>+ {second}</span></div>
+      <div className="math-visual word-model change-increase-model" role="img" aria-label={`Anfang ${first}, dazu ${second}, neue Gesamtmenge unbekannt.`}>
+        <span className="model-caption">zuerst</span>
+        <div className="model-bar model-bar--known-part" style={{ width: `${(first / (first + second)) * 100}%` }}><span>{first}</span></div>
+        <span className="model-caption">danach kommt etwas dazu</span>
+        <div className="model-bar model-bar--parts" style={{ gridTemplateColumns: `${first}fr ${second}fr` }}><span>{first}</span><span>+ {second}</span></div>
         <strong>neue Gesamtmenge: ?</strong>
       </div>
     )

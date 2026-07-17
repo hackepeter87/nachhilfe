@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App `0.9.0`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App `0.9.1`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -14,7 +14,7 @@ Stand: App `0.9.0`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Dies
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.9.0
+## Aktive Veränderungen bis 0.9.1
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -28,6 +28,7 @@ Stand: App `0.9.0`, Katalog `0.7.0`, Schema `6`, Status `ready-for-review`. Dies
 - Längen: Stufe 1 liest eine Zentimeter-Messstrecke, Stufe 2 wechselt zwischen Metern und Zentimetern, Stufe 3 addiert oder vergleicht Längen mit gemeinsamer Einheit.
 - Katalogschema 5: `quantityContent` liefert fachliche Aufgaben-, Erklärungs- und Darstellungsbegriffe für beide Größenkompetenzen; Mathematik und Einheitenprüfung bleiben in TypeScript.
 - Katalogschema 6: Sachaufgaben definieren konkrete Situationen, Modelltypen, Modellalternativen, Gleichungen und eine siebenstufig dokumentierte Modellierungsfolge; Rendering und Mathematik bleiben in TypeScript.
+- Sachaufgabenmodell 0.9.1: Veränderungsbalken verwenden die tatsächlichen Mengenverhältnisse; positives Zwischenfeedback ist grün, Korrekturfeedback bleibt rot.
 
 ## Bewusst deaktiviert
 

@@ -93,7 +93,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
     catalogId: 'nrw-klasse3-foerderkern',
     catalogVersion: '0.7.0',
     schemaVersion: 6,
-    appVersion: '0.9.0'
+    appVersion: '0.9.1'
   })
 
   await page.reload()
@@ -192,6 +192,16 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   const model = page.getByRole('img', { name: /neue Gesamtmenge unbekannt/i })
   await expect(model).toBeVisible()
   await expect(model).toContainText('?')
+  const modelLabel = await model.getAttribute('aria-label')
+  const [knownAmount, addedAmount] = modelLabel?.match(/\d+/g)?.map(Number) ?? []
+  if (knownAmount === undefined || addedAmount === undefined) throw new Error('Mengenverhältnis ist nicht lesbar')
+  const renderedRatio = await model.evaluate((element) => {
+    const bars = element.querySelectorAll<HTMLElement>('.model-bar')
+    return bars[0]!.getBoundingClientRect().width / bars[1]!.getBoundingClientRect().width
+  })
+  expect(renderedRatio).toBeCloseTo(knownAmount / (knownAmount + addedAmount), 2)
+  await expect(page.locator('.feedback--step-success')).toBeVisible()
+  await expect(page.locator('.feedback--try')).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('sachaufgabe-modell-375x812.png'), fullPage: true })
   await page.getByRole('button', { name: 'Weiter zur Rechnung' }).click()

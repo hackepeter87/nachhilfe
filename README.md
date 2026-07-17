@@ -127,7 +127,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Multi-Arch-Release-Images für `linux/amd64` und `linux/arm64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.9.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.9.1
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -168,6 +168,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.9.0
+## Release-Stand 0.9.1
 
-Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.9.0 stellt Sachaufgaben auf einen geführten Modellierungsweg mit konkreten unbekanntenhaltigen Bildern und eigener Ergebnisberechnung um. Die didaktischen Annahmen und Grenzen stehen in [docs/didactics/word-problems.md](docs/didactics/word-problems.md); die offene externe Abnahme bleibt in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Der vertikale MVP umfasst Onboarding, Startseite, vollständige adaptive Runde, alle oben genannten Aufgabenfamilien, lokale Persistenz, PWA/Offline-Betrieb, automatisierte Tests und das OCI-Image `mathe-reise:local`. Version 0.9.0 stellt Sachaufgaben auf einen geführten Modellierungsweg mit konkreten unbekanntenhaltigen Bildern und eigener Ergebnisberechnung um; Version 0.9.1 korrigiert die Proportionen der Veränderungsmodelle und die Farbe positiven Zwischenfeedbacks. Die didaktischen Annahmen und Grenzen stehen in [docs/didactics/word-problems.md](docs/didactics/word-problems.md); die offene externe Abnahme bleibt in [docs/validation-0.6.md](docs/validation-0.6.md) dokumentiert. Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).

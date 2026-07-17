@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Sachaufgabenmodell-UI-Hotfix 0.9.1
+
+- Veränderungsmodelle stellen bekannte Anfangsmenge und hinzukommende Menge jetzt proportional dar. Bei `13 + 3` belegt der obere Balken deshalb `13/16` der Gesamtbreite statt fälschlich die volle Breite.
+- Richtige Antworten in Zwischenschritten verwenden wieder das grüne Erfolgsfeedback. Rot bleibt falschen Antworten und konkreten Korrekturhinweisen vorbehalten.
+- Komponenten- und Mobile-Regressionstests sichern Proportionen, Feedbackzustände und die Darstellung bei `375 x 812` ab.
+
+Der fachliche Katalog bleibt unverändert bei Version `0.7.0` und Schema `6`.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 176 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und fünf Playwright-Szenarien jeweils gegen Vite Preview und den Container. Der mobile Sachaufgabentest misst das gerenderte Mengenverhältnis, prüft grünes Erfolgsfeedback und horizontales Overflow bei `375 x 812`. Das OCI-Image `mathe-reise:0.9.1` und `mathe-reise:local` läuft als UID 101 mit Read-only-Rootfs, ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Podman war nicht installiert und wurde nicht als ausgeführt behauptet; ein echter iPhone-Test wurde ebenfalls nicht durchgeführt.
+
 ## Sachaufgaben als Modellierungsprozess 0.9.0
 
 - Sachaufgaben beginnen mit der konkret gesuchten Größe und der Handlung der Geschichte. Technische Kategorien wie „Mengenbeziehung“ und eine isolierte Rechenartauswahl sind aus dem Kinderablauf entfernt.

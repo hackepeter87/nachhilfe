@@ -615,6 +615,7 @@ p {
 .model-bar > span { display: grid; place-items: center; min-width: 0; padding: 6px; font-weight: 850; }
 .model-bar--parts { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 .model-bar--parts > span + span { border-left: 2px solid #315d45; background: #ffe5d7; }
+.model-bar--known-part { min-width: 44px; }
 .model-bar--short { grid-template-columns: minmax(0, 3fr) minmax(42px, 2fr); width: 78%; }
 .model-unknown { color: #19577d; background: repeating-linear-gradient(135deg, #eef7fb, #eef7fb 8px, #d8edf6 8px, #d8edf6 16px) !important; }
 .model-removed { color: #7e3823; background: repeating-linear-gradient(135deg, #fff2eb, #fff2eb 8px, #f7d8ca 8px, #f7d8ca 16px) !important; }
@@ -754,6 +755,12 @@ p {
 }
 
 .feedback--success {
+  color: var(--green-dark);
+  background: var(--green-soft);
+}
+
+.feedback--step-success {
+  display: block;
   color: var(--green-dark);
   background: var(--green-soft);
 }

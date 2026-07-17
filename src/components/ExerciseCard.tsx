@@ -11,6 +11,7 @@ interface ExerciseCardProps {
 }
 
 type AnswerState = 'answering' | 'correct' | 'scaffold'
+type MessageKind = 'error' | 'success'
 
 export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   const [answer, setAnswer] = useState('')
@@ -19,6 +20,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   const [hadError, setHadError] = useState(false)
   const [hintsShown, setHintsShown] = useState(0)
   const [message, setMessage] = useState('')
+  const [messageKind, setMessageKind] = useState<MessageKind>('success')
   const [stepIndex, setStepIndex] = useState(0)
 
   const currentStep = exercise.steps?.[stepIndex]
@@ -33,6 +35,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
     setChecks(nextChecks)
     setHadError(true)
     setMessage(feedback)
+    setMessageKind('error')
     setAnswer('')
     if (nextChecks >= 2) setAnswerState('scaffold')
   }
@@ -42,6 +45,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
     if (isAnswerCorrect(exercise, value)) {
       setAnswerState('correct')
       setMessage(hadError ? `Jetzt passt es. ${exercise.successFeedback}` : exercise.successFeedback)
+      setMessageKind('success')
       return
     }
     registerWrongAnswer(exercise.errorFeedback)
@@ -55,6 +59,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
       return
     }
     setMessage(currentStep.successFeedback)
+    setMessageKind('success')
     if (stepIndex === (exercise.steps?.length ?? 1) - 1) {
       setAnswerState('correct')
     } else {
@@ -86,6 +91,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   const continueStep = () => {
     if (!currentStep) return
     setMessage(currentStep.successFeedback)
+    setMessageKind('success')
     if (stepIndex === (exercise.steps?.length ?? 1) - 1) setAnswerState('correct')
     else setStepIndex((current) => current + 1)
   }
@@ -188,7 +194,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         </div>
       )}
 
-      {message && answerState === 'answering' && <p className="feedback feedback--try" role="status">{message}</p>}
+      {message && answerState === 'answering' && <p className={`feedback ${messageKind === 'error' ? 'feedback--try' : 'feedback--step-success'}`} role="status">{message}</p>}
 
       {answerState === 'scaffold' && (
         <div className="scaffold" role="status">

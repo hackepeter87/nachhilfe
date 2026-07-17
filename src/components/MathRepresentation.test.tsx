@@ -42,6 +42,17 @@ describe('MathRepresentation Gruppenbild', () => {
 })
 
 describe('MathRepresentation Sachaufgabenmodelle', () => {
+  it('stellt Anfangsmenge und Zuwachs proportional dar', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'bar-model', visibility: 'always', label: 'Hinzufügen',
+      values: { modelType: 'change-increase', first: 13, second: 3, third: 0, total: 13 }
+    }} />)
+    const bars = container.querySelectorAll<HTMLElement>('.change-increase-model .model-bar')
+    expect(bars).toHaveLength(2)
+    expect(bars[0]).toHaveStyle({ width: '81.25%' })
+    expect(bars[1]).toHaveStyle({ gridTemplateColumns: '13fr 3fr' })
+  })
+
   it('lässt den gesuchten Rest im Balkenmodell offen', () => {
     const { container } = render(<MathRepresentation representation={{
       kind: 'bar-model', visibility: 'always', label: 'Wegnehmen',
