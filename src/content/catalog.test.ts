@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(15)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.16.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(16)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.17.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -267,6 +267,16 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(catalog.quantityContent.lengths.equivalenceLabel).toBe('1 m = 100 cm')
     catalog.quantityContent.lengths.equivalenceLabel = ''
     expect(validateTaskCatalog(catalog)).toBe(false)
+  })
+
+  it('lehnt doppelte oder mehrdeutige Größen-Bezugsdaten auch zur Laufzeit ab', () => {
+    const duplicateReference = structuredClone(readPublicCatalog()) as TaskCatalog
+    duplicateReference.quantityContent.mass.referenceEstimates[1]!.id = duplicateReference.quantityContent.mass.referenceEstimates[0]!.id
+    expect(validateTaskCatalog(duplicateReference)).toBe(false)
+
+    const missingCorrectOption = structuredClone(readPublicCatalog()) as TaskCatalog
+    missingCorrectOption.quantityContent.capacity.referenceEstimates[0]!.options = ['10 ml', '50 ml', '500 ml']
+    expect(validateTaskCatalog(missingCorrectOption)).toBe(false)
   })
 
   it('validiert Körpervorlagen, Stufen und feste Blickrichtungen', () => {

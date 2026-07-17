@@ -30,7 +30,7 @@ import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisp
 import { isValidCombinationTemplate, isValidProbabilityTemplate, type CombinationTemplate, type ProbabilityTemplate } from '../domain/chance'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 15
+export const CATALOG_SCHEMA_VERSION = 16
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -153,6 +153,35 @@ export interface QuantityContent {
     rulerLabel: string
     equivalenceLabel: string
   }
+  time: {
+    readPrompt: string
+    durationPrompt: string
+    readExplanation: string
+    durationExplanation: string
+    clockLabel: string
+    durationLabel: string
+  }
+  mass: MeasurementQuantityContent
+  capacity: MeasurementQuantityContent
+}
+
+export interface ReferenceEstimate {
+  id: string
+  label: string
+  correct: string
+  options: [string, string, string]
+}
+
+export interface MeasurementQuantityContent {
+  referencePrompt: string
+  complementPrompt: string
+  calculationPrompt: string
+  referenceExplanation: string
+  complementExplanation: string
+  calculationExplanation: string
+  displayLabel: string
+  equivalenceLabel: string
+  referenceEstimates: ReferenceEstimate[]
 }
 
 export interface StrategySteps {
@@ -472,7 +501,8 @@ const KNOWN_PLACEHOLDERS = new Set([
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
   'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
-  'category', 'larger', 'smaller', 'unitLabel'
+  'category', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
+  'knownAmount', 'targetAmount', 'quantityAnswer', 'firstAmount', 'secondAmount'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -837,12 +867,25 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
     topic.releaseStatus === 'disabled'
   )) return false
   if (new Set(value.preparedTopics.map((topic) => (topic as PreparedTopic).id)).size !== 1) return false
-  if (!isRecord(value.quantityContent) || !isRecord(value.quantityContent.money) || !isRecord(value.quantityContent.lengths)) return false
+  if (!isRecord(value.quantityContent) || !isRecord(value.quantityContent.money) || !isRecord(value.quantityContent.lengths) ||
+    !isRecord(value.quantityContent.time) || !isRecord(value.quantityContent.mass) || !isRecord(value.quantityContent.capacity)) return false
   const quantityContent = value.quantityContent
   const moneyContent = quantityContent.money as Record<string, unknown>
   const lengthsContent = quantityContent.lengths as Record<string, unknown>
+  const timeContent = quantityContent.time as Record<string, unknown>
   if (!['countPrompt', 'changePrompt', 'countExplanation', 'changeExplanation', 'coinsLabel', 'priceLabel', 'paidLabel'].every((field) => isNonEmptyString(moneyContent[field]))) return false
   if (!['readPrompt', 'toCentimetersPrompt', 'toMetersPrompt', 'calculationPrompt', 'readExplanation', 'conversionExplanation', 'calculationExplanation', 'rulerLabel', 'equivalenceLabel'].every((field) => isNonEmptyString(lengthsContent[field]))) return false
+  if (!['readPrompt', 'durationPrompt', 'readExplanation', 'durationExplanation', 'clockLabel', 'durationLabel'].every((field) => isNonEmptyString(timeContent[field]))) return false
+  for (const key of ['mass', 'capacity'] as const) {
+    const content = quantityContent[key]
+    if (!isRecord(content) || !['referencePrompt', 'complementPrompt', 'calculationPrompt', 'referenceExplanation', 'complementExplanation', 'calculationExplanation', 'displayLabel', 'equivalenceLabel'].every((field) => isNonEmptyString(content[field]))) return false
+    if (!Array.isArray(content.referenceEstimates) || content.referenceEstimates.length < 3 || !content.referenceEstimates.every((estimate) =>
+      isRecord(estimate) && isNonEmptyString(estimate.id) && isNonEmptyString(estimate.label) && isNonEmptyString(estimate.correct) &&
+      Array.isArray(estimate.options) && estimate.options.length === 3 && estimate.options.every(isNonEmptyString) &&
+      new Set(estimate.options).size === 3 && estimate.options.includes(estimate.correct as string)
+    )) return false
+    if (new Set(content.referenceEstimates.map((estimate) => (estimate as ReferenceEstimate).id)).size !== content.referenceEstimates.length) return false
+  }
   if (!isRecord(value.strategySteps) || !isRecord(value.strategySteps.placeValue) || !isRecord(value.strategySteps.rounding) || !isRecord(value.strategySteps.arithmetic1000) || !isRecord(value.strategySteps.writtenAddition) || !isRecord(value.strategySteps.writtenSubtraction)) return false
   const placeValueSteps = value.strategySteps.placeValue
   const roundingSteps = value.strategySteps.rounding

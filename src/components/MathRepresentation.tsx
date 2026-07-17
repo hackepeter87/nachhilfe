@@ -16,6 +16,27 @@ function amountLabel(cents: number): string {
     : `${cents} ct`
 }
 
+function ClockFace({ hour, minute }: { hour: number; minute: number }) {
+  const minuteAngle = minute * 6
+  const hourAngle = (hour % 12) * 30 + minute * 0.5
+  return (
+    <div className="clock-face" aria-hidden="true">
+      <span className="clock-number clock-number--12">12</span>
+      <span className="clock-number clock-number--3">3</span>
+      <span className="clock-number clock-number--6">6</span>
+      <span className="clock-number clock-number--9">9</span>
+      <i className="clock-hand clock-hand--hour" style={{ transform: `translateX(-50%) rotate(${hourAngle}deg)` }} />
+      <i className="clock-hand clock-hand--minute" style={{ transform: `translateX(-50%) rotate(${minuteAngle}deg)` }} />
+      <b className="clock-center" />
+    </div>
+  )
+}
+
+function measureLabel(value: number, quantityType: 'mass' | 'capacity'): string {
+  if (value === 1000) return quantityType === 'mass' ? '1 kg' : '1 l'
+  return `${value} ${quantityType === 'mass' ? 'g' : 'ml'}`
+}
+
 function CubeBuildingDiagram({ building, turn, axisLabel, turnLabel }: {
   building: CubeBuilding
   turn?: 'left' | 'right'
@@ -304,6 +325,72 @@ export function MathRepresentation({ representation }: { representation: Exercis
           }))}
         </div>
         {excluded && <small>{textValue(values.excludedLabel)}: {excluded}</small>}
+      </div>
+    )
+  }
+
+  if (representation.kind === 'clock') {
+    const mode = String(values.mode)
+    const startHour = Number(mode === 'read' ? values.hour : values.startHour)
+    const startMinute = Number(mode === 'read' ? values.minute : values.startMinute)
+    const endHour = Number(values.endHour)
+    const endMinute = Number(values.endMinute)
+    const validTime = (hour: number, minute: number) => Number.isInteger(hour) && hour >= 0 && hour <= 23 && Number.isInteger(minute) && minute >= 0 && minute < 60
+    const valid = ['read', 'duration'].includes(mode) && validTime(startHour, startMinute) && (mode === 'read' || validTime(endHour, endMinute)) && typeof values.answerLabel === 'string'
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Uhrendarstellung enthält ungültige Zeiten.</div>
+    const answerVisible = isValueVisible('answerLabel')
+    const startLabel = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')} Uhr`
+    const endLabel = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')} Uhr`
+    const description = mode === 'read'
+      ? `${representation.label}. Der kurze Zeiger gehört zur Stunde ${startHour}, der lange Zeiger zu ${startMinute} Minuten. ${answerVisible ? `Ergebnis ${values.answerLabel}.` : 'Die digitale Uhrzeit bleibt unbekannt.'}`
+      : `${representation.label}. Start ${startLabel}, Ende ${endLabel}. ${answerVisible ? `Ergebnis ${values.answerLabel}.` : 'Die Zeitspanne bleibt unbekannt.'}`
+    return (
+      <div className="math-visual clock-visual" role="img" aria-label={description}>
+        <div className={mode === 'duration' ? 'clock-pair' : 'clock-single'}>
+          <section><ClockFace hour={startHour} minute={startMinute} />{mode === 'duration' && <b>Start: {startLabel}</b>}</section>
+          {mode === 'duration' && <span className="clock-arrow">→</span>}
+          {mode === 'duration' && <section><ClockFace hour={endHour} minute={endMinute} /><b>Ende: {endLabel}</b></section>}
+        </div>
+        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+      </div>
+    )
+  }
+
+  if (representation.kind === 'mass-scale' || representation.kind === 'capacity-vessel') {
+    const quantityType = representation.kind === 'mass-scale' ? 'mass' : 'capacity'
+    const mode = String(values.mode)
+    const knownAmount = Number(values.knownAmountBase)
+    const targetAmount = Number(values.targetAmountBase)
+    const firstAmount = Number(values.firstAmountBase)
+    const secondAmount = Number(values.secondAmountBase)
+    const operation = String(values.operation)
+    const validBase = (value: number) => Number.isInteger(value) && value >= 0 && value <= 1000
+    const valid = typeof values.answerLabel === 'string' && typeof values.equivalenceLabel === 'string' && (
+      (mode === 'reference' && typeof values.itemLabel === 'string') ||
+      (mode === 'complement' && validBase(knownAmount) && targetAmount === 1000 && knownAmount < targetAmount) ||
+      (mode === 'calculation' && validBase(firstAmount) && validBase(secondAmount) && ['+', '−'].includes(operation))
+    )
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Größendarstellung enthält ungültige Messwerte.</div>
+    const answerVisible = isValueVisible('answerLabel')
+    const knownDescription = mode === 'reference' ? String(values.itemLabel)
+      : mode === 'complement' ? `${measureLabel(knownAmount, quantityType)} bis ${measureLabel(targetAmount, quantityType)}`
+        : `${measureLabel(firstAmount, quantityType)} ${operation} ${measureLabel(secondAmount, quantityType)}`
+    const description = `${representation.label}. Bekannt: ${knownDescription}. ${answerVisible ? `Ergebnis ${values.answerLabel}.` : 'Das Ergebnis bleibt unbekannt.'}`
+    const content = mode === 'reference' ? (
+      <div className="reference-measure" aria-hidden="true"><span>{textValue(values.itemLabel)}</span><i /><strong>?</strong></div>
+    ) : mode === 'complement' ? (
+      <div className="measure-complement" aria-hidden="true">
+        <div className="measure-track"><i style={{ '--measure-fill': `${knownAmount / targetAmount * 100}%` } as CSSProperties} /></div>
+        <div><span>{measureLabel(knownAmount, quantityType)}</span><span>?</span><span>{measureLabel(targetAmount, quantityType)}</span></div>
+      </div>
+    ) : (
+      <div className="measure-calculation" aria-hidden="true"><span>{measureLabel(firstAmount, quantityType)}</span><b>{operation}</b><span>{measureLabel(secondAmount, quantityType)}</span><b>=</b><span>?</span></div>
+    )
+    return (
+      <div className={`math-visual quantity-measure quantity-measure--${quantityType}`} role="img" aria-label={description}>
+        {content}
+        <small>{textValue(values.equivalenceLabel)}</small>
+        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
       </div>
     )
   }

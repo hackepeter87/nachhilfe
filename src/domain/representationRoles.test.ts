@@ -50,7 +50,10 @@ describe('mathematische Rollen aller Darstellungen', () => {
       money: ['displayedCents'],
       lengths: ['lengthCm'],
       probability: ['classification'],
-      combinatorics: ['combinationCount']
+      combinatorics: ['combinationCount'],
+      time: ['answerLabel'],
+      mass: ['answerLabel'],
+      capacity: ['answerLabel']
     }
     for (const [skillId, expected] of Object.entries(expectedUnknowns)) {
       const exercise = generateExercise(skillId as (typeof SKILL_IDS)[number], 42, 1)

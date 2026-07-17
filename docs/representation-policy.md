@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.17.0, Katalog 0.16.0, Schema 15.
+Stand: App 0.18.0, Katalog 0.17.0, Schema 16.
 
 ## Verbindliche Regel
 
@@ -29,6 +29,7 @@ Der Renderer lehnt doppelte, überlappende, unvollständige oder unzulässig auf
 | Stellenwerttafel | Zeigt bekannte Ziffern beziehungsweise Material, nicht das Rechenergebnis. | Ergebnisrollen werden ausdrücklich unbekannt geführt; bekannte Stellen bleiben sichtbar. |
 | Schriftliches Rechnen | Ergebnisziffern wurden schrittweise eingetragen. | `result` bleibt unbekannt; nur erfolgreich bearbeitete Spalten werden ergänzt. |
 | Körperansichten, Rotation, Falten und Symmetrie | Ausgangsdaten und auswählbare Kandidaten waren getrennt. | Gesuchte Transformationen werden als unbekannte Rollen geführt; Antwortoptionen bleiben bewusst prüfbare Kandidaten. |
+| Uhr, Masse und Rauminhalt | Neu in 0.18. | Zeigerpositionen, Start/Ende und bekannte Mengen sind sichtbar; digitale Uhrzeit, Dauer oder gesuchte Menge bleiben visuell und zugänglich unbekannt. |
 
 Bei Rundungsaufgaben dürfen die beiden bekannten Nachbarzahlen als Entscheidungsgrundlage sichtbar sein. Die Darstellung entscheidet jedoch nicht, welche davon das Rundungsergebnis ist. Bei Stellenwertaufgaben darf eine bekannte Ziffer sichtbar sein, auch wenn ihre Zahl zufällig dem gesuchten Stellenwert entspricht; maßgeblich ist ihre mathematische Rolle, nicht bloße Zeichengleichheit.
 

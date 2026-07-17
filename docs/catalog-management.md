@@ -25,15 +25,15 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 
 ```json
 {
-  "schemaVersion": 15,
-  "catalogVersion": "0.16.0",
+  "schemaVersion": 16,
+  "catalogVersion": "0.17.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review"
 }
 ```
 
-Schema 15 ergänzt `chanceContent` für katalogisierte Zufallsversuche, Ereignisse und kleine Auswahlmengen. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
+Schema 16 ergänzt Zeit sowie katalogisierte Bezugsgrößen für Masse und Rauminhalt in `quantityContent`. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
 
 - `schemaVersion` bezeichnet die technische JSON-Struktur. Eine inkompatible Änderung erfordert kompatiblen Anwendungscode.
 - `catalogVersion` bezeichnet die fachliche Inhaltsversion und folgt SemVer.

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 15,
-  "catalogVersion": "0.16.0",
+  "schemaVersion": 16,
+  "catalogVersion": "0.17.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -4110,6 +4110,459 @@
         "Eine Einschränkung ist sichtbar und eindeutig.",
         "Der Ergebnisraum bleibt bei höchstens neun Paarungen."
       ]
+    },
+    {
+      "id": "time",
+      "label": "Zeit",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Analoge und digitale Uhrzeiten verbinden und einfache vorwärts gerichtete Zeitspannen bestimmen.",
+      "misconceptions": [
+        "Stunden- und Minutenzeiger werden vertauscht.",
+        "Bei einer Zeitspanne werden nur die Minutenzahlen voneinander abgezogen."
+      ],
+      "hints": [
+        "Achte zuerst auf den kurzen Stundenzeiger und dann auf den langen Minutenzeiger.",
+        "{strategy}"
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Prüfe Stundenzeiger, Minutenzeiger und die zeitliche Reihenfolge.",
+      "explanation": "{quantityExplanation}",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 720
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Analoge Zeigerstellung und digitale Uhrzeit werden verbunden."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Eine Zeitspanne wird als Vorwärtsweg zwischen zwei Uhrzeiten geprüft."
+        }
+      ],
+      "prerequisites": [
+        "Zählen in Fünferschritten",
+        "Stunden und Minuten unterscheiden"
+      ],
+      "representations": [
+        "Analoge Uhr",
+        "digitale Uhrzeit",
+        "zwei Uhren für eine Zeitspanne"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Volle und halbe Stunden an einer analogen Uhr ablesen",
+          "numberRange": "1 bis 12 Uhr",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Viertelstunden und Fünf-Minuten-Schritte selbstständig ablesen",
+          "numberRange": "1 bis 12 Uhr",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Eine vorwärts gerichtete Zeitspanne zwischen zwei bekannten Uhrzeiten bestimmen",
+          "numberRange": "15 bis 90 Minuten",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Von 9:15 Uhr bis 9:45 Uhr vergehen 30 Minuten.",
+      "successFeedback": "Uhrzeit und Zeigerstellung beziehungsweise Zeitspanne passen zusammen.",
+      "remediation": {
+        "strategy": "Gehe in Viertelstunden oder Fünferschritten vorwärts.",
+        "foundationStrategy": "Beginne mit einer vollen oder halben Stunde und benenne beide Zeiger.",
+        "representation": "Analoge Uhr",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Nenne eine Alltagssituation, die ungefähr so lange dauert.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Stunden- und Minutenzeiger unterscheiden.",
+          "exerciseTypes": [
+            "time:foundation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Analoge und digitale Uhrzeit verbinden.",
+          "exerciseTypes": [
+            "time:foundation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Volle und halbe Stunden ablesen.",
+          "exerciseTypes": [
+            "time:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Viertelstunden und Fünf-Minuten-Schritte ablesen.",
+          "exerciseTypes": [
+            "time:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Uhrzeiten ohne Zeitdruck sicher zuordnen.",
+          "exerciseTypes": [
+            "time:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Einfache Zeitspannen vorwärts bestimmen.",
+          "exerciseTypes": [
+            "time:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Zeigerstellung und digitale Uhrzeit stimmen überein.",
+        "Zeitspannen verlaufen vorwärts und überschreiten nicht Mitternacht.",
+        "Das Ergebnis verwendet die passende Zeiteinheit."
+      ]
+    },
+    {
+      "id": "mass",
+      "label": "Masse",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Tragfähige Bezugsgrößen für Gramm und Kilogramm nutzen und einfache Massen bis 1 Kilogramm ergänzen oder verrechnen.",
+      "misconceptions": [
+        "Gramm und Kilogramm werden nur nach der Zahlengröße verglichen.",
+        "1 Kilogramm wird mit 100 statt mit 1000 Gramm gleichgesetzt."
+      ],
+      "hints": [
+        "Vergleiche mit 1 Kilogramm = 1000 Gramm.",
+        "{strategy}"
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Prüfe die Einheit und nutze 1 Kilogramm = 1000 Gramm.",
+      "explanation": "{quantityExplanation}",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        {
+          "id": "modelling",
+          "elicitedBy": "Alltagsgegenstände werden einer plausiblen Masse zugeordnet."
+        },
+        {
+          "id": "representing",
+          "elicitedBy": "Grammwerte und die Bezugsgröße 1 Kilogramm werden verbunden."
+        }
+      ],
+      "prerequisites": [
+        "Zahlen bis 1000",
+        "Ergänzen und einfache Addition beziehungsweise Subtraktion"
+      ],
+      "representations": [
+        "Waage",
+        "Bezugsgegenstand",
+        "1000-Gramm-Skala"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Eine plausible Masse zu einem vertrauten Gegenstand auswählen",
+          "numberRange": "5 Gramm bis 1 Kilogramm",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Eine bekannte Grammmenge zu 1 Kilogramm ergänzen",
+          "numberRange": "100 bis 900 Gramm",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Zwei Grammwerte bis insgesamt 1 Kilogramm addieren oder vergleichen",
+          "numberRange": "50 bis 1000 Gramm",
+          "representation": "hint",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "650 Gramm brauchen noch 350 Gramm bis 1 Kilogramm.",
+      "successFeedback": "Masse, Maßzahl und Einheit passen zusammen.",
+      "remediation": {
+        "strategy": "Rechne alle bekannten Massen in Gramm.",
+        "foundationStrategy": "Vergleiche zuerst einen vertrauten Gegenstand mit 1 Kilogramm.",
+        "representation": "Waage und 1000-Gramm-Skala",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Ordne einen weiteren Alltagsgegenstand einer plausiblen Masse zu.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Gramm und Kilogramm unterscheiden.",
+          "exerciseTypes": [
+            "mass:foundation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Bezugsgrößen mit 1 Kilogramm verbinden.",
+          "exerciseTypes": [
+            "mass:foundation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Plausible Alltagsmassen auswählen.",
+          "exerciseTypes": [
+            "mass:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Zu 1 Kilogramm ergänzen.",
+          "exerciseTypes": [
+            "mass:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Die Beziehung 1 kg = 1000 g sicher nutzen.",
+          "exerciseTypes": [
+            "mass:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Massen in einem Rechenschritt verbinden.",
+          "exerciseTypes": [
+            "mass:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Bezugsgrößen sind alltagsplausibel.",
+        "1 Kilogramm wird als 1000 Gramm verwendet.",
+        "Rechenergebnis und Einheit sind konsistent."
+      ]
+    },
+    {
+      "id": "capacity",
+      "label": "Rauminhalt",
+      "curriculumArea": "Größen und Messen",
+      "supportGoal": "Tragfähige Bezugsgrößen für Milliliter und Liter nutzen und einfache Flüssigkeitsmengen bis 1 Liter ergänzen oder verrechnen.",
+      "misconceptions": [
+        "Milliliter und Liter werden nur nach der Zahlengröße verglichen.",
+        "1 Liter wird mit 100 statt mit 1000 Millilitern gleichgesetzt."
+      ],
+      "hints": [
+        "Vergleiche mit 1 Liter = 1000 Milliliter.",
+        "{strategy}"
+      ],
+      "prompt": "{taskPrompt}",
+      "errorFeedback": "Prüfe die Einheit und nutze 1 Liter = 1000 Milliliter.",
+      "explanation": "{quantityExplanation}",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 0,
+        "maxValue": 1000
+      },
+      "processCompetencies": [
+        {
+          "id": "modelling",
+          "elicitedBy": "Gefäße werden einem plausiblen Rauminhalt zugeordnet."
+        },
+        {
+          "id": "representing",
+          "elicitedBy": "Milliliterwerte und die Bezugsgröße 1 Liter werden verbunden."
+        }
+      ],
+      "prerequisites": [
+        "Zahlen bis 1000",
+        "Ergänzen und einfache Addition beziehungsweise Subtraktion"
+      ],
+      "representations": [
+        "Messgefäß",
+        "Bezugsgefäß",
+        "1000-Milliliter-Skala"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Einen plausiblen Rauminhalt zu einem vertrauten Gefäß auswählen",
+          "numberRange": "5 Milliliter bis 1 Liter",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Eine bekannte Millilitermenge zu 1 Liter ergänzen",
+          "numberRange": "100 bis 900 Milliliter",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Zwei Milliliterwerte bis insgesamt 1 Liter addieren oder vergleichen",
+          "numberRange": "50 bis 1000 Milliliter",
+          "representation": "hint",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": false,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "750 Milliliter brauchen noch 250 Milliliter bis 1 Liter.",
+      "successFeedback": "Rauminhalt, Maßzahl und Einheit passen zusammen.",
+      "remediation": {
+        "strategy": "Rechne alle bekannten Flüssigkeitsmengen in Milliliter.",
+        "foundationStrategy": "Vergleiche zuerst ein vertrautes Gefäß mit 1 Liter.",
+        "representation": "Messgefäß und 1000-Milliliter-Skala",
+        "keepSubskill": true
+      },
+      "transferPrompt": "Ordne ein weiteres Gefäß einem plausiblen Rauminhalt zu.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Milliliter und Liter unterscheiden.",
+          "exerciseTypes": [
+            "capacity:foundation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "understand",
+          "goal": "Bezugsgrößen mit 1 Liter verbinden.",
+          "exerciseTypes": [
+            "capacity:foundation"
+          ],
+          "releaseStatus": "ready-for-review"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Plausible Gefäßinhalte auswählen.",
+          "exerciseTypes": [
+            "capacity:difficulty-1"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Zu 1 Liter ergänzen.",
+          "exerciseTypes": [
+            "capacity:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Die Beziehung 1 l = 1000 ml sicher nutzen.",
+          "exerciseTypes": [
+            "capacity:difficulty-2"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Flüssigkeitsmengen in einem Rechenschritt verbinden.",
+          "exerciseTypes": [
+            "capacity:difficulty-3"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Bezugsgrößen sind alltagsplausibel.",
+        "1 Liter wird als 1000 Milliliter verwendet.",
+        "Rechenergebnis und Einheit sind konsistent."
+      ]
     }
   ],
   "wordProblems": [
@@ -5882,6 +6335,98 @@
       "calculationExplanation": "{firstLength} {operation} {secondLength} ergibt {answerLength}.",
       "rulerLabel": "Messstrecke mit markiertem Nullpunkt",
       "equivalenceLabel": "1 m = 100 cm"
+    },
+    "time": {
+      "readPrompt": "Welche digitale Uhrzeit zeigt die Uhr?",
+      "durationPrompt": "Wie viele Minuten vergehen von {startTime} bis {endTime}?",
+      "readExplanation": "Die Zeiger zeigen {time}.",
+      "durationExplanation": "Von {startTime} bis {endTime} vergehen {duration}.",
+      "clockLabel": "Analoge Uhr mit zwei Zeigern",
+      "durationLabel": "Start- und Enduhr für eine Zeitspanne"
+    },
+    "mass": {
+      "referencePrompt": "Welche Masse passt ungefähr zu {item}?",
+      "complementPrompt": "{knownAmount} liegen auf der Waage. Wie viel fehlt bis {targetAmount}?",
+      "calculationPrompt": "Rechne die Massen: {firstAmount} {operation} {secondAmount}.",
+      "referenceExplanation": "Zu {item} passt als Bezugsgröße ungefähr {quantityAnswer}.",
+      "complementExplanation": "Von {knownAmount} bis {targetAmount} fehlen {quantityAnswer}.",
+      "calculationExplanation": "{firstAmount} {operation} {secondAmount} ergibt {quantityAnswer}.",
+      "displayLabel": "Waage für Gramm und Kilogramm",
+      "equivalenceLabel": "1 kg = 1000 g",
+      "referenceEstimates": [
+        {
+          "id": "apple",
+          "label": "einem Apfel",
+          "correct": "200 g",
+          "options": [
+            "20 g",
+            "200 g",
+            "2 kg"
+          ]
+        },
+        {
+          "id": "butter",
+          "label": "einer Packung Butter",
+          "correct": "250 g",
+          "options": [
+            "25 g",
+            "250 g",
+            "2 kg"
+          ]
+        },
+        {
+          "id": "flour",
+          "label": "einer Packung Mehl",
+          "correct": "1 kg",
+          "options": [
+            "100 g",
+            "500 g",
+            "1 kg"
+          ]
+        }
+      ]
+    },
+    "capacity": {
+      "referencePrompt": "Welcher Rauminhalt passt ungefähr zu {item}?",
+      "complementPrompt": "Im Gefäß sind {knownAmount}. Wie viel fehlt bis {targetAmount}?",
+      "calculationPrompt": "Rechne die Flüssigkeitsmengen: {firstAmount} {operation} {secondAmount}.",
+      "referenceExplanation": "Zu {item} passt als Bezugsgröße ungefähr {quantityAnswer}.",
+      "complementExplanation": "Von {knownAmount} bis {targetAmount} fehlen {quantityAnswer}.",
+      "calculationExplanation": "{firstAmount} {operation} {secondAmount} ergibt {quantityAnswer}.",
+      "displayLabel": "Messgefäß für Milliliter und Liter",
+      "equivalenceLabel": "1 l = 1000 ml",
+      "referenceEstimates": [
+        {
+          "id": "spoon",
+          "label": "einem Teelöffel",
+          "correct": "5 ml",
+          "options": [
+            "5 ml",
+            "50 ml",
+            "500 ml"
+          ]
+        },
+        {
+          "id": "glass",
+          "label": "einem Trinkglas",
+          "correct": "250 ml",
+          "options": [
+            "25 ml",
+            "250 ml",
+            "1 l"
+          ]
+        },
+        {
+          "id": "bottle",
+          "label": "einer Wasserflasche",
+          "correct": "1 l",
+          "options": [
+            "100 ml",
+            "500 ml",
+            "1 l"
+          ]
+        }
+      ]
     }
   },
   "strategySteps": {

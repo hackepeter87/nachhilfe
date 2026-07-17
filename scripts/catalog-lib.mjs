@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 15
+export const CATALOG_SCHEMA_VERSION = 16
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts', 'probability', 'combinatorics'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding', 'read-tables', 'read-charts', 'probability', 'combinatorics', 'time', 'mass', 'capacity'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -19,7 +19,8 @@ const KNOWN_PLACEHOLDERS = new Set([
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
   'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
-  'category', 'larger', 'smaller', 'unitLabel'
+  'category', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
+  'knownAmount', 'targetAmount', 'quantityAnswer', 'firstAmount', 'secondAmount'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -554,9 +555,23 @@ export function validateCatalog(catalog) {
       if (!Array.isArray(topic[field]) || topic[field].length === 0 || !topic[field].every(isText)) fail(`preparedTopics.${topic.id}.${field} ist unvollständig`)
     }
   }
-  if (!isRecord(catalog.quantityContent) || !isRecord(catalog.quantityContent.money) || !isRecord(catalog.quantityContent.lengths)) fail('quantityContent fehlt')
+  if (!isRecord(catalog.quantityContent) || !isRecord(catalog.quantityContent.money) || !isRecord(catalog.quantityContent.lengths) ||
+    !isRecord(catalog.quantityContent.time) || !isRecord(catalog.quantityContent.mass) || !isRecord(catalog.quantityContent.capacity)) fail('quantityContent fehlt')
   for (const field of ['countPrompt', 'changePrompt', 'countExplanation', 'changeExplanation', 'coinsLabel', 'priceLabel', 'paidLabel']) requireText(catalog.quantityContent.money, field, 'quantityContent.money')
   for (const field of ['readPrompt', 'toCentimetersPrompt', 'toMetersPrompt', 'calculationPrompt', 'readExplanation', 'conversionExplanation', 'calculationExplanation', 'rulerLabel', 'equivalenceLabel']) requireText(catalog.quantityContent.lengths, field, 'quantityContent.lengths')
+  for (const field of ['readPrompt', 'durationPrompt', 'readExplanation', 'durationExplanation', 'clockLabel', 'durationLabel']) requireText(catalog.quantityContent.time, field, 'quantityContent.time')
+  for (const key of ['mass', 'capacity']) {
+    const content = catalog.quantityContent[key]
+    for (const field of ['referencePrompt', 'complementPrompt', 'calculationPrompt', 'referenceExplanation', 'complementExplanation', 'calculationExplanation', 'displayLabel', 'equivalenceLabel']) requireText(content, field, `quantityContent.${key}`)
+    if (!Array.isArray(content.referenceEstimates) || content.referenceEstimates.length < 3) fail(`quantityContent.${key}.referenceEstimates ist unvollständig`)
+    requireUnique(content.referenceEstimates.map((estimate) => estimate.id), `quantityContent.${key}.referenceEstimates IDs`)
+    content.referenceEstimates.forEach((estimate) => {
+      for (const field of ['id', 'label', 'correct']) requireText(estimate, field, `quantityContent.${key}.referenceEstimates`)
+      if (!Array.isArray(estimate.options) || estimate.options.length !== 3 || !estimate.options.every(isText) || new Set(estimate.options).size !== 3 || !estimate.options.includes(estimate.correct)) {
+        fail(`quantityContent.${key}.referenceEstimates.${estimate.id}.options ist ungültig`)
+      }
+    })
+  }
   if (!isRecord(catalog.strategySteps) || !isRecord(catalog.strategySteps.placeValue) || !isRecord(catalog.strategySteps.rounding) || !isRecord(catalog.strategySteps.arithmetic1000) || !isRecord(catalog.strategySteps.writtenAddition) || !isRecord(catalog.strategySteps.writtenSubtraction)) fail('strategySteps fehlt')
   for (const field of ['digitPrompt', 'digitError', 'digitSuccess', 'valuePrompt', 'valueError', 'valueSuccess']) requireText(catalog.strategySteps.placeValue, field, 'strategySteps.placeValue')
   for (const field of ['neighborsPrompt', 'neighborsError', 'neighborsSuccess', 'resultPrompt', 'resultError', 'resultSuccess', 'reasonPrompt', 'reasonError', 'reasonSuccess', 'closerLower', 'closerUpper', 'halfwayUp', 'wrongLower', 'wrongUpper']) requireText(catalog.strategySteps.rounding, field, 'strategySteps.rounding')

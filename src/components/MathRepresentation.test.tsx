@@ -277,6 +277,80 @@ describe('MathRepresentation Größen', () => {
     }} />)
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Längenangaben')
   })
+
+  it('maskiert die gelesene Uhrzeit und deckt sie erst nach der Lösung auf', () => {
+    const representation: ExerciseRepresentation = {
+      kind: 'clock', visibility: 'always', label: 'Lies die Uhr',
+      values: { mode: 'read', hour: 8, minute: 30, answerLabel: '08:30 Uhr' },
+      valueRoles: { knownValues: ['mode', 'hour', 'minute'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
+    expect(screen.getByRole('img', { name: /digitale Uhrzeit bleibt unbekannt/ })).toBeVisible()
+    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+    expect(container.querySelector('.quantity-result')).not.toHaveTextContent('08:30')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: ['answerLabel'] }
+    }} />)
+    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: 08:30 Uhr')
+  })
+
+  it('zeigt bei einer Zeitspanne beide bekannten Uhren, aber nicht die Dauer', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'clock', visibility: 'always', label: 'Zeitspanne',
+      values: { mode: 'duration', startHour: 9, startMinute: 15, endHour: 10, endMinute: 0, answerLabel: '45 Minuten' },
+      valueRoles: { knownValues: ['mode', 'startHour', 'startMinute', 'endHour', 'endMinute'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Start 09:15 Uhr, Ende 10:00 Uhr/ })).toBeVisible()
+    expect(container.querySelectorAll('.clock-face')).toHaveLength(2)
+    expect(container).not.toHaveTextContent('45 Minuten')
+  })
+
+  it('lehnt ungültige Uhrzeiten sichtbar ab', () => {
+    render(<RuntimeMathRepresentation representation={{
+      kind: 'clock', visibility: 'always', label: 'Ungültige Uhr',
+      values: { mode: 'read', hour: 8, minute: 60, answerLabel: '09:00 Uhr' },
+      valueRoles: { knownValues: ['mode', 'hour', 'minute'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Zeiten')
+  })
+
+  it.each([
+    ['mass-scale', 'mass', '350 g', '650 g'],
+    ['capacity-vessel', 'capacity', '250 ml', '750 ml']
+  ] as const)('maskiert beim Ergänzen von %s die gesuchte Menge', (kind, quantityType, knownLabel, answerLabel) => {
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={{
+      kind, visibility: 'always', label: 'Bis zur Grundeinheit ergänzen',
+      values: { mode: 'complement', quantityType, knownAmountBase: Number.parseInt(knownLabel), targetAmountBase: 1000, unitLabel: quantityType === 'mass' ? 'g' : 'ml', equivalenceLabel: quantityType === 'mass' ? '1000 g = 1 kg' : '1000 ml = 1 l', answerLabel },
+      valueRoles: { knownValues: ['mode', 'quantityType', 'knownAmountBase', 'targetAmountBase', 'unitLabel', 'equivalenceLabel'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /Ergebnis bleibt unbekannt/ })).toBeVisible()
+    expect(container).toHaveTextContent(knownLabel)
+    expect(container).not.toHaveTextContent(answerLabel)
+
+    const representation = (kind === 'mass-scale' ? {
+      kind: 'mass-scale' as const, visibility: 'always' as const, label: 'Bis zur Grundeinheit ergänzen',
+      values: { mode: 'complement', quantityType, knownAmountBase: Number.parseInt(knownLabel), targetAmountBase: 1000, unitLabel: 'g', equivalenceLabel: '1000 g = 1 kg', answerLabel }
+    } : {
+      kind: 'capacity-vessel' as const, visibility: 'always' as const, label: 'Bis zur Grundeinheit ergänzen',
+      values: { mode: 'complement', quantityType, knownAmountBase: Number.parseInt(knownLabel), targetAmountBase: 1000, unitLabel: 'ml', equivalenceLabel: '1000 ml = 1 l', answerLabel }
+    })
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { knownValues: ['mode', 'quantityType', 'knownAmountBase', 'targetAmountBase', 'unitLabel', 'equivalenceLabel'], unknownValues: ['answerLabel'], revealedValues: ['answerLabel'] }
+    }} />)
+    expect(container.querySelector('.quantity-result')).toHaveTextContent(`Ergebnis: ${answerLabel}`)
+  })
+
+  it('lehnt widersprüchliche Messwerte sichtbar ab', () => {
+    render(<RuntimeMathRepresentation representation={{
+      kind: 'mass-scale', visibility: 'always', label: 'Ungültige Masse',
+      values: { mode: 'complement', quantityType: 'mass', knownAmountBase: 1200, targetAmountBase: 1000, equivalenceLabel: '1000 g = 1 kg', answerLabel: '0 g' },
+      valueRoles: { knownValues: ['mode', 'quantityType', 'knownAmountBase', 'targetAmountBase', 'equivalenceLabel'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Messwerte')
+  })
 })
 
 describe('MathRepresentation mathematische Rollen', () => {

@@ -1,6 +1,6 @@
 # Didaktisches Gesamtmodell
 
-Stand: App 0.17.0, Katalog 0.16.0, Schema 15. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen. Für alle Kompetenzpfade gilt zusätzlich die [Darstellungsrichtlinie](../representation-policy.md).
+Stand: App 0.18.0, Katalog 0.17.0, Schema 16. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen. Für alle Kompetenzpfade gilt zusätzlich die [Darstellungsrichtlinie](../representation-policy.md).
 
 ## Lernphasen
 
@@ -39,4 +39,4 @@ Der Lernstand unterscheidet abgeleitet `new`, `building`, `review`, `secure` und
 
 `active` ist keine externe Lehrkraftfreigabe. Die Gesamtprüfung erfolgt erst mit dem vollständigen [Review-Paket](teacher-review-package.md).
 
-Die aktuellen Kompetenzpfade stehen in [data-tables-charts.md](data-tables-charts.md) und [probability-combinatorics.md](probability-combinatorics.md).
+Die aktuellen Kompetenzpfade stehen unter anderem in [data-tables-charts.md](data-tables-charts.md), [probability-combinatorics.md](probability-combinatorics.md) und [time-mass-capacity.md](time-mass-capacity.md).

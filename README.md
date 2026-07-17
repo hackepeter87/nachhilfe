@@ -135,7 +135,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.17.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.18.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -176,6 +176,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.17.0
+## Release-Stand 0.18.0
 
-Version 0.17.0 ergänzt Wahrscheinlichkeit und Kombinatorik. Sichtbare Ergebnisräume führen zu sicher, möglich und unmöglich; erst danach werden Häufigkeiten gleich großer Felder verglichen. Kleine Auswahlmengen werden systematisch gepaart, ohne das unbekannte Ergebnis vorwegzunehmen. Katalog 0.16.0 und Schema 15 enthalten die geprüften Vorlagen und Beschriftungen. Details stehen in [docs/didactics/probability-combinatorics.md](docs/didactics/probability-combinatorics.md), [docs/representation-policy.md](docs/representation-policy.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.18.0 ergänzt die adaptiven Kompetenzen Zeit, Masse und Rauminhalt. Analoge Uhren führen von vollen und halben Stunden über Fünfminutenablesung zu einfachen vorwärts gerichteten Zeitspannen. Alltagsbezogene Bezugsgrößen führen zu Ergänzungen und Rechnungen in Gramm/Kilogramm sowie Milliliter/Liter. Katalog 0.17.0 und Schema 16 enthalten die geprüften Texte und Bezugsgrößen; Mathematik und Einheitenprüfung bleiben in TypeScript. Details stehen in [docs/didactics/time-mass-capacity.md](docs/didactics/time-mass-capacity.md), [docs/representation-policy.md](docs/representation-policy.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

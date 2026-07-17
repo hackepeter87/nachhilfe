@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.16.0',
-    schemaVersion: 15,
-    appVersion: '0.17.0'
+    catalogVersion: '0.17.0',
+    schemaVersion: 16,
+    appVersion: '0.18.0'
   })
 
   await page.reload()
@@ -214,6 +214,70 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
   expect(seen).toEqual(new Set(['probability', 'combinatorics']))
+})
+
+test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'time', 'mass', 'capacity'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Messen')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  const referenceAnswers = new Map([
+    ['einem Apfel', '200 g'], ['einer Packung Butter', '250 g'], ['einer Packung Mehl', '1 kg'],
+    ['einem Teelöffel', '5 ml'], ['einem Trinkglas', '250 ml'], ['einer Wasserflasche', '1 l']
+  ])
+  const seen = new Set<string>()
+  for (let focus = 0; focus < 3; focus += 1) {
+    const clock = page.locator('.clock-visual')
+    const mass = page.locator('.quantity-measure--mass')
+    const capacity = page.locator('.quantity-measure--capacity')
+    await expect(clock.or(mass).or(capacity).first()).toBeVisible()
+    await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+    await expect(page.locator('.quantity-result')).toHaveText('Ergebnis: ?')
+
+    if (await clock.isVisible().catch(() => false)) {
+      seen.add('time')
+      const description = await clock.getAttribute('aria-label')
+      const match = description?.match(/Stunde (\d+), der lange Zeiger zu (\d+) Minuten/)
+      if (!match) throw new Error('Analoge Uhrzeit ist nicht zugänglich beschrieben.')
+      const answer = `${match[1]!.padStart(2, '0')}:${match[2]!.padStart(2, '0')} Uhr`
+      await page.getByRole('button', { name: answer, exact: true }).click()
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('zeit-375x812.png'), fullPage: true })
+    } else {
+      const prompt = await page.locator('.exercise-heading h2').textContent() ?? ''
+      const matchingEntry = [...referenceAnswers.entries()].find(([item]) => prompt.includes(item))
+      if (!matchingEntry) throw new Error(`Bezugsgröße ist nicht zuordenbar: ${prompt}`)
+      const [item, answer] = matchingEntry
+      if (await mass.isVisible().catch(() => false)) seen.add('mass')
+      else seen.add('capacity')
+      await page.getByRole('button', { name: answer, exact: true }).click()
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath(`${item.includes('Teelöffel') || item.includes('Trinkglas') || item.includes('Wasserflasche') ? 'rauminhalt' : 'masse'}-375x812.png`), fullPage: true })
+    }
+    await expect(page.locator('.quantity-result')).not.toHaveText('Ergebnis: ?')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    if (focus === 2) {
+      await page.setViewportSize({ width: 812, height: 375 })
+      await expect(page.locator('.exercise-panel')).toBeVisible()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    }
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+  expect(seen).toEqual(new Set(['time', 'mass', 'capacity']))
 })
 
 test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt', async ({ page }, testInfo) => {

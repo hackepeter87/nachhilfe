@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.16.0',
-      schemaVersion: 15,
-      appVersion: '0.17.0'
+      catalogVersion: '0.17.0',
+      schemaVersion: 16,
+      appVersion: '0.18.0'
     })
   })
 
@@ -63,7 +63,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.16.0')
+      expect(runningSession.catalogVersion).toBe('0.17.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -99,6 +99,36 @@ describe('Sitzungsplanung', () => {
       const skills = createSessionPlan({}, 808).exercises.map((exercise) => exercise.skillId)
       expect(skills).toContain('money')
       expect(skills).toContain('lengths')
+    } finally {
+      setTaskCatalog(originalCatalog)
+    }
+  })
+
+  it.each(['mass', 'capacity'] as const)('hält %s bis zur sicheren Ergänzungsgrundlage bei Bezugsgrößen', (skillId) => {
+    const originalCatalog = getTaskCatalog()
+    try {
+      const catalog = structuredClone(FALLBACK_TASK_CATALOG)
+      catalog.skills.forEach((skill) => {
+        if (!['addition', skillId].includes(skill.id)) skill.releaseStatus = 'disabled'
+      })
+      setTaskCatalog(catalog)
+      const advancedQuantity = {
+        ...createSkillProgress(skillId),
+        attempts: 10,
+        mastery: 92,
+        difficulty: 3 as const,
+        learningPhase: 'transfer' as const
+      }
+      const withoutFoundation = createSessionPlan({ [skillId]: advancedQuantity }, 818).exercises.find((exercise) => exercise.skillId === skillId)
+      const complementFoundation = {
+        ...createSkillProgress('complement-1000'),
+        attempts: 6,
+        mastery: 70,
+        learningPhase: 'independent-practice' as const
+      }
+      const withFoundation = createSessionPlan({ [skillId]: advancedQuantity, 'complement-1000': complementFoundation }, 819).exercises.find((exercise) => exercise.skillId === skillId)
+      expect(withoutFoundation).toMatchObject({ difficulty: 1, subskillId: `${skillId}-reference-estimate` })
+      expect(withFoundation).toMatchObject({ difficulty: 3 })
     } finally {
       setTaskCatalog(originalCatalog)
     }

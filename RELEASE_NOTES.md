@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Zeit, Masse und Rauminhalt 0.18.0
+
+- Die neuen adaptiven Kompetenzen `time`, `mass` und `capacity` führen von vertrauten Angaben über Ergänzen zu einfachen Zeitspannen, Summen und Unterschieden.
+- Zeit nutzt volle und halbe Stunden, Fünfminutenschritte und vorwärts gerichtete Spannen von 15 bis 90 Minuten. Masse und Rauminhalt bleiben bei ganzzahligen Gramm/Kilogramm und Milliliter/Liter bis 1000 Basiseinheiten.
+- Katalog 0.17.0 und Schema 16 ergänzen Uhrtexte und geprüfte alltagsnahe Bezugsgrößen. Zeitrechnung, Mengenrechnung, Eindeutigkeit und Lösungsprüfung bleiben in TypeScript.
+- Uhr, Waage und Messgefäß zeigen bekannte Angaben; digitale Uhrzeit, Dauer und gesuchte Menge bleiben bis zur richtigen Antwort visuell und für Screenreader unbekannt.
+- Dezimalzahlen, Sekunden, Zeitspannen über Mitternacht, künstliche Umrechnungsserien und komplexe Größensachaufgaben bleiben ausgeschlossen. Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 311 Unit-/Komponententests, Produktionsbuild, Compose-Konfiguration und 16 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.18.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Wahrscheinlichkeit und Kombinatorik 0.17.0
 
 - Die neuen adaptiven Kompetenzen `probability` und `combinatorics` führen von sichtbaren Ergebnisräumen über bekannte Zufallsgeräte zu Häufigkeitsvergleichen sowie von `2×2`-Paarungen zu `3×3` mit genau einer Ausnahme.

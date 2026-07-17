@@ -1294,6 +1294,157 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
+export function formatClockTime(hour: number, minute: number): string {
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23 || !Number.isInteger(minute) || minute < 0 || minute > 59) {
+    throw new RangeError('Uhrzeiten brauchen gültige Stunden und Minuten.')
+  }
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} Uhr`
+}
+
+function time(seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().quantityContent.time
+  let correctAnswer: string
+  let options: AnswerOption[]
+  let taskPrompt: string
+  let quantityExplanation: string
+  let strategy: string
+  let subskillId: string
+  let representationValues: ExerciseRepresentation['values']
+  if (difficulty < 3) {
+    const hour = integer(random, 1, 12)
+    const minute = difficulty === 1 ? pick(random, [0, 30]) : pick(random, [5, 10, 15, 20, 25, 35, 40, 45, 50, 55])
+    correctAnswer = formatClockTime(hour, minute)
+    taskPrompt = content.readPrompt
+    quantityExplanation = renderCatalogText(content.readExplanation, { time: correctAnswer })
+    strategy = difficulty === 1
+      ? 'Der kurze Zeiger nennt die Stunde. Der lange Zeiger steht bei 12 für 00 und bei 6 für 30 Minuten.'
+      : 'Lies den langen Zeiger in Fünferschritten und prüfe danach den kurzen Zeiger.'
+    subskillId = difficulty === 1 ? 'time-full-half-hours' : 'time-five-minute-reading'
+    representationValues = { mode: 'read', hour, minute, answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, [
+      { value: formatClockTime(hour === 12 ? 1 : hour + 1, minute), misconception: 'Stundenzeiger eine Stunde zu weit gelesen' },
+      { value: formatClockTime(hour, (minute + 15) % 60), misconception: 'Minutenzeiger um eine Viertelstunde versetzt gelesen' },
+      { value: formatClockTime(hour === 1 ? 12 : hour - 1, minute), misconception: 'Stundenzeiger eine Stunde zu früh gelesen' }
+    ])
+  } else {
+    const startMinutes = integer(random, 32, 62) * 15
+    const durationMinutes = pick(random, [15, 30, 45, 60, 75, 90])
+    const endMinutes = startMinutes + durationMinutes
+    const startHour = Math.floor(startMinutes / 60)
+    const startMinute = startMinutes % 60
+    const endHour = Math.floor(endMinutes / 60)
+    const endMinute = endMinutes % 60
+    const startTime = formatClockTime(startHour, startMinute)
+    const endTime = formatClockTime(endHour, endMinute)
+    correctAnswer = String(durationMinutes)
+    taskPrompt = renderCatalogText(content.durationPrompt, { startTime, endTime })
+    quantityExplanation = renderCatalogText(content.durationExplanation, { startTime, endTime, duration: `${durationMinutes} Minuten` })
+    strategy = 'Gehe von der Startzeit zuerst zur nächsten Viertel- oder vollen Stunde und dann bis zur Endzeit weiter.'
+    subskillId = 'time-forward-duration'
+    representationValues = { mode: 'duration', startHour, startMinute, endHour, endMinute, answerLabel: `${durationMinutes} Minuten` }
+    options = numberOptions(random, durationMinutes, [
+      { value: durationMinutes - 15, misconception: 'Eine Viertelstunde ausgelassen' },
+      { value: durationMinutes + 15, misconception: 'Eine Viertelstunde zu viel gezählt' },
+      { value: Math.abs(endMinute - startMinute), misconception: 'Nur die Minutenzahlen voneinander abgezogen' }
+    ]).map((option) => ({ ...option, label: `${option.value} Minuten` }))
+  }
+  const values = { taskPrompt, quantityExplanation, strategy, answer: correctAnswer }
+  return withMetadata({
+    ...base('time', seed, difficulty, values),
+    ...contentFor('time', values, difficulty),
+    typeId: difficulty === 3 ? 'time-duration' : 'time-read-clock',
+    subskillId,
+    answerMode: 'choice',
+    correctAnswer,
+    options,
+    representation: representation('time', difficulty, 'clock', difficulty === 3 ? content.durationLabel : content.clockLabel, representationValues, ['answerLabel'])
+  })
+}
+
+export function formatBaseQuantity(value: number, quantity: 'mass' | 'capacity'): string {
+  if (!Number.isInteger(value) || value < 0 || value > 1000) throw new RangeError('Die Grundmenge muss zwischen 0 und 1000 liegen.')
+  if (value === 1000) return quantity === 'mass' ? '1 kg' : '1 l'
+  return `${value} ${quantity === 'mass' ? 'g' : 'ml'}`
+}
+
+function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficulty: Difficulty): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().quantityContent[skillId]
+  let correctAnswer: string
+  let options: AnswerOption[]
+  let taskPrompt: string
+  let quantityExplanation: string
+  let strategy: string
+  let subskillId: string
+  let representationValues: ExerciseRepresentation['values']
+  if (difficulty === 1) {
+    const estimate = pick(random, content.referenceEstimates)
+    correctAnswer = estimate.correct
+    taskPrompt = renderCatalogText(content.referencePrompt, { item: estimate.label })
+    quantityExplanation = renderCatalogText(content.referenceExplanation, { item: estimate.label, quantityAnswer: correctAnswer })
+    strategy = `Vergleiche ${estimate.label} mit einer bekannten Bezugsgröße. ${content.equivalenceLabel}.`
+    subskillId = `${skillId}-reference-estimate`
+    representationValues = { mode: 'reference', quantityType: skillId, itemLabel: estimate.label, equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    options = shuffle(random, estimate.options.map((value) => ({
+      value,
+      label: value,
+      misconception: value === correctAnswer ? undefined : 'Unpassende Größenordnung oder Einheit gewählt'
+    })))
+  } else {
+    const operation = difficulty === 2 ? 'complement' : random() < 0.5 ? '+' : '−'
+    let firstBase: number
+    let secondBase: number
+    let answerBase: number
+    if (operation === 'complement') {
+      firstBase = integer(random, 2, 18) * 50
+      secondBase = 1000
+      answerBase = secondBase - firstBase
+    } else if (operation === '+') {
+      firstBase = integer(random, 2, 14) * 50
+      secondBase = integer(random, 1, Math.max(1, 20 - firstBase / 50)) * 50
+      answerBase = firstBase + secondBase
+    } else {
+      firstBase = integer(random, 6, 20) * 50
+      secondBase = integer(random, 1, firstBase / 50 - 1) * 50
+      answerBase = firstBase - secondBase
+    }
+    correctAnswer = formatBaseQuantity(answerBase, skillId)
+    const firstAmount = formatBaseQuantity(firstBase, skillId)
+    const secondAmount = formatBaseQuantity(secondBase, skillId)
+    if (operation === 'complement') {
+      taskPrompt = renderCatalogText(content.complementPrompt, { knownAmount: firstAmount, targetAmount: secondAmount })
+      quantityExplanation = renderCatalogText(content.complementExplanation, { knownAmount: firstAmount, targetAmount: secondAmount, quantityAnswer: correctAnswer })
+      strategy = `Ergänze in passenden Schritten bis 1000. ${content.equivalenceLabel}.`
+      subskillId = `${skillId}-complement-to-1000`
+      representationValues = { mode: 'complement', quantityType: skillId, knownAmountBase: firstBase, targetAmountBase: secondBase, unitLabel: skillId === 'mass' ? 'g' : 'ml', equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    } else {
+      taskPrompt = renderCatalogText(content.calculationPrompt, { firstAmount, secondAmount, operation })
+      quantityExplanation = renderCatalogText(content.calculationExplanation, { firstAmount, secondAmount, operation, quantityAnswer: correctAnswer })
+      strategy = `Rechne beide bekannten Mengen in ${skillId === 'mass' ? 'Gramm' : 'Millilitern'} ${operation === '+' ? 'zusammen' : 'voneinander ab'}.`
+      subskillId = operation === '+' ? `${skillId}-addition` : `${skillId}-difference`
+      representationValues = { mode: 'calculation', quantityType: skillId, firstAmountBase: firstBase, secondAmountBase: secondBase, operation, unitLabel: skillId === 'mass' ? 'g' : 'ml', equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    }
+    const wrongOperation = operation === '+' ? Math.abs(firstBase - secondBase) : operation === '−' ? firstBase + secondBase : firstBase
+    options = textOptions(random, correctAnswer, [
+      { value: formatBaseQuantity(Math.max(0, answerBase - 50), skillId), misconception: 'Einen 50er-Schritt ausgelassen' },
+      { value: formatBaseQuantity(Math.min(1000, answerBase + 50), skillId), misconception: 'Einen 50er-Schritt zu viel gezählt' },
+      { value: formatBaseQuantity(Math.min(1000, wrongOperation), skillId), misconception: 'Rechenbeziehung verwechselt' }
+    ])
+  }
+  const values = { taskPrompt, quantityExplanation, strategy, quantityAnswer: correctAnswer }
+  return withMetadata({
+    ...base(skillId, seed, difficulty, values),
+    ...contentFor(skillId, values, difficulty),
+    typeId: difficulty === 1 ? `${skillId}-reference` : difficulty === 2 ? `${skillId}-complement` : `${skillId}-calculate`,
+    subskillId,
+    answerMode: 'choice',
+    correctAnswer,
+    options,
+    representation: representation(skillId, difficulty, skillId === 'mass' ? 'mass-scale' : 'capacity-vessel', content.displayLabel, representationValues, ['answerLabel'])
+  })
+}
+
 function bodyViews(seed: number, difficulty: Difficulty): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().spatialViews
@@ -1786,6 +1937,9 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'read-charts': return readCharts(seed, difficulty)
     case 'probability': return probability(seed, difficulty)
     case 'combinatorics': return combinatorics(seed, difficulty)
+    case 'time': return time(seed, difficulty)
+    case 'mass': return measurementQuantity('mass', seed, difficulty)
+    case 'capacity': return measurementQuantity('capacity', seed, difficulty)
   }
 }
 

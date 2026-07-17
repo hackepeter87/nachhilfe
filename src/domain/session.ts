@@ -26,7 +26,10 @@ const FOCUS_SKILLS: SkillId[] = [
   'read-tables',
   'read-charts',
   'probability',
-  'combinatorics'
+  'combinatorics',
+  'time',
+  'mass',
+  'capacity'
 ]
 
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']
@@ -132,6 +135,8 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
   }
   if (skillId === 'probability') return difficulty === 1 ? 'chance-classify-visible' : difficulty === 2 ? 'chance-classify-experiment' : 'chance-compare-frequency'
   if (skillId === 'combinatorics') return difficulty === 3 ? 'combinations-one-exclusion' : 'combinations-systematic'
+  if (skillId === 'time') return difficulty === 1 ? 'time-full-half-hours' : difficulty === 2 ? 'time-five-minute-reading' : 'time-forward-duration'
+  if (skillId === 'mass' || skillId === 'capacity') return difficulty === 1 ? `${skillId}-reference-estimate` : difficulty === 2 ? `${skillId}-complement-to-1000` : undefined
   const candidates = skillId === 'addition'
     ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])
     : skillId === 'subtraction'
@@ -165,6 +170,14 @@ function settingsForProgress(progress: SkillProgress | undefined): { difficulty:
       ? 3
       : 1
   return { difficulty, phase }
+}
+
+function settingsForSkill(skillId: SkillId, progress: ProgressMap): { difficulty: Difficulty; phase: LearningPhase } {
+  const settings = settingsForProgress(progress[skillId])
+  if ((skillId === 'mass' || skillId === 'capacity') && !hasReachedPhase(progress['complement-1000'], 'independent-practice')) {
+    return { difficulty: 1, phase: settings.phase }
+  }
+  return settings
 }
 
 function applyLearningPhase(exercise: Exercise, phase: LearningPhase): Exercise {
@@ -202,7 +215,7 @@ export function createSessionPlan(
   const skills = [...warmups, ...focus, ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled)]
   const exercises = skills.map((skillId, index) => {
     const skillProgress = progress[skillId]
-    const { difficulty, phase } = settingsForProgress(skillProgress)
+    const { difficulty, phase } = settingsForSkill(skillId, progress)
     const exerciseSeed = seed + (index + 1) * 113
     const focus = selectSubskill(skillId, progress, exerciseSeed + 41, difficulty)
     return applyLearningPhase(uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus), phase)
