@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 9
+export const CATALOG_SCHEMA_VERSION = 10
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -358,14 +358,34 @@ export function validateCatalog(catalog) {
   requireUnique(catalog.wordProblems.map((template) => template.id), 'Sachaufgaben-IDs')
   catalog.wordProblems.forEach((template) => validateWordProblem(template, numberRange))
   if (!isRecord(catalog.wordProblemSteps)) fail('wordProblemSteps fehlt')
-  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'situationPrompt', 'situationError', 'situationSuccess', 'modelPrompt', 'modelExplorePrompt', 'modelContinueLabel', 'modelError', 'modelSuccess', 'equationPrompt', 'equationError', 'equationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'secondEquationPrompt', 'secondEquationError', 'secondEquationSuccess', 'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
+  for (const field of ['questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess', 'modelPrompt', 'modelExplorePrompt', 'modelContinueLabel', 'modelError', 'modelSuccess', 'equationPrompt', 'equationError', 'equationSuccess', 'calculatePrompt', 'calculateError', 'calculateSuccess', 'secondEquationPrompt', 'secondEquationError', 'secondEquationSuccess', 'finalCalculationPrompt', 'finalCalculationError', 'finalCalculationSuccess', 'checkPrompt', 'checkError', 'checkSuccess', 'plausibilityError', 'plausibilitySuccess']) {
     requireText(catalog.wordProblemSteps, field, 'wordProblemSteps')
   }
-  const progressionIds = ['understand-story', 'identify-unknown', 'choose-model', 'form-equation', 'calculate', 'check-result', 'answer-in-context']
+  const progressionIds = ['understand-story', 'identify-unknown', 'identify-relevant', 'choose-model', 'form-equation', 'calculate', 'check-result', 'answer-in-context']
   if (!Array.isArray(catalog.wordProblemSteps.modellingProgression) || catalog.wordProblemSteps.modellingProgression.length !== progressionIds.length ||
     !catalog.wordProblemSteps.modellingProgression.every((stage, index) => isRecord(stage) && stage.stage === index + 1 &&
       stage.id === progressionIds[index] && isText(stage.childPrompt) && isText(stage.purpose))) {
     fail('wordProblemSteps.modellingProgression ist unvollständig')
+  }
+  const expectedRuntime = [
+    ['question', 'identify-unknown', 'always', 'choice', 'none'],
+    ['relevant', 'identify-relevant', 'always', 'choice', 'none'],
+    ['model', 'choose-model', 'always', 'model-by-difficulty', 'word-model'],
+    ['equation', 'form-equation', 'always', 'choice', 'none'],
+    ['calculate', 'calculate', 'always', 'number', 'none'],
+    ['second-equation', 'form-equation', 'second-operation', 'choice', 'none'],
+    ['final-calculation', 'calculate', 'second-operation', 'number', 'none'],
+    ['plausibility', 'check-result', 'always', 'choice', 'none'],
+    ['check', 'answer-in-context', 'always', 'choice', 'none']
+  ]
+  if (!Array.isArray(catalog.wordProblemSteps.runtimeSequence) || catalog.wordProblemSteps.runtimeSequence.length !== expectedRuntime.length ||
+    !catalog.wordProblemSteps.runtimeSequence.every((step, index) => isRecord(step) &&
+      [step.id, step.progressionId, step.condition, step.interaction, step.representation].every((entry, fieldIndex) => entry === expectedRuntime[index][fieldIndex]))) {
+    fail('wordProblemSteps.runtimeSequence weicht vom vollständigen Modellierungsablauf ab')
+  }
+  const modelInteractions = catalog.wordProblemSteps.modelInteractionByDifficulty
+  if (!isRecord(modelInteractions) || modelInteractions['1'] !== 'continue' || modelInteractions['2'] !== 'choice' || modelInteractions['3'] !== 'choice') {
+    fail('wordProblemSteps.modelInteractionByDifficulty ist ungültig')
   }
   validateSymmetry(catalog.symmetry)
   validateSpatialViews(catalog.spatialViews)

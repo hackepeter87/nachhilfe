@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.11.0',
-    schemaVersion: 9,
-    appVersion: '0.13.0'
+    catalogVersion: '0.12.0',
+    schemaVersion: 10,
+    appVersion: '0.13.1'
   })
 
   await page.reload()
@@ -269,7 +269,8 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   await expect(page.getByText('1. Was wird gesucht?')).toBeVisible()
   await expect(page.getByText(/Mengenbeziehung|Welche Rechenart/i)).toHaveCount(0)
   await page.getByRole('button', { name: 'Wie viele Muscheln hat Mila jetzt?' }).click()
-  await page.getByRole('button', { name: /^Mila hat zuerst/ }).click()
+  await expect(page.getByText('2. Welche Angaben brauchst du für die ganze Geschichte?')).toBeVisible()
+  await page.getByRole('button', { name: /Muscheln und \d+ neue Muscheln/ }).click()
   const model = page.getByRole('img', { name: /neue Gesamtmenge unbekannt/i })
   await expect(model).toBeVisible()
   await expect(model).toContainText('?')
@@ -294,6 +295,7 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   await equationButton.click()
   await page.getByLabel('Dein Ergebnis').fill(String(first + second))
   await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
+  await page.getByRole('button', { name: new RegExp(`Das Ergebnis ${first + second} ist größer`) }).click()
   await page.getByRole('button', { name: `Mila hat jetzt ${first + second} Muscheln.` }).click()
   await page.getByRole('button', { name: 'Weiter', exact: true }).click()
 })

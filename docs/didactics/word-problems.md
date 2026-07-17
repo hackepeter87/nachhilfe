@@ -19,15 +19,15 @@ Ein Schlüsselwort entscheidet; alle Zahlen müssen verwendet werden; eine bekan
 Die Handlung und die gesuchte Größe bestimmen die Mengenbeziehung. Technische Beziehung und Operation bleiben intern; der Kinderablauf arbeitet mit konkreten Situationen, Bildern und Gleichungen.
 
 ## 7. Methodischer Zugang
-Der Katalog dokumentiert die Folge Geschichte verstehen, gesuchte Größe erkennen, Modell wählen, Gleichung bilden, selbst rechnen, Ergebnis prüfen und im Antwortsatz auf die Geschichte beziehen. Nicht jede Aufgabe benötigt alle sieben Schritte.
+Der Katalog dokumentiert die Folge Geschichte verstehen, gesuchte Größe erkennen, wichtige Angaben bestimmen, Modell wählen, Gleichung bilden, selbst rechnen, Ergebnis prüfen und im Antwortsatz auf die Geschichte beziehen. `wordProblemSteps.runtimeSequence` ist die verbindliche Reihenfolge der Runtime. Jede Aufgabe durchläuft diese acht fachlichen Stationen; nur die zweite Gleichung und zweite Berechnung sind ausdrücklich an `second-operation` gebunden.
 
 ## 8. Geeignete Darstellungen
-Aktiv sind Veränderungs-, Teil-Ganzes-, Vergleichs-, Ergänzungs- und zweistufige Balkenmodelle sowie Gruppenbilder für unbekannte Gesamtzahl oder unbekannte Gruppengröße. Alle Bilder zeigen nur bekannte Zahlen; die gesuchte Zahl bleibt `?`.
+Aktiv sind Veränderungs-, Teil-Ganzes-, Vergleichs-, Ergänzungs- und zweistufige Balkenmodelle sowie Gruppenbilder für unbekannte Gesamtzahl oder unbekannte Gruppengröße. Jedes Modell trägt intern `unknownQuantity`; der Renderer lehnt eine unpassende Kennung sichtbar ab. Alle Bilder zeigen nur bekannte Zahlen, die gesuchte Zahl bleibt bis nach der eigenen Berechnung `?`.
 
 ## 9. Lernprogression
-- **Stufe 1:** Suchgröße und Handlung klären; das korrekte unbekanntenhaltige Modell gemeinsam untersuchen; Gleichung wählen und Ergebnis selbst eingeben.
-- **Stufe 2:** genau ein passendes Modell aus drei konkreten Bildern auswählen; Gleichung und Antwort verbinden.
-- **Stufe 3:** unwichtige Angabe unterscheiden, Modell auswählen, Ergebnis plausibilisieren und ausgewählte zweischrittige Situationen bearbeiten.
+- **Stufe 1:** Suchgröße und wichtige Angaben klären; das korrekte unbekanntenhaltige Modell gemeinsam untersuchen; Gleichung wählen, Ergebnis selbst eingeben, plausibilisieren und Antwort prüfen.
+- **Stufe 2:** denselben Ablauf nutzen und genau ein passendes Modell aus drei konkreten Bildern auswählen.
+- **Stufe 3:** eine unwichtige Angabe unterscheiden und ausgewählte zweischrittige Situationen im selben Ablauf bearbeiten.
 
 Die Schwierigkeit entsteht durch mathematische Selbstständigkeit und zusätzliche relevante Handlungsschritte, nicht durch künstlich lange Texte.
 
@@ -56,7 +56,7 @@ Freie Skizzen, frei formulierte Antwortsätze und alternative selbst notierte Re
 Sprachliche Zugänglichkeit, Lebensnähe, Qualität der visuellen Modelle und tatsächliche Förderwirkung benötigen eine menschliche didaktische Prüfung und Unterrichtserprobung. Eine Lehrkraftfreigabe ist nicht dokumentiert; automatisierte Konsistenzprüfungen belegen keine pädagogische Wirksamkeit.
 
 ### Katalog-/Code-Grenze
-Im Katalog liegen Geschichte, Suchfrage, konkrete Situation, relevante Angaben, plausible Alternativen, Modelltyp, Modellhilfe, Gleichungen, Feedback und `wordProblemSteps.modellingProgression`. TypeScript verantwortet Zahlenwahl, mathematische Operationen, Ergebnisprüfung, deterministische Varianten und Rendering. JSON enthält keine ausführbare Logik.
+Im Katalog liegen Geschichte, Suchfrage, die fachliche Situationsbeschreibung, relevante Angaben, plausible Alternativen, Modelltyp, Modellhilfe, Gleichungen, Feedback, `modellingProgression`, `runtimeSequence` und die schwierigkeitsabhängige Modellinteraktion. `situation` und `situationDistractors` bleiben interne Review-Texte und werden nicht als zusätzliches Kinder-Quiz gerendert. TypeScript verantwortet Zahlenwahl, mathematische Operationen, Ergebnisprüfung, deterministische Varianten und Rendering. JSON enthält keine ausführbare Logik.
 
 ### Gegen Schlüsselwortstrategien
 „Zusammen“ kommt sowohl bei Addition zweier Teilmengen als auch bei Multiplikation gleich großer Gruppen vor. „Mehr“ bezeichnet in einer Vergleichsgeschichte den gesuchten Abstand. Hinweise beziehen sich deshalb immer auf bekannte, veränderte und gesuchte Mengen.

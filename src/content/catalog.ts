@@ -14,7 +14,7 @@ import {
 import { isValidCubeBuilding, type CubeBuilding, type CubeViewDirection } from '../domain/cubeViews'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 9
+export const CATALOG_SCHEMA_VERSION = 10
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -209,6 +209,20 @@ export type WordModelType =
   | 'increase-then-decrease'
   | 'decrease-then-increase'
 
+export type WordUnknownQuantity = 'new-total' | 'remaining' | 'whole' | 'difference' | 'missing-part' | 'total' | 'group-size' | 'final-total'
+
+export const WORD_MODEL_UNKNOWN_QUANTITY: Record<WordModelType, WordUnknownQuantity> = {
+  'change-increase': 'new-total',
+  'change-decrease': 'remaining',
+  'part-whole': 'whole',
+  comparison: 'difference',
+  'missing-part': 'missing-part',
+  'equal-groups-total': 'total',
+  'equal-groups-share': 'group-size',
+  'increase-then-decrease': 'final-total',
+  'decrease-then-increase': 'final-total'
+}
+
 export interface WordProblemTemplate {
   id: string
   relationship: 'join' | 'separate' | 'combine' | 'compare' | 'complement' | 'equal-groups' | 'sharing'
@@ -247,20 +261,29 @@ export interface WordProblemTemplate {
 
 export interface WordProblemSteps {
   modellingProgression: Array<{
-    stage: 1 | 2 | 3 | 4 | 5 | 6 | 7
-    id: 'understand-story' | 'identify-unknown' | 'choose-model' | 'form-equation' | 'calculate' | 'check-result' | 'answer-in-context'
+    stage: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+    id: 'understand-story' | 'identify-unknown' | 'identify-relevant' | 'choose-model' | 'form-equation' | 'calculate' | 'check-result' | 'answer-in-context'
     childPrompt: string
     purpose: string
   }>
+  runtimeSequence: Array<{
+    id: 'question' | 'relevant' | 'model' | 'equation' | 'calculate' | 'second-equation' | 'final-calculation' | 'plausibility' | 'check'
+    progressionId: 'identify-unknown' | 'identify-relevant' | 'choose-model' | 'form-equation' | 'calculate' | 'check-result' | 'answer-in-context'
+    condition: 'always' | 'second-operation'
+    interaction: 'choice' | 'number' | 'model-by-difficulty'
+    representation: 'none' | 'word-model'
+  }>
+  modelInteractionByDifficulty: {
+    '1': 'continue'
+    '2': 'choice'
+    '3': 'choice'
+  }
   questionPrompt: string
   questionError: string
   questionSuccess: string
   relevantPrompt: string
   relevantError: string
   relevantSuccess: string
-  situationPrompt: string
-  situationError: string
-  situationSuccess: string
   modelPrompt: string
   modelExplorePrompt: string
   modelContinueLabel: string
@@ -566,7 +589,6 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
   if (!isRecord(value)) return false
   const stringFields = [
     'questionPrompt', 'questionError', 'questionSuccess', 'relevantPrompt', 'relevantError', 'relevantSuccess',
-    'situationPrompt', 'situationError', 'situationSuccess',
     'modelPrompt', 'modelExplorePrompt', 'modelContinueLabel', 'modelError', 'modelSuccess',
     'equationPrompt', 'equationError', 'equationSuccess',
     'calculatePrompt', 'calculateError', 'calculateSuccess',
@@ -576,10 +598,26 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     'plausibilityError', 'plausibilitySuccess'
   ]
   if (!stringFields.every((field) => isNonEmptyString(value[field]))) return false
-  if (!Array.isArray(value.modellingProgression) || value.modellingProgression.length !== 7) return false
-  const progressionIds = ['understand-story', 'identify-unknown', 'choose-model', 'form-equation', 'calculate', 'check-result', 'answer-in-context']
-  return value.modellingProgression.every((stage, index) => isRecord(stage) && stage.stage === index + 1 && stage.id === progressionIds[index] &&
-    isNonEmptyString(stage.childPrompt) && isNonEmptyString(stage.purpose))
+  const progressionIds = ['understand-story', 'identify-unknown', 'identify-relevant', 'choose-model', 'form-equation', 'calculate', 'check-result', 'answer-in-context']
+  if (!Array.isArray(value.modellingProgression) || value.modellingProgression.length !== progressionIds.length ||
+    !value.modellingProgression.every((stage, index) => isRecord(stage) && stage.stage === index + 1 && stage.id === progressionIds[index] &&
+      isNonEmptyString(stage.childPrompt) && isNonEmptyString(stage.purpose))) return false
+  const expectedRuntime = [
+    ['question', 'identify-unknown', 'always', 'choice', 'none'],
+    ['relevant', 'identify-relevant', 'always', 'choice', 'none'],
+    ['model', 'choose-model', 'always', 'model-by-difficulty', 'word-model'],
+    ['equation', 'form-equation', 'always', 'choice', 'none'],
+    ['calculate', 'calculate', 'always', 'number', 'none'],
+    ['second-equation', 'form-equation', 'second-operation', 'choice', 'none'],
+    ['final-calculation', 'calculate', 'second-operation', 'number', 'none'],
+    ['plausibility', 'check-result', 'always', 'choice', 'none'],
+    ['check', 'answer-in-context', 'always', 'choice', 'none']
+  ]
+  if (!Array.isArray(value.runtimeSequence) || value.runtimeSequence.length !== expectedRuntime.length ||
+    !value.runtimeSequence.every((step, index) => isRecord(step) &&
+      [step.id, step.progressionId, step.condition, step.interaction, step.representation].every((entry, fieldIndex) => entry === expectedRuntime[index]![fieldIndex]))) return false
+  return isRecord(value.modelInteractionByDifficulty) && value.modelInteractionByDifficulty['1'] === 'continue' &&
+    value.modelInteractionByDifficulty['2'] === 'choice' && value.modelInteractionByDifficulty['3'] === 'choice'
 }
 
 export function validateTaskCatalog(value: unknown): value is TaskCatalog {

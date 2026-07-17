@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(9)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.11.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(10)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.12.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -195,8 +195,17 @@ describe('versionierter Aufgabenkatalog', () => {
       expect(new Set([template.equation, ...template.equationDistractors]).size).toBe(3)
       expect(template.plausibility.options.filter((option) => option.correct)).toHaveLength(1)
     })
-    expect(catalog.wordProblemSteps.modellingProgression.map((stage) => stage.stage)).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(catalog.wordProblemSteps.modellingProgression.map((stage) => stage.stage)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
+    expect(catalog.wordProblemSteps.runtimeSequence.map((step) => step.id)).toEqual([
+      'question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check'
+    ])
     expect(JSON.stringify(catalog.wordProblemSteps)).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
+  })
+
+  it('lehnt eine abweichende Sachaufgaben-Runtime-Sequenz ab', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    catalog.wordProblemSteps.runtimeSequence = catalog.wordProblemSteps.runtimeSequence.filter((step) => step.id !== 'model')
+    expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
   it('fördert keine einfache Schlüsselwortregel', () => {

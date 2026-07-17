@@ -22,7 +22,13 @@ export default defineConfig({
   projects: [
     {
       name: 'iPhone-13-mini',
+      testIgnore: /mobile-safari\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 812 } }
+    },
+    {
+      name: 'mobile-safari-webkit',
+      testMatch: /mobile-safari\.spec\.ts/,
+      use: { ...devices['iPhone 13'], viewport: { width: 375, height: 812 } }
     }
   ]
 })

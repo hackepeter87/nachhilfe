@@ -51,10 +51,10 @@ describe('App-Ablauf', () => {
     await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
 
     await screen.findByRole('button', { name: /mathe-runde starten/i })
-    expect(screen.getByText('nrw-klasse3-foerderkern 0.11.0')).not.toBeVisible()
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.12.0')).not.toBeVisible()
     await user.click(screen.getByLabelText('Versionsinformationen öffnen'))
-    expect(screen.getByText('nrw-klasse3-foerderkern 0.11.0')).toBeVisible()
-    expect(screen.getByText('0.13.0')).toBeVisible()
+    expect(screen.getByText('nrw-klasse3-foerderkern 0.12.0')).toBeVisible()
+    expect(screen.getByText('0.13.1')).toBeVisible()
     expect(screen.getByText('ready-for-review')).toBeVisible()
   })
 
@@ -63,7 +63,7 @@ describe('App-Ablauf', () => {
     render(<App />)
     await user.click(await screen.findByRole('button', { name: 'Weiter zur Mathe-Reise' }))
     await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
-    await user.click(screen.getByRole('button', { name: /mathe-runde starten/i }))
+    await user.click(await screen.findByRole('button', { name: /mathe-runde starten/i }))
 
     act(() => pwa.onNeedRefresh?.())
     expect(screen.queryByText('Eine neue Version ist bereit.')).not.toBeInTheDocument()

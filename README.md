@@ -131,7 +131,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.13.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.13.1
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -172,6 +172,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.13.0
+## Release-Stand 0.13.1
 
-Version 0.13.0 ergänzt Körperansichten einfacher Würfelgebäude. Stufe 1 nutzt nur die Vorderansicht, Stufe 2 unterscheidet vorne und rechts, Stufe 3 ergänzt die Draufsicht und ähnlichere Distraktoren. Gebäude, didaktische Texte und Stufengrenzen liegen im Katalog 0.11.0; Projektion und Prüfung bleiben in TypeScript. Schema 9 ergänzt die verwendete Struktur `spatialViews`. GHCR und Compose sind auf linux/amd64 begrenzt. Didaktik, Grenzen und weitere Releasefolge stehen in [docs/didactics/body-views.md](docs/didactics/body-views.md), der [Roadmap](docs/roadmap.md) und [docs/validation-0.6.md](docs/validation-0.6.md). Details stehen in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.13.1 synchronisiert den bestehenden Sachaufgaben-Lernweg mit Katalog und Runtime. Katalog 0.12.0 und Schema 10 definieren die verbindliche Folge von Suchgröße, wichtigen Angaben, Modell, Rechnung, eigener Berechnung, Plausibilitätsprüfung und Antwortsatz. Zweite Rechenschritte sind die einzige katalogisierte Ausnahme. Modelle benennen die unbekannte Größe explizit und zeigen sie bis zur eigenen Berechnung ausschließlich als `?`. Neue Aufgaben verwerfen ihren gesamten lokalen Zustand; Überschriftenfokus, Hover und Touch erscheinen nicht als Auswahl. Details stehen in [docs/curriculum-runtime-sync-0.13.1.md](docs/curriculum-runtime-sync-0.13.1.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { Check, HelpCircle, Lightbulb, Send } from 'lucide-react'
 import { isAnswerCorrect, isStepAnswerCorrect } from '../domain'
 import type { AttemptResult, Exercise } from '../domain'
@@ -14,6 +14,12 @@ type AnswerState = 'answering' | 'correct' | 'scaffold'
 type MessageKind = 'error' | 'success'
 
 export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
+  return <ExerciseCardState key={exercise.id} exercise={exercise} onComplete={onComplete} />
+}
+
+function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
+  const panelRef = useRef<HTMLElement>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
   const [answer, setAnswer] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>('answering')
   const [checks, setChecks] = useState(0)
@@ -23,6 +29,11 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   const [messageKind, setMessageKind] = useState<MessageKind>('success')
   const [stepIndex, setStepIndex] = useState(0)
   const [completedStepAnswers, setCompletedStepAnswers] = useState<Record<string, string>>({})
+
+  useLayoutEffect(() => {
+    panelRef.current?.scrollTo?.({ top: 0, left: 0 })
+    headingRef.current?.focus({ preventScroll: true })
+  }, [])
 
   const currentStep = exercise.steps?.[stepIndex]
   const currentInteraction = currentStep?.interaction ?? 'choice'
@@ -134,6 +145,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
         {options.map((option) => (
           <button
             className={option.representation ? 'answer-option model-option' : exercise.answerMode === 'symmetry' ? 'symmetry-option' : 'answer-option'}
+            data-answer-state="idle"
             key={option.value}
             type="button"
             onClick={() => currentStep ? checkStepAnswer(option.value) : checkRegularAnswer(option.value)}
@@ -146,10 +158,10 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   }
 
   return (
-    <section className="exercise-panel" aria-labelledby="exercise-title">
+    <section className="exercise-panel" aria-labelledby="exercise-title" data-exercise-id={exercise.id} ref={panelRef}>
       <div className="exercise-heading">
         <span className="eyebrow">{exercise.title}</span>
-        <h2 id="exercise-title">{exercise.prompt}</h2>
+        <h2 id="exercise-title" ref={headingRef} tabIndex={-1}>{exercise.prompt}</h2>
       </div>
 
       {exercise.answerMode !== 'guided-word' && displayedRepresentation && (displayedRepresentation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
@@ -157,7 +169,7 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
       )}
 
       {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice' || exercise.answerMode === 'guided-number') && currentStep && answerState === 'answering' && (
-        <div className="guided-step">
+        <div className="guided-step" data-curriculum-stage={currentStep.curriculumStage}>
           <div className="step-dots" aria-label={`Schritt ${stepIndex + 1} von ${exercise.steps?.length}`}>
             {exercise.steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
           </div>

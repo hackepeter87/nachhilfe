@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Curriculum-Runtime-Synchronisation 0.13.1
+
+- Katalog 0.12.0 und Schema 10 definieren für Sachaufgaben eine verbindliche Runtime-Sequenz: gesuchte Größe, wichtige Angaben, Modell, Rechnung, eigene Berechnung, Plausibilität und Antwortsatz. Nur zweischrittige Geschichten ergänzen katalogisiert eine zweite Gleichung und Berechnung.
+- Der Generator baut seine Schritte aus dieser Sequenz. Die frühere, schwierigkeitsabhängige Parallelfolge und das zusätzliche Situationsquiz im Kinderbereich entfallen.
+- Balken- und Gruppenmodelle tragen `unknownQuantity`; sie erhalten vor der Berechnung keine Ergebnis- oder Zwischenergebniswerte. Widersprüchliche Modelldaten schlagen sichtbar fehl.
+- Antwortkarten starten neutral. Hover gilt nur für feine Zeiger, Touch markiert keine Auswahl, und Fokus liegt nach dem Aufgabenwechsel auf der neuen Überschrift.
+- Eine mit `exercise.id` gekeyte interne Komponente verwirft Antwort, Eingabe, Hilfe, Feedback, Teilschritte und Modellzustand vollständig.
+- Katalog-, Generator-, Modell-, Komponenten- und WebKit-Tests sichern Sequenz, Pflichtdarstellungen, unbekannte Größen, Fokus und Reset ab.
+
+Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test wurden nicht durchgeführt. Playwright WebKit ist nur eine Mobile-Safari-Näherung; automatisierte Konsistenzprüfungen belegen keine pädagogische Wirksamkeit.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 223 Unit-/Komponententests, Produktionsbuild und zehn Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.13.1` beziehungsweise `mathe-reise:local` ist 56,5 MB groß, läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert.
+
 ## Körperansichten 0.13.0
 
 - Die neue Kompetenz `body-views` verbindet fest ausgerichtete Würfelgebäude aus zwei bis fünf sichtbaren Würfeln mit Vorder-, rechter Seiten- und Draufsicht.

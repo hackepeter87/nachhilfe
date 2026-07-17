@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 9,
-  "catalogVersion": "0.11.0",
+  "schemaVersion": 10,
+  "catalogVersion": "0.12.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -1697,7 +1697,7 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Gesuchte Größe klären, sichtbares unbekanntenhaltiges Mengenbild untersuchen, passende Rechnung wählen und selbst rechnen",
+          "description": "Gesuchte Größe und wichtige Angaben klären, sichtbares unbekanntenhaltiges Mengenbild untersuchen, passende Rechnung wählen, selbst rechnen und das Ergebnis prüfen",
           "numberRange": "Ergebnisse bis 20",
           "representation": "always",
           "requirements": {
@@ -1711,9 +1711,9 @@
         },
         {
           "level": 2,
-          "description": "Zusätzlich aus drei konkreten Mengenbildern wählen; sprachlich unterschiedliche, aber kurze Situationen",
+          "description": "Den vollständigen Modellierungsweg mit Auswahl aus drei konkreten Mengenbildern und kurzen sprachlich variierten Situationen bearbeiten",
           "numberRange": "Ergebnisse bis 100",
-          "representation": "hint",
+          "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
             "requiresRepresentationChoice": true,
@@ -1725,9 +1725,9 @@
         },
         {
           "level": 3,
-          "description": "Zusätzlich wichtige Angaben unterscheiden, Plausibilität prüfen und bei Bedarf zwei Veränderungen modellieren",
+          "description": "Eine unwichtige Angabe unterscheiden und bei Bedarf zwei Veränderungen im vollständigen Modellierungsweg bearbeiten",
           "numberRange": "Ergebnisse bis 100",
-          "representation": "none",
+          "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
             "requiresRepresentationChoice": true,
@@ -3590,7 +3590,7 @@
       ],
       "modelType": "equal-groups-share",
       "modelDistractors": [
-        "equal-groups-total",
+        "change-decrease",
         "part-whole"
       ],
       "modelHint": "Zeige den bekannten Vorrat von {total} Punkten und {first} gleich große leere Gruppen. Die Größe einer Gruppe bleibt ?.",
@@ -3758,44 +3758,117 @@
       },
       {
         "stage": 3,
+        "id": "identify-relevant",
+        "childPrompt": "Welche Angaben sind wichtig?",
+        "purpose": "Bekannte benötigte Mengen werden von nicht benötigten Informationen unterschieden."
+      },
+      {
+        "stage": 4,
         "id": "choose-model",
         "childPrompt": "Welches Bild passt zur Geschichte?",
         "purpose": "Bekannte Mengen und Unbekannte werden räumlich geordnet."
       },
       {
-        "stage": 4,
+        "stage": 5,
         "id": "form-equation",
         "childPrompt": "Welche Rechnung passt zum Bild?",
         "purpose": "Die Darstellung wird in mathematische Schreibweise übersetzt."
       },
       {
-        "stage": 5,
+        "stage": 6,
         "id": "calculate",
         "childPrompt": "Rechne selbst.",
         "purpose": "Das Ergebnis wird eigenständig berechnet."
       },
       {
-        "stage": 6,
+        "stage": 7,
         "id": "check-result",
         "childPrompt": "Kann das Ergebnis zur Geschichte passen?",
         "purpose": "Das Ergebnis wird an der Situation geprüft."
       },
       {
-        "stage": 7,
+        "stage": 8,
         "id": "answer-in-context",
         "childPrompt": "Welcher Antwortsatz passt?",
         "purpose": "Das Ergebnis wird wieder auf die Geschichte bezogen."
       }
     ],
+    "runtimeSequence": [
+      {
+        "id": "question",
+        "progressionId": "identify-unknown",
+        "condition": "always",
+        "interaction": "choice",
+        "representation": "none"
+      },
+      {
+        "id": "relevant",
+        "progressionId": "identify-relevant",
+        "condition": "always",
+        "interaction": "choice",
+        "representation": "none"
+      },
+      {
+        "id": "model",
+        "progressionId": "choose-model",
+        "condition": "always",
+        "interaction": "model-by-difficulty",
+        "representation": "word-model"
+      },
+      {
+        "id": "equation",
+        "progressionId": "form-equation",
+        "condition": "always",
+        "interaction": "choice",
+        "representation": "none"
+      },
+      {
+        "id": "calculate",
+        "progressionId": "calculate",
+        "condition": "always",
+        "interaction": "number",
+        "representation": "none"
+      },
+      {
+        "id": "second-equation",
+        "progressionId": "form-equation",
+        "condition": "second-operation",
+        "interaction": "choice",
+        "representation": "none"
+      },
+      {
+        "id": "final-calculation",
+        "progressionId": "calculate",
+        "condition": "second-operation",
+        "interaction": "number",
+        "representation": "none"
+      },
+      {
+        "id": "plausibility",
+        "progressionId": "check-result",
+        "condition": "always",
+        "interaction": "choice",
+        "representation": "none"
+      },
+      {
+        "id": "check",
+        "progressionId": "answer-in-context",
+        "condition": "always",
+        "interaction": "choice",
+        "representation": "none"
+      }
+    ],
+    "modelInteractionByDifficulty": {
+      "1": "continue",
+      "2": "choice",
+      "3": "choice"
+    },
     "questionPrompt": "Was wird gesucht?",
     "questionError": "Lies die Frage am Ende noch einmal: Welche Menge kennst du noch nicht?",
     "questionSuccess": "Du weißt jetzt, welche Menge gesucht wird.",
     "relevantPrompt": "Welche Angaben brauchst du für die ganze Geschichte?",
     "relevantError": "Prüfe jede Handlung: Welche Mengen sind bekannt und welche Angabe verändert nichts?",
     "relevantSuccess": "Diese Angaben brauchst du für das Modell.",
-    "situationPrompt": "Was passiert in der Geschichte?",
-    "situationError": "Stell dir die Handlung ohne Rechnung vor: Was ist zuerst da, was verändert sich und was bleibt gleich?",
-    "situationSuccess": "Du hast die Handlung der Geschichte erfasst.",
     "modelPrompt": "Welches Bild passt zur Geschichte?",
     "modelExplorePrompt": "Dieses Bild zeigt die Geschichte. Wo stehen bekannte Mengen und wo ist die gesuchte Menge mit ? markiert?",
     "modelContinueLabel": "Weiter zur Rechnung",
@@ -4530,7 +4603,7 @@
     "successFeedback": "runtime",
     "errorFeedback": "runtime",
     "releaseStatus": "runtime",
-    "learningPhases": "runtime",
+    "learningPhases": "review",
     "successCriteria": "review"
   },
   "preparedTopics": [

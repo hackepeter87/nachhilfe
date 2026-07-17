@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { isValidCubeBuilding, type CubeBuilding, type ExerciseRepresentation } from '../domain'
+import { WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 
 const isValidGroupValue = (value: number) => Number.isInteger(value) && value >= 1 && value <= 10
 const isNumberLineJump = (value: unknown): value is { from: number; to: number; label: string } =>
@@ -13,6 +14,8 @@ export function MathRepresentation({ representation }: { representation: Exercis
   const values = representation.values
   const textValue = (value: typeof values[string]) => Array.isArray(value) ? '' : value
   const modelType = typeof values.modelType === 'string' ? values.modelType : undefined
+  const expectedUnknownQuantity = modelType ? WORD_MODEL_UNKNOWN_QUANTITY[modelType as keyof typeof WORD_MODEL_UNKNOWN_QUANTITY] : undefined
+  const hasValidUnknownQuantity = !modelType || Boolean(expectedUnknownQuantity) && expectedUnknownQuantity === values.unknownQuantity
 
   if (representation.kind === 'cube-building') {
     const building: CubeBuilding = {
@@ -244,6 +247,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
   }
 
   if (representation.kind === 'groups') {
+    if (modelType && !hasValidUnknownQuantity) {
+      return <div className="math-visual math-visual--error" role="alert">Das Gruppenbild benennt die unbekannte Größe nicht eindeutig.</div>
+    }
     const groups = Number(values.groups)
     const size = Number(values.size)
     if (modelType === 'equal-groups-share') {
@@ -291,6 +297,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
   }
 
   if (representation.kind === 'bar-model' && modelType) {
+    if (!hasValidUnknownQuantity) {
+      return <div className="math-visual math-visual--error" role="alert">Das Balkenmodell benennt die unbekannte Größe nicht eindeutig.</div>
+    }
     const first = Number(values.first)
     const second = Number(values.second)
     const third = Number(values.third)

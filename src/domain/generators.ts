@@ -1,6 +1,6 @@
 import { integer, pick, seededRandom, shuffle } from './random'
 import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, ExerciseStep, SkillId } from './types'
-import { getSkillContent, getTaskCatalog, renderCatalogText } from '../content/catalog'
+import { getSkillContent, getTaskCatalog, renderCatalogText, WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 import type { WordModelType } from '../content/catalog'
 import { createShiftDistractor, flipGrid, mirrorGrid, reflectGrid } from './symmetry'
 import { createCubeViewDistractors, cubeCount, cubeViewKey, projectCubeView, type CubeViewDirection } from './cubeViews'
@@ -450,24 +450,29 @@ function rounding(seed: number, difficulty: Difficulty, unit: 10 | 100): Exercis
 function wordModelRepresentation(
   modelType: WordModelType,
   values: Record<string, number | string>,
-  label: string
+  label: string,
+  sourceModelType: WordModelType
 ): ExerciseRepresentation {
   const kind = modelType.startsWith('equal-groups') ? 'groups' : 'bar-model'
-  const first = Number(values.first)
-  const second = Number(values.second)
-  const suppliedTotal = Number(values.total)
+  const sourceFirst = Number(values.first)
+  const sourceSecond = Number(values.second)
+  const sourceTotal = Number(values.total)
+  const isSharingStory = sourceModelType === 'equal-groups-share'
+  const first = isSharingStory ? sourceTotal : sourceFirst
+  const second = isSharingStory ? sourceFirst : sourceSecond
   return {
     kind,
     visibility: 'always',
     label,
     values: {
       modelType,
+      unknownQuantity: WORD_MODEL_UNKNOWN_QUANTITY[modelType],
       first,
       second,
       third: values.third,
-      total: suppliedTotal > 0 ? suppliedTotal : modelType === 'equal-groups-share' ? second : first,
-      groups: first,
-      ...(modelType === 'equal-groups-share' ? {} : { size: second })
+      total: isSharingStory ? sourceTotal : first,
+      groups: sourceFirst,
+      ...(modelType === 'equal-groups-total' && !isSharingStory ? { size: sourceSecond } : {})
     }
   }
 }
@@ -481,7 +486,7 @@ function wordModelOptions(
   return shuffle(random, [correct, ...distractors].map((modelType) => ({
     value: modelType,
     label: '',
-    representation: wordModelRepresentation(modelType, values, 'Darstellung der Geschichte'),
+    representation: wordModelRepresentation(modelType, values, 'Darstellung der Geschichte', correct),
     misconception: modelType === correct ? undefined : 'Mengen im Bild anders als in der Geschichte angeordnet'
   }))).map((option, index) => ({ ...option, label: `Bild ${String.fromCharCode(65 + index)}` }))
 }
@@ -517,9 +522,9 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     story, answerSentence, question, irrelevant, equation, secondEquation, modelHint,
     templateId: template.id
   }
-  const steps: ExerciseStep[] = []
-  steps.push({
+  const questionStep: ExerciseStep = {
     id: 'question',
+    interaction: 'choice',
     prompt: renderCatalogText(stepsContent.questionPrompt, values),
     options: textOptions(random, question, template.questionDistractors.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Bekannte Angabe statt gesuchter Menge gewählt'
@@ -527,32 +532,22 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     correctAnswer: question,
     errorFeedback: stepsContent.questionError,
     successFeedback: stepsContent.questionSuccess
-  })
-  if (difficulty === 3) {
-    steps.push({
-      id: 'relevant',
-      prompt: renderCatalogText(stepsContent.relevantPrompt, values),
-      options: textOptions(random, relevant, template.relevantDistractors.map((text) => ({
-        value: renderCatalogText(text, values), misconception: 'Wichtige Handlung oder benötigte Menge ausgelassen'
-      }))),
-      correctAnswer: relevant,
-      errorFeedback: renderCatalogText(stepsContent.relevantError, values),
-      successFeedback: renderCatalogText(stepsContent.relevantSuccess, values)
-    })
   }
-  steps.push({
-    id: 'situation',
-    prompt: stepsContent.situationPrompt,
-    options: textOptions(random, renderCatalogText(template.situation, values), template.situationDistractors.map((text) => ({
-      value: renderCatalogText(text, values), misconception: 'Handlung oder gesuchte Menge anders als in der Geschichte gedeutet'
+  const relevantStep: ExerciseStep = {
+    id: 'relevant',
+    interaction: 'choice',
+    prompt: renderCatalogText(stepsContent.relevantPrompt, values),
+    options: textOptions(random, relevant, template.relevantDistractors.map((text) => ({
+      value: renderCatalogText(text, values), misconception: 'Wichtige Handlung oder benötigte Menge ausgelassen'
     }))),
-    correctAnswer: renderCatalogText(template.situation, values),
-    errorFeedback: renderCatalogText(stepsContent.situationError, values),
-    successFeedback: stepsContent.situationSuccess
-  })
-  const model = wordModelRepresentation(template.modelType, values, 'Passendes Mengenbild mit offener gesuchter Größe')
-  if (difficulty === 1) {
-    steps.push({
+    correctAnswer: relevant,
+    errorFeedback: renderCatalogText(stepsContent.relevantError, values),
+    successFeedback: renderCatalogText(stepsContent.relevantSuccess, values)
+  }
+  const model = wordModelRepresentation(template.modelType, values, 'Passendes Mengenbild mit offener gesuchter Größe', template.modelType)
+  const modelInteraction = stepsContent.modelInteractionByDifficulty[String(difficulty) as '1' | '2' | '3']
+  const modelStep: ExerciseStep = modelInteraction === 'continue'
+    ? {
       id: 'model',
       interaction: 'continue',
       prompt: stepsContent.modelExplorePrompt,
@@ -561,19 +556,19 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
       correctAnswer: 'continue',
       errorFeedback: stepsContent.modelError,
       successFeedback: stepsContent.modelSuccess
-    })
-  } else {
-    steps.push({
+    }
+    : {
       id: 'model',
+      interaction: 'choice',
       prompt: stepsContent.modelPrompt,
       options: wordModelOptions(random, template.modelType, template.modelDistractors, values),
       correctAnswer: template.modelType,
       errorFeedback: stepsContent.modelError,
       successFeedback: stepsContent.modelSuccess
-    })
-  }
-  steps.push({
+    }
+  const equationStep: ExerciseStep = {
     id: 'equation',
+    interaction: 'choice',
     prompt: stepsContent.equationPrompt,
     options: textOptions(random, equation, template.equationDistractors.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Rechnung beschreibt ein anderes Mengenbild'
@@ -581,51 +576,52 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     correctAnswer: equation,
     errorFeedback: renderCatalogText(template.equationError, values),
     successFeedback: stepsContent.equationSuccess
-  }, {
-      id: 'calculate',
-      interaction: 'number',
-      prompt: renderCatalogText(stepsContent.calculatePrompt, values),
-      correctAnswer: String(intermediate),
-      errorFeedback: stepsContent.calculateError,
-      successFeedback: stepsContent.calculateSuccess
-    })
-  if (template.secondOperation) {
-    steps.push({
-      id: 'second-equation',
-      prompt: renderCatalogText(stepsContent.secondEquationPrompt, values),
-      options: textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
-        value: renderCatalogText(text, values), misconception: 'Zweite Veränderung in die falsche Richtung gerechnet'
-      }))),
-      correctAnswer: secondEquation,
-      errorFeedback: renderCatalogText(stepsContent.secondEquationError, values),
-      successFeedback: stepsContent.secondEquationSuccess
-    }, {
-      id: 'final-calculation',
-      interaction: 'number',
-      prompt: renderCatalogText(stepsContent.finalCalculationPrompt, values),
-      correctAnswer: String(result),
-      errorFeedback: stepsContent.finalCalculationError,
-      successFeedback: stepsContent.finalCalculationSuccess
-    })
   }
-  if (difficulty === 3) {
-    const plausibilityOptions = template.plausibility.options.map((option) => ({
-      value: renderCatalogText(option.label, values),
-      label: renderCatalogText(option.label, values),
-      misconception: option.correct ? undefined : 'Größenbeziehung falsch eingeschätzt'
-    }))
-    const correctPlausibility = plausibilityOptions[template.plausibility.options.findIndex((option) => option.correct)]!.value
-    steps.push({
-      id: 'plausibility',
-      prompt: renderCatalogText(template.plausibility.prompt, values),
-      options: shuffle(random, plausibilityOptions),
-      correctAnswer: correctPlausibility,
-      errorFeedback: stepsContent.plausibilityError,
-      successFeedback: stepsContent.plausibilitySuccess
-    })
+  const calculateStep: ExerciseStep = {
+    id: 'calculate',
+    interaction: 'number',
+    prompt: renderCatalogText(stepsContent.calculatePrompt, values),
+    correctAnswer: String(intermediate),
+    errorFeedback: stepsContent.calculateError,
+    successFeedback: stepsContent.calculateSuccess
   }
-  steps.push({
+  const secondEquationStep: ExerciseStep | undefined = template.secondOperation ? {
+    id: 'second-equation',
+    interaction: 'choice',
+    prompt: renderCatalogText(stepsContent.secondEquationPrompt, values),
+    options: textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
+      value: renderCatalogText(text, values), misconception: 'Zweite Veränderung in die falsche Richtung gerechnet'
+    }))),
+    correctAnswer: secondEquation,
+    errorFeedback: renderCatalogText(stepsContent.secondEquationError, values),
+    successFeedback: stepsContent.secondEquationSuccess
+  } : undefined
+  const finalCalculationStep: ExerciseStep | undefined = template.secondOperation ? {
+    id: 'final-calculation',
+    interaction: 'number',
+    prompt: renderCatalogText(stepsContent.finalCalculationPrompt, values),
+    correctAnswer: String(result),
+    errorFeedback: stepsContent.finalCalculationError,
+    successFeedback: stepsContent.finalCalculationSuccess
+  } : undefined
+  const plausibilityOptions = template.plausibility.options.map((option) => ({
+    value: renderCatalogText(option.label, values),
+    label: renderCatalogText(option.label, values),
+    misconception: option.correct ? undefined : 'Größenbeziehung falsch eingeschätzt'
+  }))
+  const correctPlausibility = plausibilityOptions[template.plausibility.options.findIndex((option) => option.correct)]!.value
+  const plausibilityStep: ExerciseStep = {
+    id: 'plausibility',
+    interaction: 'choice',
+    prompt: renderCatalogText(template.plausibility.prompt, values),
+    options: shuffle(random, plausibilityOptions),
+    correctAnswer: correctPlausibility,
+    errorFeedback: stepsContent.plausibilityError,
+    successFeedback: stepsContent.plausibilitySuccess
+  }
+  const checkStep: ExerciseStep = {
     id: 'check',
+    interaction: 'choice',
     prompt: stepsContent.checkPrompt,
     options: textOptions(random, answerSentence, [
       { value: renderCatalogText(template.answer, { ...templateValues, result: Math.max(0, result - 1) }), misconception: 'Antwortsatz mit falschem Ergebnis' },
@@ -634,7 +630,32 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     correctAnswer: answerSentence,
     errorFeedback: stepsContent.checkError,
     successFeedback: stepsContent.checkSuccess
-  })
+  }
+  const stepById: Record<string, ExerciseStep | undefined> = {
+    question: questionStep,
+    relevant: relevantStep,
+    model: modelStep,
+    equation: equationStep,
+    calculate: calculateStep,
+    'second-equation': secondEquationStep,
+    'final-calculation': finalCalculationStep,
+    plausibility: plausibilityStep,
+    check: checkStep
+  }
+  const steps = stepsContent.runtimeSequence
+    .filter((definition) => definition.condition === 'always' || Boolean(template.secondOperation))
+    .map((definition) => {
+      const step = stepById[definition.id]
+      if (!step) throw new Error(`Katalogschritt ${definition.id} kann für ${template.id} nicht erzeugt werden.`)
+      const expectedInteraction = definition.interaction === 'model-by-difficulty' ? modelInteraction : definition.interaction
+      const actualInteraction = step.interaction ?? 'choice'
+      if (actualInteraction !== expectedInteraction) throw new Error(`Interaktion für ${definition.id} weicht vom Katalog ab.`)
+      const hasRepresentation = Boolean(step.representation || step.options?.every((option) => option.representation))
+      if ((definition.representation === 'word-model') !== hasRepresentation) {
+        throw new Error(`Pflichtdarstellung für ${definition.id} weicht vom Katalog ab.`)
+      }
+      return { ...step, curriculumStage: definition.progressionId }
+    })
   return withMetadata({
     ...base('word-problem', seed, difficulty, values),
     ...contentFor('word-problem', values, difficulty),

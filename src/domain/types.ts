@@ -73,6 +73,7 @@ export interface ExerciseRepresentation {
 
 export interface ExerciseStep {
   id: string
+  curriculumStage?: string
   prompt: string
   interaction?: 'choice' | 'number' | 'continue'
   options?: AnswerOption[]

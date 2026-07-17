@@ -1,6 +1,6 @@
 # Validierung und Konsolidierung 0.6
 
-Stand: App 0.13.0, Katalog 0.11.0, Schema 9. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
+Stand: App 0.13.1, Katalog 0.12.0, Schema 10. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
 
 ## Intern prüfbar
 
@@ -32,4 +32,4 @@ Nachweis und Arbeitsstand werden in GitHub Issue #58 geführt. Der Katalogstatus
 - [ ] lokale Persistenz nach erneutem Start prüfen
 - [ ] Service-Worker-Update nach einer Runde prüfen
 
-Nachweis und Arbeitsstand werden in GitHub Issue #59 geführt. Playwright bei 375 x 812 und 812 x 375 ist eine mobile Browserprüfung, aber kein echter Gerätetest.
+Nachweis und Arbeitsstand werden in GitHub Issue #59 geführt. Playwright bei 375 x 812 und 812 x 375 sowie die WebKit-Näherung für Mobile Safari sind Browserprüfungen, aber kein echter Gerätetest.

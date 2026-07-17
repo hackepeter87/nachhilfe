@@ -268,16 +268,49 @@ describe('ExerciseCard', () => {
     const exercise = generateExercise('word-problem', 42, 1)
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
 
-    for (const stepId of ['question', 'situation']) {
+    for (const stepId of ['question', 'relevant']) {
       const step = exercise.steps?.find((candidate) => candidate.id === stepId)
       const option = step?.options?.find((candidate) => candidate.value === step.correctAnswer)
       if (!step || !option) throw new Error(`Richtige Option für ${stepId} fehlt`)
       await user.click(screen.getByRole('button', { name: option.label }))
     }
 
-    const feedback = screen.getByText(exercise.steps?.find((step) => step.id === 'situation')?.successFeedback ?? '')
+    const feedback = screen.getByText(exercise.steps?.find((step) => step.id === 'relevant')?.successFeedback ?? '')
     expect(feedback).toHaveClass('feedback--step-success')
     expect(feedback).not.toHaveClass('feedback--try')
+  })
+
+  it('startet Auswahlaufgaben neutral und trennt Fokus von Auswahl', () => {
+    const exercise = generateExercise('body-views', 42, 2)
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const heading = screen.getByRole('heading', { level: 2 })
+    const options = [...container.querySelectorAll<HTMLButtonElement>('.answer-option')]
+
+    expect(heading).toHaveFocus()
+    expect(options).toHaveLength(3)
+    options.forEach((option) => expect(option).toHaveAttribute('data-answer-state', 'idle'))
+    options[0]?.focus()
+    expect(options[0]).toHaveFocus()
+    expect(options[0]).toHaveAttribute('data-answer-state', 'idle')
+  })
+
+  it('setzt Auswahl, Hilfe, Eingabe, Feedback und Fokus bei einer neuen Aufgabe zurück', async () => {
+    const user = userEvent.setup()
+    const first = generateExercise('addition', 42, 2)
+    const second = generateExercise('body-views', 43, 2)
+    const { rerender } = render(<ExerciseCard exercise={first} onComplete={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: /tipp/i }))
+    await user.type(screen.getByLabelText('Deine Antwort'), '999')
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(screen.getByText(first.errorFeedback)).toBeVisible()
+
+    rerender(<ExerciseCard exercise={second} onComplete={vi.fn()} />)
+    expect(screen.queryByText(first.errorFeedback)).not.toBeInTheDocument()
+    expect(screen.queryByText(first.hints[0].text)).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2 })).toHaveFocus()
+    screen.getAllByRole('button').filter((button) => button.classList.contains('answer-option'))
+      .forEach((button) => expect(button).toHaveAttribute('data-answer-state', 'idle'))
   })
 
   it.each(['money', 'lengths'] as const)('lässt eine Größenaufgabe %s vollständig lösen', async (skill) => {

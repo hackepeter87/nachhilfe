@@ -777,10 +777,15 @@ p {
   background: var(--white);
 }
 
-.answer-option:hover,
 .answer-option:active {
-  border-color: var(--blue);
-  background: var(--blue-soft);
+  transform: translateY(1px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .answer-option:hover {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 1px var(--blue);
+  }
 }
 .model-options { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
 .model-option { display: grid; align-content: start; gap: 8px; padding: 9px; text-align: center; }

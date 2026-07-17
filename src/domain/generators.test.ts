@@ -28,6 +28,28 @@ describe('deterministische Aufgabengeneratoren', () => {
     })
   })
 
+  it('setzt die katalogisierte Sichtbarkeit verpflichtender Darstellungen um', () => {
+    for (const skill of getTaskCatalog().skills) {
+      for (const difficulty of [1, 2, 3] as const) {
+        const exercise = generateExercise(skill.id, difficulty * 1_001, difficulty)
+        const expected = skill.difficultyLevels[difficulty - 1].representation
+        if (skill.id === 'symmetry') {
+          expect(exercise.sourceGrid).toBeDefined()
+          expect(exercise.options?.every((option) => option.grid)).toBe(true)
+        } else if (skill.id === 'word-problem') {
+          const modelStep = exercise.steps?.find((step) => step.id === 'model')
+          expect(modelStep).toBeDefined()
+          expect(modelStep?.representation || modelStep?.options?.every((option) => option.representation)).toBeTruthy()
+        } else if (expected === 'none') {
+          expect(exercise.representation).toBeUndefined()
+        } else {
+          expect(exercise.representation).toBeDefined()
+          expect(exercise.representation?.visibility).toBe(expected)
+        }
+      }
+    }
+  })
+
   it('hält Addition und Subtraktion über viele Seeds im Zahlenraum bis 20', () => {
     for (let seed = 1; seed <= 400; seed += 1) {
       const addition = generateExercise('addition', seed, 3)
@@ -213,11 +235,13 @@ describe('deterministische Aufgabengeneratoren', () => {
         const expected = secondOperation === '+' ? intermediate + third : secondOperation === '−' ? intermediate - third : intermediate
         expect(Number(exercise.variant.values.intermediate)).toBe(intermediate)
         expect(Number(exercise.variant.values.result)).toBe(expected)
-        const expectedSteps = difficulty < 3 ? 6 : secondOperation ? 10 : 8
-        expect(exercise.steps).toHaveLength(expectedSteps)
+        const runtimeSequence = getTaskCatalog().wordProblemSteps.runtimeSequence
+          .filter((step) => step.condition === 'always' || Boolean(secondOperation))
+        expect(exercise.steps).toHaveLength(runtimeSequence.length)
         expect(exercise.prompt).not.toMatch(/\{\w+\}/)
         const ids = exercise.steps?.map((step) => step.id) ?? []
-        expect(ids[0]).toBe('question')
+        expect(ids).toEqual(runtimeSequence.map((step) => step.id))
+        expect(exercise.steps?.map((step) => step.curriculumStage)).toEqual(runtimeSequence.map((step) => step.progressionId))
         expect(ids).not.toContain('relationship')
         expect(ids).not.toContain('operation')
         expect(ids.indexOf('model')).toBeLessThan(ids.indexOf('equation'))
@@ -231,6 +255,8 @@ describe('deterministische Aufgabengeneratoren', () => {
         if (!modelStep) throw new Error('Modellschritt fehlt')
         if (difficulty === 1) {
           expect(modelStep.interaction).toBe('continue')
+          expect(modelStep.representation).toBeDefined()
+          expect(modelStep.representation?.values.unknownQuantity).toBeTruthy()
           expect(modelStep.representation?.values).not.toHaveProperty('result')
           expect(modelStep.representation?.values).not.toHaveProperty('intermediate')
         } else {
@@ -240,6 +266,7 @@ describe('deterministische Aufgabengeneratoren', () => {
           modelStep.options?.forEach((option) => {
             expect(option.representation?.values).not.toHaveProperty('result')
             expect(option.representation?.values).not.toHaveProperty('intermediate')
+            expect(option.representation?.values.unknownQuantity).toBeTruthy()
             if (option.value === 'equal-groups-share') expect(option.representation?.values).not.toHaveProperty('size')
           })
         }
