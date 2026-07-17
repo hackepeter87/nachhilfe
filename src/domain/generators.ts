@@ -14,6 +14,7 @@ import {
   type CubeTurnDirection,
   type CubeViewDirection
 } from './cubeViews'
+import { createFoldingOutcomes, foldingCellsKey, type FoldingTemplate } from './folding'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1380,6 +1381,84 @@ function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exe
   })
 }
 
+function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+  const random = seededRandom(seed)
+  const content = getTaskCatalog().spatialFolding
+  const requestedMode = focus === 'fold-cut-unfold' ? 'cut-unfold' : focus === 'fold-point' ? 'point-fold' : undefined
+  const levelCandidates = content.templates.filter((template) => template.difficulty === difficulty)
+  const focusedCandidates = requestedMode ? levelCandidates.filter((template) => template.mode === requestedMode) : levelCandidates
+  const candidates = focusedCandidates.length > 0 ? focusedCandidates : levelCandidates
+  if (candidates.length === 0) throw new Error(`Keine Faltvorlage für Stufe ${difficulty}.`)
+  const template = pick(random, candidates)
+  const outcomes = createFoldingOutcomes(template as FoldingTemplate)
+  const values = {
+    templateId: template.id,
+    foldLabel: content.foldLabels[template.foldSide],
+    axis: template.axis,
+    mode: template.mode
+  }
+  const resultCandidates = shuffle<{ cells: number[]; misconception?: string }>(random, [
+    { cells: outcomes.correct },
+    {
+      cells: outcomes.unchanged,
+      misconception: template.mode === 'point-fold' ? 'Punkt bleibt trotz Faltung am Ausgangsort' : 'Beim Aufklappen entsteht kein Spiegelpunkt'
+    },
+    {
+      cells: outcomes.shifted,
+      misconception: template.mode === 'point-fold' ? 'Punkt wird verschoben statt gespiegelt' : 'Zweiter Schnitt wird verschoben statt gespiegelt'
+    }
+  ])
+  const options = resultCandidates.map((candidate, index): AnswerOption => ({
+    value: foldingCellsKey(candidate.cells),
+    label: content.optionLabels[index]!,
+    misconception: candidate.misconception,
+    representation: {
+      kind: 'folding-paper',
+      visibility: 'always',
+      label: `${content.optionLabels[index]}: ${template.mode === 'point-fold' ? 'Lage des Punktes nach dem Falten' : 'Lage der Schnitte nach dem Aufklappen'}`,
+      values: {
+        rows: template.rows,
+        columns: template.columns,
+        axis: template.axis,
+        foldSide: template.foldSide,
+        mode: template.mode,
+        marks: candidate.cells,
+        showInstruction: 0,
+        axisLabel: content.axisLabel,
+        foldLabel: content.foldLabels[template.foldSide]
+      }
+    }
+  }))
+  const skillContent = contentFor('folding', values, difficulty)
+  return withMetadata({
+    ...base('folding', seed, difficulty, values),
+    ...skillContent,
+    prompt: renderCatalogText(template.mode === 'point-fold' ? content.pointPrompt : content.cutPrompt, values),
+    typeId: template.mode,
+    subskillId: template.mode === 'point-fold' ? 'fold-point' : 'fold-cut-unfold',
+    answerMode: 'choice',
+    correctAnswer: foldingCellsKey(outcomes.correct),
+    options,
+    representation: {
+      kind: 'folding-paper',
+      visibility: 'always',
+      label: `${template.instruction} ${content.axisLabel}.`,
+      values: {
+        rows: template.rows,
+        columns: template.columns,
+        axis: template.axis,
+        foldSide: template.foldSide,
+        mode: template.mode,
+        marks: [template.sourceCell],
+        showInstruction: 1,
+        axisLabel: content.axisLabel,
+        foldLabel: content.foldLabels[template.foldSide]
+      }
+    },
+    explanation: `${content.modeGuidance[template.mode]} ${skillContent.explanation}`
+  })
+}
+
 export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
   switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus)
@@ -1404,6 +1483,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'symmetry': return symmetry(seed, difficulty, focus)
     case 'body-views': return bodyViews(seed, difficulty)
     case 'cube-rotation': return cubeRotation(seed, difficulty, focus)
+    case 'folding': return folding(seed, difficulty, focus)
   }
 }
 

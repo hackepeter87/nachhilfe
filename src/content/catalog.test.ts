@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(11)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.13.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(12)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.14.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -274,6 +274,26 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
     catalog.spatialRotations.templates.find((template) => template.difficulty === 1)!.turn = 'left'
     expect(validateTaskCatalog(catalog)).toBe(false)
+  })
+
+  it('validiert die Faltprogression von Punktlage zu einfachem Faltschnitt', () => {
+    const catalog = structuredClone(readPublicCatalog()) as TaskCatalog
+    expect(catalog.spatialFolding.templates.filter((template) => template.difficulty === 1).every((template) =>
+      template.mode === 'point-fold' && template.axis === 'vertical' && template.columns % 2 === 0
+    )).toBe(true)
+    expect(new Set(catalog.spatialFolding.templates.filter((template) => template.difficulty === 2).map((template) => template.axis))).toEqual(new Set(['vertical', 'horizontal']))
+    expect(catalog.spatialFolding.templates.filter((template) => template.difficulty === 3).every((template) => template.mode === 'cut-unfold')).toBe(true)
+    expect(catalog.spatialFolding.entryRationale).toMatch(/gerichtete Spiegelung.*Achsen zwischen Zellen/i)
+  })
+
+  it('lehnt einen Faltschnitt in der Einstiegsstufe und Achsen durch Zellen ab', () => {
+    const earlyCut = structuredClone(readPublicCatalog()) as TaskCatalog
+    earlyCut.spatialFolding.templates.find((template) => template.difficulty === 1)!.mode = 'cut-unfold'
+    expect(validateTaskCatalog(earlyCut)).toBe(false)
+
+    const oddGrid = structuredClone(readPublicCatalog()) as TaskCatalog
+    oddGrid.spatialFolding.templates.find((template) => template.axis === 'vertical')!.columns = 5
+    expect(validateTaskCatalog(oddGrid)).toBe(false)
   })
 
   it('verwendet bei ungültigem oder nicht ladbarem Katalog den geprüften Fallback', async () => {

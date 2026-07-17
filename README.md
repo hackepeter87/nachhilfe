@@ -132,7 +132,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.14.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.15.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -173,6 +173,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.14.0
+## Release-Stand 0.15.0
 
-Version 0.14.0 ergänzt kontrollierte Würfelrotation als eigene adaptive Kompetenz. Katalog 0.13.0 und Schema 11 definieren Vorlagen, Achse, Richtung, Stufen und Hilfen; reine TypeScript-Logik dreht die Gebäude exakt um 90 Grad und verwirft uneindeutige Folgezustände. Die statische Darstellung zeigt den Ausgangszustand, ohne die mentale Drehung interaktiv vorwegzunehmen. Rotation wird erst nach mindestens fünf Körperansichtsversuchen und Lernwert 60 ausgewählt. Freie Rotation, Kippen und Falten bleiben ausgeschlossen. Details stehen in [docs/didactics/cube-rotation.md](docs/didactics/cube-rotation.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).
+Version 0.15.0 ergänzt einzelne Faltungen und einen einfachen Faltschnitt als adaptive Kompetenz. Katalog 0.14.0 und Schema 12 definieren Punktfaltungen, Achsen, bewegte Papierhälften und Faltschnittvorlagen; reine TypeScript-Logik spiegelt Rasterzellen exakt und verwirft uneindeutige Ergebnisse. Gerade Raster halten die Achse zwischen Zellen. Falten wird erst ab Symmetriephase 3 ausgewählt. Mehrfachfaltungen, Körpernetze und Kippen bleiben ausgeschlossen. Details stehen in [docs/didactics/folding.md](docs/didactics/folding.md), [docs/didactic-catalog-review.md](docs/didactic-catalog-review.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md).

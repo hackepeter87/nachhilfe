@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 11,
-  "catalogVersion": "0.13.0",
+  "schemaVersion": 12,
+  "catalogVersion": "0.14.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-17",
   "status": "ready-for-review",
@@ -3330,6 +3330,162 @@
         "Ausgangslage, korrekte Drehung und entgegengesetzte Drehung sind eindeutig verschieden.",
         "Die Kompetenz wird erst nach fünf Körperansichtsversuchen und Lernwert 60 adaptiv ausgewählt."
       ]
+    },
+    {
+      "id": "folding",
+      "label": "Falten und Spiegeln",
+      "curriculumArea": "Raum und Form",
+      "supportGoal": "Eine einzelne sichtbare Faltung als gerichtete Spiegelung verstehen, die Lage eines Punktes verfolgen und einen einfachen Faltschnitt nach dem Aufklappen vorhersagen.",
+      "misconceptions": [
+        "Der Punkt bleibt beim Falten an seinem Ausgangsort.",
+        "Der Punkt wird parallel verschoben statt mit gleichem Achsenabstand gespiegelt.",
+        "Beim Aufklappen wird nur ein Loch erwartet.",
+        "Die Faltachse wird mit dem Rand des Papiers verwechselt."
+      ],
+      "hints": [
+        "Markiere den Abstand des Punktes zur roten Faltachse. Auf der anderen Seite bleibt dieser Abstand gleich.",
+        "Bei {foldLabel} bewegt sich nur die benannte Hälfte. Beim Aufklappen erscheinen Schnitt und Spiegelpunkt gemeinsam."
+      ],
+      "prompt": "Falte das Papier an der markierten Achse. Welche Lage passt?",
+      "errorFeedback": "Diese Lage hat noch nicht denselben Abstand zur Faltachse. Verfolge genau eine Zeile oder Spalte.",
+      "explanation": "Eine einzelne Faltung wirkt wie eine Spiegelung an der Faltachse. Jeder Punkt landet im gleichen Abstand auf der anderen Seite; ein Faltschnitt erscheint nach dem Aufklappen als Spiegelpaar.",
+      "difficultyBounds": {
+        "minLevel": 1,
+        "maxLevel": 3,
+        "minValue": 1,
+        "maxValue": 2
+      },
+      "processCompetencies": [
+        {
+          "id": "representing",
+          "elicitedBy": "Faltpfeil, Achse und markierte Rasterzellen werden als eine räumliche Bewegung verbunden."
+        },
+        {
+          "id": "reasoning",
+          "elicitedBy": "Das Kind nutzt den gleichen Abstand zur Faltachse als Invariante."
+        }
+      ],
+      "prerequisites": [
+        "Spiegelprinzip mindestens bis Symmetriephase 3",
+        "Senkrechte und waagerechte Achsen unterscheiden",
+        "Rasterzellen zeilen- und spaltenweise verfolgen"
+      ],
+      "representations": [
+        "Rechteckiges Faltpapier mit gerader Zellzahl",
+        "Sichtbare Faltachse zwischen Zellen",
+        "Gerichteter Falthinweis",
+        "Drei gleichartig dargestellte Ergebnisse"
+      ],
+      "difficultyLevels": [
+        {
+          "level": 1,
+          "description": "Ein Punkt, senkrechte Achse, linke oder rechte Hälfte wird gefaltet; klare Distraktoren",
+          "numberRange": "ein markierter Punkt",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": false,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "guided-practice"
+        },
+        {
+          "level": 2,
+          "description": "Ein Punkt, senkrechte oder waagerechte Achse und wechselnde Faltrichtung; ähnlichere Lageoptionen",
+          "numberRange": "ein markierter Punkt",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": false
+          },
+          "learningPhase": "independent-practice"
+        },
+        {
+          "level": 3,
+          "description": "Ein einfacher Schnitt im einmal gefalteten Papier; beim Aufklappen muss das vollständige Spiegelpaar erkannt werden",
+          "numberRange": "zwei Schnittmarken nach dem Aufklappen",
+          "representation": "always",
+          "requirements": {
+            "requiresNeighborIdentification": false,
+            "requiresRepresentationChoice": true,
+            "requiresOperationChoice": false,
+            "requiresJustification": true,
+            "requiresMultiStepCalculation": true
+          },
+          "learningPhase": "transfer"
+        }
+      ],
+      "workedExample": "Liegt ein Punkt zwei Felder links von der senkrechten Faltachse, landet er beim Falten zwei Felder rechts davon. Ein Schnitt durch das gefaltete Papier erzeugt beim Aufklappen beide Stellen.",
+      "successFeedback": "Du hast den gleichen Abstand zur Faltachse richtig verfolgt.",
+      "remediation": {
+        "strategy": "Verfolge nur die Zeile oder Spalte des markierten Punktes und zähle die Felder bis zur Achse.",
+        "foundationStrategy": "Beginne mit einem Punkt direkt neben einer senkrechten Achse und falte nur die linke Hälfte nach rechts.",
+        "representation": "Kleines gerades Raster mit sichtbarer Achse und genau einem Punkt",
+        "keepSubskill": false
+      },
+      "transferPrompt": "Erkläre, warum ein Schnitt nach dem Aufklappen genau zwei gleich weit von der Achse entfernte Markierungen erzeugt.",
+      "releaseStatus": "active",
+      "learningPhases": [
+        {
+          "id": "activate",
+          "goal": "Faltachse und bewegte Papierhälfte benennen.",
+          "exerciseTypes": [
+            "folding:point-vertical"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "understand",
+          "goal": "Gleiche Abstände auf beiden Seiten einer senkrechten Faltachse erkennen.",
+          "exerciseTypes": [
+            "folding:point-vertical"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "guided-practice",
+          "goal": "Einen Punkt mit sichtbarer senkrechter Achse verfolgen.",
+          "exerciseTypes": [
+            "folding:point-vertical"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "independent-practice",
+          "goal": "Senkrechte und waagerechte Einzelfaltungen selbstständig unterscheiden.",
+          "exerciseTypes": [
+            "folding:point-mixed-axis"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "automate",
+          "goal": "Punktlagen bei wechselnder Achse und Richtung sicher vorhersagen.",
+          "exerciseTypes": [
+            "folding:point-mixed-axis"
+          ],
+          "releaseStatus": "active"
+        },
+        {
+          "id": "transfer",
+          "goal": "Einen einfachen Faltschnitt beim Aufklappen als Spiegelpaar deuten.",
+          "exerciseTypes": [
+            "folding:cut-unfold"
+          ],
+          "releaseStatus": "active"
+        }
+      ],
+      "successCriteria": [
+        "Die Faltachse liegt in allen Einstiegsaufgaben eindeutig zwischen Zellen.",
+        "Der Zielpunkt besitzt denselben senkrechten Abstand zur Achse wie der Ausgangspunkt.",
+        "Beim Aufklappen eines einfachen Faltschnitts erscheinen genau zwei symmetrische Markierungen.",
+        "Mehrfachfaltungen und Körpernetze werden nicht erzeugt."
+      ]
     }
   ],
   "wordProblems": [
@@ -4909,6 +5065,139 @@
       }
     ]
   },
+  "spatialFolding": {
+    "entryRationale": "Eine einzelne Faltung wird als gerichtete Spiegelung aufgebaut. Gerade Raster und Achsen zwischen Zellen vermeiden zu Beginn Sonderfälle; Punktlage und Faltschnitt werden getrennt gelernt.",
+    "pointPrompt": "{foldLabel}. Wo landet der grüne Punkt?",
+    "cutPrompt": "Das Papier war einmal gefaltet. Am markierten Punkt wurde geschnitten. Welches Bild entsteht beim Aufklappen?",
+    "axisLabel": "Faltachse",
+    "optionLabels": [
+      "Bild A",
+      "Bild B",
+      "Bild C"
+    ],
+    "foldLabels": {
+      "left": "Falte die linke Hälfte nach rechts",
+      "right": "Falte die rechte Hälfte nach links",
+      "top": "Falte die obere Hälfte nach unten",
+      "bottom": "Falte die untere Hälfte nach oben"
+    },
+    "modeGuidance": {
+      "point-fold": "Der Punkt bewegt sich senkrecht über die Faltachse und behält seinen Abstand zur Achse.",
+      "cut-unfold": "Der Schnitt geht durch beide Papierlagen; nach dem Aufklappen liegen zwei Markierungen spiegelbildlich zur Achse."
+    },
+    "templates": [
+      {
+        "id": "point-left-near",
+        "difficulty": 1,
+        "mode": "point-fold",
+        "rows": 4,
+        "columns": 4,
+        "axis": "vertical",
+        "foldSide": "left",
+        "sourceCell": 5,
+        "instruction": "Ein Punkt liegt direkt links von der senkrechten Faltachse."
+      },
+      {
+        "id": "point-left-far",
+        "difficulty": 1,
+        "mode": "point-fold",
+        "rows": 4,
+        "columns": 4,
+        "axis": "vertical",
+        "foldSide": "left",
+        "sourceCell": 8,
+        "instruction": "Ein Punkt liegt zwei Felder links von der senkrechten Faltachse."
+      },
+      {
+        "id": "point-right-near",
+        "difficulty": 1,
+        "mode": "point-fold",
+        "rows": 4,
+        "columns": 4,
+        "axis": "vertical",
+        "foldSide": "right",
+        "sourceCell": 10,
+        "instruction": "Ein Punkt liegt direkt rechts von der senkrechten Faltachse."
+      },
+      {
+        "id": "point-wide-vertical",
+        "difficulty": 2,
+        "mode": "point-fold",
+        "rows": 4,
+        "columns": 6,
+        "axis": "vertical",
+        "foldSide": "right",
+        "sourceCell": 17,
+        "instruction": "Ein Punkt liegt in einem breiteren Raster rechts von der Faltachse."
+      },
+      {
+        "id": "point-top-horizontal",
+        "difficulty": 2,
+        "mode": "point-fold",
+        "rows": 4,
+        "columns": 6,
+        "axis": "horizontal",
+        "foldSide": "top",
+        "sourceCell": 2,
+        "instruction": "Ein Punkt liegt oberhalb der waagerechten Faltachse."
+      },
+      {
+        "id": "point-bottom-horizontal",
+        "difficulty": 2,
+        "mode": "point-fold",
+        "rows": 4,
+        "columns": 6,
+        "axis": "horizontal",
+        "foldSide": "bottom",
+        "sourceCell": 21,
+        "instruction": "Ein Punkt liegt unterhalb der waagerechten Faltachse."
+      },
+      {
+        "id": "cut-vertical-left",
+        "difficulty": 3,
+        "mode": "cut-unfold",
+        "rows": 4,
+        "columns": 6,
+        "axis": "vertical",
+        "foldSide": "left",
+        "sourceCell": 7,
+        "instruction": "Das Papier wurde an der senkrechten Achse einmal gefaltet und gelocht."
+      },
+      {
+        "id": "cut-vertical-right",
+        "difficulty": 3,
+        "mode": "cut-unfold",
+        "rows": 4,
+        "columns": 6,
+        "axis": "vertical",
+        "foldSide": "right",
+        "sourceCell": 16,
+        "instruction": "Das Papier wurde an der senkrechten Achse einmal gefaltet und gelocht."
+      },
+      {
+        "id": "cut-horizontal-top",
+        "difficulty": 3,
+        "mode": "cut-unfold",
+        "rows": 6,
+        "columns": 4,
+        "axis": "horizontal",
+        "foldSide": "top",
+        "sourceCell": 6,
+        "instruction": "Das Papier wurde an der waagerechten Achse einmal gefaltet und gelocht."
+      },
+      {
+        "id": "cut-horizontal-bottom",
+        "difficulty": 3,
+        "mode": "cut-unfold",
+        "rows": 6,
+        "columns": 4,
+        "axis": "horizontal",
+        "foldSide": "bottom",
+        "sourceCell": 17,
+        "instruction": "Das Papier wurde an der waagerechten Achse einmal gefaltet und gelocht."
+      }
+    ]
+  },
   "fieldUsage": {
     "workedExample": "review",
     "remediation": "runtime",
@@ -4926,29 +5215,25 @@
   "preparedTopics": [
     {
       "id": "spatial-reasoning",
-      "label": "Kippen und Falten",
+      "label": "Kippen",
       "curriculumArea": "Raum und Form",
-      "supportGoal": "Nach der aktivierten Würfelrotation weitere räumliche Lageänderungen und einfache Faltungen verstehen.",
+      "supportGoal": "Nach der aktivierten Würfelrotation weitere räumliche Kippbewegungen verstehen.",
       "prerequisites": [
         "Lagebegriffe",
         "ebene Figuren erkennen",
-        "einfache Symmetrie",
-        "kontrollierte Würfelrotation"
+        "kontrollierte Würfelrotation",
+        "einzelne Faltungen"
       ],
       "representations": [
-        "Würfel mit sichtbarer Kippachse",
-        "Faltvorlage"
+        "Würfel mit sichtbarer Kippachse"
       ],
       "misconceptions": [
-        "Kippen wird mit einer Drehung um die senkrechte Achse verwechselt.",
-        "Beim Falten wird die Spiegelbeziehung nicht erhalten."
+        "Kippen wird mit einer Drehung um die senkrechte Achse verwechselt."
       ],
       "progression": [
-        "einfache Kippbewegungen verfolgen",
-        "Faltungen vorhersagen",
-        "eine Faltung wieder öffnen"
+        "einfache Kippbewegungen verfolgen"
       ],
-      "remediation": "Mit genau einer sichtbaren Kipp- oder Faltachse und einem markierten Ausgangspunkt beginnen.",
+      "remediation": "Mit genau einer sichtbaren Kippachse und einem markierten Ausgangspunkt beginnen.",
       "releaseStatus": "disabled"
     }
   ],

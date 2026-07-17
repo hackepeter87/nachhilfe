@@ -4,11 +4,12 @@ import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
 import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSide } from './symmetry'
 import { cubeBuildingKey, cubeCount, cubeViewKey, isValidCubeBuilding, projectCubeView, rotateCubeBuilding, type CubeBuilding, type CubeTurnDirection, type CubeViewDirection } from './cubeViews'
+import { foldingCellsKey, reflectFoldingCell } from './folding'
 
 const skills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds',
-  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation'
+  'addition-1000', 'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding'
 ]
 
 describe('deterministische Aufgabengeneratoren', () => {
@@ -724,6 +725,30 @@ describe('deterministische Aufgabengeneratoren', () => {
       for (let seed = 1; seed <= 100; seed += 1) {
         expect(allowed.has(JSON.stringify(generateExercise('symmetry', seed, difficulty, `symmetry-phase-${progressionPhase}`).sourceGrid))).toBe(true)
       }
+    }
+  })
+
+  it('erzeugt über 1.000 Seeds je Faltstufe nur eindeutige fachlich passende Ergebnisse', () => {
+    for (const difficulty of [1, 2, 3] as const) {
+      const axes = new Set<string>()
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('folding', seed, difficulty)
+        const values = exercise.representation?.values
+        const rows = Number(values?.rows)
+        const columns = Number(values?.columns)
+        const axis = String(values?.axis) as 'vertical' | 'horizontal'
+        const source = Array.isArray(values?.marks) ? Number(values.marks[0]) : -1
+        const reflected = reflectFoldingCell(source, rows, columns, axis)
+        axes.add(axis)
+        expect(exercise.options).toHaveLength(3)
+        expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(3)
+        expect(exercise.options?.filter((option) => option.value === exercise.correctAnswer)).toHaveLength(1)
+        expect(exercise.correctAnswer).toBe(difficulty === 3
+          ? foldingCellsKey([source, reflected])
+          : foldingCellsKey([reflected]))
+        expect(axis === 'vertical' ? columns % 2 : rows % 2).toBe(0)
+      }
+      expect(axes).toEqual(difficulty === 1 ? new Set(['vertical']) : new Set(['vertical', 'horizontal']))
     }
   })
 })

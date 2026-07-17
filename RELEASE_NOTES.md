@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Falten und Spiegeln 0.15.0
+
+- Die neue Kompetenz `folding` verbindet das bekannte Spiegelprinzip mit genau einer gerichteten Faltung. Stufe 1 verfolgt einen Punkt an einer senkrechten Achse, Stufe 2 wechselt Achse und bewegte Papierhälfte, Stufe 3 öffnet einen einfachen Faltschnitt zu einem symmetrischen Markierungspaar.
+- Katalog 0.14.0 und Schema 12 ergänzen `spatialFolding` mit zehn geprüften Vorlagen, Faltbegriffen, Achsenbezeichnung und konkreten Stufengrenzen. Der Gesamtkatalog bleibt `ready-for-review`; eine Lehrkraftfreigabe wird nicht behauptet.
+- Reine TypeScript-Domänenlogik spiegelt Rasterzellen, prüft gerade Achsenmaße und erzeugt aus typischen Fehlvorstellungen genau drei unterschiedliche Ergebnisse.
+- Die mobile Rasterdarstellung zeigt die Achse eindeutig zwischen Zellen, die bewegte Papierhälfte und Punkt- beziehungsweise Schnittmarken. Optionen starten neutral und bleiben im Hoch- und Querformat ohne horizontales Overflow.
+- Die adaptive Auswahl setzt mindestens Symmetriephase 3 voraus. Fehler führen zu einer anderen, leichteren Einzelfaltung; Mehrfachfaltungen, Körpernetze, mehrere Schnitte und Kippen bleiben ausgeschlossen.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 250 Unit-/Komponententests, Produktionsbuild und 13 Playwright-Szenarien jeweils gegen Vite Preview und den Read-only-Container. Das AMD64-Image `mathe-reise:0.15.0` beziehungsweise `mathe-reise:local` läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker und Katalog besitzen die vorgesehenen MIME-, Cache- und Security-Header. Podman war nicht installiert. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test wurden nicht durchgeführt; WebKit ist nur eine Mobile-Safari-Näherung.
+
 ## Würfel und räumliche Rotation 0.14.0
 
 - Die neue Kompetenz `cube-rotation` führt genau eine kontrollierte 90-Grad-Drehung bekannter Würfelgebäude nach links oder rechts um die senkrechte Achse ein. Freie Rotation, Kippen, 180-Grad-Folgen und Falten bleiben ausgeschlossen.

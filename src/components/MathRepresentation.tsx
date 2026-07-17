@@ -98,6 +98,38 @@ export function MathRepresentation({ representation }: { representation: Exercis
     )
   }
 
+  if (representation.kind === 'folding-paper') {
+    const rows = Number(values.rows)
+    const columns = Number(values.columns)
+    const marks = Array.isArray(values.marks) ? values.marks.map(Number) : []
+    const axis = values.axis === 'vertical' || values.axis === 'horizontal' ? values.axis : undefined
+    const foldSide = ['left', 'right', 'top', 'bottom'].includes(String(values.foldSide)) ? String(values.foldSide) : undefined
+    const mode = values.mode === 'point-fold' || values.mode === 'cut-unfold' ? values.mode : undefined
+    const showInstruction = Number(values.showInstruction) === 1
+    const valid = Number.isInteger(rows) && rows >= 2 && rows <= 6 && Number.isInteger(columns) && columns >= 2 && columns <= 8 &&
+      Boolean(axis) && Boolean(foldSide) && Boolean(mode) && marks.length > 0 && new Set(marks).size === marks.length &&
+      marks.every((cell) => Number.isInteger(cell) && cell >= 0 && cell < rows * columns) &&
+      (axis === 'vertical' ? columns % 2 === 0 && ['left', 'right'].includes(foldSide!) : rows % 2 === 0 && ['top', 'bottom'].includes(foldSide!))
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Faltvorlage enthält ungültige Daten.</div>
+    return (
+      <div className="math-visual folding-paper-visual" role="img" aria-label={representation.label}>
+        <div
+          aria-hidden="true"
+          className={`folding-grid folding-grid--axis-${axis}`}
+          style={{ '--fold-rows': rows, '--fold-columns': columns } as CSSProperties}
+        >
+          {Array.from({ length: rows * columns }, (_, cell) => (
+            <i className={marks.includes(cell) ? `folding-cell folding-cell--marked folding-cell--${mode}` : 'folding-cell'} key={cell} />
+          ))}
+        </div>
+        {showInstruction && <div className={`folding-instruction folding-instruction--${foldSide}`}>
+          <strong>{textValue(values.axisLabel)}</strong>
+          <span>{textValue(values.foldLabel)}</span>
+        </div>}
+      </div>
+    )
+  }
+
   if (representation.kind === 'cube-view') {
     const rows = Number(values.rows)
     const columns = Number(values.columns)

@@ -14,9 +14,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(7)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.13.0',
-      schemaVersion: 11,
-      appVersion: '0.14.0'
+      catalogVersion: '0.14.0',
+      schemaVersion: 12,
+      appVersion: '0.15.0'
     })
   })
 
@@ -63,7 +63,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.13.0')
+      expect(runningSession.catalogVersion).toBe('0.14.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -128,6 +128,14 @@ describe('Sitzungsplanung', () => {
     expect(isSkillEligible('cube-rotation', { 'body-views': { ...bodyViews, attempts: 4, mastery: 80 } })).toBe(false)
     expect(isSkillEligible('cube-rotation', { 'body-views': { ...bodyViews, attempts: 5, mastery: 59 } })).toBe(false)
     expect(isSkillEligible('cube-rotation', { 'body-views': { ...bodyViews, attempts: 5, mastery: 60 } })).toBe(true)
+  })
+
+  it('schaltet Falten erst ab der sicheren dritten Symmetriephase frei', () => {
+    const symmetry = createSkillProgress('symmetry')
+    expect(isSkillEligible('folding', {})).toBe(false)
+    expect(isSkillEligible('folding', { symmetry: { ...symmetry, learningPhase: 'independent-practice' } })).toBe(false)
+    expect(isSkillEligible('folding', { symmetry: { ...symmetry, learningPhase: 'automate' } })).toBe(true)
+    expect(isSkillEligible('folding', { symmetry: { ...symmetry, learningPhase: 'transfer' } })).toBe(true)
   })
 
   it('berücksichtigt schwache Grundrechenarten und Unterkompetenzen häufiger', () => {

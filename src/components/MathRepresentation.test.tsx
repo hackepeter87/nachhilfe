@@ -255,3 +255,38 @@ describe('MathRepresentation Körperansichten', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
   })
 })
+
+describe('MathRepresentation Falten', () => {
+  it('zeigt eine einzelne Faltachse zwischen Zellen und genau den markierten Ausgangspunkt', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'folding-paper', visibility: 'always', label: 'Linke Hälfte nach rechts falten.',
+      values: { rows: 4, columns: 4, axis: 'vertical', foldSide: 'left', mode: 'point-fold', marks: [5], showInstruction: 1, axisLabel: 'Faltachse', foldLabel: 'Falte links nach rechts' }
+    }} />)
+    expect(screen.getByRole('img', { name: 'Linke Hälfte nach rechts falten.' })).toBeVisible()
+    expect(container.querySelectorAll('.folding-cell')).toHaveLength(16)
+    expect(container.querySelectorAll('.folding-cell--marked')).toHaveLength(1)
+    expect(container.querySelector('.folding-grid--axis-vertical')).toBeInTheDocument()
+    expect(container).toHaveTextContent('Falte links nach rechts')
+  })
+
+  it('zeigt nach dem Aufklappen genau zwei symmetrische Schnittmarken', () => {
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'folding-paper', visibility: 'always', label: 'Aufgeklapptes Papier mit zwei Schnitten.',
+      values: { rows: 4, columns: 6, axis: 'vertical', foldSide: 'left', mode: 'cut-unfold', marks: [7, 10], showInstruction: 0, axisLabel: 'Faltachse', foldLabel: 'Falte links nach rechts' }
+    }} />)
+    expect(container.querySelectorAll('.folding-cell--cut-unfold')).toHaveLength(2)
+  })
+
+  it('lehnt ungerade Achsenmaße und doppelte Markierungen sichtbar ab', () => {
+    const { rerender } = render(<MathRepresentation representation={{
+      kind: 'folding-paper', visibility: 'always', label: 'Ungültig',
+      values: { rows: 4, columns: 5, axis: 'vertical', foldSide: 'left', mode: 'point-fold', marks: [1], showInstruction: 1 }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
+    rerender(<MathRepresentation representation={{
+      kind: 'folding-paper', visibility: 'always', label: 'Ungültig',
+      values: { rows: 4, columns: 4, axis: 'vertical', foldSide: 'left', mode: 'cut-unfold', marks: [1, 1], showInstruction: 0 }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Daten')
+  })
+})

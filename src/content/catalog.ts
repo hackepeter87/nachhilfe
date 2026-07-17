@@ -18,9 +18,17 @@ import {
   type CubeTurnDirection,
   type CubeViewDirection
 } from '../domain/cubeViews'
+import {
+  createFoldingOutcomes,
+  isValidFoldingTemplate,
+  type FoldAxis,
+  type FoldSide,
+  type FoldingMode,
+  type FoldingTemplate
+} from '../domain/folding'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 11
+export const CATALOG_SCHEMA_VERSION = 12
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -376,6 +384,21 @@ export interface SpatialRotationsContent {
   templates: CubeRotationTemplate[]
 }
 
+export interface FoldingTemplateContent extends FoldingTemplate {
+  instruction: string
+}
+
+export interface SpatialFoldingContent {
+  entryRationale: string
+  pointPrompt: string
+  cutPrompt: string
+  axisLabel: string
+  optionLabels: [string, string, string]
+  foldLabels: Record<FoldSide, string>
+  modeGuidance: Record<FoldingMode, string>
+  templates: FoldingTemplateContent[]
+}
+
 export interface TaskCatalog extends CatalogMetadata {
   fieldUsage: Record<'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
   numberRange: { min: number; max: number }
@@ -395,6 +418,7 @@ export interface TaskCatalog extends CatalogMetadata {
   }
   spatialViews: SpatialViewsContent
   spatialRotations: SpatialRotationsContent
+  spatialFolding: SpatialFoldingContent
 }
 
 type FetchCatalog = (input: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>
@@ -414,7 +438,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel'
 ])
 
 function hasOnlyKnownPlaceholders(value: unknown): boolean {
@@ -533,6 +557,42 @@ function isSpatialRotationsContent(value: unknown): value is SpatialRotationsCon
   return [1, 2, 3].every((difficulty) => difficulties.has(difficulty)) &&
     turnsByDifficulty.get(1)?.size === 1 && turnsByDifficulty.get(1)?.has('right') === true &&
     [2, 3].every((difficulty) => turns.every((turn) => turnsByDifficulty.get(difficulty)?.has(turn)))
+}
+
+function isSpatialFoldingContent(value: unknown): value is SpatialFoldingContent {
+  if (!isRecord(value) || !isNonEmptyString(value.entryRationale) || !isNonEmptyString(value.pointPrompt) ||
+    !isNonEmptyString(value.cutPrompt) || !isNonEmptyString(value.axisLabel)) return false
+  if (!Array.isArray(value.optionLabels) || value.optionLabels.length !== 3 ||
+    !value.optionLabels.every(isNonEmptyString) || new Set(value.optionLabels).size !== 3) return false
+  const sides: FoldSide[] = ['left', 'right', 'top', 'bottom']
+  const modes: FoldingMode[] = ['point-fold', 'cut-unfold']
+  if (!isRecord(value.foldLabels) || !sides.every((side) => isNonEmptyString((value.foldLabels as Record<string, unknown>)[side]))) return false
+  if (!isRecord(value.modeGuidance) || !modes.every((mode) => isNonEmptyString((value.modeGuidance as Record<string, unknown>)[mode]))) return false
+  if (!Array.isArray(value.templates) || value.templates.length < 8) return false
+  const ids = value.templates.map((template) => isRecord(template) ? template.id : undefined)
+  if (new Set(ids).size !== value.templates.length) return false
+  const stages = new Set<number>()
+  const axesByDifficulty = new Map<number, Set<FoldAxis>>()
+  if (!value.templates.every((candidate) => {
+    if (!isRecord(candidate) || !isNonEmptyString(candidate.id) || !isNonEmptyString(candidate.instruction) ||
+      ![1, 2, 3].includes(candidate.difficulty as number) || !modes.includes(candidate.mode as FoldingMode) ||
+      !['vertical', 'horizontal'].includes(candidate.axis as FoldAxis) || !sides.includes(candidate.foldSide as FoldSide)) return false
+    const template = candidate as unknown as FoldingTemplateContent
+    stages.add(template.difficulty)
+    const axes = axesByDifficulty.get(template.difficulty) ?? new Set<FoldAxis>()
+    axes.add(template.axis)
+    axesByDifficulty.set(template.difficulty, axes)
+    if (!isValidFoldingTemplate(template)) return false
+    if (template.difficulty === 1 && (template.mode !== 'point-fold' || template.axis !== 'vertical')) return false
+    if (template.difficulty === 2 && template.mode !== 'point-fold') return false
+    if (template.difficulty === 3 && template.mode !== 'cut-unfold') return false
+    const outcomes = createFoldingOutcomes(template)
+    return new Set([outcomes.correct, outcomes.unchanged, outcomes.shifted].map((cells) => cells.join(','))).size === 3
+  })) return false
+  return [1, 2, 3].every((stage) => stages.has(stage)) &&
+    axesByDifficulty.get(1)?.size === 1 && axesByDifficulty.get(1)?.has('vertical') === true &&
+    ['vertical', 'horizontal'].every((axis) => axesByDifficulty.get(2)?.has(axis as FoldAxis)) &&
+    ['vertical', 'horizontal'].every((axis) => axesByDifficulty.get(3)?.has(axis as FoldAxis))
 }
 
 const REQUIREMENT_FIELDS = [
@@ -727,7 +787,8 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!Array.isArray(value.wordProblems) || value.wordProblems.length === 0 || !value.wordProblems.every((template) => isWordProblem(template, numberRange as { min: number; max: number }))) return false
   if (new Set(value.wordProblems.map((template) => (template as WordProblemTemplate).id)).size !== value.wordProblems.length) return false
   if (!isWordProblemSteps(value.wordProblemSteps) || !isSymmetryContent(value.symmetry) ||
-    !isSpatialViewsContent(value.spatialViews) || !isSpatialRotationsContent(value.spatialRotations)) return false
+    !isSpatialViewsContent(value.spatialViews) || !isSpatialRotationsContent(value.spatialRotations) ||
+    !isSpatialFoldingContent(value.spatialFolding)) return false
   return hasOnlyKnownPlaceholders(value)
 }
 

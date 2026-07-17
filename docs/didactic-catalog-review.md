@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.14.0, Katalog 0.13.0, Schema 11, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.15.0, Katalog 0.14.0, Schema 12, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -18,10 +18,11 @@ Stand: App 0.14.0, Katalog 0.13.0, Schema 11, Status ready-for-review. Diese Dat
 | `symmetry.progression`, `axisPosition`, `figureComplexity`, `distractorSimilarity` | Runtime | Progressionsphase, Achsenlage, Vorlage, Hilfen und Distraktortransformation ändern sich |
 | `spatialViews` | Runtime | geprüfte Würfelgebäude, Blickrichtungen und Stufengrenzen steuern Projektion und Antwortdarstellungen |
 | `spatialRotations` | Runtime | geprüfte Ausgangsgebäude, 90-Grad-Richtung, Achsenbezeichnung und Stufengrenzen steuern Transformation und Folgezustände |
+| `spatialFolding` | Runtime | Einzelfaltung, Achse, bewegte Papierhälfte und Faltschnittvorlagen steuern Spiegeltransformation und Ergebnisraster |
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.14.0
+## Aktive Veränderungen bis 0.15.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -44,10 +45,11 @@ Stand: App 0.14.0, Katalog 0.13.0, Schema 11, Status ready-for-review. Diese Dat
 - App 0.13.0 und Schema 9: Körperansichten verbinden katalogisierte Gebäude mit berechneter Vorder-, rechter Seiten- und Draufsicht. Die Stufen steigern Blickrichtungen und Gebäudekomplexität; Rotation und verdeckte Würfel bleiben deaktiviert.
 - App 0.13.1 und Schema 10: Sachaufgaben verwenden eine katalogisierte, einheitliche Runtime-Sequenz. `unknownQuantity` verhindert Ergebnislecks in Balken- und Gruppenmodellen. Neue Aufgaben remounten ihren lokalen Zustand; Fokus, Hover und Touch gelten nicht als Auswahl.
 - App 0.14.0 und Schema 11: `cube-rotation` dreht katalogisierte Gebäude kontrolliert um 90 Grad nach links oder rechts. Achse und Richtung bleiben sichtbar; Ausgangslage, korrekte Drehung und Gegenrichtung müssen paarweise verschieden sein. Die adaptive Auswahl setzt fünf Körperansichtsversuche und Lernwert 60 voraus.
+- App 0.15.0 und Schema 12: `folding` verfolgt einen Punkt bei genau einer gerichteten Faltung und öffnet auf Stufe 3 einen einfachen Faltschnitt. Gerade Raster halten die Achse zwischen Zellen; die adaptive Auswahl setzt Symmetriephase 3 voraus.
 
 ## Bewusst deaktiviert
 
-Kippen und Falten bleiben unter `preparedTopics` methodisch vorbereitet und stehen auf `disabled`. Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Übergänge, verdeckte Würfel, freie Rotation, Kippen und Falten werden nicht als aktiv dargestellt.
+Kippen bleibt unter `preparedTopics` methodisch vorbereitet und steht auf `disabled`. Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Übergänge, verdeckte Würfel, freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze werden nicht als aktiv dargestellt.
 
 ## Menschliche Gesamtprüfung
 

@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 11
+export const CATALOG_SCHEMA_VERSION = 12
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'round-tens', 'round-hundreds', 'addition-1000',
-  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation'
+  'written-addition', 'subtraction-1000', 'written-subtraction', 'complement-1000', 'money', 'lengths', 'word-problem', 'symmetry', 'body-views', 'cube-rotation', 'folding'
 ]
 
 const KNOWN_PLACEHOLDERS = new Set([
@@ -18,7 +18,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
-  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel'
+  'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel'
 ])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -404,6 +404,60 @@ function validateSpatialRotations(spatialRotations) {
   }
 }
 
+function validateSpatialFolding(spatialFolding) {
+  if (!isRecord(spatialFolding) || !isText(spatialFolding.entryRationale) || !isText(spatialFolding.pointPrompt) ||
+    !isText(spatialFolding.cutPrompt) || !isText(spatialFolding.axisLabel) || !Array.isArray(spatialFolding.optionLabels) ||
+    spatialFolding.optionLabels.length !== 3 || !spatialFolding.optionLabels.every(isText)) {
+    fail('spatialFolding Grunddaten sind ungültig')
+  }
+  requireUnique(spatialFolding.optionLabels, 'spatialFolding.optionLabels')
+  for (const side of ['left', 'right', 'top', 'bottom']) {
+    if (!isText(spatialFolding.foldLabels?.[side])) fail(`spatialFolding.foldLabels.${side} fehlt`)
+  }
+  for (const mode of ['point-fold', 'cut-unfold']) {
+    if (!isText(spatialFolding.modeGuidance?.[mode])) fail(`spatialFolding.modeGuidance.${mode} fehlt`)
+  }
+  if (!Array.isArray(spatialFolding.templates) || spatialFolding.templates.length < 8) fail('spatialFolding.templates ist unvollständig')
+  requireUnique(spatialFolding.templates.map((template) => template.id), 'spatialFolding.templates IDs')
+  const stages = new Set()
+  const axesByDifficulty = new Map()
+  const reflect = (template) => {
+    const row = Math.floor(template.sourceCell / template.columns)
+    const column = template.sourceCell % template.columns
+    return template.axis === 'vertical'
+      ? row * template.columns + template.columns - 1 - column
+      : (template.rows - 1 - row) * template.columns + column
+  }
+  spatialFolding.templates.forEach((template) => {
+    if (!isRecord(template) || !isText(template.id) || !isText(template.instruction) || ![1, 2, 3].includes(template.difficulty) ||
+      !['point-fold', 'cut-unfold'].includes(template.mode) || !['vertical', 'horizontal'].includes(template.axis) ||
+      !['left', 'right', 'top', 'bottom'].includes(template.foldSide) || !Number.isInteger(template.rows) ||
+      !Number.isInteger(template.columns) || template.rows < 2 || template.rows > 6 || template.columns < 2 || template.columns > 8 ||
+      !Number.isInteger(template.sourceCell) || template.sourceCell < 0 || template.sourceCell >= template.rows * template.columns) {
+      fail(`Faltvorlage ${String(template?.id)} ist ungültig`)
+    }
+    if (template.axis === 'vertical' ? template.columns % 2 !== 0 : template.rows % 2 !== 0) fail(`Faltvorlage ${template.id} braucht eine Achse zwischen Zellen`)
+    const row = Math.floor(template.sourceCell / template.columns)
+    const column = template.sourceCell % template.columns
+    const sideMatches = template.foldSide === 'left' ? template.axis === 'vertical' && column < template.columns / 2
+      : template.foldSide === 'right' ? template.axis === 'vertical' && column >= template.columns / 2
+        : template.foldSide === 'top' ? template.axis === 'horizontal' && row < template.rows / 2
+          : template.axis === 'horizontal' && row >= template.rows / 2
+    if (!sideMatches || reflect(template) === template.sourceCell) fail(`Faltvorlage ${template.id} passt nicht zur Faltrichtung`)
+    if (template.difficulty === 1 && (template.mode !== 'point-fold' || template.axis !== 'vertical')) fail(`Faltvorlage ${template.id} verletzt Stufe 1`)
+    if (template.difficulty === 2 && template.mode !== 'point-fold') fail(`Faltvorlage ${template.id} verletzt Stufe 2`)
+    if (template.difficulty === 3 && template.mode !== 'cut-unfold') fail(`Faltvorlage ${template.id} verletzt Stufe 3`)
+    stages.add(template.difficulty)
+    const axes = axesByDifficulty.get(template.difficulty) ?? new Set()
+    axes.add(template.axis)
+    axesByDifficulty.set(template.difficulty, axes)
+  })
+  if (![1, 2, 3].every((stage) => stages.has(stage)) || axesByDifficulty.get(1)?.size !== 1 || !axesByDifficulty.get(1)?.has('vertical') ||
+    ![2, 3].every((difficulty) => ['vertical', 'horizontal'].every((axis) => axesByDifficulty.get(difficulty)?.has(axis)))) {
+    fail('spatialFolding braucht die katalogisierte Achsen- und Modusprogression')
+  }
+}
+
 export function validateCatalog(catalog) {
   if (!isRecord(catalog)) fail('Wurzel muss ein Objekt sein')
   validateMetadata(catalog)
@@ -478,6 +532,7 @@ export function validateCatalog(catalog) {
   validateSymmetry(catalog.symmetry)
   validateSpatialViews(catalog.spatialViews)
   validateSpatialRotations(catalog.spatialRotations)
+  validateSpatialFolding(catalog.spatialFolding)
   validatePlaceholders(catalog)
   return catalog
 }

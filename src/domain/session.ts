@@ -21,7 +21,8 @@ const FOCUS_SKILLS: SkillId[] = [
   'money',
   'lengths',
   'body-views',
-  'cube-rotation'
+  'cube-rotation',
+  'folding'
 ]
 
 const WARMUP_SKILLS: SkillId[] = ['addition', 'subtraction', 'multiplication', 'division']
@@ -62,6 +63,9 @@ export function isSkillEligible(skillId: SkillId, progress: ProgressMap): boolea
   if (skillId === 'cube-rotation') {
     const bodyViews = progress['body-views']
     return Boolean(bodyViews && bodyViews.attempts >= 5 && bodyViews.mastery >= 60)
+  }
+  if (skillId === 'folding') {
+    return hasReachedPhase(progress.symmetry, 'automate')
   }
   return true
 }
@@ -108,6 +112,9 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
     const random = seededRandom(seed)
     const weights = candidates.map((candidate) => subskillWeight(progress[skillId], candidate))
     return candidates[weightedIndex(weights, random)]
+  }
+  if (skillId === 'folding') {
+    return difficulty === 3 ? 'fold-cut-unfold' : 'fold-point'
   }
   const candidates = skillId === 'addition'
     ? (difficulty === 1 ? ['addition-within-10'] : ['addition-bridge-10'])

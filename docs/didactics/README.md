@@ -1,6 +1,6 @@
 # Didaktisches Gesamtmodell
 
-Stand: App 0.14.0, Katalog 0.13.0, Schema 11. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form sowie Größen und Messen und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen.
+Stand: App 0.15.0, Katalog 0.14.0, Schema 12. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form sowie Größen und Messen und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen.
 
 ## Lernphasen
 

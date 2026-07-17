@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.14.0. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.14.0, sobald der Release-Workflow für `v0.14.0` erfolgreich gelaufen ist. Die Gesamtprüfung ist für Version 0.20 vorgesehen.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.15.0. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.15.0, sobald der Release-Workflow für `v0.15.0` erfolgreich gelaufen ist. Die Gesamtprüfung ist für Version 0.20 vorgesehen.
 
 ## Förderziel
 
@@ -10,7 +10,7 @@ Mathe-Reise unterstützt ein etwa neunjähriges Kind am Ende der Klasse 3 dabei,
 
 ## Behandelte Themen
 
-Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, schriftliche Addition/Subtraktion mit genau einem Übergang, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, fünfphasige Raster-Symmetrie, Geld, Längen, fest orientierte Körperansichten und kontrollierte 90-Grad-Würfelrotation. Freie Rotation, Kippen und Falten bleiben deaktiviert.
+Aktiv sind Addition/Subtraktion bis 20, Einmaleins/Division, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Runden, kontrollierte Rechenstrategien bis 1000, schriftliche Addition/Subtraktion mit genau einem Übergang, sieben Sachaufgabenbeziehungen einschließlich erster zweischrittiger Situationen, fünfphasige Raster-Symmetrie, Geld, Längen, fest orientierte Körperansichten, kontrollierte 90-Grad-Würfelrotation und einzelne Faltungen samt einfachem Faltschnitt. Freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze bleiben deaktiviert.
 
 ## Methodischer Aufbau
 
@@ -36,4 +36,4 @@ Stufe 1 nutzt kleinere Zahlen und sichtbare Darstellung. Stufe 2 reduziert die D
 
 ## Bekannte Grenzen
 
-Es liegt keine dokumentierte Lehrkraftfreigabe vor. Ein echter iPhone-Test ist noch offen. Freie Rechenwege oder Freitextbegründungen werden nicht diagnostisch ausgewertet. Millimeter/Kilometer, komplexe Kaufsituationen, freie Rotation, Kippen und Falten sind nicht sichtbar. Das adaptive Modell ist eine getestete Produktheuristik, kein wissenschaftlich validiertes Diagnosemodell.
+Es liegt keine dokumentierte Lehrkraftfreigabe vor. Ein echter iPhone-Test ist noch offen. Freie Rechenwege oder Freitextbegründungen werden nicht diagnostisch ausgewertet. Millimeter/Kilometer, komplexe Kaufsituationen, freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze sind nicht sichtbar. Das adaptive Modell ist eine getestete Produktheuristik, kein wissenschaftlich validiertes Diagnosemodell.

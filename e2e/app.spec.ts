@@ -91,9 +91,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.13.0',
-    schemaVersion: 11,
-    appVersion: '0.14.0'
+    catalogVersion: '0.14.0',
+    schemaVersion: 12,
+    appVersion: '0.15.0'
   })
 
   await page.reload()
@@ -297,6 +297,64 @@ test('Würfelrotation zeigt Achse, Richtung und drei Folgezustände mobil ohne O
   await expect(page.locator('.cube-rotation-visual')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wuerfelrotation-812x375.png'), fullPage: true })
+})
+
+test('Einzelfaltung zeigt Achse, Faltrichtung und drei neutrale Ergebnisse mobil ohne Overflow', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (!['addition', 'folding'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Faltung')
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('mathe-reise')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('progress', 'readwrite')
+      transaction.objectStore('progress').put({
+        skillId: 'symmetry', attempts: 8, correctAnswers: 6, hintsUsed: 1,
+        lastPracticedAt: '2026-07-17T10:00:00.000Z', difficulty: 3,
+        learningPhase: 'automate', mastery: 75, recentErrors: 0,
+        correctStreak: 3, lastVariantKey: null, status: 'practicing', subskills: {}
+      })
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+    database.close()
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map((registration) => registration.unregister()))
+    const cacheNames = await caches.keys()
+    await Promise.all(cacheNames.map((name) => caches.delete(name)))
+  })
+  await page.reload()
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent()
+    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
+    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
+    await page.getByLabel('Deine Antwort').fill(String(first + second))
+    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+
+  await expect(page.getByRole('img', { name: /Faltachse/i }).first()).toBeVisible()
+  await expect(page.locator('.folding-grid--axis-vertical').first()).toBeVisible()
+  await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+  await expect(page.getByRole('img', { name: /Bild [ABC]/ })).toHaveCount(3)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('falten-375x812.png'), fullPage: true })
+
+  await page.setViewportSize({ width: 812, height: 375 })
+  await expect(page.locator('.folding-paper-visual').first()).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('falten-812x375.png'), fullPage: true })
 })
 
 test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen Rechnung', async ({ page }, testInfo) => {

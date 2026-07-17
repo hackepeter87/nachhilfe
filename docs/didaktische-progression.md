@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.13.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
+Stand: Katalogversion 0.14.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md).
 
 ## Gemeinsame Regeln
 
@@ -216,6 +216,16 @@ Stand: Katalogversion 0.13.0. Die Stufen beschreiben die produktive Heuristik vo
 - **Hilfe / Transfer:** eine auffällige Ecke um die Achse verfolgen / benennen, welche bisherige Seite danach vorne erscheint.
 - **Später:** freie Rotation, 180-Grad-Folgen, Kippen und Körpernetze.
 
+### Falten und Spiegeln
+
+- **Vorkenntnisse:** Symmetriephase 3, senkrechte und waagerechte Achsen sowie Rasterzellen sicher verfolgen.
+- **Stufe 1:** ein Punkt, senkrechte Achse zwischen Zellen und eine eindeutig benannte Faltung nach links oder rechts.
+- **Stufe 2:** senkrechte oder waagerechte Achse und wechselnde bewegte Papierhälfte.
+- **Stufe 3 / Ziel:** ein einfacher Schnitt im einmal gefalteten Papier; nach dem Aufklappen zwei symmetrische Markierungen erkennen.
+- **Erhöhen / Zurückstufen:** Achsenabstand bei wechselnder Richtung sicher erhalten / zu einem Punkt direkt neben einer senkrechten Achse zurückkehren.
+- **Hilfe / Transfer:** Zeile oder Spalte bis zur Achse zählen / begründen, warum der Faltschnitt ein Spiegelpaar erzeugt.
+- **Später:** Mehrfachfaltungen, mehrere Schnitte, diagonale Achsen und Körpernetze.
+
 ## Größen und Messen
 
 ### Geld
@@ -234,4 +244,4 @@ Stand: Katalogversion 0.13.0. Die Stufen beschreiben die produktive Heuristik vo
 
 ## Bewusst offene Förderbereiche
 
-Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, freie Rotation, Würfelkippen und Falten sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.
+Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, freie Rotation, Würfelkippen, Mehrfachfaltungen und Körpernetze sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.

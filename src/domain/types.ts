@@ -20,7 +20,8 @@ export const SKILL_IDS = [
   'word-problem',
   'symmetry',
   'body-views',
-  'cube-rotation'
+  'cube-rotation',
+  'folding'
 ] as const
 
 export type SkillId = typeof SKILL_IDS[number]
@@ -49,7 +50,7 @@ export interface AnswerOption {
   misconception?: string
 }
 
-export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation'
+export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper'
 
 export interface NumberLineJump {
   from: number
