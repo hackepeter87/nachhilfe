@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.26.0, Katalog 0.25.0, Schema 19.
+Stand: App 0.27.0, Katalog 0.26.0, Schema 19.
 
 ## Verbindliche Regel
 
@@ -23,7 +23,7 @@ Der Renderer lehnt doppelte, überlappende, unvollständige oder unzulässig auf
 | Nachbarzehner/-hunderter | Beide gesuchten Nachbarn waren beschriftet. | Nur die gegebene Zahl ist beschriftet; beide Nachbarn bleiben `?`. |
 | Ergänzen | Sprungbeschriftungen ergaben unmittelbar die gesuchte Ergänzung. | Start und bekannte Zielzahl bleiben sichtbar; Sprünge bleiben bis zur Lösung unbekannt. |
 | Division | Die Anzahl gezeichneter Gruppen wurde nur durch eine einzelne Beispielgruppe angedeutet; Gruppieren und Verteilen waren nicht getrennt. | Gruppierungs- und Verteilmodell verarbeiten die vollständige Gesamtmenge. Die gesuchte Anzahl beziehungsweise Gruppengröße bleibt numerisch `?`, während der Aufteilungsprozess vollständig sichtbar ist. |
-| Geld | Der summierte Betrag stand im `aria-label`. | Einzelne bekannte Münzen bleiben sichtbar; der Gesamtbetrag ist visuell und für Screenreader unbekannt. |
+| Geld | Der summierte Betrag stand im `aria-label`. | Einzelne bekannte Münzen und ein Zahlbetrag bleiben sichtbar; Gesamtbetrag oder Rückgeld sind visuell und für Screenreader unbekannt. |
 | Messstrecke | Der gesuchte Endwert stand als Zahl und im `aria-label`. | Die Strecke bleibt messbar, ihr Zahlenwert wird bis zur Lösung durch `?` ersetzt. |
 | Balkenmodelle | Gesuchte Teile waren bereits maskiert. | Die bestehende Maskierung bleibt verbindlich und verwendet dieselben Rollen. |
 | Stellenwerttafel | Zeigt bekannte Ziffern beziehungsweise Material, nicht das Rechenergebnis. | Ergebnisrollen werden ausdrücklich unbekannt geführt; bekannte Stellen bleiben sichtbar. |

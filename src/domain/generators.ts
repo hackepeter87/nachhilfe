@@ -1901,9 +1901,10 @@ function moneyDenominations(cents: number): number[] {
   return result
 }
 
-function money(seed: number, difficulty: Difficulty): Exercise {
+function money(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().quantityContent.money
+  const moneyPhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
   let amountCents: number
   let paidCents = 0
   let priceCents = 0
@@ -1912,17 +1913,31 @@ function money(seed: number, difficulty: Difficulty): Exercise {
   let strategy: string
   let coins: number[]
   let subskillId: string
-  if (difficulty === 1) {
+  if (moneyPhase === 'activate') {
+    amountCents = pick(random, [10, 20, 50, 100, 200])
+    coins = [amountCents]
+    taskPrompt = 'Welchen Wert hat diese Münze?'
+    quantityExplanation = `Die Münze trägt den Wert ${formatEuro(amountCents)}.`
+    strategy = 'Lies Zahl und Einheit direkt auf der Münze.'
+    subskillId = 'money-coin-values'
+  } else if (moneyPhase === 'understand') {
+    amountCents = integer(random, 2, 9) * 100
+    coins = moneyDenominations(amountCents)
+    taskPrompt = 'Welche Geldschreibweise beschreibt denselben Wert wie die Münzen?'
+    quantityExplanation = `${amountCents} Cent und ${formatEuro(amountCents)} beschreiben denselben Geldwert.`
+    strategy = 'Lege Euro und Cent nebeneinander: 100 Cent sind genau 1 Euro.'
+    subskillId = 'money-euro-cent-equivalence'
+  } else if (moneyPhase === 'guided-practice') {
     amountCents = integer(random, 2, 10) * 100
     coins = moneyDenominations(amountCents)
     taskPrompt = content.countPrompt
     quantityExplanation = renderCatalogText(content.countExplanation, { amount: formatEuro(amountCents) })
     strategy = 'Zähle zuerst die 2-Euro-Münzen und danach die 1-Euro-Münzen.'
     subskillId = 'money-whole-euros'
-  } else if (difficulty === 2) {
+  } else if (moneyPhase === 'independent-practice' || moneyPhase === 'automate') {
     amountCents = integer(random, 12, 98) * 10
     coins = moneyDenominations(amountCents)
-    taskPrompt = content.countPrompt
+    taskPrompt = moneyPhase === 'automate' ? 'Bestimme den Geldwert. Zähle Euro und Cent getrennt.' : content.countPrompt
     quantityExplanation = renderCatalogText(content.countExplanation, { amount: formatEuro(amountCents) })
     strategy = 'Zähle Euro und Cent getrennt. 100 Cent ergeben 1 Euro.'
     subskillId = 'money-euro-cent'
@@ -1949,28 +1964,29 @@ function money(seed: number, difficulty: Difficulty): Exercise {
     change: formatEuro(amountCents)
   }
   const options = numberOptions(random, amountCents, [
-    { value: amountCents - 10, misconception: 'Centbetrag um 10 zu klein gelesen' },
-    { value: amountCents + 10, misconception: 'Centbetrag um 10 zu groß gelesen' },
-    { value: amountCents - 100, misconception: 'Einen Euro zu wenig berücksichtigt' },
-    { value: amountCents + 100, misconception: 'Einen Euro zu viel berücksichtigt' },
-    { value: priceCents, misconception: 'Preis und Rückgeld verwechselt' }
+    { value: amountCents - 10, misconception: 'Centbetrag um 10 zu klein gelesen', misconceptionId: 'money-unit-confusion' },
+    { value: amountCents + 10, misconception: 'Centbetrag um 10 zu groß gelesen', misconceptionId: 'money-unit-confusion' },
+    { value: amountCents - 100, misconception: 'Einen Euro zu wenig berücksichtigt', misconceptionId: 'money-unit-confusion' },
+    { value: amountCents + 100, misconception: 'Einen Euro zu viel berücksichtigt', misconceptionId: 'money-unit-confusion' },
+    { value: priceCents, misconception: 'Preis und Rückgeld verwechselt', misconceptionId: 'money-direction-confusion' }
   ]).map((option) => ({ ...option, label: formatEuro(Number(option.value)) }))
   return withMetadata({
     ...base('money', seed, difficulty, values),
     ...contentFor('money', values, difficulty),
-    typeId: difficulty === 3 ? 'money-change' : 'money-count',
+    typeId: moneyPhase === 'activate' ? 'money-identify-coin' : moneyPhase === 'understand' ? 'money-connect-representations' : moneyPhase === 'guided-practice' ? 'money-count-whole-euros' : moneyPhase === 'independent-practice' ? 'money-count-mixed' : moneyPhase === 'automate' ? 'money-read-fluently' : 'money-change',
     subskillId,
     answerMode: 'choice',
     correctAnswer: String(amountCents),
     options,
-    representation: representation('money', difficulty, 'money', content.coinsLabel, {
+    representation: representation('money', moneyPhase === 'activate' || moneyPhase === 'guided-practice' ? 1 : moneyPhase === 'transfer' ? 3 : 2, 'money', content.coinsLabel, {
       coins,
       displayedCents: paidCents || amountCents,
+      changeCents: amountCents,
       priceCents,
       paidCents,
       priceLabel: content.priceLabel,
       paidLabel: content.paidLabel
-    }, difficulty < 3 ? ['displayedCents'] : [])
+    }, moneyPhase === 'transfer' ? ['changeCents'] : ['displayedCents'])
   })
 }
 
@@ -1981,9 +1997,10 @@ export function formatLength(centimeters: number): string {
   return `${centimeters} cm`
 }
 
-function lengths(seed: number, difficulty: Difficulty): Exercise {
+function lengths(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().quantityContent.lengths
+  const lengthPhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
   let answerCm: number
   let correctAnswer: string
   let options: AnswerOption[]
@@ -1992,7 +2009,31 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
   let strategy: string
   let subskillId: string
   let representationValues: ExerciseRepresentation['values']
-  if (difficulty === 1) {
+  if (lengthPhase === 'activate') {
+    answerCm = 10
+    correctAnswer = 'am Nullpunkt'
+    taskPrompt = 'Wo beginnt richtiges Messen mit dem Lineal?'
+    quantityExplanation = 'Eine Messstrecke beginnt am Nullpunkt. Erst danach werden die gleich langen Zentimeterabschnitte gezählt.'
+    strategy = 'Suche zuerst die Markierung 0.'
+    subskillId = 'length-zero-point'
+    representationValues = { lengthCm: answerCm, maxCm: 20 }
+    options = textOptions(random, correctAnswer, [
+      { value: 'an der ersten Strichmarke nach 0', misconception: 'Der Nullpunkt wird als erster Zentimeter mitgezählt.', misconceptionId: 'length-zero-counted' },
+      { value: 'am Rand des Lineals', misconception: 'Der Linealrand wird mit dem Nullpunkt verwechselt.', misconceptionId: 'length-zero-counted' }
+    ])
+  } else if (lengthPhase === 'understand') {
+    answerCm = 100
+    correctAnswer = '100 cm'
+    taskPrompt = 'Welche Länge ist genauso lang wie 1 Meter?'
+    quantityExplanation = 'Ein Meter besteht aus 100 Zentimetern. Beide Angaben beschreiben dieselbe Länge.'
+    strategy = 'Nutze die Grundbeziehung 1 m = 100 cm.'
+    subskillId = 'length-unit-equivalence'
+    representationValues = { lengthCm: 100, maxCm: 100, equivalence: content.equivalenceLabel }
+    options = textOptions(random, correctAnswer, [
+      { value: '10 cm', misconception: 'Meter und Zentimeter werden mit dem Faktor 10 verbunden.', misconceptionId: 'length-factor-ten' },
+      { value: '1000 cm', misconception: 'Meter und Zentimeter werden mit dem Faktor 1000 verbunden.', misconceptionId: 'length-factor-ten' }
+    ])
+  } else if (lengthPhase === 'guided-practice') {
     answerCm = integer(random, 2, 20)
     correctAnswer = `${answerCm} cm`
     taskPrompt = content.readPrompt
@@ -2001,11 +2042,11 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
     subskillId = 'length-read-centimeters'
     representationValues = { lengthCm: answerCm, maxCm: 20 }
     options = textOptions(random, correctAnswer, [
-      { value: `${answerCm - 1} cm`, misconception: 'Nullpunkt als ersten Zentimeter mitgezählt' },
-      { value: `${answerCm + 1} cm`, misconception: 'Einen Skalenabschnitt zu weit gezählt' },
-      { value: `${answerCm * 10} cm`, misconception: 'Skalenteilung mit Zehnerschritten verwechselt' }
+      { value: `${answerCm - 1} cm`, misconception: 'Nullpunkt als ersten Zentimeter mitgezählt', misconceptionId: 'length-zero-counted' },
+      { value: `${answerCm + 1} cm`, misconception: 'Einen Skalenabschnitt zu weit gezählt', misconceptionId: 'length-zero-counted' },
+      { value: `${answerCm * 10} cm`, misconception: 'Skalenteilung mit Zehnerschritten verwechselt', misconceptionId: 'length-factor-ten' }
     ])
-  } else if (difficulty === 2) {
+  } else if (lengthPhase === 'independent-practice' || lengthPhase === 'automate') {
     const meters = integer(random, 1, 9)
     answerCm = meters * 100
     const toCentimeters = random() < 0.5
@@ -2014,15 +2055,15 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
       length: toCentimeters ? `${meters} m` : `${answerCm} cm`
     })
     quantityExplanation = renderCatalogText(content.conversionExplanation, { length: correctAnswer })
-    strategy = 'Nutze die Beziehung 1 m = 100 cm.'
+    strategy = lengthPhase === 'automate' ? 'Rufe die Grundbeziehung 1 m = 100 cm ab und prüfe die Einheit.' : 'Nutze die Beziehung 1 m = 100 cm.'
     subskillId = toCentimeters ? 'length-m-to-cm' : 'length-cm-to-m'
     representationValues = { lengthCm: 100, maxCm: 100, equivalence: content.equivalenceLabel }
     options = textOptions(random, correctAnswer, toCentimeters ? [
-      { value: `${meters * 10} cm`, misconception: 'Mit 10 statt mit 100 umgerechnet' },
-      { value: `${meters} cm`, misconception: 'Maßzahl ohne Einheitenumrechnung übernommen' }
+      { value: `${meters * 10} cm`, misconception: 'Mit 10 statt mit 100 umgerechnet', misconceptionId: 'length-factor-ten' },
+      { value: `${meters} cm`, misconception: 'Maßzahl ohne Einheitenumrechnung übernommen', misconceptionId: 'length-factor-ten' }
     ] : [
-      { value: `${answerCm / 10} m`, misconception: 'Durch 10 statt durch 100 geteilt' },
-      { value: `${answerCm} m`, misconception: 'Maßzahl ohne Einheitenumrechnung übernommen' }
+      { value: `${answerCm / 10} m`, misconception: 'Durch 10 statt durch 100 geteilt', misconceptionId: 'length-factor-ten' },
+      { value: `${answerCm} m`, misconception: 'Maßzahl ohne Einheitenumrechnung übernommen', misconceptionId: 'length-factor-ten' }
     ])
   } else {
     const additionTask = random() < 0.5
@@ -2046,12 +2087,12 @@ function lengths(seed: number, difficulty: Difficulty): Exercise {
   return withMetadata({
     ...base('lengths', seed, difficulty, values),
     ...contentFor('lengths', values, difficulty),
-    typeId: difficulty === 1 ? 'length-read' : difficulty === 2 ? 'length-convert' : 'length-calculate',
+    typeId: lengthPhase === 'activate' ? 'length-find-zero' : lengthPhase === 'understand' ? 'length-connect-units' : lengthPhase === 'guided-practice' ? 'length-read' : lengthPhase === 'independent-practice' ? 'length-convert-guided' : lengthPhase === 'automate' ? 'length-convert-fluent' : 'length-calculate',
     subskillId,
     answerMode: 'choice',
     correctAnswer,
     options,
-    representation: representation('lengths', difficulty, 'length', content.rulerLabel, representationValues, difficulty === 1 ? ['lengthCm'] : [])
+    representation: representation('lengths', lengthPhase === 'activate' || lengthPhase === 'guided-practice' ? 1 : lengthPhase === 'transfer' ? 3 : 2, 'length', content.rulerLabel, representationValues, lengthPhase === 'guided-practice' ? ['lengthCm'] : [])
   })
 }
 
@@ -2155,9 +2196,10 @@ export function formatBaseQuantity(value: number, quantity: 'mass' | 'capacity')
   return `${value} ${quantity === 'mass' ? 'g' : 'ml'}`
 }
 
-function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficulty: Difficulty): Exercise {
+function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().quantityContent[skillId]
+  const quantityPhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
   let correctAnswer: string
   let options: AnswerOption[]
   let taskPrompt: string
@@ -2165,7 +2207,32 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
   let strategy: string
   let subskillId: string
   let representationValues: ExerciseRepresentation['values']
-  if (difficulty === 1) {
+  if (quantityPhase === 'activate') {
+    const estimate = pick(random, content.referenceEstimates)
+    const largeUnit = skillId === 'mass' ? 'kg' : 'l'
+    const smallUnit = skillId === 'mass' ? 'g' : 'ml'
+    correctAnswer = estimate.correct.endsWith(largeUnit) ? largeUnit : smallUnit
+    taskPrompt = `Welche Einheit passt zu ${estimate.label}?`
+    quantityExplanation = `${estimate.correct} ist eine passende Bezugsgröße. Deshalb passt die Einheit ${correctAnswer}.`
+    strategy = `Entscheide zuerst, ob ${estimate.label} eher mit der kleinen oder der großen Einheit beschrieben wird.`
+    subskillId = `${skillId}-unit-choice`
+    representationValues = { mode: 'reference', quantityType: skillId, itemLabel: estimate.label, equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, [
+      { value: correctAnswer === smallUnit ? largeUnit : smallUnit, misconception: 'Kleine und große Einheit werden vertauscht.', misconceptionId: `${skillId}-unit-confusion` },
+      { value: skillId === 'mass' ? 'ml' : 'g', misconception: 'Die Einheit gehört zu einer anderen Größenart.', misconceptionId: `${skillId}-quantity-confusion` }
+    ])
+  } else if (quantityPhase === 'understand') {
+    correctAnswer = skillId === 'mass' ? '1000 g' : '1000 ml'
+    taskPrompt = `Welche Angabe beschreibt genau ${skillId === 'mass' ? '1 Kilogramm' : '1 Liter'}?`
+    quantityExplanation = content.equivalenceLabel
+    strategy = `Verbinde die große Einheit mit 1000 ${skillId === 'mass' ? 'Gramm' : 'Millilitern'}.`
+    subskillId = `${skillId}-unit-equivalence`
+    representationValues = { mode: 'complement', quantityType: skillId, knownAmountBase: 0, targetAmountBase: 1000, unitLabel: skillId === 'mass' ? 'g' : 'ml', equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, [
+      { value: skillId === 'mass' ? '100 g' : '100 ml', misconception: 'Die Grundeinheit wird mit 100 statt 1000 verbunden.', misconceptionId: `${skillId}-factor-hundred` },
+      { value: skillId === 'mass' ? '10 g' : '10 ml', misconception: 'Die Grundeinheit wird mit 10 statt 1000 verbunden.', misconceptionId: `${skillId}-factor-hundred` }
+    ])
+  } else if (quantityPhase === 'guided-practice') {
     const estimate = pick(random, content.referenceEstimates)
     correctAnswer = estimate.correct
     taskPrompt = renderCatalogText(content.referencePrompt, { item: estimate.label })
@@ -2176,10 +2243,11 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
     options = shuffle(random, estimate.options.map((value) => ({
       value,
       label: value,
-      misconception: value === correctAnswer ? undefined : 'Unpassende Größenordnung oder Einheit gewählt'
+      misconception: value === correctAnswer ? undefined : 'Unpassende Größenordnung oder Einheit gewählt',
+      misconceptionId: value === correctAnswer ? undefined : `${skillId}-unit-confusion`
     })))
   } else {
-    const operation = difficulty === 2 ? 'complement' : random() < 0.5 ? '+' : '−'
+    const operation = quantityPhase === 'independent-practice' || quantityPhase === 'automate' ? 'complement' : random() < 0.5 ? '+' : '−'
     let firstBase: number
     let secondBase: number
     let answerBase: number
@@ -2214,21 +2282,21 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
     }
     const wrongOperation = operation === '+' ? Math.abs(firstBase - secondBase) : operation === '−' ? firstBase + secondBase : firstBase
     options = textOptions(random, correctAnswer, [
-      { value: formatBaseQuantity(Math.max(0, answerBase - 50), skillId), misconception: 'Einen 50er-Schritt ausgelassen' },
-      { value: formatBaseQuantity(Math.min(1000, answerBase + 50), skillId), misconception: 'Einen 50er-Schritt zu viel gezählt' },
-      { value: formatBaseQuantity(Math.min(1000, wrongOperation), skillId), misconception: 'Rechenbeziehung verwechselt' }
+      { value: formatBaseQuantity(Math.max(0, answerBase - 50), skillId), misconception: 'Einen 50er-Schritt ausgelassen', misconceptionId: `${skillId}-factor-hundred` },
+      { value: formatBaseQuantity(Math.min(1000, answerBase + 50), skillId), misconception: 'Einen 50er-Schritt zu viel gezählt', misconceptionId: `${skillId}-factor-hundred` },
+      { value: formatBaseQuantity(Math.min(1000, wrongOperation), skillId), misconception: 'Rechenbeziehung verwechselt', misconceptionId: `${skillId}-unit-confusion` }
     ])
   }
   const values = { taskPrompt, quantityExplanation, strategy, quantityAnswer: correctAnswer }
   return withMetadata({
     ...base(skillId, seed, difficulty, values),
     ...contentFor(skillId, values, difficulty),
-    typeId: difficulty === 1 ? `${skillId}-reference` : difficulty === 2 ? `${skillId}-complement` : `${skillId}-calculate`,
+    typeId: quantityPhase === 'activate' ? `${skillId}-choose-unit` : quantityPhase === 'understand' ? `${skillId}-connect-units` : quantityPhase === 'guided-practice' ? `${skillId}-reference` : quantityPhase === 'independent-practice' ? `${skillId}-complement-guided` : quantityPhase === 'automate' ? `${skillId}-complement-fluent` : `${skillId}-calculate`,
     subskillId,
     answerMode: 'choice',
     correctAnswer,
     options,
-    representation: representation(skillId, difficulty, skillId === 'mass' ? 'mass-scale' : 'capacity-vessel', content.displayLabel, representationValues, ['answerLabel'])
+    representation: representation(skillId, quantityPhase === 'activate' || quantityPhase === 'guided-practice' ? 1 : quantityPhase === 'transfer' ? 3 : 2, skillId === 'mass' ? 'mass-scale' : 'capacity-vessel', content.displayLabel, representationValues, ['answerLabel'])
   })
 }
 
@@ -2950,8 +3018,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'subtraction-1000': return subtraction1000(seed, difficulty, phase)
     case 'written-subtraction': return writtenSubtraction(seed, difficulty, phase)
     case 'complement-1000': return complement1000(seed, difficulty, phase)
-    case 'money': return money(seed, difficulty)
-    case 'lengths': return lengths(seed, difficulty)
+    case 'money': return money(seed, difficulty, phase)
+    case 'lengths': return lengths(seed, difficulty, phase)
     case 'word-problem': return wordProblem(seed, difficulty, phase)
     case 'symmetry': return symmetry(seed, difficulty, focus)
     case 'body-views': return bodyViews(seed, difficulty)
@@ -2962,8 +3030,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'probability': return probability(seed, difficulty)
     case 'combinatorics': return combinatorics(seed, difficulty, phase)
     case 'time': return time(seed, difficulty, phase)
-    case 'mass': return measurementQuantity('mass', seed, difficulty)
-    case 'capacity': return measurementQuantity('capacity', seed, difficulty)
+    case 'mass': return measurementQuantity('mass', seed, difficulty, phase)
+    case 'capacity': return measurementQuantity('capacity', seed, difficulty, phase)
     case 'plane-shapes': return planeShapes(seed, difficulty)
     case 'patterns': return patterns(seed, difficulty, phase)
     case 'area': return area(seed, difficulty)

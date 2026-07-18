@@ -1,6 +1,6 @@
 services:
   mathe-reise:
-    image: ghcr.io/hackepeter87/nachhilfe:0.26.0
+    image: ghcr.io/hackepeter87/nachhilfe:0.27.0
     platform: linux/amd64
     ports:
       - "127.0.0.1:8080:8080"

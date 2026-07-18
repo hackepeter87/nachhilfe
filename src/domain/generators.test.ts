@@ -767,6 +767,41 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(formatLength(370)).toBe('3 m 70 cm')
   })
 
+  it('setzt Geld, Länge, Masse und Rauminhalt in sechs fachlich verschiedenen Lernphasen um', () => {
+    const expectedTypes = {
+      money: ['money-identify-coin', 'money-connect-representations', 'money-count-whole-euros', 'money-count-mixed', 'money-read-fluently', 'money-change'],
+      lengths: ['length-find-zero', 'length-connect-units', 'length-read', 'length-convert-guided', 'length-convert-fluent', 'length-calculate'],
+      mass: ['mass-choose-unit', 'mass-connect-units', 'mass-reference', 'mass-complement-guided', 'mass-complement-fluent', 'mass-calculate'],
+      capacity: ['capacity-choose-unit', 'capacity-connect-units', 'capacity-reference', 'capacity-complement-guided', 'capacity-complement-fluent', 'capacity-calculate']
+    } as const
+    const phases = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer'] as const
+    for (const skill of Object.keys(expectedTypes) as Array<keyof typeof expectedTypes>) {
+      for (const [phaseIndex, phase] of phases.entries()) {
+        const typeIds = new Set<string>()
+        for (let seed = 1; seed <= 1_000; seed += 1) {
+          const exercise = generateExercise(skill, seed, 3, undefined, phase)
+          typeIds.add(exercise.typeId)
+          expect(exercise.learningPhase).toBe(phase)
+          expect(exercise.options).toHaveLength(3)
+          expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(3)
+          expect(exercise.options?.filter((option) => option.correct)).toHaveLength(1)
+          expect(exercise.representation?.valueRoles.revealedValues).toEqual([])
+        }
+        expect(typeIds).toEqual(new Set([expectedTypes[skill][phaseIndex]]))
+      }
+    }
+  })
+
+  it('beginnt Größenlernen bei Einheit und Bezugsgröße statt beim Umrechnen', () => {
+    for (const skill of ['money', 'lengths', 'mass', 'capacity'] as const) {
+      const activate = generateExercise(skill, 27, 3, undefined, 'activate')
+      const understand = generateExercise(skill, 27, 3, undefined, 'understand')
+      expect(activate.typeId).not.toMatch(/convert|calculate|change|complement/)
+      expect(understand.typeId).toMatch(/connect/)
+      expect(activate.options?.every((option) => option.misconceptionId || option.correct)).toBe(true)
+    }
+  })
+
   it('erzeugt zweischrittige Sachaufgaben mit zwei passenden Rechnungen', () => {
     const exercises = Array.from({ length: 400 }, (_, index) => generateExercise('word-problem', index + 1, 3))
     const multiStep = exercises.filter((exercise) => exercise.variant.values.secondOperation)

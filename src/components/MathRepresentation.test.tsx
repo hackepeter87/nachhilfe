@@ -496,6 +496,28 @@ describe('MathRepresentation mathematische Rollen', () => {
     expect(container.querySelector('.ruler-labels')).toHaveTextContent('014 cm20 cm')
   })
 
+  it('zeigt beim Bezahlen den bekannten Zahlbetrag, aber nicht das gesuchte Rückgeld', () => {
+    const values = {
+      coins: [200, 200, 200, 200, 200], displayedCents: 1000, changeCents: 370,
+      priceCents: 630, paidCents: 1000, priceLabel: 'Preis', paidLabel: 'Bezahlt'
+    }
+    const knownValues = Object.keys(values).filter((key) => key !== 'changeCents')
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={{
+      kind: 'money', visibility: 'always', label: 'Rückgeld ergänzen', values,
+      valueRoles: { knownValues, unknownValues: ['changeCents'], revealedValues: [] }
+    }} />)
+    expect(container).toHaveTextContent('Preis 6,30 €')
+    expect(container).toHaveTextContent('Bezahlt 10,00 €')
+    expect(container).toHaveTextContent('Rückgeld: ?')
+    expect(container).not.toHaveTextContent('Rückgeld: 3,70 €')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      kind: 'money', visibility: 'always', label: 'Rückgeld ergänzen', values,
+      valueRoles: { knownValues, unknownValues: ['changeCents'], revealedValues: ['changeCents'] }
+    }} />)
+    expect(container).toHaveTextContent('Rückgeld: 3,70 €')
+  })
+
   it('stellt den vollständigen Gruppierungsprozess ohne numerische Gruppenanzahl dar', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{
       kind: 'grouping-model', visibility: 'always', label: 'Vollständiges Gruppierungsmodell',

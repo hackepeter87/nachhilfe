@@ -1,6 +1,6 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.25.0",
+  "catalogVersion": "0.26.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -3237,49 +3237,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Bekannte Münzwerte erkennen.",
+          "goal": "Bekannte Münzwerte an Zahl und Einheit erkennen.",
           "exerciseTypes": [
-            "money:entry"
+            "money:identify-coin"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Münzen, Centwert und Euroschreibweise verbinden.",
+          "goal": "Münzbild, Centwert und Euroschreibweise als denselben Geldwert verbinden.",
           "exerciseTypes": [
-            "money:representation"
+            "money:connect-representations"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
           "goal": "Ganze Eurobeträge mit sichtbaren Münzen bestimmen.",
           "exerciseTypes": [
-            "money:difficulty-1"
+            "money:count-whole-euros"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Gemischte Beträge mit abrufbarer Hilfe lesen.",
+          "goal": "Gemischte Beträge mit abrufbarer Münzdarstellung lesen.",
           "exerciseTypes": [
-            "money:difficulty-2"
+            "money:count-mixed"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Euro- und Centbeträge sicher lesen.",
+          "goal": "Euro- und Centanteil ohne Zeitdruck sicher zusammenführen.",
           "exerciseTypes": [
-            "money:difficulty-2"
+            "money:read-fluently"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Rückgeld in einer Kaufsituation ergänzen.",
+          "goal": "Rückgeld durch Ergänzen in einer Kaufsituation bestimmen.",
           "exerciseTypes": [
-            "money:difficulty-3"
+            "money:change"
           ],
           "releaseStatus": "active"
         }
@@ -3288,6 +3288,18 @@
         "Münzsumme und Betrag stimmen überein.",
         "Euro und Cent sind korrekt formatiert.",
         "Rückgeld ergänzt Preis und Zahlbetrag exakt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "money-unit-confusion",
+          "misconception": "Euro und Cent werden ohne Einheitenbezug wie eine ganze Zahl gelesen.",
+          "feedback": "Lies Zahl und Einheit auf jeder Münze. 100 Cent sind genau 1 Euro."
+        },
+        {
+          "id": "money-direction-confusion",
+          "misconception": "Beim Rückgeld werden Preis und Zahlbetrag vertauscht.",
+          "feedback": "Beginne beim Preis und ergänze vorwärts bis zum bezahlten Betrag."
+        }
       ]
     },
     {
@@ -3388,41 +3400,41 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Nullpunkt und Zentimeterabschnitte erkennen.",
+          "goal": "Nullpunkt und gleich lange Zentimeterabschnitte erkennen.",
           "exerciseTypes": [
-            "lengths:entry"
+            "lengths:find-zero"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Dieselbe Länge in Meter und Zentimeter darstellen.",
+          "goal": "Einen Meter und 100 Zentimeter als dieselbe Länge verbinden.",
           "exerciseTypes": [
-            "lengths:representation"
+            "lengths:connect-units"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Ganze Zentimeter an einer Messstrecke ablesen.",
+          "goal": "Ganze Zentimeter an einer sichtbaren Messstrecke ablesen.",
           "exerciseTypes": [
-            "lengths:difficulty-1"
+            "lengths:read"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Meter und Zentimeter mit abrufbarer Hilfe umwandeln.",
+          "goal": "Meter und Zentimeter mit abrufbarer Einheitenbeziehung umwandeln.",
           "exerciseTypes": [
-            "lengths:difficulty-2"
+            "lengths:convert-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Einfache Einheitenwechsel sicher ausführen.",
+          "goal": "Einfache Einheitenwechsel ohne Zeitdruck sicher ausführen.",
           "exerciseTypes": [
-            "lengths:difficulty-2"
+            "lengths:convert-fluent"
           ],
           "releaseStatus": "active"
         },
@@ -3430,7 +3442,7 @@
           "id": "transfer",
           "goal": "Längen in einem Rechenschritt verbinden oder vergleichen.",
           "exerciseTypes": [
-            "lengths:difficulty-3"
+            "lengths:calculate"
           ],
           "releaseStatus": "active"
         }
@@ -3439,6 +3451,18 @@
         "Messstrecke und Zentimeterwert stimmen überein.",
         "1 Meter wird als 100 Zentimeter verwendet.",
         "Rechenergebnis und Einheit sind konsistent."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "length-zero-counted",
+          "misconception": "Der Nullpunkt einer Skala wird als erster Zentimeter mitgezählt.",
+          "feedback": "Beginne am Strich mit der 0. Der erste Zentimeter ist der Abschnitt von 0 bis 1."
+        },
+        {
+          "id": "length-factor-ten",
+          "misconception": "Beim Wechsel zwischen Meter und Zentimeter wird mit 10 statt mit 100 gerechnet.",
+          "feedback": "Ein Meter besteht aus 100 Zentimeterabschnitten. Nutze deshalb den Faktor 100."
+        }
       ]
     },
     {
@@ -4721,7 +4745,8 @@
       "supportGoal": "Tragfähige Bezugsgrößen für Gramm und Kilogramm nutzen und einfache Massen bis 1 Kilogramm ergänzen oder verrechnen.",
       "misconceptions": [
         "Gramm und Kilogramm werden nur nach der Zahlengröße verglichen.",
-        "1 Kilogramm wird mit 100 statt mit 1000 Gramm gleichgesetzt."
+        "1 Kilogramm wird mit 100 statt mit 1000 Gramm gleichgesetzt.",
+        "Eine Einheit einer anderen Größenart wird gewählt."
       ],
       "hints": [
         "Vergleiche mit 1 Kilogramm = 1000 Gramm.",
@@ -4812,49 +4837,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Gramm und Kilogramm unterscheiden.",
+          "goal": "Gramm und Kilogramm als Einheiten der Masse unterscheiden.",
           "exerciseTypes": [
-            "mass:foundation"
+            "mass:choose-unit"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Bezugsgrößen mit 1 Kilogramm verbinden.",
+          "goal": "Ein Kilogramm und 1000 Gramm als dieselbe Masse verbinden.",
           "exerciseTypes": [
-            "mass:foundation"
+            "mass:connect-units"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Plausible Alltagsmassen auswählen.",
+          "goal": "Plausible Alltagsmassen über Bezugsgrößen auswählen.",
           "exerciseTypes": [
-            "mass:difficulty-1"
+            "mass:reference"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Zu 1 Kilogramm ergänzen.",
+          "goal": "Eine sichtbare Grammmenge zu 1 Kilogramm ergänzen.",
           "exerciseTypes": [
-            "mass:difficulty-2"
+            "mass:complement-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Die Beziehung 1 kg = 1000 g sicher nutzen.",
+          "goal": "Ergänzungen zu 1000 Gramm ohne Zeitdruck sicher bestimmen.",
           "exerciseTypes": [
-            "mass:difficulty-2"
+            "mass:complement-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Massen in einem Rechenschritt verbinden.",
+          "goal": "Zwei bekannte Massen in einem Rechenschritt verbinden.",
           "exerciseTypes": [
-            "mass:difficulty-3"
+            "mass:calculate"
           ],
           "releaseStatus": "active"
         }
@@ -4863,6 +4888,23 @@
         "Bezugsgrößen sind alltagsplausibel.",
         "1 Kilogramm wird als 1000 Gramm verwendet.",
         "Rechenergebnis und Einheit sind konsistent."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "mass-unit-confusion",
+          "misconception": "Gramm und Kilogramm werden nur nach der Zahlengröße verglichen.",
+          "feedback": "Vergleiche erst die Einheit und eine bekannte Bezugsmasse, dann die Maßzahl."
+        },
+        {
+          "id": "mass-quantity-confusion",
+          "misconception": "Eine Einheit einer anderen Größenart wird gewählt.",
+          "feedback": "Gramm und Kilogramm beschreiben Masse; Milliliter und Liter beschreiben Rauminhalt."
+        },
+        {
+          "id": "mass-factor-hundred",
+          "misconception": "1 Kilogramm wird mit 100 statt mit 1000 Gramm gleichgesetzt.",
+          "feedback": "Ein Kilogramm besteht aus 1000 Gramm. Ergänze auf der 1000-Gramm-Skala."
+        }
       ]
     },
     {
@@ -4872,7 +4914,8 @@
       "supportGoal": "Tragfähige Bezugsgrößen für Milliliter und Liter nutzen und einfache Flüssigkeitsmengen bis 1 Liter ergänzen oder verrechnen.",
       "misconceptions": [
         "Milliliter und Liter werden nur nach der Zahlengröße verglichen.",
-        "1 Liter wird mit 100 statt mit 1000 Millilitern gleichgesetzt."
+        "1 Liter wird mit 100 statt mit 1000 Millilitern gleichgesetzt.",
+        "Eine Einheit einer anderen Größenart wird gewählt."
       ],
       "hints": [
         "Vergleiche mit 1 Liter = 1000 Milliliter.",
@@ -4963,49 +5006,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Milliliter und Liter unterscheiden.",
+          "goal": "Milliliter und Liter als Einheiten des Rauminhalts unterscheiden.",
           "exerciseTypes": [
-            "capacity:foundation"
+            "capacity:choose-unit"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Bezugsgrößen mit 1 Liter verbinden.",
+          "goal": "Einen Liter und 1000 Milliliter als denselben Rauminhalt verbinden.",
           "exerciseTypes": [
-            "capacity:foundation"
+            "capacity:connect-units"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Plausible Gefäßinhalte auswählen.",
+          "goal": "Plausible Gefäßinhalte über Bezugsgrößen auswählen.",
           "exerciseTypes": [
-            "capacity:difficulty-1"
+            "capacity:reference"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Zu 1 Liter ergänzen.",
+          "goal": "Eine sichtbare Millilitermenge zu 1 Liter ergänzen.",
           "exerciseTypes": [
-            "capacity:difficulty-2"
+            "capacity:complement-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Die Beziehung 1 l = 1000 ml sicher nutzen.",
+          "goal": "Ergänzungen zu 1000 Millilitern ohne Zeitdruck sicher bestimmen.",
           "exerciseTypes": [
-            "capacity:difficulty-2"
+            "capacity:complement-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Flüssigkeitsmengen in einem Rechenschritt verbinden.",
+          "goal": "Zwei bekannte Flüssigkeitsmengen in einem Rechenschritt verbinden.",
           "exerciseTypes": [
-            "capacity:difficulty-3"
+            "capacity:calculate"
           ],
           "releaseStatus": "active"
         }
@@ -5014,6 +5057,23 @@
         "Bezugsgrößen sind alltagsplausibel.",
         "1 Liter wird als 1000 Milliliter verwendet.",
         "Rechenergebnis und Einheit sind konsistent."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "capacity-unit-confusion",
+          "misconception": "Milliliter und Liter werden nur nach der Zahlengröße verglichen.",
+          "feedback": "Vergleiche erst die Einheit und ein bekanntes Gefäß, dann die Maßzahl."
+        },
+        {
+          "id": "capacity-quantity-confusion",
+          "misconception": "Eine Einheit einer anderen Größenart wird gewählt.",
+          "feedback": "Milliliter und Liter beschreiben Rauminhalt; Gramm und Kilogramm beschreiben Masse."
+        },
+        {
+          "id": "capacity-factor-hundred",
+          "misconception": "1 Liter wird mit 100 statt mit 1000 Millilitern gleichgesetzt.",
+          "feedback": "Ein Liter besteht aus 1000 Millilitern. Ergänze auf der 1000-Milliliter-Skala."
+        }
       ]
     },
     {

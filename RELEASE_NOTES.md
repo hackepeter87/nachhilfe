@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Größen und Messen 0.27.0
+
+- Geld, Längen, Masse und Rauminhalt besitzen nun sechs fachlich verschiedene Lernhandlungen von Einheit und Bezugsgröße bis zum Transfer.
+- Umrechnen ist nicht mehr die erste Lernhandlung. Messstrecke, Münzbild, Waage und Messgefäß zeigen bekannte Informationen und maskieren Messwert, Ergänzung oder Rückgeld.
+- Fehlende Ergänzungsgrundlagen reduzieren Schwierigkeit und Lernphase gemeinsam; eine gespeicherte Transferphase kann die fachliche Sperre nicht mehr umgehen.
+- Katalogisierte Fehlvorstellungsrouten reagieren auf Einheitenwechsel, falsche Größenart, Umrechnungsfaktor, Nullpunkt und Geldrichtung.
+- Katalog 0.26.0 bleibt bei Schema 19. Dezimalzahlen, Millimeter, Kilometer und komplexe Kaufsituationen bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 401 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.27.0-local` beziehungsweise `mathe-reise:local` (`sha256:a262af41fdf579b3dca159ccde00eba904f8c9a32adfb16732ee8775a0c3de0a`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8087`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Mathematisches Modellieren 0.26.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Sachaufgaben wurden als vollständiger Modellierungsprozess auf den Qualitätsstandard ab 0.21 migriert.

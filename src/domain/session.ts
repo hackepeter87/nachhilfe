@@ -177,7 +177,7 @@ function settingsForProgress(progress: SkillProgress | undefined): { difficulty:
 function settingsForSkill(skillId: SkillId, progress: ProgressMap): { difficulty: Difficulty; phase: LearningPhase } {
   const settings = settingsForProgress(progress[skillId])
   if ((skillId === 'mass' || skillId === 'capacity') && !hasReachedPhase(progress['complement-1000'], 'independent-practice')) {
-    return { difficulty: 1, phase: settings.phase }
+    return { difficulty: 1, phase: 'guided-practice' }
   }
   return settings
 }

@@ -657,6 +657,8 @@ export function MathRepresentation({ representation }: { representation: Exercis
       ? values.coins as number[]
       : []
     const displayedCents = Number(values.displayedCents)
+    const hasChange = Number(values.priceCents) > 0 && values.changeCents !== undefined
+    const changeVisible = !hasChange || isValueVisible('changeCents')
     if (coins.length === 0 || coins.reduce((sum, coin) => sum + coin, 0) !== displayedCents) {
       return <div className="math-visual math-visual--error" role="alert">Die Gelddarstellung enthält einen ungültigen Betrag.</div>
     }
@@ -673,6 +675,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
           {coins.map((coin, index) => <span className={`coin coin--${coin}`} key={`${coin}-${index}`}>{coinLabel(coin)}</span>)}
         </div>
         <strong className="money-total">Gesamt: {totalVisible ? amountLabel(displayedCents) : '?'}</strong>
+        {hasChange && <strong className="money-total">Rückgeld: {changeVisible ? amountLabel(Number(values.changeCents)) : '?'}</strong>}
       </div>
     )
   }
