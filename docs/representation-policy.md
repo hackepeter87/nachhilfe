@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.27.0, Katalog 0.26.0, Schema 19.
+Stand: App 0.28.0, Katalog 0.27.0, Schema 19.
 
 ## Verbindliche Regel
 
@@ -31,6 +31,7 @@ Der Renderer lehnt doppelte, überlappende, unvollständige oder unzulässig auf
 | Körperansichten, Rotation, Falten und Symmetrie | Ausgangsdaten und auswählbare Kandidaten waren getrennt. | Gesuchte Transformationen werden als unbekannte Rollen geführt; Antwortoptionen bleiben bewusst prüfbare Kandidaten. |
 | Uhr, Masse und Rauminhalt | Neu in 0.18. | Zeigerpositionen, Start/Ende und bekannte Mengen sind sichtbar; digitale Uhrzeit, Dauer oder gesuchte Menge bleiben visuell und zugänglich unbekannt. |
 | Figuren, Muster, Fläche und Umfang | Neu in 0.19. | Außenform, Folge, belegte Einheitsfelder und Randkanten sind bekannte Lerninformationen; Formname, Fortsetzung und numerischer Wert bleiben unbekannt. |
+| Tabellen und Diagramme | Vergleichswerte wurden zusätzlich über Zahlenaufdrucke an den Säulen sichtbar. | Skala und bekannte Daten bleiben vollständig; aufgedruckte Säulenwerte entfallen und das gesuchte Ergebnis bleibt bis zur Lösung `?`. |
 
 Bei Rundungsaufgaben dürfen die beiden bekannten Nachbarzahlen als Entscheidungsgrundlage sichtbar sein. Die Darstellung entscheidet jedoch nicht, welche davon das Rundungsergebnis ist. Bei Stellenwertaufgaben darf eine bekannte Ziffer sichtbar sein, auch wenn ihre Zahl zufällig dem gesuchten Stellenwert entspricht; maßgeblich ist ihre mathematische Rolle, nicht bloße Zeichengleichheit.
 

@@ -17,9 +17,9 @@ Der Einstieg nutzt sichtbare Beutelinhalte. Danach folgen Münze, Würfel und Dr
 ## 8. Geeignete Darstellungen
 Gleichartig dargestellte Ergebnisfelder machen den Ergebnisraum sichtbar. Zwei geordnete Auswahlmengen und auswählbare Paarungskarten machen das systematische Bilden vollständig beobachtbar; ein bloßes Zählen leerer Rasterzellen reicht nicht. Die gesuchte Klassifikation beziehungsweise Anzahl bleibt numerisch und sprachlich unbekannt.
 ## 9. Lernprogression
-`probability` Stufe 1 klassifiziert sichtbare Beutelinhalte, Stufe 2 überträgt dies auf bekannte Zufallsgeräte und Stufe 3 vergleicht zwei Ereignisse. `combinatorics` Stufe 1 nutzt `2×2`, Stufe 2 `3×2` und Stufe 3 `3×3` mit genau einer ausgeschlossenen Paarung.
+`probability` beginnt mit einem möglichen Ergebnis, vervollständigt danach den Ergebnisraum, klassifiziert Ereignisse geführt und selbstständig, sichert die Begriffe ohne Zeitdruck und verbindet im Transfer Vorhersage und Auswertung eines Einzelversuchs. Die Schwierigkeit führt vom sichtbaren Beutel über bekannte Zufallsgeräte zum Vergleich gleich großer Ergebnisfelder. `combinatorics` nutzt in den Stufen `2×2`, `3×2` und `3×3` mit genau einer ausgeschlossenen Paarung.
 ## 10. Aufgabentypen
-Produktiv sind `classify-bag`, Klassifikationen für Münze, Würfel und Drehscheibe, `compare-events`, `combinations-2x2`, `combinations-3x2` und `combinations-with-exclusion`. Die Kombinationsaufgaben verwenden `build-pairing`: Das Kind markiert jede gültige Paarung und prüft die vollständige Auswahl. Inhalte und Beschriftungen liegen im Katalog; Klassifikation, Zählung und Prüfung bleiben in TypeScript.
+Produktiv sind sechs phasengenaue Wahrscheinlichkeitstypen von `chance-identify-outcome` bis `chance-predict-and-evaluate` sowie die Kombinationsfolgen `combinations-identify-pair`, `combinations-understand-build`, `combinations-2x2`, `combinations-3x2` und `combinations-with-exclusion`. Die Kombinationsaufgaben verwenden `build-pairing`: Das Kind markiert jede gültige Paarung und prüft die vollständige Auswahl. Inhalte und Beschriftungen liegen im Katalog; Klassifikation, Zählung und Prüfung bleiben in TypeScript.
 ## 11. Hilfestufen
 Die erste Hilfe lenkt auf alle sichtbaren Ergebnisse oder auf eine vollständige Zeile des Paarungsrasters. Die zweite erklärt die Begriffe beziehungsweise das paarweise Vorgehen, ohne die richtige Antwort zu nennen.
 ## 12. Remediation
@@ -31,6 +31,6 @@ Niedriger Lernwert, Fehler und lange Abstände erhöhen das Auswahlgewicht. Unte
 ## 15. Erfolgskriterien
 Alle drei Klassifikationen und beide Vergleichsrichtungen werden erzeugt, jede Aufgabe besitzt genau eine Lösung, Ergebnisfelder sind gleichartig, jede Paarung wird höchstens einmal gezählt und eine Ausnahme ist eindeutig markiert.
 ## 16. Grenzen der aktuellen Umsetzung
-Es gibt keine Bruchwahrscheinlichkeiten, empirischen Versuchstabellen, mehrstufigen Zufallsversuche, Baumdiagramme oder großen kombinatorischen Räume. Würfelbilder verwenden Ziffern statt möglicherweise missverständlicher Augenbilder.
+Es gibt keine Bruchwahrscheinlichkeiten, langfristigen empirischen Versuchstabellen, mehrstufigen Zufallsversuche, Baumdiagramme oder großen kombinatorischen Räume. Würfelbilder verwenden Ziffern statt möglicherweise missverständlicher Augenbilder.
 ## 17. Punkte für die Gesamtprüfung
-In Version 0.20 sind Begriffswahl, Verständlichkeit der Ergebnisfelder, Erkennbarkeit der Ausnahme und Bedienbarkeit auf einem echten iPhone extern zu prüfen. Eine Lehrkraftfreigabe oder Unterrichtserprobung liegt nicht vor.
+Begriffswahl, Verständlichkeit der Ergebnisfelder, Erkennbarkeit der Ausnahme und Bedienbarkeit auf einem echten iPhone sind in der externen Gesamtprüfung zu untersuchen. Eine Lehrkraftfreigabe oder Unterrichtserprobung liegt nicht vor.

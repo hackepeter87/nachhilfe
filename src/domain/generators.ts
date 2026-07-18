@@ -2707,8 +2707,8 @@ function dataDisplayRepresentation(
   label: string,
   hiddenIndex = -1,
   total = dataValues.reduce((sum, value) => sum + value, 0),
-  unknownValues: string[] = [],
-  scaleMax = Math.max(...dataValues)
+  scaleMax = Math.max(...dataValues),
+  answerLabel?: string
 ): ExerciseRepresentation {
   const displayedValues = hiddenIndex >= 0
     ? dataValues.map((value, index) => index === hiddenIndex ? -1 : value)
@@ -2728,14 +2728,18 @@ function dataDisplayRepresentation(
     scaleMax
   }
   if (hiddenIndex >= 0) values.missingValue = dataValues[hiddenIndex]!
-  const hiddenRoles = hiddenIndex >= 0 ? [...unknownValues, 'missingValue'] : unknownValues
+  if (answerLabel !== undefined) values.answerLabel = answerLabel
+  const hiddenRoles = [
+    ...(hiddenIndex >= 0 ? ['missingValue'] : []),
+    ...(answerLabel !== undefined ? ['answerLabel'] : [])
+  ]
   return {
     kind: 'data-display',
     visibility: 'always',
     label,
     values,
     valueRoles: {
-      knownValues: Object.keys(values).filter((key) => key !== 'missingValue'),
+      knownValues: Object.keys(values).filter((key) => !hiddenRoles.includes(key)),
       unknownValues: hiddenRoles,
       revealedValues: []
     }
@@ -2755,7 +2759,7 @@ function dataExerciseValues(template: DataSetTemplate, values: number[], targetI
   }
 }
 
-function readTables(seed: number, difficulty: Difficulty): Exercise {
+function readTables(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().dataAndCharts
   const template = pick(random, content.templates)
@@ -2763,14 +2767,45 @@ function readTables(seed: number, difficulty: Difficulty): Exercise {
   const targetIndex = integer(random, 0, 2)
   const generatedValues = dataExerciseValues(template, dataValues, targetIndex)
   const generatedContent = contentFor('read-tables', generatedValues, difficulty)
+  const dataPhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
 
-  if (difficulty === 1) {
+  if (dataPhase === 'activate') {
+    const answer = template.categories[targetIndex]!
+    return withMetadata({
+      ...base('read-tables', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: 'Welche Angabe in der Tabelle ist eine Kategorie und keine Anzahl?',
+      typeId: 'table-identify-category', subskillId: 'table-category-value', answerMode: 'choice', correctAnswer: answer,
+      options: textOptions(random, answer, [
+        { value: String(dataValues[targetIndex]), misconception: 'Anzahl und Kategorie werden verwechselt.', misconceptionId: 'data-category-value' },
+        { value: content.totalLabel, misconception: 'Überschrift und Kategorie werden verwechselt.', misconceptionId: 'data-category-value' }
+      ]),
+      representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`)
+    })
+  }
+
+  if (dataPhase === 'understand') {
+    const answer = `${template.categories[targetIndex]}: ${dataValues[targetIndex]} ${template.unitLabel}`
+    const wrongCategory = (targetIndex + 1) % 3
+    const wrongValue = dataValues.find((value, index) => index !== targetIndex && value !== dataValues[targetIndex]) ?? dataValues[targetIndex]! + 1
+    return withMetadata({
+      ...base('read-tables', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: 'Welche Aussage liest eine Tabellenzeile richtig von links nach rechts?',
+      typeId: 'table-connect-row', subskillId: 'table-category-value', answerMode: 'choice', correctAnswer: answer,
+      options: textOptions(random, answer, [
+        { value: `${template.categories[targetIndex]}: ${wrongValue} ${template.unitLabel}`, misconception: content.distractorFeedback.wrongRow, misconceptionId: 'data-wrong-row' },
+        { value: `${template.categories[wrongCategory]}: ${dataValues[targetIndex]} ${template.unitLabel}`, misconception: content.distractorFeedback.wrongRow, misconceptionId: 'data-wrong-row' }
+      ]),
+      representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`)
+    })
+  }
+
+  if (dataPhase === 'guided-practice') {
     const answer = dataValues[targetIndex]!
     return withMetadata({
       ...base('read-tables', seed, difficulty, generatedValues),
       ...generatedContent,
       prompt: renderCatalogText(content.prompts.tableRead, generatedValues),
-      typeId: 'table-read',
+      typeId: 'table-read-guided',
       subskillId: 'table-read-value',
       answerMode: 'choice',
       correctAnswer: String(answer),
@@ -2783,18 +2818,32 @@ function readTables(seed: number, difficulty: Difficulty): Exercise {
   const smallest = Math.min(...dataValues)
   const largestIndex = dataValues.indexOf(largest)
   const smallestIndex = dataValues.indexOf(smallest)
-  if (difficulty === 2) {
+  if (dataPhase === 'independent-practice') {
     const answer = largest - smallest
     return withMetadata({
       ...base('read-tables', seed, difficulty, { ...generatedValues, answer, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
       ...generatedContent,
       prompt: renderCatalogText(content.prompts.tallyCompare, { ...generatedValues, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
-      typeId: 'tally-compare',
+      typeId: 'tally-compare-independent',
       subskillId: 'tally-compare-values',
       answerMode: 'choice',
       correctAnswer: String(answer),
       options: numberOptions(random, answer, createDataDistractors(answer, [largest, smallest]).map((value) => ({ value, misconception: content.distractorFeedback.wrongDifference }))),
-      representation: dataDisplayRepresentation('tally', template, dataValues, `${content.displayLabels.tally}: ${template.title}`, -1, largest + smallest, ['difference'])
+      representation: dataDisplayRepresentation('tally', template, dataValues, `${content.displayLabels.tally}: ${template.title}`, -1, largest + smallest, Math.max(...dataValues), String(answer))
+    })
+  }
+
+  if (dataPhase === 'automate') {
+    const largest = Math.max(...dataValues)
+    const answer = template.categories[dataValues.indexOf(largest)]!
+    return withMetadata({
+      ...base('read-tables', seed, difficulty, { ...generatedValues, largest }), ...generatedContent,
+      prompt: `Welche Kategorie hat mit ${largest} ${template.unitLabel} den größten Wert?`,
+      typeId: 'table-find-maximum', subskillId: 'table-compare-values', answerMode: 'choice', correctAnswer: answer,
+      options: textOptions(random, answer, template.categories.filter((category) => category !== answer).map((value) => ({
+        value, misconception: content.distractorFeedback.wrongRow, misconceptionId: 'data-wrong-row'
+      }))),
+      representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`)
     })
   }
 
@@ -2804,16 +2853,16 @@ function readTables(seed: number, difficulty: Difficulty): Exercise {
     ...base('read-tables', seed, difficulty, { ...generatedValues, total }),
     ...generatedContent,
     prompt: renderCatalogText(content.prompts.tableMissing, { ...generatedValues, total }),
-    typeId: 'table-missing',
+    typeId: 'table-complete-transfer',
     subskillId: 'table-complete-total',
     answerMode: 'choice',
     correctAnswer: String(answer),
     options: numberOptions(random, answer, createDataDistractors(answer, dataValues).map((value) => ({ value, misconception: content.distractorFeedback.wrongCompletion }))),
-    representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, targetIndex, total, ['missing-value'])
+    representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, targetIndex, total)
   })
 }
 
-function readCharts(seed: number, difficulty: Difficulty): Exercise {
+function readCharts(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().dataAndCharts
   const template = pick(random, content.templates)
@@ -2821,14 +2870,43 @@ function readCharts(seed: number, difficulty: Difficulty): Exercise {
   const targetIndex = integer(random, 0, 2)
   const generatedValues = dataExerciseValues(template, dataValues, targetIndex)
   const generatedContent = contentFor('read-charts', generatedValues, difficulty)
+  const chartPhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
 
-  if (difficulty === 1) {
+  if (chartPhase === 'activate') {
+    const answer = `1 ${template.unitLabel}`
+    return withMetadata({
+      ...base('read-charts', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: `Was bedeutet ein Bildpunkt in diesem Diagramm?`,
+      typeId: 'pictogram-identify-key', subskillId: 'chart-symbol-key', answerMode: 'choice', correctAnswer: answer,
+      options: textOptions(random, answer, [
+        { value: `2 ${template.unitLabel}`, misconception: 'Der Bildschlüssel wird verdoppelt.', misconceptionId: 'chart-key-scale' },
+        { value: `5 ${template.unitLabel}`, misconception: 'Der Bildschlüssel wird als Fünfergruppe gelesen.', misconceptionId: 'chart-key-scale' }
+      ]),
+      representation: dataDisplayRepresentation('pictogram', template, dataValues, `${content.displayLabels.pictogram}: ${template.title}`)
+    })
+  }
+
+  if (chartPhase === 'understand') {
+    const largest = Math.max(...dataValues)
+    const answer = template.categories[dataValues.indexOf(largest)]!
+    return withMetadata({
+      ...base('read-charts', seed, difficulty, { ...generatedValues, largest }), ...generatedContent,
+      prompt: 'Welche Kategorie gehört zur höchsten Säule?',
+      typeId: 'bar-connect-height', subskillId: 'bar-scale-reading', answerMode: 'choice', correctAnswer: answer,
+      options: textOptions(random, answer, template.categories.filter((category) => category !== answer).map((value) => ({
+        value, misconception: content.distractorFeedback.wrongBarDifference, misconceptionId: 'chart-category-height'
+      }))),
+      representation: dataDisplayRepresentation('bar', template, dataValues, `${content.displayLabels.bar}: ${template.title}`)
+    })
+  }
+
+  if (chartPhase === 'guided-practice') {
     const answer = dataValues[targetIndex]!
     return withMetadata({
       ...base('read-charts', seed, difficulty, generatedValues),
       ...generatedContent,
       prompt: renderCatalogText(content.prompts.pictogramRead, generatedValues),
-      typeId: 'pictogram-read',
+      typeId: 'pictogram-read-guided',
       subskillId: 'pictogram-read-one-to-one',
       answerMode: 'choice',
       correctAnswer: String(answer),
@@ -2841,18 +2919,29 @@ function readCharts(seed: number, difficulty: Difficulty): Exercise {
   const smallest = Math.min(...dataValues)
   const largestIndex = dataValues.indexOf(largest)
   const smallestIndex = dataValues.indexOf(smallest)
-  if (difficulty === 2) {
+  if (chartPhase === 'independent-practice') {
     const answer = largest - smallest
     return withMetadata({
       ...base('read-charts', seed, difficulty, { ...generatedValues, answer, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
       ...generatedContent,
       prompt: renderCatalogText(content.prompts.barCompare, { ...generatedValues, larger: template.categories[largestIndex]!, smaller: template.categories[smallestIndex]! }),
-      typeId: 'bar-compare',
+      typeId: 'bar-compare-independent',
       subskillId: 'bar-compare-values',
       answerMode: 'choice',
       correctAnswer: String(answer),
       options: numberOptions(random, answer, createDataDistractors(answer, [largest, smallest]).map((value) => ({ value, misconception: content.distractorFeedback.wrongBarDifference }))),
-      representation: dataDisplayRepresentation('bar', template, dataValues, `${content.displayLabels.bar}: ${template.title}`, -1, largest + smallest, ['difference'])
+      representation: dataDisplayRepresentation('bar', template, dataValues, `${content.displayLabels.bar}: ${template.title}`, -1, largest + smallest, Math.max(...dataValues), String(answer))
+    })
+  }
+
+  if (chartPhase === 'automate') {
+    const answer = dataValues[targetIndex]!
+    return withMetadata({
+      ...base('read-charts', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: `Welchen Wert zeigt die Säule „${template.categories[targetIndex]}“ auf der Skala?`,
+      typeId: 'bar-read-scale', subskillId: 'bar-scale-reading', answerMode: 'choice', correctAnswer: String(answer),
+      options: numberOptions(random, answer, createDataDistractors(answer, dataValues).map((value) => ({ value, misconception: content.distractorFeedback.wrongBarDifference, misconceptionId: 'chart-key-scale' }))),
+      representation: dataDisplayRepresentation('bar', template, dataValues, `${content.displayLabels.bar}: ${template.title}`)
     })
   }
 
@@ -2877,18 +2966,18 @@ function readCharts(seed: number, difficulty: Difficulty): Exercise {
     value: candidate.value,
     label: `Diagramm ${String.fromCharCode(65 + index)}`,
     misconception: candidate.misconception,
-    representation: dataDisplayRepresentation('bar', template, candidate.values, `Diagramm ${String.fromCharCode(65 + index)} zu ${template.title}`, -1, candidate.values.reduce((sum, value) => sum + value, 0), [], sharedScaleMaximum)
+    representation: dataDisplayRepresentation('bar', template, candidate.values, `Diagramm ${String.fromCharCode(65 + index)} zu ${template.title}`, -1, candidate.values.reduce((sum, value) => sum + value, 0), sharedScaleMaximum)
   }))
   return withMetadata({
     ...base('read-charts', seed, difficulty, generatedValues),
     ...generatedContent,
     prompt: content.prompts.representationMatch,
-    typeId: 'representation-match',
+    typeId: 'chart-representation-transfer',
     subskillId: 'table-to-bar-match',
     answerMode: 'choice',
     correctAnswer: 'same',
     options,
-    representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, -1, dataValues.reduce((sum, value) => sum + value, 0), ['matching-display'])
+    representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, -1, dataValues.reduce((sum, value) => sum + value, 0))
   })
 }
 
@@ -2907,24 +2996,71 @@ function chanceRepresentation(template: ProbabilityTemplate): ExerciseRepresenta
   }
 }
 
-function probability(seed: number, difficulty: Difficulty): Exercise {
+function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().chanceContent
-  const templates = content.probabilityTemplates.filter((template) => template.difficulty === difficulty)
+  const chancePhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
+  const templateDifficulty: Difficulty = chancePhase === 'activate' || chancePhase === 'guided-practice' ? 1 : chancePhase === 'understand' || chancePhase === 'independent-practice' || chancePhase === 'automate' ? 2 : 3
+  const templates = content.probabilityTemplates.filter((template) => template.difficulty === templateDifficulty)
   const template = pick(random, templates)
   const generatedValues = { templateId: template.id, experimentType: template.experimentType, outcomeCount: template.outcomes.length }
   const generatedContent = contentFor('probability', generatedValues, difficulty)
-  const correctAnswer = difficulty === 3
+  if (chancePhase === 'activate') {
+    const outcomes = [...new Set(template.outcomes)]
+    const correctAnswer = outcomes[0]!
+    const absent = ['gelb', 'grün', 'schwarz', 'weiß'].filter((value) => !outcomes.includes(value)).slice(0, 2)
+    return withMetadata({
+      ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: 'Welches Ergebnis ist im sichtbaren Ergebnisraum enthalten?', typeId: 'chance-identify-outcome',
+      subskillId: 'chance-outcome-space', answerMode: 'choice', correctAnswer,
+      options: textOptions(random, correctAnswer, absent.map((value) => ({ value, misconception: 'Ein nicht vorhandenes Ergebnis wird angenommen.', misconceptionId: 'chance-outcome-space' }))),
+      representation: chanceRepresentation(template)
+    })
+  }
+  if (chancePhase === 'understand') {
+    const outcomes = [...new Set(template.outcomes)]
+    const correctAnswer = outcomes.join(', ')
+    return withMetadata({
+      ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: 'Welche Liste enthält alle möglichen Ergebnisse dieses Versuchs?', typeId: 'chance-complete-outcome-space',
+      subskillId: 'chance-outcome-space', answerMode: 'choice', correctAnswer,
+      options: textOptions(random, correctAnswer, [
+        { value: outcomes.slice(0, Math.max(1, outcomes.length - 1)).join(', '), misconception: 'Ein mögliches Ergebnis wird ausgelassen.', misconceptionId: 'chance-outcome-space' },
+        { value: [...outcomes, 'anderes Ergebnis'].join(', '), misconception: 'Ein unmögliches Ergebnis wird ergänzt.', misconceptionId: 'chance-outcome-space' }
+      ]), representation: chanceRepresentation(template)
+    })
+  }
+  const correctAnswer = templateDifficulty === 3
     ? compareEventFrequency(template.outcomes, template.eventA, template.eventB ?? [])
     : classifyEvent(template.outcomes, template.eventA)
-  const labels = difficulty === 3 ? content.comparisonLabels : content.classificationLabels
+  const labels = templateDifficulty === 3 ? content.comparisonLabels : content.classificationLabels
+  const options = shuffle(random, Object.entries(labels).map(([value, label]) => ({
+    value, label, misconception: value === correctAnswer ? undefined : templateDifficulty === 3 ? 'Häufigkeiten werden ohne vollständigen Ergebnisraum verglichen.' : 'Ein Einzelereignis wird mit der Möglichkeit des Ereignisses verwechselt.',
+    misconceptionId: value === correctAnswer ? undefined : templateDifficulty === 3 ? 'chance-frequency-count' : 'chance-single-result'
+  })))
+  if (chancePhase === 'transfer') {
+    const evaluationAnswer = 'Ein einzelnes Ergebnis ändert die Verteilung der gleich großen Felder nicht.'
+    const steps: ExerciseStep[] = [
+      { id: 'prediction', prompt: template.question, interaction: 'select', options, correctAnswer, errorFeedback: generatedContent.errorFeedback, successFeedback: 'Die Vorhersage berücksichtigt alle gleich großen Felder.' },
+      { id: 'evaluation', prompt: `Einmal erscheint „${template.outcomes[0]}“. Was folgt daraus für den nächsten Versuch?`, interaction: 'select',
+        options: textOptions(random, evaluationAnswer, [
+          { value: 'Beim nächsten Versuch muss ein anderes Ergebnis erscheinen.', misconception: 'Aus einem Einzelereignis wird eine feste Folge abgeleitet.', misconceptionId: 'chance-single-result' },
+          { value: 'Dieses Ergebnis ist nun beim nächsten Versuch unmöglich.', misconception: 'Einzelereignis und Wahrscheinlichkeit werden verwechselt.', misconceptionId: 'chance-single-result' }
+        ]), correctAnswer: evaluationAnswer, errorFeedback: 'Ein einzelner Versuch verändert die gleich großen Felder nicht.', successFeedback: 'Du trennst das beobachtete Einzelereignis von der Wahrscheinlichkeit.' }
+    ]
+    return withMetadata({
+      ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: 'Triff zuerst eine Vorhersage und werte danach einen einzelnen Versuch aus.', typeId: 'chance-predict-and-evaluate',
+      subskillId: 'chance-compare-frequency', answerMode: 'guided-choice', correctAnswer, steps, representation: chanceRepresentation(template)
+    })
+  }
   return withMetadata({
     ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
     prompt: template.question,
-    typeId: difficulty === 3 ? 'compare-events' : `classify-${template.experimentType}`,
-    subskillId: difficulty === 1 ? 'chance-classify-visible' : difficulty === 2 ? 'chance-classify-experiment' : 'chance-compare-frequency',
+    typeId: chancePhase === 'guided-practice' ? 'chance-classify-guided' : chancePhase === 'independent-practice' ? 'chance-classify-independent' : 'chance-classify-fluent',
+    subskillId: chancePhase === 'guided-practice' ? 'chance-classify-visible' : 'chance-classify-experiment',
     answerMode: 'choice', correctAnswer,
-    options: shuffle(random, Object.entries(labels).map(([value, label]) => ({ value, label }))),
+    options,
     representation: chanceRepresentation(template)
   })
 }
@@ -3025,9 +3161,9 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'body-views': return bodyViews(seed, difficulty)
     case 'cube-rotation': return cubeRotation(seed, difficulty, focus)
     case 'folding': return folding(seed, difficulty, focus)
-    case 'read-tables': return readTables(seed, difficulty)
-    case 'read-charts': return readCharts(seed, difficulty)
-    case 'probability': return probability(seed, difficulty)
+    case 'read-tables': return readTables(seed, difficulty, phase)
+    case 'read-charts': return readCharts(seed, difficulty, phase)
+    case 'probability': return probability(seed, difficulty, phase)
     case 'combinatorics': return combinatorics(seed, difficulty, phase)
     case 'time': return time(seed, difficulty, phase)
     case 'mass': return measurementQuantity('mass', seed, difficulty, phase)

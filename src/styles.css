@@ -736,12 +736,16 @@ p {
 .pictogram-row > span:last-child { display: flex; flex-wrap: wrap; gap: 5px; }
 .pictogram-row i { width: 13px; height: 13px; border: 2px solid #2876a8; border-radius: 50%; background: #d8edf6; }
 .data-display small { color: #557060; font-weight: 750; text-align: center; }
-.bar-chart { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 8px; height: 150px; padding: 8px 6px 0; border-bottom: 3px solid #315d45; }
-.bar-chart-column { display: grid; grid-template-rows: 20px minmax(0, 1fr) 28px; align-items: end; height: 100%; min-width: 0; text-align: center; }
-.bar-chart-column > span { align-self: start; font-size: .72rem; font-weight: 850; }
+.bar-chart-frame { display: grid; grid-template-columns: 28px minmax(0, 1fr); min-width: 0; }
+.bar-chart-scale { display: flex; flex-direction: column; justify-content: space-between; height: 150px; padding: 0 3px 28px 0; color: #466357; font-size: .58rem; text-align: right; }
+.bar-chart-scale > i { position: relative; display: block; height: 0; border-top: 1px solid #c8d7cf; font-style: normal; }
+.bar-chart-scale > i > span { position: absolute; top: -.55em; right: 2px; background: #fff; }
+.bar-chart { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 8px; height: 150px; padding: 0 6px; border-bottom: 3px solid #315d45; background: repeating-linear-gradient(to top, transparent 0, transparent calc(100% / var(--bar-steps) - 1px), #e3ebe7 calc(100% / var(--bar-steps) - 1px), #e3ebe7 calc(100% / var(--bar-steps))); }
+.bar-chart-column { display: grid; grid-template-rows: minmax(0, 1fr) 28px; align-items: end; height: 100%; min-width: 0; text-align: center; }
 .bar-chart-column > i { display: block; align-self: end; width: min(78%, 48px); max-height: 100%; min-height: 8px; margin-inline: auto; border: 1px solid #23664e; background: #8fc5ae; }
 .bar-chart-column > b { align-self: center; overflow: hidden; font-size: .66rem; line-height: 1.05; text-overflow: ellipsis; white-space: nowrap; }
 .model-option .bar-chart { height: 112px; gap: 3px; }
+.model-option .bar-chart-scale { height: 112px; }
 .model-option .bar-chart-column > b { font-size: .58rem; }
 
 .chance-display, .combination-display { display: grid; gap: 12px; text-align: center; }

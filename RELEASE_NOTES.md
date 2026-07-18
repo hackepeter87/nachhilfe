@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Daten und Wahrscheinlichkeit 0.28.0
+
+- Tabellen, Diagramme und Wahrscheinlichkeit besitzen nun sechs fachlich verschiedene Lernhandlungen vom Erkennen der Datenrollen beziehungsweise des Ergebnisraums bis zum Transfer.
+- Säulendiagramme verwenden eine sichtbare ganzzahlige Skala und keine aufgedruckten Werte. Gesuchte Differenzen bleiben bis zur richtigen Antwort maskiert.
+- Der Darstellungswechsel prüft Kategorie und Wert über Tabelle und Diagramm hinweg; Wahrscheinlichkeit verbindet im Transfer eine Vorhersage mit der angemessenen Auswertung eines einzelnen Versuchs.
+- Katalogisierte Fehlvorstellungsrouten reagieren auf Kategorie-Wert-Verwechslungen, falsche Zeilen, Symbolschlüssel, Säulenhöhe, unvollständige Ergebnisräume und die Überdeutung eines Einzelversuchs.
+- Katalog 0.27.0 bleibt bei Schema 19. Freie Datenerhebungen, Kreisdiagramme, manipulierte Achsen und Bruchwahrscheinlichkeiten bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 406 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.28.0-local` beziehungsweise `mathe-reise:local` (`sha256:e880b9929ab22199069b82759af2e2b2b7befdb5e6630e37884c1edadb370df3`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8088`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Größen und Messen 0.27.0
 
 - Geld, Längen, Masse und Rauminhalt besitzen nun sechs fachlich verschiedene Lernhandlungen von Einheit und Bezugsgröße bis zum Transfer.

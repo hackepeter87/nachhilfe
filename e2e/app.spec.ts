@@ -159,9 +159,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.26.0',
+    catalogVersion: '0.27.0',
     schemaVersion: 19,
-    appVersion: '0.27.0'
+    appVersion: '0.28.0'
   })
 
   await page.reload()
@@ -243,15 +243,21 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
     if (await chance.isVisible().catch(() => false)) {
       seen.add('probability')
       await expect(chance).toHaveAttribute('aria-label', /Mögliche gleich große Felder oder Ergebnisse/)
-      const outcomes = await chance.locator('.chance-outcomes span').allTextContents()
+      const outcomes = (await chance.locator('.chance-outcomes span').allTextContents()).map((outcome) => outcome.replace(/^[□○●]\s*/, '').trim())
       expect(outcomes.length).toBeGreaterThanOrEqual(2)
       const prompt = await page.locator('.exercise-heading h2').textContent()
-      const event = ['rot', 'blau', 'grün', 'gelb'].find((color) => prompt?.toLowerCase().includes(color))
-      if (!event) throw new Error('Das Ereignis der Beutelaufgabe ist nicht lesbar.')
-      const matches = outcomes.filter((outcome) => outcome.toLowerCase().includes(event)).length
-      const answer = matches === 0 ? 'unmöglich' : matches === outcomes.length ? 'sicher' : 'möglich'
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wahrscheinlichkeit-375x812.png'), fullPage: true })
-      await page.getByRole('button', { name: answer, exact: true }).click()
+      if (prompt?.includes('im sichtbaren Ergebnisraum enthalten')) {
+        await page.getByRole('button', { name: outcomes[0]!, exact: true }).click()
+      } else if (prompt?.includes('alle möglichen Ergebnisse')) {
+        await page.getByRole('button', { name: [...new Set(outcomes)].join(', '), exact: true }).click()
+      } else {
+        const event = ['rot', 'blau', 'grün', 'gelb'].find((color) => prompt?.toLowerCase().includes(color))
+        if (!event) throw new Error('Das Ereignis der Zufallsaufgabe ist nicht lesbar.')
+        const matches = outcomes.filter((outcome) => outcome.toLowerCase().includes(event)).length
+        const answer = matches === 0 ? 'unmöglich' : matches === outcomes.length ? 'sicher' : 'möglich'
+        await page.getByRole('button', { name: answer, exact: true }).click()
+      }
     } else {
       seen.add('combinatorics')
       await expect(combinations).toHaveAttribute('aria-label', /Die Anzahl bleibt unbekannt/)

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.26.0",
+  "catalogVersion": "0.27.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -3939,9 +3939,10 @@
       "id": "read-tables",
       "label": "Tabellen und Strichlisten",
       "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
-      "supportGoal": "Daten aus übersichtlichen Tabellen und Strichlisten entnehmen, vergleichen und einen fehlenden Wert aus einer bekannten Gesamtzahl bestimmen.",
+      "supportGoal": "Kategorien und Werte als zusammengehörige Daten verstehen, Tabellen und Strichlisten aktiv lesen, vergleichen und aus einer Gesamtzahl vervollständigen.",
       "misconceptions": [
-        "Zeile und Spalte werden vertauscht.",
+        "Eine Kategorie wird mit ihrem Zahlenwert verwechselt.",
+        "Eine Tabellenzeile wird nicht als zusammengehörige Information gelesen.",
         "Bei einer Strichliste wird der Fünferblock als vier einzelne Striche gelesen.",
         "Beim Vergleich wird die größere Anzahl genannt statt des Unterschieds.",
         "Ein fehlender Tabellenwert wird geschätzt, ohne die bekannte Gesamtzahl zu nutzen."
@@ -4035,49 +4036,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Kategorien und Werte in einer Tabelle benennen.",
+          "goal": "Kategorie und Zahlenwert als verschiedene Datenrollen unterscheiden.",
           "exerciseTypes": [
-            "read-tables:read"
+            "read-tables:table-identify-category"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Eine Tabellenzeile als zusammengehörige Information verstehen.",
+          "goal": "Kategorie und Häufigkeit innerhalb einer Tabellenzeile verbinden.",
           "exerciseTypes": [
-            "read-tables:read"
+            "read-tables:table-connect-row"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Direkte Werte mit sichtbarer Tabelle ablesen.",
+          "goal": "Einen benannten Tabellenwert mit sichtbarer Zeilenstruktur ablesen.",
           "exerciseTypes": [
-            "read-tables:read"
+            "read-tables:table-read-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Strichlisten sicher lesen und Werte vergleichen.",
+          "goal": "Strichlisten selbstständig vergleichen und den Unterschied bestimmen.",
           "exerciseTypes": [
-            "read-tables:compare"
+            "read-tables:tally-compare-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Tabellen- und Strichlistenwerte zügig zuordnen.",
+          "goal": "Größte Häufigkeiten ohne Zeitdruck sicher einer Kategorie zuordnen.",
           "exerciseTypes": [
-            "read-tables:compare"
+            "read-tables:table-find-maximum"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Einen fehlenden Wert aus einer Gesamtzahl begründet ergänzen.",
+          "goal": "Einen verdeckten Tabellenwert aus bekannten Werten und Gesamtzahl ergänzen.",
           "exerciseTypes": [
-            "read-tables:transfer"
+            "read-tables:table-complete-transfer"
           ],
           "releaseStatus": "active"
         }
@@ -4087,13 +4088,40 @@
         "Fünferblöcke in Strichlisten werden korrekt gebündelt.",
         "Vergleichsfragen besitzen genau einen positiven Unterschied.",
         "Fehlende Werte sind aus Gesamtzahl und bekannten Werten eindeutig bestimmbar."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "data-category-value",
+          "misconception": "Eine Kategorie wird mit ihrem Zahlenwert verwechselt.",
+          "feedback": "Die Kategorie sagt, worum es geht. Der Wert sagt, wie viele dazu gehören."
+        },
+        {
+          "id": "data-wrong-row",
+          "misconception": "Eine Tabellenzeile wird nicht als zusammengehörige Information gelesen.",
+          "feedback": "Bleibe in einer Zeile: Lies zuerst die Kategorie und dann den Wert direkt daneben."
+        },
+        {
+          "id": "data-tally-five",
+          "misconception": "Bei einer Strichliste wird der Fünferblock als vier einzelne Striche gelesen.",
+          "feedback": "Der schräge fünfte Strich bündelt vier Striche zu einer Fünfergruppe."
+        },
+        {
+          "id": "data-wrong-difference",
+          "misconception": "Beim Vergleich wird die größere Anzahl genannt statt des Unterschieds.",
+          "feedback": "Gesucht ist nicht der größere Wert, sondern der Abstand zwischen größerem und kleinerem Wert."
+        },
+        {
+          "id": "data-missing-total",
+          "misconception": "Ein fehlender Tabellenwert wird geschätzt, ohne die bekannte Gesamtzahl zu nutzen.",
+          "feedback": "Addiere die sichtbaren Werte und ergänze diese Summe bis zur Gesamtzahl."
+        }
       ]
     },
     {
       "id": "read-charts",
       "label": "Bild- und Säulendiagramme",
       "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
-      "supportGoal": "Häufigkeiten aus Bild- und Säulendiagrammen lesen, vergleichen und eine zu denselben Daten passende Darstellung auswählen.",
+      "supportGoal": "Symbolschlüssel, Kategorien, Säulenhöhen und Skalen als zusammengehörige Daten lesen sowie zwischen Tabelle und Diagramm wechseln.",
       "misconceptions": [
         "Ein Symbol wird mit einer beliebigen statt der angegebenen Einheit verbunden.",
         "Die Höhe einer Säule wird nach ihrer Fläche statt an der Skala gelesen.",
@@ -4190,49 +4218,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Kategorien und Symbolschlüssel benennen.",
+          "goal": "Den sichtbaren Symbolschlüssel eines Bilddiagramms lesen.",
           "exerciseTypes": [
-            "read-charts:read"
+            "read-charts:pictogram-identify-key"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Symbolzahl beziehungsweise Säulenhöhe als Häufigkeit verstehen.",
+          "goal": "Kategorie und Säulenhöhe als zusammengehörige Häufigkeit verbinden.",
           "exerciseTypes": [
-            "read-charts:read"
+            "read-charts:bar-connect-height"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Werte aus einem Bilddiagramm ablesen.",
+          "goal": "Einen Wert aus einem Bilddiagramm mit Schlüssel 1 zu 1 ablesen.",
           "exerciseTypes": [
-            "read-charts:read"
+            "read-charts:pictogram-read-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Säulenwerte vergleichen und Unterschiede bestimmen.",
+          "goal": "Zwei Säulenwerte an einer Skala vergleichen.",
           "exerciseTypes": [
-            "read-charts:compare"
+            "read-charts:bar-compare-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Bild- und Säulendiagramme sicher lesen.",
+          "goal": "Säulenwerte an einer ganzzahligen Skala sicher ablesen.",
           "exerciseTypes": [
-            "read-charts:compare"
+            "read-charts:bar-read-scale"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Eine passende Darstellung zu gegebenen Tabellendaten auswählen.",
+          "goal": "Zu einer Tabelle das einzige vollständig passende Diagramm auswählen.",
           "exerciseTypes": [
-            "read-charts:transfer"
+            "read-charts:chart-representation-transfer"
           ],
           "releaseStatus": "active"
         }
@@ -4242,17 +4270,42 @@
         "Säulendiagramme beginnen bei 0 und verwenden eine gleichmäßige ganzzahlige Skala.",
         "Vergleichsfragen besitzen genau einen eindeutigen Unterschied.",
         "Bei Darstellungswechseln stimmt genau eine Option in allen Kategorien überein."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "chart-key-scale",
+          "misconception": "Ein Symbol wird mit einer beliebigen statt der angegebenen Einheit verbunden.",
+          "feedback": "Lies zuerst den sichtbaren Schlüssel beziehungsweise die Skala. Erst dann ordnest du Symbolzahl oder Säulenhöhe einem Wert zu."
+        },
+        {
+          "id": "chart-category-height",
+          "misconception": "Die Höhe einer Säule wird nach ihrer Fläche statt an der Skala gelesen.",
+          "feedback": "Gehe von der Kategorie senkrecht zur Säule und von ihrer Oberkante waagerecht zur Skala."
+        },
+        {
+          "id": "chart-swapped-category",
+          "misconception": "Kategorien werden beim Vergleich vertauscht.",
+          "feedback": "Prüfe jede Beschriftung einzeln und verfolge sie bis zu ihrer eigenen Säule."
+        },
+        {
+          "id": "chart-similar-display",
+          "misconception": "Eine ähnlich aussehende Darstellung wird gewählt, obwohl Werte vertauscht sind.",
+          "feedback": "Eine Darstellung passt nur, wenn Kategorie und Wert in allen drei Zeilen übereinstimmen."
+        }
       ]
     },
     {
       "id": "probability",
       "label": "Zufall einschätzen",
       "curriculumArea": "Daten, Häufigkeiten und Wahrscheinlichkeiten",
-      "supportGoal": "Ereignisse bei überschaubaren Zufallsversuchen als sicher, möglich oder unmöglich einordnen und Häufigkeiten ohne Bruchrechnung vergleichen.",
+      "supportGoal": "Ergebnisräume vollständig erfassen, Ereignisse als sicher, möglich oder unmöglich einordnen und Vorhersagen von einzelnen Versuchsergebnissen unterscheiden.",
       "misconceptions": [
+        "Ein mögliches Ergebnis außerhalb des sichtbaren Ergebnisraums wird angenommen.",
         "Möglich wird mit sicher verwechselt.",
         "Ein gewünschtes Ergebnis wird für wahrscheinlicher gehalten.",
         "Die Größe eines Symbols wird statt der Anzahl möglicher Felder verglichen.",
+        "Die Häufigkeiten werden verglichen, ohne den vollständigen Ergebnisraum zu zählen.",
+        "Ein Einzelereignis wird mit der Wahrscheinlichkeit des nächsten Versuchs verwechselt.",
         "Gleich häufige Ereignisse werden wegen ihrer Lage als verschieden eingeschätzt."
       ],
       "hints": [
@@ -4344,49 +4397,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Sichere und unmögliche Alltagsergebnisse benennen.",
+          "goal": "Ein tatsächlich mögliches Ergebnis im sichtbaren Ergebnisraum erkennen.",
           "exerciseTypes": [
-            "probability:foundation"
+            "probability:chance-identify-outcome"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Alle möglichen Ergebnisse eines Versuchs als Grundlage verstehen.",
+          "goal": "Den Ergebnisraum eines Zufallsversuchs vollständig beschreiben.",
           "exerciseTypes": [
-            "probability:foundation"
+            "probability:chance-complete-outcome-space"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Beutelereignisse einordnen.",
+          "goal": "Sicher, möglich und unmöglich an einem übersichtlichen Ergebnisraum unterscheiden.",
           "exerciseTypes": [
-            "probability:foundation"
+            "probability:chance-classify-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Wechselnde Zufallsgeräte systematisch prüfen.",
+          "goal": "Ereignisse wechselnder Zufallsgeräte selbstständig einordnen.",
           "exerciseTypes": [
-            "probability:practice"
+            "probability:chance-classify-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Sicher, möglich und unmöglich zuverlässig unterscheiden.",
+          "goal": "Ereignisse ohne Zeitdruck zuverlässig aus dem vollständigen Ergebnisraum klassifizieren.",
           "exerciseTypes": [
-            "probability:practice"
+            "probability:chance-classify-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Zwei Ereignisse anhand gleich großer Felder vergleichen.",
+          "goal": "Eine Vorhersage treffen und anschließend ein einzelnes Versuchsergebnis angemessen auswerten.",
           "exerciseTypes": [
-            "probability:transfer"
+            "probability:chance-predict-and-evaluate"
           ],
           "releaseStatus": "active"
         }
@@ -4396,6 +4449,43 @@
         "Die Einordnung folgt ausschließlich der Ergebnismenge.",
         "Vergleiche verwenden gleich große Felder und keine Bruchzahlen.",
         "Jede Aufgabe besitzt genau eine korrekte Einordnung."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "chance-outcome-space",
+          "misconception": "Ein mögliches Ergebnis außerhalb des sichtbaren Ergebnisraums wird angenommen.",
+          "feedback": "Zähle nur Ergebnisse, die im sichtbaren Ergebnisraum wirklich vorkommen, und lasse keines davon aus."
+        },
+        {
+          "id": "chance-possible-sure",
+          "misconception": "Möglich wird mit sicher verwechselt.",
+          "feedback": "Sicher gilt für alle Ergebnisse. Möglich gilt für mindestens eines, aber nicht für alle."
+        },
+        {
+          "id": "chance-wish",
+          "misconception": "Ein gewünschtes Ergebnis wird für wahrscheinlicher gehalten.",
+          "feedback": "Ein Wunsch verändert die sichtbaren gleich großen Felder nicht."
+        },
+        {
+          "id": "chance-symbol-size",
+          "misconception": "Die Größe eines Symbols wird statt der Anzahl möglicher Felder verglichen.",
+          "feedback": "Vergleiche die Anzahl gleich großer Felder, nicht die Größe oder Lage der Symbole."
+        },
+        {
+          "id": "chance-frequency-count",
+          "misconception": "Die Häufigkeiten werden verglichen, ohne den vollständigen Ergebnisraum zu zählen.",
+          "feedback": "Zähle für beide Ereignisse alle passenden gleich großen Felder und vergleiche erst danach."
+        },
+        {
+          "id": "chance-single-result",
+          "misconception": "Ein Einzelereignis wird mit der Wahrscheinlichkeit des nächsten Versuchs verwechselt.",
+          "feedback": "Ein beobachtetes Ergebnis verändert den unveränderten Ergebnisraum des nächsten Versuchs nicht."
+        },
+        {
+          "id": "chance-equal-position",
+          "misconception": "Gleich häufige Ereignisse werden wegen ihrer Lage als verschieden eingeschätzt.",
+          "feedback": "Entscheidend ist die Anzahl gleich großer Felder. Ihre Lage ändert die Häufigkeit nicht."
+        }
       ]
     },
     {

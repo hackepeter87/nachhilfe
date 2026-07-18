@@ -17,9 +17,9 @@ Zuerst wird eine einzelne Tabellenzeile gelesen. Danach werden Strichlisten in F
 ## 8. Geeignete Darstellungen
 Die Runtime verwendet semantische Tabellen, gruppierte Strichlisten, Bildpunkte mit eindeutiger Legende und drei gleichartig skalierte Säulen. Fehlende Tabellenwerte erscheinen bis zur richtigen Lösung als Fragezeichen.
 ## 9. Lernprogression
-`read-tables` Stufe 1 liest einen Wert direkt, Stufe 2 bestimmt die Differenz zweier Strichlisten, Stufe 3 ergänzt einen unbekannten Wert aus der Gesamtzahl. `read-charts` Stufe 1 liest ein 1:1-Bilddiagramm, Stufe 2 vergleicht Säulen, Stufe 3 ordnet eine Tabelle genau einem von drei Säulendiagrammen zu.
+`read-tables` trennt zuerst Kategorie und Wert, verbindet beide dann innerhalb einer Zeile, liest geführt, vergleicht Strichlisten selbstständig, ordnet den größten Wert sicher zu und ergänzt im Transfer einen unbekannten Wert aus der Gesamtzahl. `read-charts` führt vom Symbolschlüssel über Kategorie und Säulenhöhe zum geführten Bilddiagramm, selbstständigen Säulenvergleich, sicheren Skalenlesen und Darstellungswechsel. Die drei Schwierigkeitsstufen bestimmen Zahlenraum und Komplexität; die sechs Lernphasen bestimmen die mathematische Handlung.
 ## 10. Aufgabentypen
-Produktiv sind `table-read`, `tally-compare`, `table-missing`, `pictogram-read`, `bar-compare` und `representation-match`. Katalogisierte Datensätze variieren Kategorien und Werte; Berechnung, Eindeutigkeit und Distraktoren bleiben in TypeScript.
+Produktiv sind sechs getrennte Phasentypen je Kompetenz, darunter `table-identify-category`, `table-connect-row`, `tally-compare-independent`, `table-complete-transfer`, `pictogram-identify-key`, `bar-read-scale` und `chart-representation-transfer`. Katalogisierte Datensätze variieren Kategorien und Werte; Berechnung, Eindeutigkeit und Distraktoren bleiben in TypeScript.
 ## 11. Hilfestufen
 Die erste Hilfe lenkt auf Zeile, Kategorie oder Fünfergruppe. Die zweite beschreibt das zeilenweise Ablesen, Subtrahieren beim Vergleich oder Ergänzen der bekannten Werte, ohne die richtige Option zu nennen.
 ## 12. Remediation
@@ -33,4 +33,4 @@ Alle Darstellungen sind vollständig, Werte bleiben ihren Kategorien zugeordnet,
 ## 16. Grenzen der aktuellen Umsetzung
 Es gibt keine Kreisdiagramme, gebrochenen oder manipulierten Achsen, Mehrfachskalierungen, Dezimalwerte oder freien Diagrammeditor. Strichliste und Bilddiagramm verwenden bewusst den Wert eins pro Zeichen.
 ## 17. Punkte für die Gesamtprüfung
-In Version 0.20 sind Lesbarkeit der Kategorien, Verständlichkeit der Fünferbündel, Farbwahrnehmung, Säulenskalierung und sprachliche Eignung extern zu prüfen. Eine Lehrkraftfreigabe oder Unterrichtserprobung liegt nicht vor.
+Lesbarkeit der Kategorien, Verständlichkeit der Fünferbündel, Farbwahrnehmung, Säulenskalierung und sprachliche Eignung sind in der externen Gesamtprüfung zu untersuchen. Eine Lehrkraftfreigabe oder Unterrichtserprobung liegt nicht vor.

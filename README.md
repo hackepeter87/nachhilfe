@@ -141,7 +141,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.27.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.28.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -182,6 +182,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.27.0
+## Release-Stand 0.28.0
 
-Version 0.27.0 migriert Geld, Längen, Masse und Rauminhalt auf sechs fachlich verschiedene Lernhandlungen. Einheit und Bezugsgröße stehen vor Messen, Ergänzen und Rechnen; die Voraussetzungssperre reduziert nun auch die Lernphase. Katalog 0.26.0 bleibt bei Schema 19. Details stehen in [docs/didactic-migration-0.27.0.md](docs/didactic-migration-0.27.0.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md). Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt.
+Version 0.28.0 migriert Tabellen, Diagramme und Wahrscheinlichkeit auf sechs fachlich verschiedene Lernhandlungen. Säulendiagramme werden an einer sichtbaren Skala gelesen, Datendarstellungen aktiv gewechselt und Vorhersagen von einzelnen Zufallsergebnissen getrennt. Katalog 0.27.0 bleibt bei Schema 19. Details stehen in [docs/didactic-migration-0.28.0.md](docs/didactic-migration-0.28.0.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md). Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt.

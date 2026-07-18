@@ -707,4 +707,17 @@ describe('MathRepresentation Daten und Diagramme', () => {
     expect(screen.getByRole('img', { name: /Apfel: 4, Birne: 6, Pflaume: 7/i })).toBeVisible()
     expect(container.querySelector(displayType === 'tally' ? '.tally-list' : displayType === 'pictogram' ? '.pictogram' : '.bar-chart')).toBeInTheDocument()
   })
+
+  it('zeigt Säulen an einer Skala ohne aufgedruckte Werte und maskiert das Ergebnis', () => {
+    const values = { ...base, displayType: 'bar', dataValues: [4, 6, 7], hiddenIndex: -1, scaleMax: 8, answerLabel: '3' }
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'data-display', visibility: 'always', label: 'Säulendiagramm Obstwahl', values,
+      valueRoles: { knownValues: Object.keys(values).filter((key) => key !== 'answerLabel'), unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(container.querySelectorAll('.bar-chart-scale i')).toHaveLength(9)
+    expect(container.querySelector('.bar-chart-values')).not.toBeInTheDocument()
+    expect(container.querySelector('.bar-chart')).toHaveTextContent('Apfel')
+    expect(container.querySelector('.bar-chart')).not.toHaveTextContent('467')
+    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+  })
 })

@@ -542,6 +542,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const visibleLabel = (index: number) => index === hiddenIndex && !missingVisible ? 'unbekannt' : String(dataValues[index])
     const description = `${representation.label}. ${categories.map((category, index) => `${category}: ${visibleLabel(index)}`).join(', ')}.`
     const rows = categories.map((category, index) => ({ category: String(category), value: dataValues[index]!, hidden: index === hiddenIndex && !missingVisible }))
+    const hasAnswer = values.answerLabel !== undefined
+    const answerVisible = hasAnswer && isValueVisible('answerLabel')
+    const result = hasAnswer ? <strong className="quantity-result">Ergebnis: {answerVisible ? textValue(values.answerLabel) : '?'}</strong> : null
 
     if (displayType === 'table') {
       return (
@@ -552,6 +555,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
             <tbody>{rows.map((row) => <tr key={row.category}><th>{row.category}</th><td className={row.hidden ? 'data-value--unknown' : ''}>{row.hidden ? '?' : row.value}</td></tr>)}</tbody>
             {hiddenIndex >= 0 && <tfoot><tr><th>{textValue(values.totalLabel) || 'Insgesamt'}</th><td>{Number(values.total)}</td></tr></tfoot>}
           </table>
+          {result}
         </div>
       )
     }
@@ -563,6 +567,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
           <div className="tally-list" aria-hidden="true">{rows.map((row) => (
             <div className="tally-row" key={row.category}><span>{row.category}</span><span className="tally-marks">{Array.from({ length: row.value }, (_, index) => <i className={(index + 1) % 5 === 0 ? 'tally-mark tally-mark--fifth' : 'tally-mark'} key={index} />)}</span></div>
           ))}</div>
+          {result}
         </div>
       )
     }
@@ -575,21 +580,28 @@ export function MathRepresentation({ representation }: { representation: Exercis
             <div className="pictogram-row" key={row.category}><span>{row.category}</span><span>{Array.from({ length: row.value }, (_, index) => <i key={index} />)}</span></div>
           ))}</div>
           <small>1 Punkt = 1 {textValue(values.symbolLabel)}</small>
+          {result}
         </div>
       )
     }
 
-    const maximum = Math.max(1, Number(values.scaleMax))
+    const configuredMaximum = Number(values.scaleMax)
+    const maximum = Number.isInteger(configuredMaximum) && configuredMaximum > 0
+      ? configuredMaximum
+      : Math.max(1, ...rows.map((row) => row.value))
     return (
       <div className="math-visual data-display" role="img" aria-label={description}>
         <strong className="data-display-title">{textValue(values.title)}</strong>
-        <div className="bar-chart" aria-hidden="true">{rows.map((row) => (
+        <div className="bar-chart-frame" aria-hidden="true">
+          <div className="bar-chart-scale">{Array.from({ length: maximum + 1 }, (_, index) => maximum - index).map((tick) => <i key={tick}><span>{tick}</span></i>)}</div>
+          <div className="bar-chart" style={{ '--bar-steps': maximum } as CSSProperties}>{rows.map((row) => (
           <div className="bar-chart-column" key={row.category}>
-            <span>{row.value}</span>
             <i style={{ height: `${Math.max(12, row.value / maximum * 100)}%` }} />
             <b>{row.category}</b>
           </div>
-        ))}</div>
+          ))}</div>
+        </div>
+        {result}
       </div>
     )
   }
