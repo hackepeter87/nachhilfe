@@ -53,6 +53,15 @@ export function analyzeWrongAnswer(exercise: Exercise, rawAnswer: string): Misco
     if (Math.abs(answer - correct) <= 10) return feedbackFor(exercise, 'complement-1000-counting-target')
     return feedbackFor(exercise, 'complement-1000-bridge-step')
   }
+  if ((exercise.skillId === 'round-tens' || exercise.skillId === 'round-hundreds') && Number.isFinite(answer)) {
+    const lower = Number(values.lower)
+    const upper = Number(values.upper)
+    const midpoint = Number(values.lowerDistance) === Number(values.upperDistance)
+    if (midpoint && answer === lower) return feedbackFor(exercise, `${exercise.skillId}-midpoint-down`)
+    if (answer === lower && answer !== correct) return feedbackFor(exercise, `${exercise.skillId}-always-down`)
+    if (answer === upper && answer !== correct) return feedbackFor(exercise, `${exercise.skillId}-always-up`)
+    return feedbackFor(exercise, `${exercise.skillId}-wrong-neighbors`)
+  }
   if (exercise.skillId === 'place-value' && Number.isFinite(answer)) {
     if (answer === Number(values.digit) && answer !== correct) return feedbackFor(exercise, 'place-value-digit-as-value')
     return feedbackFor(exercise, 'place-value-column-confusion')

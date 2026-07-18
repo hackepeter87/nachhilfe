@@ -812,7 +812,7 @@ export function roundToUnit(number: number, unit: 10 | 100): number {
   return Math.round(number / unit) * unit
 }
 
-export function createRoundingExercise(number: number, unit: 10 | 100, seed = number * 17 + unit, difficulty: Difficulty = 1): Exercise {
+export function createRoundingExercise(number: number, unit: 10 | 100, seed = number * 17 + unit, difficulty: Difficulty = 1, phase?: LearningPhase): Exercise {
   const { min, max } = getTaskCatalog().numberRange
   if (!Number.isInteger(number) || number < min || number > max) throw new RangeError(`Zahl ${number} liegt außerhalb des Zahlenraums.`)
   const random = seededRandom(seed)
@@ -837,15 +837,68 @@ export function createRoundingExercise(number: number, unit: 10 | 100, seed = nu
   ])
   const stepText = getTaskCatalog().strategySteps.rounding
   const neighborAnswer = `${lower} und ${upper}`
+  const shared = { ...base(skillId, seed, difficulty, values), ...generatedContent, explanation }
+  const numberLine = representation(skillId, difficulty, 'number-line', 'Abstände zu den Nachbarzahlen', { start: lower, end: upper, marker: number, step: unit })
+  const neighborOptions = textOptions(random, neighborAnswer, [
+    { value: `${Math.max(min, lower - unit)} und ${lower}`, misconception: 'Intervall zu weit links', misconceptionId: `${skillId}-wrong-neighbors` },
+    { value: `${upper} und ${Math.min(max, upper + unit)}`, misconception: 'Intervall zu weit rechts', misconceptionId: `${skillId}-wrong-neighbors` },
+    { value: `${Math.max(min, lower - unit)} und ${upper}`, misconception: 'Nur eine Nachbarzahl passend', misconceptionId: `${skillId}-wrong-neighbors` }
+  ])
+  const correctReason = lowerDistance === upperDistance
+    ? renderCatalogText(stepText.halfwayUp, values)
+    : lowerDistance < upperDistance
+      ? renderCatalogText(stepText.closerLower, values)
+      : renderCatalogText(stepText.closerUpper, values)
+  const reasonOptions = textOptions(random, correctReason, [
+    { value: renderCatalogText(stepText.wrongLower, values), misconception: 'Ohne Abstand immer nach unten gerundet', misconceptionId: lowerDistance === upperDistance ? `${skillId}-midpoint-down` : `${skillId}-always-down` },
+    { value: renderCatalogText(stepText.wrongUpper, values), misconception: 'Ohne Abstand immer nach oben gerundet', misconceptionId: `${skillId}-always-up` }
+  ])
+  if (phase === 'activate') {
+    return withMetadata({
+      ...shared, typeId: `${skillId}-activate-neighbors`, subskillId: `${skillId}-neighbors`,
+      prompt: `Zwischen welchen beiden vollen ${unit === 10 ? 'Zehnern' : 'Hundertern'} liegt ${number}?`, answerMode: 'choice', correctAnswer: neighborAnswer,
+      options: neighborOptions,
+      representation: { ...numberLine, valueRoles: { knownValues: ['marker', 'step'], unknownValues: ['start', 'end'], revealedValues: [] } }
+    })
+  }
+  if (phase === 'understand') {
+    return withMetadata({
+      ...shared, typeId: `${skillId}-understand-distances`, subskillId: lowerDistance === upperDistance ? `${skillId}-midpoint` : `${skillId}-distance`,
+      prompt: 'Welche Aussage beschreibt die beiden Abstände richtig?', answerMode: 'choice', correctAnswer: correctReason,
+      options: reasonOptions, representation: numberLine
+    })
+  }
+  if (phase === 'guided-practice') {
+    const guidedSteps: ExerciseStep[] = [
+      { id: 'neighbors', prompt: renderCatalogText(stepText.neighborsPrompt, values), interaction: 'mark', options: neighborOptions, correctAnswer: neighborAnswer, errorFeedback: renderCatalogText(stepText.neighborsError, values), successFeedback: renderCatalogText(stepText.neighborsSuccess, values) },
+      { id: 'compare-distances', prompt: renderCatalogText(stepText.reasonPrompt, values), interaction: 'choose-strategy', options: reasonOptions, correctAnswer: correctReason, errorFeedback: renderCatalogText(stepText.reasonError, values), successFeedback: renderCatalogText(stepText.reasonSuccess, values) },
+      { id: 'round-result', prompt: renderCatalogText(stepText.resultPrompt, values), interaction: 'guided-number', correctAnswer: String(answer), errorFeedback: renderCatalogText(stepText.resultError, values), successFeedback: renderCatalogText(stepText.resultSuccess, values) }
+    ]
+    return withMetadata({ ...shared, typeId: `${skillId}-guided-distance`, subskillId: lowerDistance === upperDistance ? `${skillId}-midpoint` : `${skillId}-distance`, answerMode: 'guided-number', correctAnswer: String(answer), steps: guidedSteps, representation: numberLine })
+  }
+  if (phase === 'independent-practice' || phase === 'automate') {
+    return withMetadata({
+      ...shared, typeId: `${skillId}-${phase === 'automate' ? 'automate' : 'independent'}`, subskillId: lowerDistance === upperDistance ? `${skillId}-midpoint` : `${skillId}-distance`,
+      answerMode: 'number', correctAnswer: String(answer), representation: numberLine
+    })
+  }
+  if (phase === 'transfer') {
+    const correct = `ungefähr ${answer}`
+    const otherNeighbor = answer === lower ? upper : lower
+    return withMetadata({
+      ...shared, typeId: `${skillId}-transfer-accuracy`, subskillId: `${skillId}-accuracy`,
+      prompt: renderCatalogText(content.transferPrompt, values), answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `genau ${number}`, misconception: 'Für einen Überblick wird die exakte Zahl statt einer Näherung verwendet.', misconceptionId: `${skillId}-accuracy-choice` },
+        { value: `ungefähr ${otherNeighbor}`, misconception: 'Die Näherung verwendet den weiter entfernten Nachbarn.', misconceptionId: `${skillId}-wrong-neighbors` }
+      ])
+    })
+  }
   const steps: ExerciseStep[] | undefined = difficulty >= 2 ? [
     {
       id: 'neighbors',
       prompt: renderCatalogText(stepText.neighborsPrompt, values),
-      options: textOptions(random, neighborAnswer, [
-        { value: `${Math.max(min, lower - unit)} und ${lower}`, misconception: 'Intervall zu weit links' },
-        { value: `${upper} und ${Math.min(max, upper + unit)}`, misconception: 'Intervall zu weit rechts' },
-        { value: `${Math.max(min, lower - unit)} und ${upper}`, misconception: 'Nur eine Nachbarzahl passend' }
-      ]),
+      options: neighborOptions,
       correctAnswer: neighborAnswer,
       errorFeedback: renderCatalogText(stepText.neighborsError, values),
       successFeedback: renderCatalogText(stepText.neighborsSuccess, values)
@@ -860,32 +913,22 @@ export function createRoundingExercise(number: number, unit: 10 | 100, seed = nu
     }
   ] : undefined
   if (difficulty === 3 && steps) {
-    const correctReason = lowerDistance === upperDistance
-      ? renderCatalogText(stepText.halfwayUp, values)
-      : lowerDistance < upperDistance
-        ? renderCatalogText(stepText.closerLower, values)
-        : renderCatalogText(stepText.closerUpper, values)
     steps.push({
       id: 'round-reason',
       prompt: renderCatalogText(stepText.reasonPrompt, values),
-      options: textOptions(random, correctReason, [
-        { value: renderCatalogText(stepText.wrongLower, values), misconception: 'Ohne Abstand immer nach unten gerundet' },
-        { value: renderCatalogText(stepText.wrongUpper, values), misconception: 'Ohne Abstand immer nach oben gerundet' }
-      ]),
+      options: reasonOptions,
       correctAnswer: correctReason,
       errorFeedback: renderCatalogText(stepText.reasonError, values),
       successFeedback: renderCatalogText(stepText.reasonSuccess, values)
     })
   }
   return withMetadata({
-    ...base(skillId, seed, difficulty, values),
-    ...generatedContent,
-    explanation,
+    ...shared,
     typeId: unit === 10 ? 'round-tens' : 'round-hundreds',
     answerMode: difficulty >= 2 ? 'guided-choice' : 'choice',
     correctAnswer: String(answer),
     steps,
-    representation: representation(skillId, difficulty, 'number-line', 'Abstände zu den Nachbarzahlen', { start: lower, end: upper, marker: number, step: unit }),
+    representation: numberLine,
     options: difficulty >= 2 ? undefined : resultOptions
   })
 }
@@ -898,18 +941,22 @@ function numberLineJumps(points: number[]): Array<{ from: number; to: number; la
   })
 }
 
-function rounding(seed: number, difficulty: Difficulty, unit: 10 | 100): Exercise {
+function rounding(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
-  const maxInterval = difficulty === 3 ? (unit === 10 ? 99 : 9) : (unit === 10 ? 98 : 8)
+  const calculationLevel: Difficulty = phase === 'activate' ? 1
+    : phase === 'understand' || phase === 'guided-practice' || phase === 'independent-practice' ? 2
+      : phase === 'automate' || phase === 'transfer' ? 3
+        : difficulty
+  const maxInterval = calculationLevel === 3 ? (unit === 10 ? 99 : 9) : (unit === 10 ? 98 : 8)
   const interval = integer(random, 0, maxInterval) * unit
-  const offset = difficulty === 1
+  const offset = calculationLevel === 1
     ? (unit === 10 ? pick(random, [2, 3, 7, 8]) : pick(random, [20, 30, 70, 80]))
-    : difficulty === 2
+    : calculationLevel === 2
       ? (unit === 10 ? pick(random, [4, 5, 6]) : pick(random, [40, 50, 60]))
       : integer(random, 1, unit - 1)
   let number = interval + offset
   if (number > 1000 - unit / 2) number = 1000 - unit / 2
-  return createRoundingExercise(number, unit, seed, difficulty)
+  return createRoundingExercise(number, unit, seed, difficulty, phase)
 }
 
 function wordModelRepresentation(
@@ -2781,8 +2828,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'compose': return compose(seed, difficulty, phase)
     case 'neighbor-tens': return neighbors(seed, difficulty, 10, phase)
     case 'neighbor-hundreds': return neighbors(seed, difficulty, 100, phase)
-    case 'round-tens': return rounding(seed, difficulty, 10)
-    case 'round-hundreds': return rounding(seed, difficulty, 100)
+    case 'round-tens': return rounding(seed, difficulty, 10, phase)
+    case 'round-hundreds': return rounding(seed, difficulty, 100, phase)
     case 'addition-1000': return addition1000(seed, difficulty, phase)
     case 'written-addition': return writtenAddition(seed, difficulty)
     case 'subtraction-1000': return subtraction1000(seed, difficulty, phase)

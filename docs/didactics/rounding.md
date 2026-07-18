@@ -17,9 +17,9 @@ Nachbarzahlen, Abstände, Entscheidung und erst danach Kurzregel.
 ## 8. Geeignete Darstellungen
 Zahlenstrahl mit markierter Zahl und beiden Abständen.
 ## 9. Lernprogression
-Stufe 1: sichtbare Nachbarn; Stufe 2: Nachbarn wählen und runden; Stufe 3: zusätzlich begründen.
+Nachbarwissen aktivieren; Abstände und Halbpunkt verstehen; Nachbarn, Begründung und Ergebnis geführt bearbeiten; selbstständig runden; ohne Zeitdruck abrufen; passende ungefähre Genauigkeit in einer Situation auswählen.
 ## 10. Aufgabentypen
-Auswahl beziehungsweise geführte Mehrschrittaufgabe für Zehner und Hunderter.
+Nachbarpaar auswählen, Abstandsaussage prüfen, geführte Dreischrittaufgabe, freie Zahleneingabe und kontextbezogene Genauigkeitsauswahl für Zehner und Hunderter.
 ## 11. Hilfestufen
 Nachbarzahlen finden; Abstände vergleichen; Halbpunktregel konkret anwenden.
 ## 12. Remediation
@@ -31,6 +31,6 @@ Halbpunkte und grenznahe Zahlen werden in neuen Varianten wiederholt.
 ## 15. Erfolgskriterien
 Nachbarn, Ergebnis und Begründung sind konsistent; alle Optionen bleiben zwischen 0 und 1000.
 ## 16. Grenzen der aktuellen Umsetzung
-Kontextabhängige Rundungsgenauigkeit ist dokumentiert, aber noch kein eigener Aufgabentyp.
+Die kontextbezogene Genauigkeitsauswahl ist produktiv. Freie Begründungstexte, Dezimalzahlen und Rundung jenseits des Zahlenraums bis 1000 bleiben ausgeschlossen.
 ## 17. Punkte für die Gesamtprüfung
 Prüfen, ob die Halbpunktformulierung zur im Unterricht verwendeten Regel passt.

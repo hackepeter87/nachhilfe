@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Runden und Abschätzen 0.24.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Runden auf Zehner und Hunderter wurde als gemeinsamer Abstands- und Genauigkeitsstrang auf den Qualitätsstandard ab 0.21 migriert.
+- Alle sechs Lernphasen besitzen unterschiedliche mathematische Handlungen: Nachbarn bestimmen, Abstände und Halbpunkt verstehen, geführt entscheiden, selbstständig runden, ohne Zeitdruck abrufen und eine passende ungefähre Angabe im Kontext wählen.
+- Der Zahlenstrahl maskiert gesuchte Nachbarn in der Aktivierung. Spätere Darstellungen zeigen nur bekannte Kandidaten und Lage; keine zusätzliche Ergebnisrolle wird vorweggenommen.
+- Katalogisierte Fehlvorstellungsrouten unterscheiden falsche Nachbarn, starres Auf- oder Abrunden, Abrunden am Halbpunkt und unpassende Genauigkeit.
+- Katalog 0.23.0 bleibt bei Schema 18. Dezimalzahlen und reine Merksatz-Automatisierung ohne Abstandsverständnis bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 392 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.24.0-local` beziehungsweise `mathe-reise:local` (`sha256:b23e055e3329576bd6a25b91f8a05d3fa5b76c3135e2d70a88e11794d63a8465`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8084`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Rechenstrategien bis 1000 in Version 0.23.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Addition, Subtraktion und Ergänzen bis 1000 wurden als gemeinsamer Strategie-Strang auf den Qualitätsstandard ab 0.21 migriert.

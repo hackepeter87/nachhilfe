@@ -224,6 +224,25 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('führt die Rundungsentscheidung von Nachbarn über Abstände zum Ergebnis', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('round-hundreds', 95, 1, undefined, 'guided-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    expect(exercise.steps?.map((step) => step.id)).toEqual(['neighbors', 'compare-distances', 'round-result'])
+    for (const step of exercise.steps?.slice(0, 2) ?? []) {
+      const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
+      if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
+      await user.click(screen.getByRole('button', { name: option.label }))
+    }
+    const resultStep = exercise.steps?.[2]
+    if (!resultStep) throw new Error('Rundungsergebnis fehlt')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), resultStep.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'round-hundreds', correct: true }))
+  })
+
   it('blendet eine Hilfe-Darstellung erst mit dem Tipp ein', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('place-value', 42, 2)

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 18,
-  "catalogVersion": "0.22.0",
+  "catalogVersion": "0.23.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -1568,7 +1568,38 @@
       "supportGoal": "Zahlen bis 1000 über Nachbarzehner und Abstände auf Zehner runden.",
       "misconceptions": [
         "Am Halbpunkt wird abgerundet.",
-        "Eine Antwort außerhalb des Zahlenraums wird gewählt."
+        "Eine Antwort außerhalb des Zahlenraums wird gewählt.",
+        "Die Nachbarzehner werden falsch bestimmt.",
+        "Es wird unabhängig vom Abstand immer abgerundet.",
+        "Es wird unabhängig vom Abstand immer aufgerundet.",
+        "Für eine ungefähre Angabe wird keine passende Genauigkeit gewählt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "round-tens-wrong-neighbors",
+          "misconception": "Die Nachbarzehner werden falsch bestimmt.",
+          "feedback": "Bestimme zuerst den vollen Zehner direkt unter und direkt über der Zahl."
+        },
+        {
+          "id": "round-tens-midpoint-down",
+          "misconception": "Am Halbpunkt wird abgerundet.",
+          "feedback": "Beide Abstände sind gleich groß. Nach der Grundschulregel wird am Halbpunkt aufgerundet."
+        },
+        {
+          "id": "round-tens-always-down",
+          "misconception": "Es wird unabhängig vom Abstand immer abgerundet.",
+          "feedback": "Vergleiche beide Abstände. Nur der nähere Nachbar entscheidet; nicht jede Zahl wird abgerundet."
+        },
+        {
+          "id": "round-tens-always-up",
+          "misconception": "Es wird unabhängig vom Abstand immer aufgerundet.",
+          "feedback": "Vergleiche beide Abstände. Nur der nähere Nachbar entscheidet; nicht jede Zahl wird aufgerundet."
+        },
+        {
+          "id": "round-tens-accuracy-choice",
+          "misconception": "Für eine ungefähre Angabe wird keine passende Genauigkeit gewählt.",
+          "feedback": "Für einen kurzen Überblick genügt eine passende ungefähre Zehnerzahl; die exakte Zahl ist hier nicht gefragt."
+        }
       ],
       "hints": [
         "{number} liegt zwischen {lower} und {upper}.",
@@ -1653,54 +1684,54 @@
         "representation": "Zahlenstrahl",
         "keepSubskill": true
       },
-      "transferPrompt": "Erkläre, warum die andere Nachbarzahl weiter entfernt ist.",
+      "transferPrompt": "Bei einem Schulfest wurden {number} Gäste gezählt. Für einen kurzen Überblick soll die Zahl ungefähr auf Zehner angegeben werden. Welche Angabe passt?",
       "releaseStatus": "active",
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Die beiden direkten Nachbarzehner als notwendige Grundlage bestimmen.",
           "exerciseTypes": [
-            "round-tens:entry"
+            "round-tens:activate-neighbors"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Die Abstände zu beiden Nachbarzehnern vergleichen und den Halbpunkt verstehen.",
           "exerciseTypes": [
-            "round-tens:representation"
+            "round-tens:understand-distances"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Nachbarn, Abstandsentscheidung und Rundungsergebnis nacheinander bearbeiten.",
           "exerciseTypes": [
-            "round-tens:difficulty-1"
+            "round-tens:guided-distance"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "goal": "Eine Rundung mit abrufbarem Zahlenstrahl selbstständig ausführen.",
           "exerciseTypes": [
-            "round-tens:difficulty-2"
+            "round-tens:independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Rundungen ohne Zeitdruck und ohne sichtbare Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "round-tens:difficulty-3"
+            "round-tens:automate"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "In einer Alltagssituation eine passende ungefähre Zehnerangabe auswählen.",
           "exerciseTypes": [
-            "round-tens:difficulty-3"
+            "round-tens:transfer-accuracy"
           ],
           "releaseStatus": "active"
         }
@@ -1718,7 +1749,38 @@
       "supportGoal": "Zahlen bis 1000 über Nachbarhunderter und Abstände auf Hunderter runden.",
       "misconceptions": [
         "Am Halbpunkt wird abgerundet.",
-        "Die Zehnerstelle wird statt des Abstands betrachtet."
+        "Die Zehnerstelle wird statt des Abstands betrachtet.",
+        "Die Nachbarhunderter werden falsch bestimmt.",
+        "Es wird unabhängig vom Abstand immer abgerundet.",
+        "Es wird unabhängig vom Abstand immer aufgerundet.",
+        "Für eine ungefähre Angabe wird keine passende Genauigkeit gewählt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "round-hundreds-wrong-neighbors",
+          "misconception": "Die Nachbarhunderter werden falsch bestimmt.",
+          "feedback": "Bestimme zuerst den vollen Hunderter direkt unter und direkt über der Zahl."
+        },
+        {
+          "id": "round-hundreds-midpoint-down",
+          "misconception": "Am Halbpunkt wird abgerundet.",
+          "feedback": "Beide Abstände sind gleich groß. Nach der Grundschulregel wird am Halbpunkt aufgerundet."
+        },
+        {
+          "id": "round-hundreds-always-down",
+          "misconception": "Es wird unabhängig vom Abstand immer abgerundet.",
+          "feedback": "Vergleiche beide Abstände. Nur der nähere Nachbar entscheidet; nicht jede Zahl wird abgerundet."
+        },
+        {
+          "id": "round-hundreds-always-up",
+          "misconception": "Es wird unabhängig vom Abstand immer aufgerundet.",
+          "feedback": "Vergleiche beide Abstände. Nur der nähere Nachbar entscheidet; nicht jede Zahl wird aufgerundet."
+        },
+        {
+          "id": "round-hundreds-accuracy-choice",
+          "misconception": "Für eine ungefähre Angabe wird keine passende Genauigkeit gewählt.",
+          "feedback": "Für einen groben Überblick genügt eine passende ungefähre Hunderterzahl; die exakte Zahl ist hier nicht gefragt."
+        }
       ],
       "hints": [
         "{number} liegt zwischen {lower} und {upper}.",
@@ -1803,54 +1865,54 @@
         "representation": "Zahlenstrahl",
         "keepSubskill": true
       },
-      "transferPrompt": "Finde eine weitere Zahl, die auf denselben Hunderter gerundet wird.",
+      "transferPrompt": "In einer Bücherei stehen {number} Bücher. Für einen groben Überblick soll die Zahl ungefähr auf Hunderter angegeben werden. Welche Angabe passt?",
       "releaseStatus": "active",
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Die beiden direkten Nachbarhunderter als notwendige Grundlage bestimmen.",
           "exerciseTypes": [
-            "round-hundreds:entry"
+            "round-hundreds:activate-neighbors"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Die Abstände zu beiden Nachbarhundertern vergleichen und den Halbpunkt verstehen.",
           "exerciseTypes": [
-            "round-hundreds:representation"
+            "round-hundreds:understand-distances"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Nachbarn, Abstandsentscheidung und Rundungsergebnis nacheinander bearbeiten.",
           "exerciseTypes": [
-            "round-hundreds:difficulty-1"
+            "round-hundreds:guided-distance"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "goal": "Eine Rundung mit abrufbarem Zahlenstrahl selbstständig ausführen.",
           "exerciseTypes": [
-            "round-hundreds:difficulty-2"
+            "round-hundreds:independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Rundungen ohne Zeitdruck und ohne sichtbare Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "round-hundreds:difficulty-3"
+            "round-hundreds:automate"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "In einer Alltagssituation eine passende ungefähre Hunderterangabe auswählen.",
           "exerciseTypes": [
-            "round-hundreds:difficulty-3"
+            "round-hundreds:transfer-accuracy"
           ],
           "releaseStatus": "active"
         }

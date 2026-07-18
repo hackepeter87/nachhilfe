@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.23.0. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.23.0, sobald der Release-Workflow für `v0.23.0` erfolgreich gelaufen ist. Dieses Paket bereitet die Gesamtprüfung vor; eine tatsächliche Prüfung ist noch nicht dokumentiert.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.24.0. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.24.0, sobald der Release-Workflow für `v0.24.0` erfolgreich gelaufen ist. Dieses Paket bereitet die Gesamtprüfung vor; eine tatsächliche Prüfung ist noch nicht dokumentiert.
 
 ## Förderziel
 

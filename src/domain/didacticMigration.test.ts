@@ -6,7 +6,7 @@ import type { LearningPhase, SkillId } from './types'
 const migratedSkills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'time', 'combinatorics', 'patterns',
-  'addition-1000', 'subtraction-1000', 'complement-1000'
+  'addition-1000', 'subtraction-1000', 'complement-1000', 'round-tens', 'round-hundreds'
 ]
 
 describe('didaktisch migrierte Lernhandlungen', () => {
@@ -180,6 +180,46 @@ describe('didaktisch migrierte Lernhandlungen', () => {
             expect(exercise.representation.valueRoles.unknownValues).toEqual(expect.arrayContaining(['end', 'marker', 'jumps']))
             expect(exercise.representation.valueRoles.revealedValues).toEqual([])
           }
+        }
+      }
+    }
+  })
+
+  it('trennt Runden in Nachbarn, Abstände, geführte Entscheidung, Abruf und Genauigkeitstransfer', () => {
+    const phases: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+    for (const skillId of ['round-tens', 'round-hundreds'] as const) {
+      const exercises = phases.map((phase) => generateExercise(skillId, 455, phase === 'automate' || phase === 'transfer' ? 3 : phase === 'independent-practice' ? 2 : 1, undefined, phase))
+      expect(new Set(exercises.map((exercise) => exercise.typeId)).size).toBe(6)
+      expect(exercises[0]?.subskillId).toBe(`${skillId}-neighbors`)
+      expect(exercises[0]?.representation?.valueRoles.unknownValues).toEqual(['start', 'end'])
+      expect(exercises[1]?.typeId).toBe(`${skillId}-understand-distances`)
+      expect(exercises[2]?.steps?.map((step) => step.id)).toEqual(['neighbors', 'compare-distances', 'round-result'])
+      expect(exercises[3]?.answerMode).toBe('number')
+      expect(exercises[4]?.answerMode).toBe('number')
+      expect(exercises[5]?.typeId).toBe(`${skillId}-transfer-accuracy`)
+      expect(exercises[5]?.correctAnswer).toMatch(/^ungefähr \d+$/)
+    }
+  })
+
+  it('erzeugt über 1.000 Seeds fachlich korrekte Rundungsphasen und begrenzte Optionen', () => {
+    const phases: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+    for (const skillId of ['round-tens', 'round-hundreds'] as const) {
+      const unit = skillId === 'round-tens' ? 10 : 100
+      for (const phase of phases) {
+        const difficulty = phase === 'automate' || phase === 'transfer' ? 3 : phase === 'independent-practice' ? 2 : 1
+        for (let seed = 1; seed <= 1_000; seed += 1) {
+          const exercise = generateExercise(skillId, seed, difficulty, undefined, phase)
+          const number = Number(exercise.variant.values.number)
+          const expected = Math.round(number / unit) * unit
+          expect(Number(exercise.variant.values.answer), `${skillId}/${phase}/${seed}`).toBe(expected)
+          expect(expected).toBeGreaterThanOrEqual(0)
+          expect(expected).toBeLessThanOrEqual(1_000)
+          const optionGroups = [exercise.options ?? [], ...exercise.steps?.map((step) => step.options ?? []) ?? []]
+          optionGroups.forEach((options) => {
+            expect(new Set(options.map((option) => option.value)).size, `${skillId}/${phase}/${seed}`).toBe(options.length)
+            options.filter((option) => /^\d+$/.test(option.value)).forEach((option) => expect(Number(option.value)).toBeGreaterThanOrEqual(0))
+            options.filter((option) => /^\d+$/.test(option.value)).forEach((option) => expect(Number(option.value)).toBeLessThanOrEqual(1_000))
+          })
         }
       }
     }

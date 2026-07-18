@@ -27,7 +27,7 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 ```json
 {
   "schemaVersion": 18,
-  "catalogVersion": "0.22.0",
+  "catalogVersion": "0.23.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review"
@@ -98,8 +98,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build --platform linux/amd64 -t mathe-reise:0.23.0 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.23.0
+docker build --platform linux/amd64 -t mathe-reise:0.24.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.24.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.
