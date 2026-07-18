@@ -1,64 +1,113 @@
-# Fachliche Roadmap ab 0.10.1
+# Fachliche Roadmap ab 0.21
 
-Stand: 17. Juli 2026. Die Roadmap ordnet die technische Arbeit der fachlichen Lernprogression unter. Eine Kompetenz wird erst produktiv, wenn Didaktik, Katalog, Domäne, Adaptivität, Darstellung, UI, Remediation, Feedback, Tests und Dokumentation vollständig umgesetzt sind.
+Stand: 18. Juli 2026. Seit Version 0.21 gilt der [didaktische Qualitätsstandard](didactic-quality-standard.md) verbindlich für jede neue und migrierte Kompetenz. Mathematische Korrektheit ist Voraussetzung; abgeschlossen ist eine Kompetenz erst, wenn die App den zugehörigen Denkprozess aufbaut, begleitet und in einen neuen Zusammenhang übertragen lässt.
 
-## Reihenfolge und Begründung
+Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html): Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten werden mit Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen verbunden.
 
-Schriftliche Addition und Subtraktion folgen direkt aufeinander, weil beide Stellenwerttafel, Spaltendarstellung und dieselbe Interaktionslogik verwenden. Erst danach folgt Raum und Form. Daten, Wahrscheinlichkeit, Größen und ebene Geometrie ergänzen die Inhaltsbereiche des NRW-Lehrplans für den Förderkern am Ende von Klasse 3. Anforderungen des vollständigen Klasse-4-Niveaus bleiben nachgelagert.
+## Ausgangslage
 
-| Version | Kompetenzbereich | Verbindlicher Umfang | Nicht enthalten |
+Der Förderkern am Ende von Klasse 3 ist in Version 0.21 bereits breit abgedeckt. Die nächsten Releases erfinden diese Inhalte nicht neu, sondern bringen sie auf einen einheitlichen Qualitätsstand.
+
+Bereits nach dem Standard 0.21 migriert sind:
+
+- Addition und Subtraktion bis 20
+- Stellenwert, Zerlegen und Zusammensetzen
+- Nachbarzehner und Nachbarhunderter
+- Uhrzeit
+- Kombinatorik
+- Muster
+
+Noch zu migrieren sind insbesondere Multiplikation und Division, Rechnen bis 1000, Runden, schriftliche Verfahren, Sachaufgaben, Geld, Längen, Masse, Rauminhalt, Daten, Wahrscheinlichkeit sowie die übrigen Bereiche von Raum und Form. Der [didaktische Audit 0.20.1](didactic-audit-0.20.1.md) bleibt die Befundgrundlage.
+
+Neue Klasse-4-Inhalte werden nicht allein deshalb vorgezogen, um die Zahl der Kompetenzen zu erhöhen. Schriftliche Multiplikation und Division, mehrere Überträge oder Entbündelungen, komplexe Umrechnungen, Millimeter, Kilometer, Körpernetze und Mehrfachfaltungen bleiben bis nach der Konvergenz des Klasse-3-Förderkerns zurückgestellt.
+
+## Kritische Reihenfolgeentscheidung
+
+Die vorgeschlagene Reihenfolge wird fachlich angepasst:
+
+1. Multiplikation und Division werden gemeinsam migriert. Gleich große Gruppen, Punktefelder, Gruppieren, Verteilen und Umkehraufgaben bilden einen zusammenhängenden Begriffsaufbau.
+2. Halbschriftliche Addition, Subtraktion und Ergänzen bis 1000 kommen vor den schriftlichen Verfahren. Eine Spaltennotation darf tragfähige Stellenwert- und Rechenstrategien nicht ersetzen.
+3. Runden folgt auf Stellenwert, Nachbarzahlen und Rechnen im Zahlenraum. Dadurch kann es als Abschätzen und Beurteilen von Genauigkeit gelernt werden, nicht als isolierte Endziffernregel.
+4. Sachrechnen wird nach der Migration der grundlegenden Operationsvorstellungen gebündelt. Modellieren bleibt jedoch bereits in jedem vorherigen Release ein Transferkriterium.
+5. Daten und Wahrscheinlichkeit werden ausdrücklich eingeplant. Sie gehören zum curricularen Förderkern und dürfen nicht hinter Zahlen und Geometrie verschwinden.
+6. Die Releasefolge ist keine Reihenfolge für eine Kindersitzung. Die App mischt weiterhin passende vertraute Bereiche; die Reihenfolge steuert nur Entwicklung und Abnahme.
+
+## Releasefolge
+
+| Version | Qualitätsmigration | Verbindlicher Umfang | Bewusst nicht enthalten |
 | --- | --- | --- | --- |
-| 0.11 | Schriftliche Addition bis 1000 | Stellen ausrichten; ohne Übertrag; ein sichtbarer und anschließend ein selbstständiger Übertrag | mehrere Überträge |
-| 0.12 | Schriftliche Subtraktion bis 1000 | ohne Entbündelung; eine sichtbare und eine selbstständige Entbündelung; Additionsprobe | negative Ergebnisse, Entbündelung über Nullstellen |
-| 0.13 | Körperansichten | Würfelgebäude aus 2 bis 5 sichtbaren Würfeln; Vorder-, rechte Seiten- und Draufsicht | mentale Rotation, verdeckte Würfel |
-| 0.14 | Würfel und räumliche Rotation | kontrollierte 90-Grad-Drehungen mit sichtbarer Achse und Richtung | freie beliebige Rotation |
-| 0.15 | Falten und Spiegeln | eine Faltachse, Punktlage, einfacher Faltschnitt und Aufklappen | Mehrfachfaltungen, Körpernetze |
-| 0.16 | Daten und Diagramme | Tabellen, Strichlisten, Bild- und Säulendiagramme lesen, ergänzen und wählen | Kreisdiagramme, manipulierte Achsen |
-| 0.17 | Wahrscheinlichkeit und Kombinatorik | sicher/möglich/unmöglich; einfache Zufallsversuche; wenige Kombinationen systematisch bestimmen | Bruchwahrscheinlichkeiten |
-| 0.18 | Zeit, Masse und Rauminhalt | Uhrzeiten, einfache Zeitspannen, g/kg und ml/l mit Bezugsgrößen | Dezimalzahlen, Millimeter, Kilometer |
-| 0.19 | Ebene Figuren, Muster, Fläche und Umfang | erkennen, zerlegen, zusammensetzen; Einheitsquadrate; Umfang als Randlänge | Formeln, Maßstab |
-| 0.20 | Curriculare Integration | gemischter Transfer, Curriculum-Matrix und vollständige technische Gesamtprüfung | Wirksamkeitsbehauptung ohne Erprobung; Lehrkraft- und echter iPhone-Test bleiben bis zur tatsächlichen Durchführung offen |
+| **0.22** | Multiplikatives Denken | Multiplikation und Division aus gleich großen Gruppen; Gruppieren und Verteilen unterscheiden; Tausch-, Nachbar- und Umkehraufgaben als echte Lernhandlungen; unsichere Reihen adaptiv berücksichtigen | schriftliche Multiplikation/Division, Restdivision |
+| **0.23** | Rechenstrategien bis 1000 | Addition und Subtraktion ohne und mit einem Stellenübergang; Ergänzen zu Zehnern/Hundertern; Rechenstrich und Stellenwertmaterial aktiv vervollständigen; Strategien vergleichen | mehrere gleichzeitige Übergänge, schriftliche Notation als Einstieg |
+| **0.24** | Runden und Abschätzen | Nachbarzehner/-hunderter als Voraussetzung nutzen; Abstände untersuchen; Halbpunkt begründen; Genauigkeit passend zur Situation wählen; Runden auf Zehner und Hunderter | Dezimalzahlen, Rundung ohne Sachbezug als alleiniger Transfer |
+| **0.25** | Schriftliche Addition und Subtraktion | Stellen selbst ausrichten; Bündeln und Entbündeln mit Material und Spalte verbinden; genau ein Übertrag beziehungsweise eine Entbündelung; Probe und Fehleranalyse | mehrere Überträge, Entbündeln über mehrere Nullstellen |
+| **0.26** | Mathematisches Modellieren | Sachaufgaben von Situation und Suchgröße über eigene Modellvervollständigung und Rechnung bis Plausibilität und Antwort führen; Hinzufügen, Wegnehmen, Ergänzen, Vergleichen, Zusammenfassen, Aufteilen und Verteilen | lange Texte, reine Schlüsselwortstrategien, komplexe Mehrschrittaufgaben |
+| **0.27** | Größen und Messen | Geld, Länge, Masse und Rauminhalt über tragfähige Bezugsgrößen, Vergleiche und Messhandlungen migrieren; Uhrzeit integrieren; einfache Größen-Sachaufgaben | Dezimalzahlen, Millimeter, Kilometer, unrealistische eindeutige Schätzwerte |
+| **0.28** | Daten und Wahrscheinlichkeit | Tabellen und Diagramme aktiv erstellen, ergänzen und wechseln; Vorhersage, einfache Erprobung und Auswertung bei Wahrscheinlichkeit; Kombinatorik als bereits migrierte Grundlage integrieren | Kreisdiagramme, manipulierte Achsen, Bruchwahrscheinlichkeiten |
+| **0.29** | Raum und Form | Ebene Figuren, Fläche, Umfang, Symmetrie, Körperansichten, Rotation und Falten mit Beobachten, Konstruieren und Begründen migrieren; Muster integrieren | freie 3D-Rotation, Körpernetze, Mehrfachfaltungen, Formeltraining |
+| **0.30** | Curriculare Konvergenz | keine neue Kompetenz; alle aktiven Kompetenzen erfüllen denselben Standard; domanenübergreifender Transfer, adaptive Folgehandlungen, Curriculum-Matrix und repositoryweiter Audit | Wirksamkeitsbehauptung ohne Erprobung, unabhängiger Remote-Katalogkanal |
 
-## Fachliche Abhängigkeiten
+Ein Release darf kleiner geschnitten werden, wenn die Abnahme sonst unübersichtlich wird. Eine Kompetenzfamilie darf dabei nicht halb migriert als abgeschlossen markiert werden. Versionsnummern bezeichnen Lieferziele, keine Kalendertermine.
 
-- `written-addition` wird erst ab `independent-practice` in Stellenwert und `addition-1000` adaptiv ausgewählt.
-- `written-subtraction` benötigt denselben Stellenwertstand sowie `subtraction-1000`.
-- Würfelrotation folgt erst nach mindestens fünf Versuchen zu Körperansichten und Lernwert 60.
-- Falten setzt mindestens Symmetriephase 3 voraus.
-- Diagramme beginnen mit Tabellen; fehlende Werte und Darstellungswechsel folgen später.
-- Fläche und Umfang setzen das sichere Erkennen und Zusammensetzen ebener Figuren voraus.
-- Schwierigkeit steigt durch eine neue Idee, weniger sichtbare Unterstützung oder höhere Selbstständigkeit, nicht nur durch größere Zahlen oder mehr Text.
+## Abhängigkeiten
 
-## Arbeitspakete je Release
+- Multiplikation beginnt mit gleich großen Gruppen und strukturierten Feldern; Division nutzt diese Grundvorstellung anschließend für Gruppieren und Verteilen.
+- Rechnen bis 1000 setzt Stellenwert, Zerlegen und Zusammensetzen auf Standard 0.21 voraus.
+- Schriftliche Verfahren werden erst adaptiv angeboten, wenn die entsprechende halbschriftliche Grundkompetenz mindestens `independent-practice` erreicht hat.
+- Runden setzt sichere Nachbarzehner beziehungsweise Nachbarhunderter voraus.
+- Sachaufgaben dürfen eine Operation nur verlangen, deren Grundvorstellung zuvor aufgebaut wurde; ein Grundlagenmodus bleibt erreichbar.
+- Größenaufgaben trennen zunächst Bezugsgröße, Messen, Vergleichen und Rechnen. Umrechnen ist kein Einstieg.
+- Diagramme beginnen mit Daten sammeln und ordnen; das Lesen fertiger Skalen ist nicht der einzige Lernweg.
+- Wahrscheinlichkeit verbindet Vorhersage, Ergebnisraum und Auswertung, ohne einzelne Zufallsergebnisse als Gesetz zu deuten.
+- Rotation setzt Körperansichten voraus; Falten setzt Spiegelung voraus; Fläche und Umfang setzen das Erkennen und Zusammensetzen ebener Figuren voraus.
 
-Jede Version besitzt vier prüfbare GitHub-Issues:
+## Ein Runtime-Modell
 
-1. **Didaktik und Katalog:** Lernziel, Voraussetzungen, Fehlvorstellungen, drei konkrete Stufen, Lernphasen, Remediation, Feedback und Transfer.
-2. **Domäne und Adaptivität:** reine Generatoren, Lösungsprüfung, Varianten, fachlich notwendige Unterkompetenzen, Auswahlregeln und leichtere Folgeaufgaben.
-3. **Darstellung und UI:** mobile Interaktion, zugängliche Beschriftung, mathematische Grundvorstellung, Hilfen und sichtbare Fehlerzustände.
-4. **Tests und Release:** Katalogvalidierung, mindestens 1.000 Seeds je Stufe, Komponenten-, Mobile-, Offline-, Persistenz- und AMD64-Containerabnahme.
+Es entsteht keine zweite Ausführungsarchitektur für neue Kompetenzen. Alle Kompetenzfamilien verwenden dieselben kleinen Interaktionsbausteine:
 
-Eine Kompetenz erhält erst `active`, wenn diese vier Pakete abgeschlossen sind. Eine externe Einzelabnahme blockiert die Aktivierung nicht.
+- auswählen
+- markieren
+- zuordnen
+- ordnen
+- Modell vervollständigen
+- Zahl eingeben
+- Strategie auswählen
+- Fehler erkennen
 
-## Katalog und Schnittstellen
+Neue Spezialinteraktionen sind nur zulässig, wenn eine mathematische Handlung mit diesen Bausteinen nicht angemessen darstellbar ist. Lernphase, Darstellung, Fehlvorstellung, Hilfe und Remediation kommen aus dem Katalog; Generator und Runtime führen die mathematische Transformation aus.
 
-`SkillId` wird nur pro adaptiv relevantem Fachbereich erweitert. Version 0.11 führt `written-addition`, `guided-number` und `column-calculation` ein und erhöht das Katalogschema deshalb auf 8. Version 0.12 nutzt dieselbe Spalteninfrastruktur. Version 0.13 ergänzt `spatialViews` mit geprüften Gebäuden und die verbindliche Sachaufgabenfolge. Version 0.14 erhöht das Schema auf 11 und ergänzt `spatialRotations`; Version 0.15 ergänzt mit Schema 12 katalogisierte Einzelfaltungen. Version 0.15.1 erhöht auf Schema 13 und macht die Trennung bekannter, unbekannter und aufgedeckter Darstellungswerte verbindlich. Version 0.16 ergänzt mit Schema 14 `read-tables`, `read-charts` und katalogisierte Datensätze. Version 0.17 ergänzt mit Schema 15 `probability`, `combinatorics` und katalogisierte Zufalls- und Auswahlvorlagen. Version 0.18 ergänzt mit Schema 16 `time`, `mass`, `capacity`, Uhrtexte und Bezugsgrößen. Version 0.19 ergänzt mit Schema 17 `plane-shapes`, `patterns`, `area`, `perimeter` und katalogisierte Geometriebezeichnungen. Geometrische Transformation, Größenrechnung und Lösungsprüfung bleiben TypeScript.
+Die Migration ist zeitlich begrenzt transparent: Die Curriculum-Matrix weist aus, welche Kompetenzen den Standard 0.21 vollständig erfüllen. Eine noch nicht migrierte Kompetenz bleibt technisch nutzbar, gilt aber nicht als didaktisch neu abgenommen. Spätestens mit 0.30 gibt es keine aktive Kompetenz unterhalb des Standards mehr.
 
-Neue Kompetenzen erhöhen die Katalog-Minor-Version. `schemaVersion` steigt nur bei einer tatsächlich genutzten inkompatiblen Datenstruktur. Der Gesamtkatalog bleibt bis zur Evaluation `ready-for-review`; intern vollständig umgesetzte Kompetenzen stehen auf `active`.
+## Arbeitspakete je Milestone
 
-## Qualitätsstandard
+Jeder Milestone besteht aus vier zusammenhängenden Abnahmepaketen. Sie dürfen in einem oder wenigen Issues geführt werden, aber nicht in technische Kleinst-Issues zerfallen.
 
-- Generatorprüfungen laufen über mindestens 1.000 Seeds je Kompetenz und Stufe.
-- Lösungen, Wertebereiche und Darstellungen sind eindeutig und vollständig.
-- Die drei Stufen unterscheiden sich objektiv in Idee, Unterstützung oder Selbstständigkeit.
-- Fehlvorstellungen, Hinweise, Erklärung, Remediation und leichtere Wiederholung werden getestet.
-- Playwright prüft `375 x 812` und `812 x 375` ohne horizontales Overflow oder Konsolenfehler.
-- Interaktive 3D-Inhalte verwenden lokal gebündeltes Three.js und erhalten Screenshot- sowie Canvas-Pixelprüfungen. Körperansichten und kontrollierte Rotation nutzen bewusst ein statisches axonometrisches SVG-Diagramm: Die Aufgabe verlangt die gedankliche Vorhersage, daher darf die Darstellung den Körper nicht selbst interaktiv drehen.
-- Offline-Runde, Reload, IndexedDB, Katalogabgleich, Typecheck, Lint, Tests, Build, E2E und AMD64-Container werden vor jedem Tag geprüft.
-- GHCR veröffentlicht ausschließlich `linux/amd64`.
+1. **Didaktik und Katalog:** Lernziel, Voraussetzungen, Fehlvorstellungen, konkrete Lernhandlungen aller sechs Phasen, Progression, Darstellungen, Transfer und Remediation.
+2. **Domäne und Runtime:** deterministische Generatoren, Lösungsprüfung, Adaptivität, Fehlvorstellungsrouten und leichtere verwandte Folgehandlungen.
+3. **Interaktion und Darstellung:** wiederverwendbare mobile Bedienung; bekannte, unbekannte und aufgedeckte Werte; zugängliche Beschriftung; Hilfe nur zu sichtbaren Darstellungen.
+4. **Tests, Audit und Release:** mathematische, curriculare, Komponenten-, Mobile-, Offline-, Persistenz- und AMD64-Containerabnahme sowie dokumentierter didaktischer Vorher-/Nachher-Audit.
+
+## Release-Gate
+
+Eine neue oder migrierte Kompetenz wird nur dann `active`, wenn alle Punkte des [didaktischen Qualitätsstandards](didactic-quality-standard.md) belegt sind. Besonders verbindlich sind:
+
+- Jede Lernphase verlangt eine andere mathematische Handlung; andere Zahlen allein reichen nicht.
+- Schwierigkeit entsteht durch Idee, Darstellung, Strategie, Selbstständigkeit oder Transfer, nicht lediglich durch größere Zahlen, mehr Text oder das Entfernen notwendiger Hilfen.
+- Fehlvorstellungen beeinflussen Rückfrage, Darstellung oder Remediation. Die App behauptet keine Diagnose.
+- Darstellungen zeigen alle bekannten Informationen, maskieren alle unbekannten Werte und werden erst nach Bearbeitung vervollständigt.
+- Transfer ist eine bearbeitete und gespeicherte Handlung, kein bloß angezeigter Katalogtext.
+- Generatoren laufen je Kompetenz, Stufe und Lernphase über mindestens 1.000 deterministische Seeds, soweit die Aufgabe variiert.
+- Mobile Hoch- und Querformatprüfung, Offline-Runde, Reload, IndexedDB, Katalogabgleich, Typecheck, Lint, Tests, Build, E2E und gehärteter AMD64-Container sind bestanden.
+
+Nach jedem Milestone wird der didaktische Audit aktualisiert. Er bewertet mathematische Korrektheit, Verständlichkeit, Lernhandlungen, Darstellungen, Fehlvorstellungen, Transfer und Adaptivität. Ein nicht behobener kritischer Befund blockiert den Kompetenzstatus `active`; eine externe Lehrkraftprüfung blockiert Entwicklung und Release nicht.
+
+## Parallele Entwicklung ohne Qualitätsbruch
+
+Neue curriculare Lücken dürfen parallel bearbeitet werden, wenn die Abhängigkeiten klar sind und die Kompetenz von Beginn an das vollständige Gate erfüllt. Bis 0.30 hat jedoch die Migration Vorrang, weil der Klasse-3-Förderkern bereits breit vorhanden ist. Parallelität bedeutet nicht, mehrere halbfertige Kompetenzpfade produktiv zu schalten.
+
+Gemeinsame Ursachen werden vor Kompetenzdetails gelöst. Beispiele sind ein einheitlicher Interaktionszustand, fehlvorstellungsspezifisches Feedback, mathematische Rollen in Darstellungen, messbarer Transfer und adaptive Wahl der nächsten Lernhandlung. Eine solche Änderung wird an mindestens einer Referenzkompetenz endgültig abgenommen und anschließend auf die betroffenen Familien ausgerollt.
 
 ## Evaluation und Nachlauf
 
-Die offenen Issues zur Lehrkraftprüfung und zum echten iPhone-Test bleiben über den technischen 0.20-Abschluss hinaus offen, falls keine geeignete Lehrkraft beziehungsweise kein echtes Gerät verfügbar ist. Die Lehrkraft bewertet das zusammenhängende Curriculum, keine Einzelreleases. Ergebnisse führen zu Korrektur-Issues und gegebenenfalls `0.20.x`. Der unabhängige Katalogkanal bleibt nachgelagert.
+Lehrkraftprüfung und echter iPhone-Test bleiben offen, bis sie tatsächlich stattgefunden haben. Die Lehrkraft bewertet das zusammenhängende Curriculum und die Unterrichtssprache; sie ist kein Freigabegremium für einzelne Entwicklungsreleases. Ergebnisse werden als konkrete Korrektur-Issues erfasst.
 
-Nach 0.20 folgen schriftliche Multiplikation und Division, mehrere Überträge und Entbündelungen, komplexere Geld- und Größenaufgaben, Millimeter, Kilometer, Körpernetze und weitere Klasse-4-Inhalte.
+Nach 0.30 werden nur curricular begründete Erweiterungen geplant. Kandidaten sind schriftliche Multiplikation und Division, mehrere Überträge und Entbündelungen, komplexere Geld- und Größenaufgaben, Millimeter, Kilometer, Körpernetze und weitere Klasse-4-Inhalte. Der unabhängige Remote-Katalogkanal bleibt eine getrennte technische Zukunftsaufgabe.

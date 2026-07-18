@@ -244,4 +244,4 @@ Stand: Katalogversion 0.20.0. Die Stufen beschreiben die produktive Heuristik vo
 
 ## Bewusst offene Förderbereiche
 
-Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, freie Rotation, Würfelkippen, Mehrfachfaltungen und Körpernetze sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests; die externe Gesamtprüfung folgt in Version 0.20.
+Millimeter/Kilometer, komplexe Kaufsituationen, mehrere gleichzeitige Entbündelungen und Überträge, freie Rotation, Würfelkippen, Mehrfachfaltungen und Körpernetze sind nicht produktiv aktiviert. Vor einer Aktivierung brauchen sie geprüfte Katalogeinträge, eigene Visualisierungen und Grenzwerttests. Die [Roadmap ab 0.21](roadmap.md) priorisiert zunächst die vollständige Migration des Klasse-3-Förderkerns auf den verbindlichen [didaktischen Qualitätsstandard](didactic-quality-standard.md). Eine externe Gesamtprüfung bleibt sinnvoll, blockiert Entwicklungsreleases aber nicht.

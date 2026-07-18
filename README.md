@@ -28,7 +28,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Installierbare PWA mit vollständig vorgehaltenen MVP-Ressourcen
 - OCI-Container mit unprivilegiertem Nginx, Healthcheck und passenden Cache-Regeln
 
-Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, schriftliche Multiplikation oder Division, verdeckte Würfel, freie Würfeldrehungen, Mehrfachfaltungen, Körpernetze, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN und Backup. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md).
+Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, schriftliche Multiplikation oder Division, verdeckte Würfel, freie Würfeldrehungen, Mehrfachfaltungen, Körpernetze, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN und Backup. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md); der seit 0.21 verbindliche Kompetenzvertrag im [didaktischen Qualitätsstandard](docs/didactic-quality-standard.md).
 
 ## Voraussetzungen
 

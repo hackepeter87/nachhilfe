@@ -4,6 +4,8 @@ Stand: App 0.21.0, Katalog 0.20.0, Schema 18. Verbindliche curriculare Quelle is
 
 Der [didaktische Audit 0.20.1](../didactic-audit-0.20.1.md) bleibt der historische Ausgangsbefund. Die [Korrekturgruppe 0.21.0](../didactic-migration-0.21.0.md) setzt daraus Addition/Subtraktion bis 20, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Uhrzeit, Kombinatorik und Muster um. Die übrigen Auditbefunde bleiben ausdrücklich offen.
 
+Seit 0.21 gelten der [didaktische Qualitätsstandard](../didactic-quality-standard.md) und die [fachliche Roadmap](../roadmap.md) verbindlich. Neue Kompetenzen dürfen nur vollständig nach diesem Standard aktiviert werden. Bestehende Kompetenzen werden familienweise auf dieselbe Runtime und denselben Katalogvertrag migriert; spätestens mit 0.30 darf keine aktive Kompetenz unterhalb dieses Standards verbleiben.
+
 ## Lernphasen
 
 1. `activate`: eine tragende Grundlage erinnern oder wiedererkennen.
