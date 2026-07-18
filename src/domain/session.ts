@@ -1,4 +1,4 @@
-import { generateExercise } from './generators'
+import { defaultLearningPhaseForDifficulty, generateExercise } from './generators'
 import { dailySeed, seededRandom, shuffle } from './random'
 import { selectionWeight, subskillWeight } from './progress'
 import { getActiveCatalogMetadata, getLearningPhaseModel, isSkillEnabled } from '../content/catalog'
@@ -238,7 +238,7 @@ export function createSessionPlan(
 
 export function createRepetitionExercise(skillId: SkillId, seed: number, difficulty: Difficulty, lastVariantKey: string, subskillId?: string): Exercise {
   const easier = Math.max(1, difficulty - 1) as Difficulty
-  return uniqueExercise(skillId, seed + 7_919, easier, lastVariantKey, subskillId)
+  return uniqueExercise(skillId, seed + 7_919, easier, lastVariantKey, subskillId, defaultLearningPhaseForDifficulty(skillId, easier))
 }
 
 export function createRemediationExercise(exercise: Exercise, seed: number): Exercise {
@@ -247,6 +247,7 @@ export function createRemediationExercise(exercise: Exercise, seed: number): Exe
     seed + 7_919,
     exercise.remediation.nextDifficulty,
     exercise.variant.key,
-    exercise.remediation.keepSubskill ? exercise.subskillId : undefined
+    exercise.remediation.keepSubskill ? exercise.subskillId : undefined,
+    defaultLearningPhaseForDifficulty(exercise.skillId, exercise.remediation.nextDifficulty)
   )
 }

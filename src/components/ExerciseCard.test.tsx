@@ -215,10 +215,17 @@ describe('ExerciseCard', () => {
   it('führt eine mehrschrittige Strategieaufgabe vollständig aus', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
-    const exercise = generateExercise('round-tens', 88, 3)
+    const exercise = generateExercise('round-tens', 88, 3, undefined, 'guided-practice')
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     for (const step of exercise.steps ?? []) {
-      await user.click(screen.getByRole('button', { name: step.correctAnswer }))
+      if (step.interaction === 'guided-number') {
+        await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
+        await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+      } else {
+        const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
+        if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
+        await user.click(screen.getByRole('button', { name: option.label }))
+      }
     }
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
@@ -309,7 +316,7 @@ describe('ExerciseCard', () => {
   it('prüft Zwischenstation und Ergebnis bei einem Stellenübergang', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
-    const exercise = generateExercise('subtraction-1000', 42, 3)
+    const exercise = generateExercise('subtraction-1000', 42, 3, undefined, 'guided-practice')
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     expect(exercise.steps?.map((step) => step.id)).toEqual(['bridge', 'result'])
     for (const step of exercise.steps ?? []) {
@@ -466,6 +473,9 @@ describe('ExerciseCard', () => {
       if (step.interaction === 'guided-number') {
         await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
         await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+      } else if (step.interaction === 'guided-equation') {
+        await user.type(screen.getByLabelText('Deine Rechnung'), step.correctAnswer)
+        await user.click(screen.getByRole('button', { name: 'Rechnung prüfen' }))
       } else if (step.interaction === 'continue') {
         await user.click(screen.getByRole('button', { name: step.continueLabel ?? 'Weiter' }))
       } else {

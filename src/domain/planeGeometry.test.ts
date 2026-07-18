@@ -28,10 +28,11 @@ describe('Ebene Figuren, Muster, Fläche und Umfang', () => {
 
   it.each(['plane-shapes', 'patterns', 'area', 'perimeter'] as SkillId[])('erzeugt %s je Stufe über 1.000 Seeds eindeutig und deterministisch', (skillId) => {
     for (const difficulty of [1, 2, 3] as Difficulty[]) {
+      const phase = difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'automate'
       const typeIds = new Set<string>()
       for (let seed = 1; seed <= 1_000; seed += 1) {
-        const exercise = generateExercise(skillId, seed, difficulty)
-        const repeat = generateExercise(skillId, seed, difficulty)
+        const exercise = generateExercise(skillId, seed, difficulty, undefined, phase)
+        const repeat = generateExercise(skillId, seed, difficulty, undefined, phase)
         expect(repeat).toEqual(exercise)
         assertChoice(exercise)
         expect(exercise.representation?.valueRoles.unknownValues).toEqual(['answerLabel'])
@@ -45,15 +46,16 @@ describe('Ebene Figuren, Muster, Fläche und Umfang', () => {
           expect(isConnectedGridFigure(rows, columns, cells)).toBe(true)
           const expected = skillId === 'area' ? areaInUnitSquares(rows, columns, cells) : perimeterInUnitEdges(rows, columns, cells)
           expect(Number(exercise.correctAnswer)).toBe(expected)
-          if (difficulty < 3) expect(cells.every((cell) => cell === 1)).toBe(true)
-          else expect(cells.some((cell) => cell === 0)).toBe(true)
+          expect(cells.every((cell) => cell === 1)).toBe(true)
         }
         if (skillId === 'patterns') {
           const values = exercise.representation!.values
           const count = Number(values.sequenceCount)
           const blockLength = Number(values.blockLength)
           const sequence = Array.from({ length: count }, (_, index) => String(values[`symbol${index}`]))
-          expect(exercise.correctAnswer).toBe(sequence[count % blockLength])
+          const next = sequence[count % blockLength]
+          const following = sequence[(count + 1) % blockLength]
+          expect(exercise.correctAnswer).toBe(phase === 'automate' ? `${next} – ${following}` : next)
         }
       }
       expect(typeIds.size).toBeGreaterThanOrEqual(1)

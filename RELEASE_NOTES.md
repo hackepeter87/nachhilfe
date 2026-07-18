@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Curriculare Konvergenz 0.30.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Alle 34 aktiven Kompetenzen laufen verbindlich über `activate`, `understand`, `guided-practice`, `independent-practice`, `automate` und `transfer`.
+- Der Katalog ist nun auch für direkte Generatoraufrufe die Quelle von Lernphase und produktiver Typkennung. Der frühere phasenlose Ausführungspfad wurde entfernt.
+- Wiederholungs- und Remediationsaufgaben übernehmen die zur Zielstufe katalogisierte Lernphase. Damit bleiben Darstellung, Hilfe, Lernhandlung und Schwierigkeit auch in adaptiven Folgeaufgaben konsistent.
+- Die generierte Curriculum-Matrix weist für jede aktive Kompetenz den Standard 0.21 und alle sechs katalogisierten Laufzeittypen aus.
+- Repositoryweite Konvergenztests prüfen 204.000 deterministische Varianten, eindeutige Optionen, Remediation und die Trennung bekannter, unbekannter und aufgedeckter Darstellungswerte.
+- Katalog 0.29.0 bleibt bei Schema 19 und Status `ready-for-review`. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 427 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den finalen gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.30.0-local` beziehungsweise `mathe-reise:local` (`sha256:ec93c762a626e2fe8123999c9b61ef570ff83c625c5bbe39ed30435b0eed7ff3`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die finale Container-E2E lief auf `127.0.0.1:8090`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Raum und Form 0.29.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Ebene Figuren, Muster, Fläche, Umfang, Symmetrie, Körperansichten, Würfelrotation und Falten wurden auf den Qualitätsstandard ab 0.21 migriert.

@@ -49,8 +49,8 @@ export function renderCurriculumMatrix(catalog) {
     `- Katalogstatus: ${catalog.status}`,
     `- Aktive Kompetenzen: ${activeSkills.length}`,
     '',
-    '| ID | Kompetenz und Bereich | Förderziel | Drei Stufen | Darstellungen | Typische Fehlvorstellungen | Remediation | Automatisierte Abdeckung |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- |'
+    '| ID | Standard | Kompetenz und Bereich | Förderziel | Sechs Lernhandlungen | Drei Stufen | Darstellungen | Typische Fehlvorstellungen | Remediation | Automatisierte Abdeckung |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |'
   ]
 
   for (const skill of activeSkills) {
@@ -58,14 +58,18 @@ export function renderCurriculumMatrix(catalog) {
       .map((level) => `Stufe ${level.level}: ${level.description} [${level.representation}]`)
       .join('; ')
     const representations = skill.representations.length > 0 ? skill.representations.join('; ') : 'keine verpflichtende Darstellung'
-    lines.push(`| \`${skill.id}\` | **${cell(skill.label)}**<br>${cell(skill.curriculumArea)} | ${cell(skill.supportGoal)} | ${cell(stages)} | ${cell(representations)} | ${cell(skill.misconceptions.join('; '))} | ${cell(`${skill.remediation.strategy} Darstellung: ${skill.remediation.representation}.`)} | ${testsFor(skill)} |`)
+    const phases = skill.learningPhases
+      .map((phase) => `${phase.id}: ${phase.exerciseTypes.join(', ')}`)
+      .join('; ')
+    lines.push(`| \`${skill.id}\` | **0.21** | **${cell(skill.label)}**<br>${cell(skill.curriculumArea)} | ${cell(skill.supportGoal)} | ${cell(phases)} | ${cell(stages)} | ${cell(representations)} | ${cell(skill.misconceptions.join('; '))} | ${cell(`${skill.remediation.strategy} Darstellung: ${skill.remediation.representation}.`)} | ${testsFor(skill)}; \`src/domain/curricularConvergence.test.ts\` |`)
   }
 
   lines.push(
     '',
     '## Verbindliche Integrationsregeln',
     '',
-    '- Generator, Katalog und Runtime verwenden dieselben drei Stufen und dieselbe Darstellungsart.',
+    '- Jede aktive Kompetenz erfüllt den Qualitätsstandard 0.21 und besitzt sechs fachlich verschiedene, katalogsynchrone Runtime-Typen.',
+    '- Generator, Katalog und Runtime verwenden dieselben Lernphasen, drei Stufen und Darstellungsarten.',
     '- Bekannte, unbekannte und aufgedeckte Werte werden für jede Darstellung explizit getrennt.',
     '- Eine Runde enthält zwei adaptive Grundaufgaben sowie je einen Fokus aus Zahlen, Größen, Daten und Geometrie; Sachaufgabe und Symmetrie schließen die Runde ab.',
     '- `ready-for-review` bezeichnet die ausstehende externe Gesamtbewertung und blockiert keine intern vollständig geprüfte aktive Kompetenz.',

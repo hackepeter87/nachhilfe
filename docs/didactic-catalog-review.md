@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.29.0, Katalog 0.28.0, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.30.0, Katalog 0.29.0, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -25,7 +25,11 @@ Stand: App 0.29.0, Katalog 0.28.0, Schema 19, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.28.0
+## Aktive Veränderungen bis 0.30.0
+
+- App 0.30.0, Katalog 0.29.0 und Schema 19: Alle 34 aktiven Kompetenzen verwenden denselben sechsphasigen Runtimepfad. Direkte Generatoraufrufe, Wiederholungen und Remediation bleiben an katalogisierte Lernphase und Typkennung gebunden. Details stehen in `docs/didactic-convergence-audit-0.30.0.md`.
+
+- App 0.29.0, Katalog 0.28.0 und Schema 19: Ebene Geometrie, Symmetrie, Körperansichten, Würfelrotation und Falten besitzen sechs fachlich verschiedene Lernhandlungen. Details stehen in `docs/didactic-migration-0.29.0.md`.
 
 - App 0.28.0, Katalog 0.27.0 und Schema 19: Tabellen, Diagramme und Wahrscheinlichkeit besitzen phasengenaue Lernhandlungen; Säulen werden an einer Skala gelesen und Vorhersagen von Einzelversuchen getrennt. Details stehen in `docs/didactic-migration-0.28.0.md`.
 

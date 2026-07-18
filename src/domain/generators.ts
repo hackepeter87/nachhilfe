@@ -661,7 +661,9 @@ function decompose(seed: number, difficulty: Difficulty, phase?: LearningPhase):
       typeId: 'decompose-understand-material-to-sum', prompt: 'Welche Zerlegung beschreibt das Material?', answerMode: 'choice', correctAnswer: answer,
       options: textOptions(random, answer, [
         { value: `${hundreds} + ${tens} + ${ones}`, misconception: 'Ziffern werden ohne Stellenwert addiert.', misconceptionId: 'decompose-digits-without-value' },
-        { value: `${tens * 100} + ${hundreds * 10} + ${ones}`, misconception: 'Zehner und Hunderter werden vertauscht.', misconceptionId: 'decompose-place-swap' }
+        { value: `${tens * 100} + ${hundreds * 10} + ${ones}`, misconception: 'Zehner und Hunderter werden vertauscht.', misconceptionId: 'decompose-place-swap' },
+        { value: `${hundreds * 100} + ${tens} + ${ones}`, misconception: 'Der Zehner wird ohne seinen Stellenwert notiert.', misconceptionId: 'decompose-digits-without-value' },
+        { value: `${hundreds * 100} + ${tens * 10} + ${ones * 10}`, misconception: 'Einer werden als Zehner notiert.', misconceptionId: 'decompose-place-swap' }
       ]), representation: material
     })
   }
@@ -717,7 +719,9 @@ function compose(seed: number, difficulty: Difficulty, phase?: LearningPhase): E
       options: numberOptions(random, answer, [
         { value: hundreds * 100 + ones * 10 + tens, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
         { value: tens * 100 + hundreds * 10 + ones, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
-        { value: Number(`${hundreds}${tens}${ones}`.replace(/0/g, '')), misconception: 'Nullen als Platzhalter fehlen.', misconceptionId: 'compose-missing-zero' }
+        { value: Number(`${hundreds}${tens}${ones}`.replace(/0/g, '')), misconception: 'Nullen als Platzhalter fehlen.', misconceptionId: 'compose-missing-zero' },
+        { value: answer + (answer <= 989 ? 10 : -10), misconception: 'Ein Zehner wird zu viel oder zu wenig gebündelt.', misconceptionId: 'compose-place-order' },
+        { value: answer + (answer <= 899 ? 100 : -100), misconception: 'Ein Hunderter wird zu viel oder zu wenig gebündelt.', misconceptionId: 'compose-place-order' }
       ]), representation: material
     })
   }
@@ -3339,7 +3343,12 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
   })
 }
 
-export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string, phase?: LearningPhase): Exercise {
+export function defaultLearningPhaseForDifficulty(skillId: SkillId, difficulty: Difficulty): LearningPhase {
+  return getSkillContent(skillId).difficultyLevels[difficulty - 1].learningPhase
+}
+
+export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string, requestedPhase?: LearningPhase): Exercise {
+  const phase = requestedPhase ?? defaultLearningPhaseForDifficulty(skillId, difficulty)
   const generated: Exercise = (() => {
     switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus, phase)
@@ -3378,9 +3387,12 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'perimeter': return perimeter(seed, difficulty, phase)
     }
   })()
-  if (!phase) return generated
+  const catalogType = getSkillContent(skillId).learningPhases.find((entry) => entry.id === phase)?.exerciseTypes[0]
+  const prefix = `${skillId}:`
+  if (!catalogType?.startsWith(prefix)) throw new Error(`Kein katalogisierter Runtime-Typ für ${skillId}/${phase}.`)
   return {
     ...generated,
+    typeId: catalogType.slice(prefix.length),
     learningPhase: phase,
     learningAction: getLearningPhaseModel(phase).learningAction,
     testMetadata: { ...generated.testMetadata, learningPhase: phase }

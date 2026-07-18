@@ -35,9 +35,14 @@ describe('Katalog-Buildpipeline', () => {
     expect(fs.readFileSync(curriculumMatrixPath, 'utf8')).toBe(matrix)
     for (const skill of catalog.skills.filter((candidate) => candidate.releaseStatus === 'active')) {
       expect(matrix).toContain(`| \`${skill.id}\` |`)
+      expect(matrix).toContain(`| \`${skill.id}\` | **0.21** |`)
       expect(matrix).toContain(skill.supportGoal)
       expect(matrix).toContain(skill.remediation.strategy.replaceAll('|', '\\|'))
       expect(skill.difficultyLevels).toHaveLength(3)
+      expect(skill.learningPhases).toHaveLength(6)
+      for (const phase of skill.learningPhases) {
+        expect(matrix).toContain(`${phase.id}: ${phase.exerciseTypes.join(', ')}`)
+      }
     }
   })
 
@@ -59,7 +64,7 @@ describe('Katalog-Buildpipeline', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
       schemaVersion: 19,
-      catalogVersion: '0.28.0',
+      catalogVersion: '0.29.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })

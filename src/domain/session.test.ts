@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createRemediationExercise, createRepetitionExercise, createSessionPlan, FOCUS_DOMAINS, isSkillEligible } from './session'
 import { createSkillProgress } from './progress'
-import { generateExercise } from './generators'
+import { defaultLearningPhaseForDifficulty, generateExercise } from './generators'
 import { FALLBACK_TASK_CATALOG, getTaskCatalog, setTaskCatalog } from '../content/catalog'
 
 describe('Sitzungsplanung', () => {
@@ -19,9 +19,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.28.0',
+      catalogVersion: '0.29.0',
       schemaVersion: 19,
-      appVersion: '0.29.0'
+      appVersion: '0.30.0'
     })
   })
 
@@ -54,7 +54,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.28.0')
+      expect(runningSession.catalogVersion).toBe('0.29.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -249,6 +249,9 @@ describe('Sitzungsplanung', () => {
     const original = session.exercises[2]!
     const repetition = createRepetitionExercise(original.skillId, 900, 3, original.variant.key)
     expect(repetition.difficulty).toBe(2)
+    expect(repetition.learningPhase).toBe(defaultLearningPhaseForDifficulty(original.skillId, 2))
+    expect(getTaskCatalog().skills.find((skill) => skill.id === original.skillId)?.learningPhases
+      .find((phase) => phase.id === repetition.learningPhase)?.exerciseTypes).toContain(`${original.skillId}:${repetition.typeId}`)
     expect(repetition.variant.key).not.toBe(original.variant.key)
   })
 
@@ -256,6 +259,7 @@ describe('Sitzungsplanung', () => {
     const original = generateExercise('addition', 901, 3, 'addition-bridge-10')
     const repetition = createRemediationExercise(original, 902)
     expect(repetition.difficulty).toBe(2)
+    expect(repetition.learningPhase).toBe(defaultLearningPhaseForDifficulty(original.skillId, 2))
     expect(repetition.subskillId).toBe(original.subskillId)
     expect(repetition.variant.key).not.toBe(original.variant.key)
   })

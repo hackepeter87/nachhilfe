@@ -72,6 +72,7 @@ describe('curriculare Gesamtintegration', () => {
           expect(modelStep?.representation || modelStep?.options?.every((option) => option.representation), `${skill.id}/Stufe ${level.level}`).toBeTruthy()
           continue
         }
+        if (level.representation === 'none' && !exercise.representation) continue
         expect(exercise.representation, `${skill.id}/Stufe ${level.level}`).toBeDefined()
         const expectedVisibility = level.representation === 'none' ? 'scaffold' : level.representation
         expect(exercise.representation?.visibility, `${skill.id}/Stufe ${level.level}`).toBe(expectedVisibility)

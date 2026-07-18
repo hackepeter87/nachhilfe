@@ -8,6 +8,8 @@ Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass
 
 Der Förderkern am Ende von Klasse 3 ist in Version 0.21 bereits breit abgedeckt. Die nächsten Releases erfinden diese Inhalte nicht neu, sondern bringen sie auf einen einheitlichen Qualitätsstand.
 
+**Umsetzungsstand 0.30.0:** Die Migrationen 0.22 bis 0.29 und die curriculare Konvergenz 0.30 sind abgeschlossen. Alle 34 aktiven Kompetenzen verwenden nun denselben Qualitätsstandard. Die folgende Releasefolge bleibt als nachvollziehbare Entwicklungs- und Abnahmehistorie erhalten.
+
 Bereits nach dem Standard 0.21 migriert sind:
 
 - Addition und Subtraktion bis 20
@@ -17,7 +19,7 @@ Bereits nach dem Standard 0.21 migriert sind:
 - Kombinatorik
 - Muster
 
-Noch zu migrieren sind insbesondere Multiplikation und Division, Rechnen bis 1000, Runden, schriftliche Verfahren, Sachaufgaben, Geld, Längen, Masse, Rauminhalt, Daten, Wahrscheinlichkeit sowie die übrigen Bereiche von Raum und Form. Der [didaktische Audit 0.20.1](didactic-audit-0.20.1.md) bleibt die Befundgrundlage.
+Der [didaktische Audit 0.20.1](didactic-audit-0.20.1.md) bleibt die historische Befundgrundlage; die Umsetzung und verbleibenden externen Risiken sind im [Konvergenz-Audit 0.30.0](didactic-convergence-audit-0.30.0.md) zusammengeführt.
 
 Neue Klasse-4-Inhalte werden nicht allein deshalb vorgezogen, um die Zahl der Kompetenzen zu erhöhen. Schriftliche Multiplikation und Division, mehrere Überträge oder Entbündelungen, komplexe Umrechnungen, Millimeter, Kilometer, Körpernetze und Mehrfachfaltungen bleiben bis nach der Konvergenz des Klasse-3-Förderkerns zurückgestellt.
 
