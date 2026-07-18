@@ -1,19 +1,19 @@
 # Didaktisches Gesamtmodell
 
-Stand: App 0.20.1, Katalog 0.19.1, Schema 17. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen. Für alle Kompetenzpfade gilt zusätzlich die [Darstellungsrichtlinie](../representation-policy.md).
+Stand: App 0.21.0, Katalog 0.20.0, Schema 18. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen. Für alle Kompetenzpfade gilt zusätzlich die [Darstellungsrichtlinie](../representation-policy.md).
 
-Der [didaktische Audit 0.20.1](../didactic-audit-0.20.1.md) bewertet alle produktiven Aufgabenarten kritisch aus Sicht des mathematischen Denkprozesses. Er dokumentiert Analyse und Empfehlungen, aber noch keine beschlossenen oder implementierten Änderungen.
+Der [didaktische Audit 0.20.1](../didactic-audit-0.20.1.md) bleibt der historische Ausgangsbefund. Die [Korrekturgruppe 0.21.0](../didactic-migration-0.21.0.md) setzt daraus Addition/Subtraktion bis 20, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Uhrzeit, Kombinatorik und Muster um. Die übrigen Auditbefunde bleiben ausdrücklich offen.
 
 ## Lernphasen
 
-1. `activate`: Vorwissen mit einer vertrauten Aufgabe aufgreifen.
-2. `understand`: Handlung, Bild, Sprache und Symbol verbinden.
-3. `guided-practice`: kleine Schritte, sichtbare Darstellung und konkrete Hinweise.
-4. `independent-practice`: Hilfen reduzieren und Varianten erhöhen.
-5. `automate`: Aufgabenfamilien sicher und ohne Zeitdruck abrufen.
-6. `transfer`: begründen, Darstellung wechseln oder Alltagssituation lösen.
+1. `activate`: eine tragende Grundlage erinnern oder wiedererkennen.
+2. `understand`: eine mathematische Beziehung untersuchen und Bild, Sprache sowie Symbol verbinden.
+3. `guided-practice`: mit sichtbarer Struktur und kleinen eigenen Schritten lösen.
+4. `independent-practice`: dieselbe Kernidee selbstständig anwenden.
+5. `automate`: eine verstandene Aufgabenfamilie ohne Zeitdruck abrufen.
+6. `transfer`: die Idee in einem neuen Zusammenhang anwenden oder eine Strategie auswählen.
 
-Die aktive Runtime bindet jede Aufgabe an eine Lernphase. Aktivieren, Verstehen und geführtes Üben erzeugen Stufe 1 mit sichtbarer tragender Darstellung; selbstständiges Üben erzeugt Stufe 2; Automatisieren und Transfer erzeugen Stufe 3. Der Übergang in Transfer erfolgt erst bei sicherem Status und einem Lernwert ab 92. Die Phasen bleiben eine Produktheuristik und keine Diagnose.
+Die aktive Runtime bindet jede Aufgabe an eine Lernphase und übernimmt die zugehörige `learningAction` aus dem Katalog. Lernphasen ändern dadurch nicht nur Zahlengröße, sondern Aufgabe, Interaktion, Darstellung und Grad der Selbstständigkeit. Der Übergang in Transfer erfolgt erst bei sicherem Status und einem Lernwert ab 92. Die Phasen bleiben eine Produktheuristik und keine Diagnose.
 
 ## Hilfestufen
 

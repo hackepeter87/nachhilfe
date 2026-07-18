@@ -1,5 +1,5 @@
 import fallbackCatalogJson from './task-catalog.fallback.json'
-import { SKILL_IDS, type LearningPhase, type SkillId } from '../domain/types'
+import { SKILL_IDS, type InteractionKind, type LearningAction, type LearningPhase, type SkillId } from '../domain/types'
 import {
   createShiftDistractor,
   expectedAxisPosition,
@@ -30,7 +30,7 @@ import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisp
 import { isValidCombinationTemplate, isValidProbabilityTemplate, type CombinationTemplate, type ProbabilityTemplate } from '../domain/chance'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 17
+export const CATALOG_SCHEMA_VERSION = 18
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -76,6 +76,7 @@ export interface CatalogSkill {
   difficultyLevels: [CatalogDifficultyLevel, CatalogDifficultyLevel, CatalogDifficultyLevel]
   representations: string[]
   misconceptions: string[]
+  misconceptionFeedback?: CatalogMisconceptionFeedback[]
   hints: [string, string]
   workedExample: string
   prompt: string
@@ -110,6 +111,19 @@ export interface CatalogLearningPhase {
   goal: string
   exerciseTypes: string[]
   releaseStatus: ContentStatus
+}
+
+export interface CatalogLearningPhaseModel {
+  id: LearningPhase
+  learningAction: LearningAction
+  allowedInteractions: InteractionKind[]
+  purpose: string
+}
+
+export interface CatalogMisconceptionFeedback {
+  id: string
+  misconception: string
+  feedback: string
 }
 
 export interface CatalogRemediation {
@@ -467,6 +481,7 @@ export interface PlaneGeometryContent {
 
 export interface TaskCatalog extends CatalogMetadata {
   representationPolicy: RepresentationPolicy
+  learningPhaseModel: CatalogLearningPhaseModel[]
   fieldUsage: Record<'representationPolicy' | 'workedExample' | 'remediation' | 'transferPrompt' | 'processCompetencies' | 'learningPhases' | 'difficultyLevels' | 'representations' | 'misconceptions' | 'successCriteria' | 'successFeedback' | 'errorFeedback' | 'releaseStatus', CatalogFieldUsage>
   numberRange: { min: number; max: number }
   skills: CatalogSkill[]
@@ -506,7 +521,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
-  'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
+  'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change', 'toTen', 'rest',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
   'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
   'category', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
@@ -723,6 +738,8 @@ function hasValidRequirements(value: unknown): boolean {
 }
 
 const LEARNING_PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+const LEARNING_ACTIONS: LearningAction[] = ['recall-foundation', 'inspect-relationship', 'solve-with-structure', 'solve-independently', 'retrieve-without-time-pressure', 'apply-in-new-context']
+const INTERACTION_KINDS: InteractionKind[] = ['select', 'mark', 'match', 'order', 'complete-model', 'guided-number', 'place-value-input', 'identify-error', 'choose-strategy', 'build-pairing', 'continue']
 const CONTENT_STATUSES: ContentStatus[] = ['draft', 'ready-for-review', 'active', 'disabled']
 const WORD_MODEL_TYPES: WordModelType[] = [
   'change-increase', 'change-decrease', 'part-whole', 'comparison', 'missing-part',
@@ -733,6 +750,13 @@ function isLearningPhase(value: unknown): value is CatalogLearningPhase {
   return isRecord(value) && LEARNING_PHASES.includes(value.id as LearningPhase) && isNonEmptyString(value.goal) &&
     Array.isArray(value.exerciseTypes) && value.exerciseTypes.length > 0 && value.exerciseTypes.every(isNonEmptyString) &&
     CONTENT_STATUSES.includes(value.releaseStatus as ContentStatus)
+}
+
+function isLearningPhaseModel(value: unknown): value is CatalogLearningPhaseModel {
+  return isRecord(value) && LEARNING_PHASES.includes(value.id as LearningPhase) &&
+    LEARNING_ACTIONS.includes(value.learningAction as LearningAction) && isNonEmptyString(value.purpose) &&
+    Array.isArray(value.allowedInteractions) && value.allowedInteractions.length > 0 &&
+    value.allowedInteractions.every((interaction) => INTERACTION_KINDS.includes(interaction as InteractionKind))
 }
 
 function isRemediation(value: unknown): value is CatalogRemediation {
@@ -756,6 +780,13 @@ function isSkill(value: unknown, numberRange: { min: number; max: number }): val
   )) return false
   if (!CONTENT_STATUSES.includes(value.releaseStatus as ContentStatus)) return false
   if (!Array.isArray(value.misconceptions) || value.misconceptions.length === 0 || !value.misconceptions.every(isNonEmptyString)) return false
+  if (value.misconceptionFeedback !== undefined) {
+    if (!Array.isArray(value.misconceptionFeedback) || value.misconceptionFeedback.length === 0 ||
+      !value.misconceptionFeedback.every((route) => isRecord(route) && isNonEmptyString(route.id) &&
+        isNonEmptyString(route.misconception) && isNonEmptyString(route.feedback) &&
+        (value.misconceptions as string[]).includes(route.misconception as string)) ||
+      new Set(value.misconceptionFeedback.map((route) => (route as CatalogMisconceptionFeedback).id)).size !== value.misconceptionFeedback.length) return false
+  }
   if (!Array.isArray(value.hints) || value.hints.length !== 2 || !value.hints.every(isNonEmptyString)) return false
   if (!Array.isArray(value.successCriteria) || value.successCriteria.length === 0 || !value.successCriteria.every(isNonEmptyString) || !isRemediation(value.remediation)) return false
   if (!isRecord(value.difficultyBounds)) return false
@@ -863,6 +894,9 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!isRecord(value.representationPolicy)) return false
   const representationPolicy = value.representationPolicy
   if (!['rule', 'knownValues', 'unknownValues', 'revealedValues'].every((field) => isNonEmptyString(representationPolicy[field]))) return false
+  if (!Array.isArray(value.learningPhaseModel) || value.learningPhaseModel.length !== LEARNING_PHASES.length ||
+    !value.learningPhaseModel.every(isLearningPhaseModel) ||
+    new Set(value.learningPhaseModel.map((phase) => (phase as CatalogLearningPhaseModel).id)).size !== LEARNING_PHASES.length) return false
   if (!isRecord(value.fieldUsage)) return false
   const fieldUsage = value.fieldUsage
   const usageFields = ['representationPolicy', 'workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
@@ -945,6 +979,11 @@ export function getActiveCatalogMetadata(): CatalogMetadata {
 
 export function getSkillContent(skillId: SkillId): CatalogSkill {
   return activeCatalog.skills.find((skill) => skill.id === skillId) ?? FALLBACK_TASK_CATALOG.skills.find((skill) => skill.id === skillId)!
+}
+
+export function getLearningPhaseModel(phase: LearningPhase): CatalogLearningPhaseModel {
+  return activeCatalog.learningPhaseModel.find((entry) => entry.id === phase) ??
+    FALLBACK_TASK_CATALOG.learningPhaseModel.find((entry) => entry.id === phase)!
 }
 
 export function isSkillEnabled(skillId: SkillId): boolean {

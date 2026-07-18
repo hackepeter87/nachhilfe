@@ -13,13 +13,13 @@ Ein sichtbares Ergebnis wird für sicher gehalten; ein nicht sichtbares Ergebnis
 ## 6. Fachliche Kernidee
 Ein Ereignis ist sicher, wenn alle möglichen Ergebnisse dazugehören, möglich, wenn mindestens eines dazugehört, und unmöglich, wenn keines dazugehört. Bei zweistufigen Auswahlen wird jedes Element der ersten Menge systematisch mit jedem Element der zweiten Menge gepaart.
 ## 7. Methodischer Zugang
-Der Einstieg nutzt sichtbare Beutelinhalte. Danach folgen Münze, Würfel und Drehscheibe. Erst im Transfer werden zwei Ereignisse anhand gleich großer Ergebnisfelder verglichen. Kombinatorik beginnt mit zwei mal zwei Möglichkeiten, wächst auf drei mal zwei und ergänzt zuletzt genau eine sichtbare Ausnahme.
+Der Einstieg nutzt sichtbare Beutelinhalte. Danach folgen Münze, Würfel und Drehscheibe. Erst im Transfer werden zwei Ereignisse anhand gleich großer Ergebnisfelder verglichen. Kombinatorik beginnt mit dem Erkennen einer gültigen Paarung. Danach bildet das Kind alle Paarungen eines `2×2`- beziehungsweise `3×2`-Raums aktiv; erst anschließend wird gezählt. Im Transfer kommt bei `3×3` genau eine sichtbare Ausnahme hinzu.
 ## 8. Geeignete Darstellungen
-Gleichartig dargestellte Ergebnisfelder machen den Ergebnisraum sichtbar. Zwei geordnete Auswahlmengen und ein leeres Paarungsraster unterstützen systematisches Zählen. Die gesuchte Klassifikation beziehungsweise Anzahl bleibt numerisch und sprachlich unbekannt.
+Gleichartig dargestellte Ergebnisfelder machen den Ergebnisraum sichtbar. Zwei geordnete Auswahlmengen und auswählbare Paarungskarten machen das systematische Bilden vollständig beobachtbar; ein bloßes Zählen leerer Rasterzellen reicht nicht. Die gesuchte Klassifikation beziehungsweise Anzahl bleibt numerisch und sprachlich unbekannt.
 ## 9. Lernprogression
 `probability` Stufe 1 klassifiziert sichtbare Beutelinhalte, Stufe 2 überträgt dies auf bekannte Zufallsgeräte und Stufe 3 vergleicht zwei Ereignisse. `combinatorics` Stufe 1 nutzt `2×2`, Stufe 2 `3×2` und Stufe 3 `3×3` mit genau einer ausgeschlossenen Paarung.
 ## 10. Aufgabentypen
-Produktiv sind `classify-bag`, Klassifikationen für Münze, Würfel und Drehscheibe, `compare-events`, `combinations-2x2`, `combinations-3x2` und `combinations-with-exclusion`. Inhalte und Beschriftungen liegen im Katalog; Klassifikation, Zählung und Prüfung bleiben in TypeScript.
+Produktiv sind `classify-bag`, Klassifikationen für Münze, Würfel und Drehscheibe, `compare-events`, `combinations-2x2`, `combinations-3x2` und `combinations-with-exclusion`. Die Kombinationsaufgaben verwenden `build-pairing`: Das Kind markiert jede gültige Paarung und prüft die vollständige Auswahl. Inhalte und Beschriftungen liegen im Katalog; Klassifikation, Zählung und Prüfung bleiben in TypeScript.
 ## 11. Hilfestufen
 Die erste Hilfe lenkt auf alle sichtbaren Ergebnisse oder auf eine vollständige Zeile des Paarungsrasters. Die zweite erklärt die Begriffe beziehungsweise das paarweise Vorgehen, ohne die richtige Antwort zu nennen.
 ## 12. Remediation

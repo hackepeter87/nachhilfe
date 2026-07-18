@@ -13,13 +13,13 @@ Zahlen werden vertauscht; Startzahl wird mitgezählt; Ergebnis wird beim Minus g
 ## 6. Fachliche Kernidee
 Subtraktion beschreibt Wegnehmen, Unterschied oder Ergänzen; Addition ist die Umkehrung.
 ## 7. Methodischer Zugang
-Erst sichtbare Schritte zurück, dann Zerlegung bis 10, später Ergänzen als alternative Strategie.
+Aktivieren greift die Teil-Ganzes-Beziehung auf. Im Verstehen zerlegt das Kind den Subtrahenden so, dass der erste Schritt genau zur 10 führt. Geführtes Üben zeigt beide Sprünge; selbstständiges Üben und Automatisieren reduzieren die Hilfe. Im Transfer dient eine passende Plusaufgabe als Probe.
 ## 8. Geeignete Darstellungen
 Rechenstrich und Teil-Ganzes-Bild.
 ## 9. Lernprogression
-Ohne Übergang bis 10, Übergang in kleinen Zahlen, Aufgaben bis 20 ohne sichtbare Darstellung.
+Teil und Ganzes verbinden; Zerlegung bis 10 wählen; Zehnerübergang in zwei Sprüngen ausführen; denselben Weg selbstständig lösen; verstandene Aufgabenfamilien ohne Zeitdruck abrufen; Plusprobe im Transfer nutzen.
 ## 10. Aufgabentypen
-Zahl eingeben; `subtraction-within-10` und `subtraction-bridge-10` werden getrennt gewichtet.
+Teil-Ganzes- und Zerlegungswahl, danach Zahleneingabe und im Transfer Auswahl einer passenden Plusprobe. `subtraction-within-10` und `subtraction-bridge-10` werden getrennt gewichtet.
 ## 11. Hilfestufen
 Richtung klären; bis 10 und Rest zerlegen; vollständigen Weg zeigen.
 ## 12. Remediation

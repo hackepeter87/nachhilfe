@@ -58,8 +58,8 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 17,
-      catalogVersion: '0.19.1',
+      schemaVersion: 18,
+      catalogVersion: '0.20.0',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })

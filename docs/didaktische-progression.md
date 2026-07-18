@@ -1,6 +1,6 @@
 # Didaktische Kompetenzprogression
 
-Stand: Katalogversion 0.19.1. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md). Für alle Stufen gilt die [Darstellungsrichtlinie](representation-policy.md): Gesuchte Größen bleiben bis zur erfolgreichen Bearbeitung unbekannt.
+Stand: Katalogversion 0.20.0. Die Stufen beschreiben die produktive Heuristik von Mathe-Reise. Sie sind keine Diagnose, Schulnote oder wissenschaftlich validierte Einstufung. Seit Schema 18 ist zusätzlich jede Lernphase an eine konkrete Lernhandlung und einen begrenzten Interaktionstyp gebunden; die erste Umsetzung ist in [didactic-migration-0.21.0.md](didactic-migration-0.21.0.md) dokumentiert. Das verbindliche Gesamtmodell und die aktuellen Einzelpfade stehen unter [docs/didactics/](didactics/README.md). Für alle Stufen gilt die [Darstellungsrichtlinie](representation-policy.md): Gesuchte Größen bleiben bis zur erfolgreichen Bearbeitung unbekannt.
 
 ## Gemeinsame Regeln
 

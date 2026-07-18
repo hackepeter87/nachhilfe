@@ -15,6 +15,22 @@ async function onboard(page: Page) {
   await expect(startButton).toBeVisible()
 }
 
+async function finishAdditionWarmups(page: Page) {
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent() ?? ''
+    const complement = prompt.match(/Welche Zahl ergänzt (\d+) bis 10\?/)
+    if (complement) {
+      await page.getByRole('button', { name: String(10 - Number(complement[1])), exact: true }).click()
+    } else {
+      const terms = prompt.match(/(\d+) \+ (\d+)/)
+      if (!terms) throw new Error(`Unerwartete Einstiegsaufgabe: ${prompt}`)
+      await page.getByLabel('Deine Antwort').fill(String(Number(terms[1]) + Number(terms[2])))
+      await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    }
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+}
+
 test('Mobile-Safari-Näherung startet Aufgaben neutral und setzt Touch-Zustände zurück', async ({ page }) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
@@ -92,14 +108,7 @@ test('Mobile-Safari-Näherung zeigt eine kontrollierte Würfelrotation neutral u
   })
   await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const terms = prompt?.match(/(\d+) \+ (\d+)/)
-    if (!terms) throw new Error(`Unerwartete Einstiegsaufgabe: ${prompt}`)
-    await page.getByLabel('Deine Antwort').fill(String(Number(terms[1]) + Number(terms[2])))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   await expect(page.locator('.cube-rotation-visual')).toBeVisible()
   await expect(page.locator('.rotation-axis')).toBeVisible()

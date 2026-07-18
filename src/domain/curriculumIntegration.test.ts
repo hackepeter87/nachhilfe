@@ -42,7 +42,12 @@ describe('curriculare Gesamtintegration', () => {
             if (exercise.options.filter((option) => option.value === exercise.correctAnswer).length !== 1) throw new Error(`${context}: keine eindeutige Lösung`)
           }
           for (const step of exercise.steps ?? []) {
-            if (step.options && step.options.filter((option) => option.value === step.correctAnswer).length !== 1) throw new Error(`${context}/${step.id}: keine eindeutige Schrittlösung`)
+            if (step.interaction === 'build-pairing') {
+              if (!step.expectedSelections || step.expectedSelections.length !== step.options?.length ||
+                [...step.expectedSelections].sort().join('|') !== step.correctAnswer) throw new Error(`${context}/${step.id}: Paarungen unvollständig`)
+            } else if (step.options && step.options.filter((option) => option.value === step.correctAnswer).length !== 1) {
+              throw new Error(`${context}/${step.id}: keine eindeutige Schrittlösung`)
+            }
           }
           for (const representation of allRepresentations(exercise)) assertInitialRepresentationRoles(representation, `${context}/${representation.kind}`)
           if (seed === 1_000 && JSON.stringify(generateExercise(skill.id, seed, level.level)) !== JSON.stringify(exercise)) throw new Error(`${context}: nicht deterministisch`)

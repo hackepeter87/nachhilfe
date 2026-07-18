@@ -5,6 +5,64 @@ import { generateExercise } from '../domain'
 import { ExerciseCard } from './ExerciseCard'
 
 describe('ExerciseCard', () => {
+  it('routet eine erkannte Fehlvorstellung in spezifisches Feedback und das Versuchsergebnis', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('addition', 72, 2)
+    const wrongOperation = String(Math.abs(Number(exercise.variant.values.first) - Number(exercise.variant.values.second)))
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    await user.type(screen.getByLabelText('Deine Antwort'), wrongOperation)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(screen.getByText(/Hier kommt die zweite Menge dazu/)).toBeVisible()
+    expect(screen.getByRole('img', { name: /Zerlegt bis 10/ })).toBeVisible()
+
+    await user.type(screen.getByLabelText('Deine Antwort'), exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ detectedMisconceptions: ['addition-operation-reversal'] }))
+  })
+
+  it('baut Kombinationspaare aktiv auf, bevor die Anzahl abgefragt wird', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('combinatorics', 37, 1, undefined, 'guided-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const pairing = exercise.steps?.[0]
+    if (!pairing?.options) throw new Error('Paarungsschritt fehlt')
+
+    for (const option of pairing.options) await user.click(screen.getByRole('button', { name: option.label }))
+    expect(screen.getByText(`${pairing.options.length} Paarungen ausgewählt`)).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Paarungen prüfen' }))
+    expect(screen.getByText(/Wie viele verschiedene Paarungen/)).toBeVisible()
+  })
+
+  it('deckt Nachbargrenzen nacheinander auf', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('neighbor-tens', 55, 1, undefined, 'understand')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const [lower, upper] = exercise.steps ?? []
+    if (!lower || !upper) throw new Error('Nachbarschritte fehlen')
+
+    expect(container.querySelectorAll('.number-line-tick small')).toHaveLength(0)
+    await user.click(screen.getByRole('button', { name: lower.correctAnswer }))
+    expect([...container.querySelectorAll('.number-line-tick small')].map((node) => node.textContent)).toEqual([lower.correctAnswer])
+    expect(screen.getByRole('heading', { name: new RegExp(upper.prompt.replace(/[?]/g, '\\?')) })).toBeVisible()
+  })
+
+  it('setzt Auswahl, Hilfe und Feedback beim Aufgabenwechsel vollständig zurück', async () => {
+    const user = userEvent.setup()
+    const first = generateExercise('addition', 31, 2)
+    const second = generateExercise('subtraction', 32, 2)
+    const { rerender } = render(<ExerciseCard exercise={first} onComplete={vi.fn()} />)
+    await user.type(screen.getByLabelText('Deine Antwort'), '99')
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(screen.getByRole('img', { name: /Zerlegt bis 10/ })).toBeVisible()
+
+    rerender(<ExerciseCard exercise={second} onComplete={vi.fn()} />)
+    expect(screen.getByLabelText('Deine Antwort')).toHaveValue('')
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Zerlegt bis 10/ })).not.toBeInTheDocument()
+  })
   it('lässt eine Körperansicht auswählen und gibt richtungsbezogenes Feedback', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
@@ -137,16 +195,16 @@ describe('ExerciseCard', () => {
     const exercise = generateExercise('addition', 42, 3)
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
     expect(exercise.representation?.visibility).toBe('scaffold')
-    expect(screen.queryByRole('img', { name: /Rechenstrich/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Zerlegt bis 10/ })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /tipp/i }))
-    expect(screen.queryByRole('img', { name: /Rechenstrich/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Zerlegt bis 10/ })).not.toBeInTheDocument()
 
     for (let attempt = 0; attempt < 2; attempt += 1) {
       await user.type(screen.getByLabelText('Deine Antwort'), '99')
       await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
     }
-    expect(screen.getByRole('img', { name: /Rechenstrich/ })).toBeVisible()
+    expect(screen.getByRole('img', { name: /Zerlegt bis 10/ })).toBeVisible()
   })
 
   it('zeigt einen modellbezogenen Sachaufgabentipp nur beim sichtbaren Modellschritt', async () => {
@@ -319,7 +377,7 @@ describe('ExerciseCard', () => {
     if (!exercise) throw new Error('Keine zweischrittige Sachaufgabe erzeugt')
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     for (const step of exercise.steps ?? []) {
-      if (step.interaction === 'number') {
+      if (step.interaction === 'guided-number') {
         await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
         await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
       } else if (step.interaction === 'continue') {

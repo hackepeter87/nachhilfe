@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 17
+export const CATALOG_SCHEMA_VERSION = 18
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -16,7 +16,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'hundredsValue', 'irrelevant', 'lower', 'lowerDistance', 'number', 'ones', 'operation',
   'operationHint', 'position', 'quotient', 'result', 'second', 'story', 'strategy',
   'sumExpression', 'target', 'taskPrompt', 'tens', 'tensValue', 'third', 'total', 'upper', 'upperDistance',
-  'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change',
+  'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change', 'toTen', 'rest',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
   'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
   'category', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
@@ -90,6 +90,14 @@ function validateSkill(skill, numberRange) {
   )) fail(`${context}.processCompetencies ist ungültig`)
   for (const field of ['representations', 'misconceptions']) {
     if (!Array.isArray(skill[field]) || skill[field].length === 0 || !skill[field].every(isText)) fail(`${context}.${field} ist unvollständig`)
+  }
+  if (skill.misconceptionFeedback !== undefined) {
+    if (!Array.isArray(skill.misconceptionFeedback) || skill.misconceptionFeedback.length === 0 ||
+      !skill.misconceptionFeedback.every((route) => isRecord(route) && isText(route.id) && isText(route.misconception) &&
+        isText(route.feedback) && skill.misconceptions.includes(route.misconception))) {
+      fail(`${context}.misconceptionFeedback ist ungültig`)
+    }
+    requireUnique(skill.misconceptionFeedback.map((route) => route.id), `${context}.misconceptionFeedback IDs`)
   }
   if (!Array.isArray(skill.prerequisites) || !skill.prerequisites.every(isText)) fail(`${context}.prerequisites ist ungültig`)
   const phases = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
@@ -529,6 +537,16 @@ export function validateCatalog(catalog) {
     !['rule', 'knownValues', 'unknownValues', 'revealedValues'].every((field) => isText(catalog.representationPolicy[field]))) {
     fail('representationPolicy ist unvollständig')
   }
+  const phaseIds = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+  const actions = ['recall-foundation', 'inspect-relationship', 'solve-with-structure', 'solve-independently', 'retrieve-without-time-pressure', 'apply-in-new-context']
+  const interactions = ['select', 'mark', 'match', 'order', 'complete-model', 'guided-number', 'place-value-input', 'identify-error', 'choose-strategy', 'build-pairing', 'continue']
+  if (!Array.isArray(catalog.learningPhaseModel) || catalog.learningPhaseModel.length !== phaseIds.length ||
+    !catalog.learningPhaseModel.every((phase) => isRecord(phase) && phaseIds.includes(phase.id) && actions.includes(phase.learningAction) &&
+      isText(phase.purpose) && Array.isArray(phase.allowedInteractions) && phase.allowedInteractions.length > 0 &&
+      phase.allowedInteractions.every((interaction) => interactions.includes(interaction)))) {
+    fail('learningPhaseModel ist unvollständig')
+  }
+  requireUnique(catalog.learningPhaseModel.map((phase) => phase.id), 'learningPhaseModel')
   const usageFields = ['representationPolicy', 'workedExample', 'remediation', 'transferPrompt', 'processCompetencies', 'learningPhases', 'difficultyLevels', 'representations', 'misconceptions', 'successCriteria', 'successFeedback', 'errorFeedback', 'releaseStatus']
   if (!isRecord(catalog.fieldUsage) || !usageFields.every((field) => ['runtime', 'review', 'planned'].includes(catalog.fieldUsage[field]))) fail('fieldUsage ist unvollständig')
   const numberRange = catalog.numberRange

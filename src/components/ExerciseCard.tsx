@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { Check, HelpCircle, Lightbulb, Send } from 'lucide-react'
-import { isAnswerCorrect, isStepAnswerCorrect } from '../domain'
+import { analyzeWrongAnswer, isAnswerCorrect, isStepAnswerCorrect } from '../domain'
 import type { AttemptResult, Exercise } from '../domain'
 import { GridPicture } from './GridPicture'
 import { MathRepresentation } from './MathRepresentation'
@@ -29,6 +29,8 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const [messageKind, setMessageKind] = useState<MessageKind>('success')
   const [stepIndex, setStepIndex] = useState(0)
   const [completedStepAnswers, setCompletedStepAnswers] = useState<Record<string, string>>({})
+  const [detectedMisconceptions, setDetectedMisconceptions] = useState<string[]>([])
+  const [pairingSelections, setPairingSelections] = useState<string[]>([])
 
   useLayoutEffect(() => {
     panelRef.current?.scrollTo?.({ top: 0, left: 0 })
@@ -36,41 +38,57 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   }, [])
 
   const currentStep = exercise.steps?.[stepIndex]
-  const currentInteraction = currentStep?.interaction ?? 'choice'
+  const currentInteraction = currentStep?.interaction ?? 'select'
   const visibleHintLimit = exercise.answerMode === 'guided-word' && currentStep?.id !== 'model' ? 1 : 2
 
   const showNextHint = () => {
     setHintsShown((current) => Math.min(visibleHintLimit, current + 1))
   }
 
-  const registerWrongAnswer = (feedback: string) => {
+  const registerWrongAnswer = (feedback: string, misconceptionId?: string) => {
     const nextChecks = checks + 1
     setChecks(nextChecks)
     setHadError(true)
+    if (misconceptionId) setDetectedMisconceptions((current) => [...current, misconceptionId])
     setMessage(feedback)
     setMessageKind('error')
     setAnswer('')
+    setPairingSelections([])
+    setHintsShown((current) => Math.max(current, 1))
     if (nextChecks >= 2) setAnswerState('scaffold')
   }
 
+  const selectedOption = (value: string) => (currentStep?.options ?? exercise.options ?? []).find((option) => option.value === value)
+
+  const optionFeedback = (value: string, fallback: string) => {
+    const option = selectedOption(value)
+    const analyzed = analyzeWrongAnswer(exercise, value)
+    return {
+      feedback: option?.misconceptionFeedback ?? analyzed?.feedback ?? fallback,
+      misconceptionId: option?.misconceptionId ?? analyzed?.id
+    }
+  }
+
   const checkRegularAnswer = (value: string) => {
-    setChecks((current) => current + 1)
     if (isAnswerCorrect(exercise, value)) {
+      setChecks((current) => current + 1)
       setAnswerState('correct')
       setMessage(hadError ? `Jetzt passt es. ${exercise.successFeedback}` : exercise.successFeedback)
       setMessageKind('success')
       return
     }
-    registerWrongAnswer(exercise.errorFeedback)
+    const routed = optionFeedback(value, exercise.errorFeedback)
+    registerWrongAnswer(routed.feedback, routed.misconceptionId)
   }
 
   const checkStepAnswer = (value: string) => {
     if (!currentStep) return
-    setChecks((current) => current + 1)
     if (!isStepAnswerCorrect(currentStep, value)) {
-      registerWrongAnswer(currentStep.errorFeedback)
+      const routed = optionFeedback(value, currentStep.errorFeedback)
+      registerWrongAnswer(routed.feedback, routed.misconceptionId)
       return
     }
+    setChecks((current) => current + 1)
     setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: value }))
     setMessage(currentStep.successFeedback)
     setMessageKind('success')
@@ -79,6 +97,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     } else {
       setStepIndex((current) => current + 1)
       setAnswer('')
+      setPairingSelections([])
     }
   }
 
@@ -91,6 +110,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       correct: !hadError && answerState === 'correct',
       hintsUsed: hintsShown,
       attempts: Math.max(1, checks),
+      detectedMisconceptions: [...new Set(detectedMisconceptions)],
       completedAt: new Date().toISOString()
     })
   }
@@ -98,7 +118,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const submitNumber = (event: FormEvent) => {
     event.preventDefault()
     if (!answer.trim()) return
-    if (currentStep && currentInteraction === 'number') checkStepAnswer(answer)
+    if (currentStep && ['guided-number', 'place-value-input'].includes(currentInteraction)) checkStepAnswer(answer)
     else checkRegularAnswer(answer)
   }
 
@@ -108,6 +128,15 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setMessageKind('success')
     if (stepIndex === (exercise.steps?.length ?? 1) - 1) setAnswerState('correct')
     else setStepIndex((current) => current + 1)
+  }
+
+  const togglePairing = (value: string) => {
+    setPairingSelections((current) => current.includes(value) ? current.filter((entry) => entry !== value) : [...current, value])
+  }
+
+  const submitPairing = () => {
+    if (!currentStep || pairingSelections.length === 0) return
+    checkStepAnswer([...pairingSelections].sort().join('|'))
   }
 
   const displayedRepresentation = exercise.representation?.kind === 'column-calculation'
@@ -146,15 +175,28 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       }
     : exercise.representation
 
-  const presentationRepresentation = displayedRepresentation && answerState === 'correct'
+  const progressivelyRevealedRepresentation = displayedRepresentation
     ? {
         ...displayedRepresentation,
         valueRoles: {
           ...displayedRepresentation.valueRoles,
-          revealedValues: [...displayedRepresentation.valueRoles.unknownValues]
+          revealedValues: [
+            ...displayedRepresentation.valueRoles.revealedValues,
+            ...Object.keys(completedStepAnswers).filter((key) => displayedRepresentation.valueRoles.unknownValues.includes(key))
+          ]
         }
       }
     : displayedRepresentation
+
+  const presentationRepresentation = progressivelyRevealedRepresentation && answerState === 'correct'
+    ? {
+        ...progressivelyRevealedRepresentation,
+        valueRoles: {
+          ...progressivelyRevealedRepresentation.valueRoles,
+          revealedValues: [...progressivelyRevealedRepresentation.valueRoles.unknownValues]
+        }
+      }
+    : progressivelyRevealedRepresentation
 
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
@@ -185,6 +227,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       {exercise.answerMode !== 'guided-word' && presentationRepresentation && (
         presentationRepresentation.visibility === 'always' ||
         (presentationRepresentation.visibility === 'hint' && hintsShown > 0) ||
+        checks > 0 ||
         answerState === 'scaffold'
       ) && (
         <MathRepresentation representation={presentationRepresentation} />
@@ -197,9 +240,28 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
           </div>
           <h3>{stepIndex + 1}. {currentStep.prompt}</h3>
           {currentStep.representation && <MathRepresentation representation={currentStep.representation} />}
-          {currentInteraction === 'choice' && renderOptions()}
+          {['select', 'mark', 'match', 'order', 'complete-model', 'identify-error', 'choose-strategy'].includes(currentInteraction) && renderOptions()}
+          {currentInteraction === 'build-pairing' && (
+            <div className="pairing-builder">
+              <div className="pairing-options" aria-label="Mögliche Paarungen">
+                {(currentStep.options ?? []).map((option) => (
+                  <button
+                    aria-pressed={pairingSelections.includes(option.value)}
+                    className="pairing-option"
+                    key={option.id ?? option.value}
+                    type="button"
+                    onClick={() => togglePairing(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <p>{pairingSelections.length} Paarungen ausgewählt</p>
+              <button className="primary-button" type="button" disabled={pairingSelections.length === 0} onClick={submitPairing}>Paarungen prüfen</button>
+            </div>
+          )}
           {currentInteraction === 'continue' && <button className="primary-button" type="button" onClick={continueStep}>{currentStep.continueLabel ?? 'Weiter'}</button>}
-          {currentInteraction === 'number' && (
+          {['guided-number', 'place-value-input'].includes(currentInteraction) && (
             <form className="number-answer" onSubmit={submitNumber}>
               <label htmlFor="guided-number-answer">Dein Ergebnis</label>
               <div className="number-row">

@@ -17,7 +17,7 @@ Material sortieren, Stellenwerttafel füllen, Summe schreiben und den Weg umkehr
 ## 8. Geeignete Darstellungen
 Stellenwerttafel und gebündeltes Material.
 ## 9. Lernprogression
-Alle Stellen besetzt; eine Null; mehrere Nullstellen und reduzierte Hilfe.
+Material und Stellenwertsumme verbinden; kanonische Zerlegung beziehungsweise Zusammensetzung mit sichtbarer Struktur; Null als Platzhalter; reduzierte Hilfe; anschließend nichtkanonische Zehnerbündelungen wie `2H + 14Z + 3E`.
 ## 10. Aufgabentypen
 Zerlegung auswählen und Zahl aus vorgegebenen Stellenwerten eingeben.
 ## 11. Hilfestufen
@@ -25,12 +25,12 @@ Stellen markieren; Werte statt Ziffern notieren; Summe stellenweise zusammensetz
 ## 12. Remediation
 Jede Ziffer zunächst sichtbar in die passende Spalte legen.
 ## 13. Transfer
-Zwei verschiedene Zerlegungen derselben Zahl vergleichen, beispielsweise `300 + 40` und `340`.
+Zwei gleichwertige Zerlegungen derselben Zahl vergleichen, beispielsweise `300 + 40` und `2H + 14Z` für 340.
 ## 14. Wiederholung
 Nullmuster und Darstellungswechsel werden zeitversetzt variiert.
 ## 15. Erfolgskriterien
 Zerlegung ergibt exakt die Ausgangszahl; Zusammensetzung bleibt im Zahlenraum.
 ## 16. Grenzen der aktuellen Umsetzung
-Nichtkanonische Zerlegungen wie `2H + 14Z` sind noch nicht aktiv.
+Nichtkanonische Zehnerbündelungen sind aktiv; freie eigene Zerlegungen und nichtkanonische Einer- oder Hundertertauschungen sind noch nicht enthalten.
 ## 17. Punkte für die Gesamtprüfung
 Prüfen, wann nichtkanonische Zerlegungen für den konkreten Förderstand sinnvoll werden.

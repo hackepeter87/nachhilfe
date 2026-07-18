@@ -25,8 +25,9 @@ describe('deterministische Aufgabengeneratoren', () => {
       expect(first.options.filter((option) => option.value === first.correctAnswer)).toHaveLength(1)
     }
     first.steps?.forEach((step) => {
-      if (step.options) expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
-      else expect(['number', 'continue']).toContain(step.interaction)
+      if (step.interaction === 'build-pairing') expect([...step.expectedSelections ?? []].sort().join('|')).toBe(step.correctAnswer)
+      else if (step.options) expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
+      else expect(['guided-number', 'continue', 'build-pairing']).toContain(step.interaction)
     })
   })
 
@@ -228,8 +229,9 @@ describe('deterministische Aufgabengeneratoren', () => {
       }
     }
     const hardDecomposition = generateExercise('decompose', 8, 3)
-    expect(hardDecomposition.variant.values.tens).toBe(0)
-    expect(hardDecomposition.variant.values.ones).toBe(0)
+    expect(Number(hardDecomposition.variant.values.tens)).toBeGreaterThanOrEqual(10)
+    expect(Number(hardDecomposition.variant.values.ones)).toBeGreaterThanOrEqual(0)
+    expect(hardDecomposition.correctAnswer.split(' + ').reduce((sum, part) => sum + Number(part), 0)).toBe(Number(hardDecomposition.variant.values.number))
   })
 
   it('liefert für Symmetrie genau eine echte Spiegelung', () => {
@@ -266,7 +268,7 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(ids.indexOf('model')).toBeLessThan(ids.indexOf('equation'))
         expect(ids.indexOf('equation')).toBeLessThan(ids.indexOf('calculate'))
         const calculationStep = exercise.steps?.find((step) => step.id === 'calculate')
-        expect(calculationStep?.interaction).toBe('number')
+        expect(calculationStep?.interaction).toBe('guided-number')
         expect(calculationStep?.options).toBeUndefined()
         expect(exercise.steps?.map((step) => step.prompt).join(' ')).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
         const modelStep = exercise.steps?.find((step) => step.id === 'model')
@@ -330,7 +332,7 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(answer).toBeLessThanOrEqual(999)
         expect(carryCount(first, second)).toBe(difficulty === 1 ? 0 : 1)
         expect(exercise.answerMode).toBe('guided-number')
-        expect(exercise.steps?.filter((step) => step.interaction === 'number')).toHaveLength(difficulty === 2 ? 4 : 3)
+        expect(exercise.steps?.filter((step) => step.interaction === 'guided-number')).toHaveLength(difficulty === 2 ? 4 : 3)
         expect(exercise.steps?.find((step) => step.id === 'ones')?.correctAnswer).toBe(String(answer % 10))
         expect(exercise.steps?.find((step) => step.id === 'tens')?.correctAnswer).toBe(String(Math.floor(answer / 10) % 10))
         expect(exercise.steps?.find((step) => step.id === 'hundreds')?.correctAnswer).toBe(String(Math.floor(answer / 100)))

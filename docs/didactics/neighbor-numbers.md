@@ -13,13 +13,13 @@ Vorgänger/Nachfolger statt Nachbarzehner; Intervall nur auf einer Seite; falsch
 ## 6. Fachliche Kernidee
 Eine nicht volle Zahl liegt eindeutig in einem Intervall zwischen zwei aufeinanderfolgenden Vielfachen von 10 oder 100.
 ## 7. Methodischer Zugang
-Zahl auf dem Ausschnitt des Zahlenstrahls markieren, Intervallgrenzen benennen, Darstellung später ausblenden.
+Zunächst volle Zehner beziehungsweise Hunderter als Referenzpunkte erkennen. Danach die gegebene Zahl in einen breiteren Zahlenstrahl einordnen und die untere sowie obere Intervallgrenze nacheinander selbst bestimmen. Erst im Transfer wird ihre Nähe verglichen.
 ## 8. Geeignete Darstellungen
-Zahlenstrahl mit markierter Zahl und Intervallgrenzen.
+Breiter Zahlenstrahlausschnitt mit Referenzmarken, markierter gegebener Zahl und zunächst maskierten Intervallgrenzen. Eine korrekt bestimmte Grenze wird aufgedeckt, bevor die zweite bearbeitet wird.
 ## 9. Lernprogression
-Zahl deutlich in der Mitte; nahe an einer Grenze; beliebige Lage ohne sichtbare Darstellung.
+Volle Referenzzahl erkennen; Intervallprinzip verstehen; untere und obere Grenze schrittweise bestimmen; selbstständig beide Grenzen finden; im Transfer den näheren Nachbarn begründen.
 ## 10. Aufgabentypen
-Drei plausible Intervallpaare auswählen, getrennt für Zehner und Hunderter.
+Referenzzahl auswählen, anschließend untere und obere Grenze getrennt bestimmen sowie im Transfer den näheren Nachbarn auswählen; Zehner und Hunderter bleiben getrennte Kompetenzen.
 ## 11. Hilfestufen
 Gesuchte Stellenebene klären; kleinere volle Zahl suchen; genau einen Schritt zur größeren Grenze gehen.
 ## 12. Remediation

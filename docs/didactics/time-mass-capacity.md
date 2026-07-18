@@ -13,11 +13,11 @@ Stunden- und Minutenzeiger werden vertauscht; nur die Minutenzahlen werden subtr
 ## 6. Fachliche Kernidee
 Eine Uhrzeit verbindet zyklische Zeigerpositionen mit einer linearen Zeitangabe. `1 kg = 1000 g` und `1 l = 1000 ml` beschreiben jeweils dieselbe Größe in verschiedenen Einheiten. Ergänzen und Rechnen erfolgen zunächst in einer gemeinsamen Basiseinheit.
 ## 7. Methodischer Zugang
-Zeit beginnt mit vollen und halben Stunden, führt über Fünfminutenschritte zu vorwärts gerichteten Zeitspannen. Masse und Rauminhalt beginnen mit bekannten Alltagsobjekten, führen zum Ergänzen auf die Grundeinheit und erst danach zu Summen und Unterschieden.
+Zeit beginnt mit der Unterscheidung von Stunden- und Minutenzeiger. Es folgen volle Stunden, halbe Stunden, Viertelstunden, Fünfminutenschritte und erst danach vorwärts gerichtete Zeitspannen. Masse und Rauminhalt beginnen mit bekannten Alltagsobjekten, führen zum Ergänzen auf die Grundeinheit und erst danach zu Summen und Unterschieden.
 ## 8. Geeignete Darstellungen
-Eine analoge Uhr zeigt bekannte Zeigerpositionen. Zwei Uhren markieren Start und Ende einer Zeitspanne. Eine gefüllte Skala macht die bekannte Teilmenge bis 1000 sichtbar; Waagen- und Gefäßdarstellungen unterscheiden die Größenbereiche. Das gesuchte Ergebnis bleibt immer `?`.
+Eine analoge Uhr zeigt alle zwölf Stundenmarken sowie unterschiedlich lange Zeiger. Der Stundenzeiger bewegt sich innerhalb der Stunde kontinuierlich mit und steht bei halben beziehungsweise Viertelstunden zwischen den Markierungen. Zwei Uhren markieren Start und Ende einer Zeitspanne. Eine gefüllte Skala macht die bekannte Teilmenge bis 1000 sichtbar; Waagen- und Gefäßdarstellungen unterscheiden die Größenbereiche. Das gesuchte Ergebnis bleibt immer `?`.
 ## 9. Lernprogression
-`time`: volle/halbe Stunden, Fünfminutenzeiten, vorwärts gerichtete Spannen von 15 bis 90 Minuten. `mass` und `capacity`: Bezugsgröße auswählen, in Fünfzigerschritten bis 1000 ergänzen, anschließend zwei bekannte Mengen addieren oder voneinander abziehen.
+`time`: Zeigerrollen, volle Stunden, halbe Stunden, Viertelstunden, Fünfminutenzeiten, vorwärts gerichtete Spannen von 15 bis 90 Minuten. `mass` und `capacity`: Bezugsgröße auswählen, in Fünfzigerschritten bis 1000 ergänzen, anschließend zwei bekannte Mengen addieren oder voneinander abziehen.
 ## 10. Aufgabentypen
 Produktiv sind `time-read-clock`, `time-duration`, `mass-reference`, `mass-complement`, `mass-calculate`, `capacity-reference`, `capacity-complement` und `capacity-calculate`. Texte und Bezugsgrößen liegen im Katalog; Zeit- und Mengenrechnung bleibt in TypeScript.
 ## 11. Hilfestufen

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 17,
-  "catalogVersion": "0.19.1",
+  "schemaVersion": 18,
+  "catalogVersion": "0.20.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -10,6 +10,76 @@
     "unknownValues": "Unbekannte Größen werden als Fragezeichen oder ausdrücklich als unbekannt dargestellt.",
     "revealedValues": "Unbekannte Größen dürfen erst nach einer erfolgreichen Bearbeitung numerisch ergänzt werden."
   },
+  "learningPhaseModel": [
+    {
+      "id": "activate",
+      "learningAction": "recall-foundation",
+      "allowedInteractions": [
+        "select",
+        "mark",
+        "match"
+      ],
+      "purpose": "Eine notwendige Grundlage aktivieren, ohne bereits die reguläre Zielaufgabe zu stellen."
+    },
+    {
+      "id": "understand",
+      "learningAction": "inspect-relationship",
+      "allowedInteractions": [
+        "mark",
+        "match",
+        "complete-model",
+        "choose-strategy",
+        "build-pairing"
+      ],
+      "purpose": "Die mathematische Kernidee an einer Beziehung oder Darstellung untersuchen."
+    },
+    {
+      "id": "guided-practice",
+      "learningAction": "solve-with-structure",
+      "allowedInteractions": [
+        "select",
+        "complete-model",
+        "guided-number",
+        "place-value-input",
+        "build-pairing"
+      ],
+      "purpose": "Mit sichtbarer Struktur und abgestuften Hilfen selbst lösen."
+    },
+    {
+      "id": "independent-practice",
+      "learningAction": "solve-independently",
+      "allowedInteractions": [
+        "select",
+        "guided-number",
+        "place-value-input",
+        "order",
+        "build-pairing"
+      ],
+      "purpose": "Mit reduzierter Unterstützung selbstständig lösen."
+    },
+    {
+      "id": "automate",
+      "learningAction": "retrieve-without-time-pressure",
+      "allowedInteractions": [
+        "select",
+        "guided-number",
+        "place-value-input"
+      ],
+      "purpose": "Bereits verstandene Grundaufgaben ohne Zeitdruck sicher abrufen."
+    },
+    {
+      "id": "transfer",
+      "learningAction": "apply-in-new-context",
+      "allowedInteractions": [
+        "identify-error",
+        "choose-strategy",
+        "match",
+        "order",
+        "complete-model"
+      ],
+      "purpose": "Verständnis auf eine neue Darstellung, Begründung oder Fehlersituation übertragen."
+    }
+  ],
   "numberRange": {
     "min": 0,
     "max": 1000
@@ -24,9 +94,21 @@
         "Die zweite Zahl wird abgezogen.",
         "Beim Zehnerübergang wird ein Schritt ausgelassen."
       ],
+      "misconceptionFeedback": [
+        {
+          "id": "addition-operation-reversal",
+          "misconception": "Die zweite Zahl wird abgezogen.",
+          "feedback": "Hier kommt die zweite Menge dazu. Wird das Ergebnis dadurch größer oder kleiner?"
+        },
+        {
+          "id": "addition-bridge-step",
+          "misconception": "Beim Zehnerübergang wird ein Schritt ausgelassen.",
+          "feedback": "Prüfe die Zerlegung bis 10. Der erste und der restliche Schritt müssen zusammen genau den zweiten Summanden ergeben."
+        }
+      ],
       "hints": [
-        "Starte bei {first} und zähle {second} weiter.",
-        "Zerlege {second}, sodass du zuerst bis 10 oder zur nächsten vollen Zahl kommst."
+        "Bündele zuerst bis 5 oder 10. Welche Teilmenge ergänzt zuerst bis 10?",
+        "Zerlege {second} in {toTen} und {rest}: zuerst bis 10, dann den Rest."
       ],
       "prompt": "Wie viel ist {first} + {second}?",
       "errorFeedback": "Fast. Prüfe noch einmal, wie viele Schritte du von {first} weiterzählst.",
@@ -114,7 +196,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "addition:entry"
+            "addition:activate-complement-to-ten"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -122,7 +204,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "addition:representation"
+            "addition:understand-bridge"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -130,7 +212,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "addition:difficulty-1"
+            "addition:guided-two-step"
           ],
           "releaseStatus": "active"
         },
@@ -138,7 +220,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "addition:difficulty-2"
+            "addition:independent"
           ],
           "releaseStatus": "active"
         },
@@ -146,7 +228,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "addition:difficulty-3"
+            "addition:automate"
           ],
           "releaseStatus": "active"
         },
@@ -154,7 +236,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "addition:difficulty-3"
+            "addition:transfer-commutative"
           ],
           "releaseStatus": "ready-for-review"
         }
@@ -174,9 +256,21 @@
         "Die Zahlen werden vertauscht.",
         "Beim Rückwärtszählen wird die Startzahl mitgezählt."
       ],
+      "misconceptionFeedback": [
+        {
+          "id": "subtraction-number-order",
+          "misconception": "Die Zahlen werden vertauscht.",
+          "feedback": "Beginne mit der ersten Menge. Von ihr wird die zweite Menge weggenommen; die Reihenfolge bleibt erhalten."
+        },
+        {
+          "id": "subtraction-counting-start",
+          "misconception": "Beim Rückwärtszählen wird die Startzahl mitgezählt.",
+          "feedback": "Die Startzahl ist noch kein Schritt. Markiere erst den ersten Sprung zurück."
+        }
+      ],
       "hints": [
-        "Gehe von {first} aus {second} Schritte zurück.",
-        "Du kannst erst bis 10 zurückgehen und dann den Rest abziehen."
+        "Sieh {first} als Ganzes und {second} als Teil, der weggenommen oder ergänzt wird.",
+        "Zerlege {second} in {toTen} und {rest}: zuerst bis 10, dann den Rest. Prüfe anschließend mit Plus."
       ],
       "prompt": "Wie viel ist {first} − {second}?",
       "errorFeedback": "Noch nicht ganz. Beim Minusrechnen wird die Zahl kleiner.",
@@ -264,7 +358,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "subtraction:entry"
+            "subtraction:activate-part-whole"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -272,7 +366,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "subtraction:representation"
+            "subtraction:understand-bridge"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -280,7 +374,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "subtraction:difficulty-1"
+            "subtraction:guided-two-step"
           ],
           "releaseStatus": "active"
         },
@@ -288,7 +382,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "subtraction:difficulty-2"
+            "subtraction:independent"
           ],
           "releaseStatus": "active"
         },
@@ -296,7 +390,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "subtraction:difficulty-3"
+            "subtraction:automate"
           ],
           "releaseStatus": "active"
         },
@@ -304,7 +398,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "subtraction:difficulty-3"
+            "subtraction:transfer-plus-check"
           ],
           "releaseStatus": "ready-for-review"
         }
@@ -625,6 +719,18 @@
         "Ziffer und Stellenwert werden gleichgesetzt.",
         "Einer, Zehner und Hunderter werden verwechselt."
       ],
+      "misconceptionFeedback": [
+        {
+          "id": "place-value-digit-as-value",
+          "misconception": "Ziffer und Stellenwert werden gleichgesetzt.",
+          "feedback": "Die Ziffer nennt, wie viele es sind. Die Spalte zeigt, ob es Einer, Zehner oder Hunderter sind."
+        },
+        {
+          "id": "place-value-column-confusion",
+          "misconception": "Einer, Zehner und Hunderter werden verwechselt.",
+          "feedback": "Ordne das Material zuerst in Hunderterflächen, Zehnerstangen und Einerpunkte."
+        }
+      ],
       "hints": [
         "Suche die {position}-Spalte.",
         "{digit} {position} bedeuten nicht nur die Ziffer {digit}, sondern ihren Wert an dieser Stelle."
@@ -714,7 +820,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "place-value:entry"
+            "place-value:activate-material"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -722,7 +828,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "place-value:representation"
+            "place-value:understand-digit-value"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -730,7 +836,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "place-value:difficulty-1"
+            "place-value:guided-table"
           ],
           "releaseStatus": "active"
         },
@@ -738,7 +844,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "place-value:difficulty-2"
+            "place-value:independent"
           ],
           "releaseStatus": "active"
         },
@@ -746,7 +852,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "place-value:difficulty-3"
+            "place-value:automate"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -754,7 +860,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "place-value:difficulty-3"
+            "place-value:transfer-hundred-change"
           ],
           "releaseStatus": "active"
         }
@@ -773,6 +879,18 @@
       "misconceptions": [
         "Ziffern werden ohne Stellenwert addiert.",
         "Zehner und Hunderter werden vertauscht."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "decompose-digits-without-value",
+          "misconception": "Ziffern werden ohne Stellenwert addiert.",
+          "feedback": "Eine Ziffer erhält ihren Wert erst durch ihre Stelle: 4 Hunderter bedeuten 400, nicht 4."
+        },
+        {
+          "id": "decompose-place-swap",
+          "misconception": "Zehner und Hunderter werden vertauscht.",
+          "feedback": "Lege jede Angabe in die passende H-, Z- oder E-Spalte und prüfe die Reihenfolge."
+        }
       ],
       "hints": [
         "Trenne Hunderter, Zehner und Einer.",
@@ -801,6 +919,7 @@
         "Stellenwerte bis 1000"
       ],
       "representations": [
+        "Stellenwertmaterial",
         "Stellenwerttafel"
       ],
       "difficultyLevels": [
@@ -834,7 +953,7 @@
         },
         {
           "level": 3,
-          "description": "Zahl mit zwei Nullstellen und ähnlichen Zerlegungen ohne Tafel",
+          "description": "Nichtkanonische Zerlegung mit mehr als neun Zehnern; Darstellungswechsel und Bündeln erforderlich",
           "numberRange": "100 bis 999",
           "representation": "none",
           "requirements": {
@@ -862,7 +981,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "decompose:entry"
+            "decompose:activate-material-count"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -870,7 +989,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "decompose:representation"
+            "decompose:understand-material-to-sum"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -878,7 +997,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "decompose:difficulty-1"
+            "decompose:guided-canonical"
           ],
           "releaseStatus": "active"
         },
@@ -886,7 +1005,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "decompose:difficulty-2"
+            "decompose:independent-placeholder"
           ],
           "releaseStatus": "active"
         },
@@ -894,7 +1013,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "decompose:difficulty-3"
+            "decompose:automate-noncanonical"
           ],
           "releaseStatus": "active"
         },
@@ -902,7 +1021,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "decompose:difficulty-3"
+            "decompose:transfer-recompose"
           ],
           "releaseStatus": "ready-for-review"
         }
@@ -921,6 +1040,18 @@
       "misconceptions": [
         "Stellen werden in falscher Reihenfolge notiert.",
         "Nullen als Platzhalter fehlen."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "compose-place-order",
+          "misconception": "Stellen werden in falscher Reihenfolge notiert.",
+          "feedback": "Lies die Stellen immer in der Reihenfolge Hunderter, Zehner, Einer."
+        },
+        {
+          "id": "compose-missing-zero",
+          "misconception": "Nullen als Platzhalter fehlen.",
+          "feedback": "Ist eine Stelle leer, hält eine 0 ihren Platz in der Zahl frei."
+        }
       ],
       "hints": [
         "Schreibe zuerst die Hunderter-, dann die Zehner- und zuletzt die Einerziffer.",
@@ -949,6 +1080,7 @@
         "Stellenwerte bis 1000"
       ],
       "representations": [
+        "Stellenwertmaterial",
         "Stellenwerttafel"
       ],
       "difficultyLevels": [
@@ -982,7 +1114,7 @@
         },
         {
           "level": 3,
-          "description": "Zwei Stellen sind mit Null besetzt; Zahl ohne Tafel zusammensetzen",
+          "description": "Nichtkanonische Stellenangaben mit mehr als neun Zehnern bündeln und zur Zahl zusammensetzen",
           "numberRange": "100 bis 999",
           "representation": "none",
           "requirements": {
@@ -1010,7 +1142,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "compose:entry"
+            "compose:activate-sort-material"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1018,7 +1150,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "compose:representation"
+            "compose:understand-material-to-number"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1026,7 +1158,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "compose:difficulty-1"
+            "compose:guided-canonical"
           ],
           "releaseStatus": "active"
         },
@@ -1034,7 +1166,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "compose:difficulty-2"
+            "compose:independent-placeholder"
           ],
           "releaseStatus": "active"
         },
@@ -1042,7 +1174,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "compose:difficulty-3"
+            "compose:automate-noncanonical"
           ],
           "releaseStatus": "active"
         },
@@ -1050,7 +1182,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "compose:difficulty-3"
+            "compose:transfer-decompose"
           ],
           "releaseStatus": "ready-for-review"
         }
@@ -1069,6 +1201,18 @@
       "misconceptions": [
         "Nicht direkt benachbarte Zehner werden gewählt.",
         "Nur der kleinere Zehner wird betrachtet."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "neighbor-tens-wrong-interval",
+          "misconception": "Nicht direkt benachbarte Zehner werden gewählt.",
+          "feedback": "Suche zuerst den Zehner direkt links von der Zahl. Der nächste Zehner rechts ist genau 10 größer."
+        },
+        {
+          "id": "neighbor-tens-one-sided",
+          "misconception": "Nur der kleinere Zehner wird betrachtet.",
+          "feedback": "Eine Zahl liegt zwischen zwei Nachbarzehnern. Nach dem unteren fehlt noch der direkt folgende obere Zehner."
+        }
       ],
       "hints": [
         "Suche die volle Zehnerzahl direkt unter und über {number}.",
@@ -1158,7 +1302,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "neighbor-tens:entry"
+            "neighbor-tens:activate-full-number"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1166,7 +1310,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "neighbor-tens:representation"
+            "neighbor-tens:understand-boundaries"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1174,7 +1318,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "neighbor-tens:difficulty-1"
+            "neighbor-tens:guided-boundaries"
           ],
           "releaseStatus": "active"
         },
@@ -1182,7 +1326,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "neighbor-tens:difficulty-2"
+            "neighbor-tens:independent"
           ],
           "releaseStatus": "active"
         },
@@ -1190,7 +1334,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "neighbor-tens:difficulty-3"
+            "neighbor-tens:automate"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1198,7 +1342,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "neighbor-tens:difficulty-3"
+            "neighbor-tens:transfer-nearer"
           ],
           "releaseStatus": "active"
         }
@@ -1217,6 +1361,18 @@
       "misconceptions": [
         "Nicht direkt benachbarte Hunderter werden gewählt.",
         "Zehner statt Hunderter werden betrachtet."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "neighbor-hundreds-wrong-interval",
+          "misconception": "Nicht direkt benachbarte Hunderter werden gewählt.",
+          "feedback": "Suche den Hunderter direkt unter der Zahl. Der obere Nachbar ist genau 100 größer."
+        },
+        {
+          "id": "neighbor-hundreds-used-tens",
+          "misconception": "Zehner statt Hunderter werden betrachtet.",
+          "feedback": "Achte auf volle Hunderter: Sie enden mit zwei Nullen."
+        }
       ],
       "hints": [
         "Suche die volle Hunderterzahl direkt unter und über {number}.",
@@ -1306,7 +1462,7 @@
           "id": "activate",
           "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
           "exerciseTypes": [
-            "neighbor-hundreds:entry"
+            "neighbor-hundreds:activate-full-number"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1314,7 +1470,7 @@
           "id": "understand",
           "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
           "exerciseTypes": [
-            "neighbor-hundreds:representation"
+            "neighbor-hundreds:understand-boundaries"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1322,7 +1478,7 @@
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "neighbor-hundreds:difficulty-1"
+            "neighbor-hundreds:guided-boundaries"
           ],
           "releaseStatus": "active"
         },
@@ -1330,7 +1486,7 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "neighbor-hundreds:difficulty-2"
+            "neighbor-hundreds:independent"
           ],
           "releaseStatus": "active"
         },
@@ -1338,7 +1494,7 @@
           "id": "automate",
           "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
           "exerciseTypes": [
-            "neighbor-hundreds:difficulty-3"
+            "neighbor-hundreds:automate"
           ],
           "releaseStatus": "ready-for-review"
         },
@@ -1346,7 +1502,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "neighbor-hundreds:difficulty-3"
+            "neighbor-hundreds:transfer-nearer"
           ],
           "releaseStatus": "active"
         }
@@ -3967,6 +4123,28 @@
         "Optionen derselben Gruppe werden miteinander kombiniert.",
         "Eine ausgeschlossene Kombination wird trotzdem mitgezählt."
       ],
+      "misconceptionFeedback": [
+        {
+          "id": "combinations-duplicate",
+          "misconception": "Möglichkeiten werden doppelt gezählt.",
+          "feedback": "Jede Paarung braucht genau eine Wahl aus jeder Gruppe und darf nur einmal markiert sein."
+        },
+        {
+          "id": "combinations-missing",
+          "misconception": "Eine Auswahl wird ausgelassen.",
+          "feedback": "Halte die linke Wahl fest und gehe rechts der Reihe nach durch. Wechsle erst dann links weiter."
+        },
+        {
+          "id": "combinations-same-group",
+          "misconception": "Optionen derselben Gruppe werden miteinander kombiniert.",
+          "feedback": "Eine gültige Paarung besteht aus genau einer Wahl links und einer Wahl rechts."
+        },
+        {
+          "id": "combinations-excluded",
+          "misconception": "Eine ausgeschlossene Kombination wird trotzdem mitgezählt.",
+          "feedback": "Die sichtbar gesperrte Paarung gehört nicht zu den möglichen Kombinationen."
+        }
+      ],
       "hints": [
         "Beginne mit der ersten Möglichkeit links und verbinde sie nacheinander mit jeder Möglichkeit rechts.",
         "Prüfe danach die nächste Möglichkeit links. So fehlt keine Kombination und keine wird doppelt gezählt."
@@ -3997,7 +4175,7 @@
       ],
       "representations": [
         "Zwei geordnete Auswahlreihen",
-        "Leeres Kombinationstableau",
+        "Aktiv mit konkreten Paarungen gefülltes Kombinationstableau",
         "Sichtbar ausgeschlossene Paarung"
       ],
       "difficultyLevels": [
@@ -4059,7 +4237,7 @@
           "id": "activate",
           "goal": "Zwei Auswahlgruppen unterscheiden.",
           "exerciseTypes": [
-            "combinatorics:foundation"
+            "combinatorics:identify-pair"
           ],
           "releaseStatus": "active"
         },
@@ -4067,7 +4245,7 @@
           "id": "understand",
           "goal": "Eine Paarung als je eine Wahl aus beiden Gruppen verstehen.",
           "exerciseTypes": [
-            "combinatorics:foundation"
+            "combinatorics:build-pairing"
           ],
           "releaseStatus": "active"
         },
@@ -4075,7 +4253,7 @@
           "id": "guided-practice",
           "goal": "Vier Möglichkeiten geordnet zählen.",
           "exerciseTypes": [
-            "combinatorics:foundation"
+            "combinatorics:build-and-count-2x2"
           ],
           "releaseStatus": "active"
         },
@@ -4083,7 +4261,7 @@
           "id": "independent-practice",
           "goal": "Sechs Möglichkeiten ohne Doppelzählung bestimmen.",
           "exerciseTypes": [
-            "combinatorics:practice"
+            "combinatorics:build-and-count-3x2"
           ],
           "releaseStatus": "active"
         },
@@ -4091,7 +4269,7 @@
           "id": "automate",
           "goal": "Kleine Ergebnisräume systematisch erfassen.",
           "exerciseTypes": [
-            "combinatorics:practice"
+            "combinatorics:build-and-count"
           ],
           "releaseStatus": "active"
         },
@@ -4099,7 +4277,7 @@
           "id": "transfer",
           "goal": "Eine sichtbare Einschränkung korrekt berücksichtigen.",
           "exerciseTypes": [
-            "combinatorics:transfer"
+            "combinatorics:build-with-exclusion"
           ],
           "releaseStatus": "active"
         }
@@ -4119,6 +4297,18 @@
       "misconceptions": [
         "Stunden- und Minutenzeiger werden vertauscht.",
         "Bei einer Zeitspanne werden nur die Minutenzahlen voneinander abgezogen."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "time-hands-swapped",
+          "misconception": "Stunden- und Minutenzeiger werden vertauscht.",
+          "feedback": "Der lange Zeiger zeigt die Minuten. Der kürzere Zeiger wandert während der Stunde weiter."
+        },
+        {
+          "id": "time-duration-minute-difference",
+          "misconception": "Bei einer Zeitspanne werden nur die Minutenzahlen voneinander abgezogen.",
+          "feedback": "Gehe auf der Zeitlinie von der Startzeit bis zur Endzeit. Ein Stundenwechsel zählt mit."
+        }
       ],
       "hints": [
         "Achte zuerst auf den kurzen Stundenzeiger und dann auf den langen Minutenzeiger.",
@@ -4155,7 +4345,7 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Volle und halbe Stunden an einer analogen Uhr ablesen",
+          "description": "Volle Stunden als Grundlage, danach halbe Stunden mit kontinuierlich wanderndem Stundenzeiger",
           "numberRange": "1 bis 12 Uhr",
           "representation": "always",
           "requirements": {
@@ -4169,7 +4359,7 @@
         },
         {
           "level": 2,
-          "description": "Viertelstunden und Fünf-Minuten-Schritte selbstständig ablesen",
+          "description": "Viertelstunden, anschließend Uhrzeiten in Fünfminutenschritten lesen",
           "numberRange": "1 bis 12 Uhr",
           "representation": "always",
           "requirements": {
@@ -4209,41 +4399,41 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Stunden- und Minutenzeiger unterscheiden.",
+          "goal": "Stunden- und Minutenzeiger anhand von Form und Länge unterscheiden.",
           "exerciseTypes": [
-            "time:foundation"
+            "time:identify-hand"
           ],
           "releaseStatus": "ready-for-review"
         },
         {
           "id": "understand",
-          "goal": "Analoge und digitale Uhrzeit verbinden.",
+          "goal": "Volle Stunden analog und digital zuordnen.",
           "exerciseTypes": [
-            "time:foundation"
+            "time:full-hour"
           ],
           "releaseStatus": "ready-for-review"
         },
         {
           "id": "guided-practice",
-          "goal": "Volle und halbe Stunden ablesen.",
+          "goal": "Halbe Stunden mit dem Stundenzeiger zwischen zwei Zahlen lesen.",
           "exerciseTypes": [
-            "time:difficulty-1"
+            "time:half-hour"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Viertelstunden und Fünf-Minuten-Schritte ablesen.",
+          "goal": "Viertelstunden analog und digital zuordnen.",
           "exerciseTypes": [
-            "time:difficulty-2"
+            "time:quarter-hour"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Uhrzeiten ohne Zeitdruck sicher zuordnen.",
+          "goal": "Uhrzeiten in Fünfminutenschritten ohne Zeitdruck lesen.",
           "exerciseTypes": [
-            "time:difficulty-2"
+            "time:five-minute"
           ],
           "releaseStatus": "active"
         },
@@ -4251,7 +4441,7 @@
           "id": "transfer",
           "goal": "Einfache Zeitspannen vorwärts bestimmen.",
           "exerciseTypes": [
-            "time:difficulty-3"
+            "time:duration"
           ],
           "releaseStatus": "active"
         }
@@ -4727,6 +4917,23 @@
         "Die Reihenfolge innerhalb des Musterblocks wird vertauscht.",
         "Ein wachsender Block wird als einfaches Wechselmuster gelesen."
       ],
+      "misconceptionFeedback": [
+        {
+          "id": "patterns-repeat-last",
+          "misconception": "Nur das letzte Zeichen wird wiederholt.",
+          "feedback": "Suche nicht nur das letzte Zeichen, sondern den kleinsten Block, der von vorn wieder beginnt."
+        },
+        {
+          "id": "patterns-block-order",
+          "misconception": "Die Reihenfolge innerhalb des Musterblocks wird vertauscht.",
+          "feedback": "Markiere den wiederholten Block und lies seine Zeichen immer in derselben Reihenfolge."
+        },
+        {
+          "id": "patterns-growing-confusion",
+          "misconception": "Ein wachsender Block wird als einfaches Wechselmuster gelesen.",
+          "feedback": "Prüfe, ob der Block wirklich gleich bleibt oder von Runde zu Runde wächst."
+        }
+      ],
       "hints": [
         "Suche zuerst den kleinsten Block, der sich wiederholt.",
         "Sprich den Musterblock leise von vorne und setze genau an derselben Stelle fort."
@@ -4755,9 +4962,9 @@
         "Reihenfolgen von links nach rechts lesen"
       ],
       "representations": [
-        "AB-Musterstreifen",
-        "ABC-Musterstreifen",
-        "Wachsender AAB-Musterstreifen"
+        "Markierter kleinster Wiederholungsblock",
+        "AB- und ABC-Musterstreifen",
+        "Fehlersuche in einem wiederkehrenden AAB- oder ABB-Block"
       ],
       "difficultyLevels": [
         {
@@ -4818,7 +5025,7 @@
           "id": "activate",
           "goal": "Gleiche Symbole ordnen.",
           "exerciseTypes": [
-            "patterns:foundation"
+            "patterns:find-smallest-block"
           ],
           "releaseStatus": "active"
         },
@@ -4826,7 +5033,7 @@
           "id": "understand",
           "goal": "Wiederholung als Regel verstehen.",
           "exerciseTypes": [
-            "patterns:foundation"
+            "patterns:identify-restart"
           ],
           "releaseStatus": "active"
         },
@@ -4834,7 +5041,7 @@
           "id": "guided-practice",
           "goal": "AB-Folgen fortsetzen.",
           "exerciseTypes": [
-            "patterns:foundation"
+            "patterns:continue-ab"
           ],
           "releaseStatus": "active"
         },
@@ -4842,7 +5049,7 @@
           "id": "independent-practice",
           "goal": "ABC-Folgen fortsetzen.",
           "exerciseTypes": [
-            "patterns:practice"
+            "patterns:continue-abc"
           ],
           "releaseStatus": "active"
         },
@@ -4850,7 +5057,7 @@
           "id": "automate",
           "goal": "Blöcke sicher erfassen.",
           "exerciseTypes": [
-            "patterns:practice"
+            "patterns:continue-complex"
           ],
           "releaseStatus": "active"
         },
@@ -4858,7 +5065,7 @@
           "id": "transfer",
           "goal": "Regel eines komplexeren Blocks beschreiben.",
           "exerciseTypes": [
-            "patterns:transfer"
+            "patterns:identify-error"
           ],
           "releaseStatus": "active"
         }

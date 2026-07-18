@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { areaInUnitSquares, isConnectedGridFigure, isValidCubeBuilding, perimeterInUnitEdges, validateGridCells, type CubeBuilding, type ExerciseRepresentation } from '../domain'
+import { areaInUnitSquares, clockHandAngles, isConnectedGridFigure, isValidCubeBuilding, perimeterInUnitEdges, validateGridCells, type CubeBuilding, type ExerciseRepresentation } from '../domain'
 import { WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 
 const isValidGroupValue = (value: number) => Number.isInteger(value) && value >= 1 && value <= 10
@@ -17,16 +17,16 @@ function amountLabel(cents: number): string {
 }
 
 function ClockFace({ hour, minute }: { hour: number; minute: number }) {
-  const minuteAngle = minute * 6
-  const hourAngle = (hour % 12) * 30 + minute * 0.5
+  const angles = clockHandAngles(hour, minute)
   return (
-    <div className="clock-face" aria-hidden="true">
-      <span className="clock-number clock-number--12">12</span>
-      <span className="clock-number clock-number--3">3</span>
-      <span className="clock-number clock-number--6">6</span>
-      <span className="clock-number clock-number--9">9</span>
-      <i className="clock-hand clock-hand--hour" style={{ transform: `translateX(-50%) rotate(${hourAngle}deg)` }} />
-      <i className="clock-hand clock-hand--minute" style={{ transform: `translateX(-50%) rotate(${minuteAngle}deg)` }} />
+    <div className="clock-face" aria-hidden="true" data-hour-angle={angles.hour} data-minute-angle={angles.minute}>
+      {Array.from({ length: 12 }, (_, index) => {
+        const value = index + 1
+        const angle = value * 30 * Math.PI / 180
+        return <span className="clock-number" key={value} style={{ left: `${50 + Math.sin(angle) * 39}%`, top: `${50 - Math.cos(angle) * 39}%` }}>{value}</span>
+      })}
+      <i className="clock-hand clock-hand--hour" style={{ transform: `translateX(-50%) rotate(${angles.hour}deg)` }} />
+      <i className="clock-hand clock-hand--minute" style={{ transform: `translateX(-50%) rotate(${angles.minute}deg)` }} />
       <b className="clock-center" />
     </div>
   )
@@ -100,6 +100,26 @@ export function MathRepresentation({ representation }: { representation: Exercis
   }
   const isValueVisible = (key: string) => known.has(key) || revealed.has(key)
   const textValue = (value: typeof values[string]) => Array.isArray(value) ? '' : value
+
+  if (representation.kind === 'ten-frame') {
+    const first = Number(values.first)
+    const second = Number(values.second)
+    const valid = Number.isInteger(first) && Number.isInteger(second) && first >= 0 && second >= 0 && first <= 10 && second <= 10
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Das Punktefeld enthält ungültige Mengen.</div>
+    const secondVisible = isValueVisible('second')
+    return (
+      <div className="math-visual ten-frame-visual" role="img" aria-label={`${representation.label}. Erste Menge ${first}, zweite Menge ${secondVisible ? second : 'unbekannt'}.`}>
+        {[{ label: 'erste Menge', count: first }, { label: 'zweite Menge', count: second }].map((frame) => (
+          <section key={frame.label}>
+            <span>{frame.label}</span>
+            <div className="ten-frame" aria-hidden="true">
+              {Array.from({ length: 10 }, (_, index) => <i className={frame.label === 'zweite Menge' && !secondVisible ? 'ten-frame-dot ten-frame-dot--unknown' : index < frame.count ? 'ten-frame-dot ten-frame-dot--filled' : 'ten-frame-dot'} key={index} />)}
+            </div>
+          </section>
+        ))}
+      </div>
+    )
+  }
   const modelType = typeof values.modelType === 'string' ? values.modelType : undefined
   const isCatalogWordModel = Boolean(modelType && modelType in WORD_MODEL_UNKNOWN_QUANTITY)
   const expectedUnknownQuantity = isCatalogWordModel ? WORD_MODEL_UNKNOWN_QUANTITY[modelType as keyof typeof WORD_MODEL_UNKNOWN_QUANTITY] : undefined
@@ -197,6 +217,21 @@ export function MathRepresentation({ representation }: { representation: Exercis
             <strong>{isValueVisible(key) ? textValue(values[key]) : '?'}</strong>
           </div>
         ))}
+      </div>
+    )
+  }
+
+  if (representation.kind === 'place-value-material') {
+    const hundreds = Number(values.hundreds)
+    const tens = Number(values.tens)
+    const ones = Number(values.ones)
+    const valid = [hundreds, tens, ones].every((value) => Number.isInteger(value) && value >= 0) && hundreds <= 9 && tens <= 19 && ones <= 19
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Das Stellenwertmaterial enthält ungültige Mengen.</div>
+    return (
+      <div className="math-visual place-material" role="img" aria-label={`${representation.label}. ${hundreds} Hunderterflächen, ${tens} Zehnerstangen und ${ones} Einerpunkte.`}>
+        <section><b>H</b><div>{Array.from({ length: hundreds }, (_, index) => <i className="hundred-flat" key={index} />)}</div></section>
+        <section><b>Z</b><div>{Array.from({ length: tens }, (_, index) => <i className="ten-rod" key={index} />)}</div></section>
+        <section><b>E</b><div>{Array.from({ length: ones }, (_, index) => <i className="one-dot" key={index} />)}</div></section>
       </div>
     )
   }
@@ -315,7 +350,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
         <strong>{textValue(values.title)}</strong>
         <div className="combination-groups" aria-hidden="true">
           <section><b>{textValue(values.firstLabel)}</b>{firstOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
-          <span className="combination-sign">×</span>
+          <span className="combination-sign">mit</span>
           <section><b>{textValue(values.secondLabel)}</b>{secondOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
         </div>
         <div className="combination-grid" aria-hidden="true" style={{ '--combination-columns': secondCount } as CSSProperties}>
@@ -423,11 +458,16 @@ export function MathRepresentation({ representation }: { representation: Exercis
       Number.isInteger(blockLength) && blockLength >= 2 && blockLength <= 3 && typeof values.answerLabel === 'string'
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Der Musterstreifen enthält ungültige Symbole.</div>
     const answerVisible = isValueVisible('answerLabel')
-    const symbolClass = (symbol: string) => `pattern-symbol pattern-symbol--${symbol.toLowerCase()}`
+    const highlightBlocks = Number(values.highlightBlocks) === 1
+    const taskMode = values.taskMode === 'identify-error' ? 'identify-error' : 'continue'
+    const symbolClass = (symbol: string, index: number) => `pattern-symbol pattern-symbol--${symbol.toLowerCase()}${highlightBlocks && index % blockLength === 0 ? ' pattern-symbol--block-start' : ''}${highlightBlocks && index % blockLength === blockLength - 1 ? ' pattern-symbol--block-end' : ''}`
+    const answerDescription = taskMode === 'identify-error'
+      ? answerVisible ? `Fehlerstelle ${values.answerLabel}.` : 'Die Fehlerstelle bleibt unbekannt.'
+      : answerVisible ? `Fortsetzung ${values.answerLabel}.` : 'Die Fortsetzung bleibt unbekannt.'
     return (
-      <div className="math-visual pattern-visual" role="img" aria-label={`${representation.label}. Sichtbare Folge: ${sequence.join(', ')}. ${answerVisible ? `Fortsetzung ${values.answerLabel}.` : 'Die Fortsetzung bleibt unbekannt.'}`}>
-        <div className="pattern-sequence" aria-hidden="true">{sequence.map((symbol, index) => <i className={symbolClass(symbol)} key={`${symbol}-${index}`} />)}<i className="pattern-symbol pattern-symbol--unknown">?</i></div>
-        <strong className="quantity-result">{answerVisible ? `Fortsetzung: ${textValue(values.answerLabel)}` : 'Fortsetzung: ?'}</strong>
+      <div className="math-visual pattern-visual" role="img" aria-label={`${representation.label}. Sichtbare Folge: ${sequence.join(', ')}. ${answerDescription}`}>
+        <div className="pattern-sequence" aria-hidden="true">{sequence.map((symbol, index) => <i className={symbolClass(symbol, index)} key={`${symbol}-${index}`} />)}{taskMode === 'continue' && <i className="pattern-symbol pattern-symbol--unknown">?</i>}</div>
+        <strong className="quantity-result">{taskMode === 'identify-error' ? answerVisible ? `Fehlerstelle: ${textValue(values.answerLabel)}` : 'Fehlerstelle: ?' : answerVisible ? `Fortsetzung: ${textValue(values.answerLabel)}` : 'Fortsetzung: ?'}</strong>
       </div>
     )
   }
@@ -549,12 +589,23 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const markerKey = values.marker !== undefined ? 'marker' : values.target !== undefined ? 'target' : 'end'
     const markerVisible = isValueVisible(markerKey)
     const jumpsVisible = isValueVisible('jumps')
+    const tickStep = Number(values.tickStep ?? 0)
+    const ticks = Number.isInteger(tickStep) && tickStep > 0 && (scaleEnd - scaleStart) / tickStep <= 20
+      ? Array.from({ length: Math.floor((scaleEnd - scaleStart) / tickStep) + 1 }, (_, index) => scaleStart + index * tickStep)
+      : []
+    const lower = Number(values.lower)
+    const upper = Number(values.upper)
     const scaleStartVisible = scaleStart === start ? startVisible : scaleStart === end ? endVisible : jumpsVisible
     const scaleEndVisible = scaleEnd === start ? startVisible : scaleEnd === end ? endVisible : jumpsVisible
     const description = `${representation.label}. Anfang ${startVisible ? start : 'unbekannt'}, Ende ${endVisible ? end : 'unbekannt'}, Markierung ${markerVisible ? marker : 'unbekannt'}.`
     return (
       <div className="math-visual number-line-visual" role="img" aria-label={description}>
         <div className="number-line-track">
+          {ticks.map((tick) => (
+            <span className="number-line-tick" key={tick} style={{ left: `${positionFor(tick)}%` }}>
+              {((tick === lower && isValueVisible('lower')) || (tick === upper && isValueVisible('upper'))) && <small>{tick}</small>}
+            </span>
+          ))}
           <span className="number-line-marker" style={{ left: `${position}%` }} />
           {jumps.map((jump, index) => {
             const from = positionFor(jump.from)

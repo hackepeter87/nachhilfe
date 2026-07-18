@@ -32,6 +32,21 @@ function groupsRepresentation(groups: number, size: number): ExerciseRepresentat
   }
 }
 
+describe('MathRepresentation Uhr', () => {
+  it('zeichnet zwölf Marken und positioniert 01:30 geometrisch exakt', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'clock', visibility: 'always', label: 'Analoge Uhr',
+      values: { mode: 'read', hour: 1, minute: 30, answerLabel: '01:30 Uhr' },
+      valueRoles: { knownValues: ['mode', 'hour', 'minute'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(container.querySelectorAll('.clock-number')).toHaveLength(12)
+    expect(container.querySelector('.clock-face')).toHaveAttribute('data-hour-angle', '45')
+    expect(container.querySelector('.clock-face')).toHaveAttribute('data-minute-angle', '180')
+    expect(container.querySelector('.clock-hand--minute')).toBeInTheDocument()
+    expect(container.querySelector('.clock-hand--hour')).toBeInTheDocument()
+  })
+})
+
 describe('MathRepresentation Gruppenbild', () => {
   it.each([
     ['2 · 10', 2, 10],

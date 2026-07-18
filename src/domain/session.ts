@@ -1,7 +1,7 @@
 import { generateExercise } from './generators'
 import { dailySeed, seededRandom, shuffle } from './random'
 import { selectionWeight, subskillWeight } from './progress'
-import { getActiveCatalogMetadata, isSkillEnabled } from '../content/catalog'
+import { getActiveCatalogMetadata, getLearningPhaseModel, isSkillEnabled } from '../content/catalog'
 import { APP_VERSION } from '../version'
 import type { Difficulty, Exercise, LearningPhase, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId, SkillProgress } from './types'
 
@@ -153,11 +153,11 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
   return candidates[weightedIndex(weights, random)]
 }
 
-function uniqueExercise(skillId: SkillId, seed: number, difficulty: Difficulty, lastVariantKey?: string | null, focus?: string): Exercise {
-  let exercise = generateExercise(skillId, seed, difficulty, focus)
+function uniqueExercise(skillId: SkillId, seed: number, difficulty: Difficulty, lastVariantKey?: string | null, focus?: string, phase?: LearningPhase): Exercise {
+  let exercise = generateExercise(skillId, seed, difficulty, focus, phase)
   let attempt = 1
   while (exercise.variant.key === lastVariantKey && attempt < 5) {
-    exercise = generateExercise(skillId, seed + attempt * 97, difficulty, focus)
+    exercise = generateExercise(skillId, seed + attempt * 97, difficulty, focus, phase)
     attempt += 1
   }
   return exercise
@@ -186,6 +186,7 @@ function applyLearningPhase(exercise: Exercise, phase: LearningPhase): Exercise 
   return {
     ...exercise,
     learningPhase: phase,
+    learningAction: getLearningPhaseModel(phase).learningAction,
     representation: exercise.representation
       ? {
           ...exercise.representation,
@@ -223,7 +224,7 @@ export function createSessionPlan(
     const { difficulty, phase } = settingsForSkill(skillId, progress)
     const exerciseSeed = seed + (index + 1) * 113
     const focus = selectSubskill(skillId, progress, exerciseSeed + 41, difficulty)
-    return applyLearningPhase(uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus), phase)
+    return applyLearningPhase(uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus, phase), phase)
   })
   return {
     id: `session-${seed}`,

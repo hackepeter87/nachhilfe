@@ -13,11 +13,11 @@ Lage wird mit Form verwechselt; Teilungslinien gelten als Außenkanten; beim Mus
 ## 6. Fachliche Kernidee
 Eine ebene Figur wird durch ihren Außenrand bestimmt. Ein Muster wiederholt einen kleinsten geordneten Block. Fläche beschreibt eine lückenlose Bedeckung, Umfang den vollständigen geschlossenen Außenrand.
 ## 7. Methodischer Zugang
-Grundformen stehen vor Zerlegung und Zusammensetzung. Regelmäßige AB-Folgen führen zu längeren Blöcken. Fläche beginnt mit kleinen Rechtecken und geht zu unregelmäßigen Figuren über. Umfang folgt erst bei tragfähiger Figurenkenntnis und wird Kante für Kante verfolgt.
+Grundformen stehen vor Zerlegung und Zusammensetzung. Bei Mustern wird zunächst der kleinste Wiederholungsblock erkannt, danach die Folge fortgesetzt und im Transfer eine fehlerhafte Stelle gefunden. Fläche beginnt mit kleinen Rechtecken und geht zu unregelmäßigen Figuren über. Umfang folgt erst bei tragfähiger Figurenkenntnis und wird Kante für Kante verfolgt.
 ## 8. Geeignete Darstellungen
 Große Außenformen mit sichtbaren Teilungslinien, stabile Musterstreifen, gleich große Einheitsquadrate und ein kontrastreich markierter Außenrand. Numerische Ergebnisse bleiben bis zur richtigen Antwort unbekannt.
 ## 9. Lernprogression
-`plane-shapes`: Grundform, sichtbare Zerlegung, Zusammensetzung. `patterns`: AB, ABC, Block mit wiederholtem Element. `area`: kleines Rechteck, strukturiertes Rechteck, unregelmäßige zusammenhängende Figur. `perimeter`: kurzer Rechteckrand, längerer Rechteckrand, unregelmäßiger Randweg.
+`plane-shapes`: Grundform, sichtbare Zerlegung, Zusammensetzung. `patterns`: kleinsten Block markieren, erste Wiederholung erkennen, AB/ABC beziehungsweise längere Blöcke fortsetzen, im Transfer eine Regelverletzung markieren. `area`: kleines Rechteck, strukturiertes Rechteck, unregelmäßige zusammenhängende Figur. `perimeter`: kurzer Rechteckrand, längerer Rechteckrand, unregelmäßiger Randweg.
 ## 10. Aufgabentypen
 Produktiv sind `shape-identify`, `shape-decompose`, `shape-compose`, `pattern-ab`, `pattern-abc`, `pattern-repeated-element`, `area-rectangle-unit-squares`, `area-irregular-unit-squares`, `perimeter-rectangle-path` und `perimeter-irregular-path`.
 ## 11. Hilfestufen

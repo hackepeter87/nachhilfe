@@ -29,6 +29,13 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
       await modelContinue.click()
       continue
     }
+    const pairingOptions = page.locator('.pairing-option[aria-pressed="false"]')
+    if (await pairingOptions.first().isVisible().catch(() => false)) {
+      const count = await pairingOptions.count()
+      for (let index = 0; index < count; index += 1) await pairingOptions.nth(index).click()
+      await page.getByRole('button', { name: 'Paarungen prüfen' }).click()
+      continue
+    }
     const guidedNumberInput = page.getByLabel('Dein Ergebnis')
     if (await guidedNumberInput.isVisible().catch(() => false)) {
       await guidedNumberInput.fill('9999')
@@ -64,6 +71,44 @@ async function onboard(page: Page, nickname = 'Nova') {
     await page.getByRole('button', { name: 'Los geht’s' }).click()
   }
   await expect(startButton).toBeVisible()
+}
+
+async function finishAdditionWarmups(page: Page) {
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent() ?? ''
+    const complement = prompt.match(/Welche Zahl ergänzt (\d+) bis 10\?/)
+    if (complement) {
+      await page.getByRole('button', { name: String(10 - Number(complement[1])), exact: true }).click()
+    } else {
+      const [first, second] = prompt.match(/\d+/g)?.map(Number) ?? []
+      const input = page.getByLabel('Deine Antwort')
+      if (first === undefined || second === undefined || !await input.isVisible().catch(() => false)) {
+        throw new Error(`Additionsvorübung ist nicht lösbar: ${prompt}`)
+      }
+      await input.fill(String(first + second))
+      await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    }
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
+}
+
+async function finishSubtractionWarmups(page: Page) {
+  for (let exercise = 0; exercise < 2; exercise += 1) {
+    const prompt = await page.locator('.exercise-heading h2').textContent() ?? ''
+    const partWhole = prompt.match(/wie (\d+) in (\d+) und (\d+) zerlegt/i)
+    if (partWhole) {
+      await page.getByRole('button', { name: `${partWhole[2]} + ${partWhole[3]} = ${partWhole[1]}`, exact: true }).click()
+    } else {
+      const [first, second] = prompt.match(/\d+/g)?.map(Number) ?? []
+      const input = page.getByLabel('Deine Antwort')
+      if (first === undefined || second === undefined || !await input.isVisible().catch(() => false)) {
+        throw new Error(`Subtraktionsvorübung ist nicht lösbar: ${prompt}`)
+      }
+      await input.fill(String(first - second))
+      await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+    }
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
+  }
 }
 
 test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline', async ({ page, context }) => {
@@ -109,9 +154,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.19.1',
-    schemaVersion: 17,
-    appVersion: '0.20.1'
+    catalogVersion: '0.20.0',
+    schemaVersion: 18,
+    appVersion: '0.21.0'
   })
 
   await page.reload()
@@ -157,14 +202,7 @@ test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral'
 
   await onboard(page, 'Daten')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   await expect(page.locator('.data-display')).toBeVisible()
   await expect(page.locator('.data-table, .tally-list')).toBeVisible()
@@ -189,14 +227,7 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
 
   await onboard(page, 'Zufall')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   const seen = new Set<string>()
   for (let focus = 0; focus < 2; focus += 1) {
@@ -221,7 +252,14 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
       await expect(combinations).toHaveAttribute('aria-label', /Die Anzahl bleibt unbekannt/)
       expect(await combinations.locator('.combination-cell').count()).toBeGreaterThanOrEqual(4)
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('kombinatorik-375x812.png'), fullPage: true })
-      await page.getByRole('button', { name: '4', exact: true }).click()
+      const groups = combinations.locator('.combination-groups section')
+      const firstOptions = await groups.nth(0).locator('span').allTextContents()
+      const secondOptions = await groups.nth(1).locator('span').allTextContents()
+      const answerButtons = page.locator('.answer-option')
+      const labels = await answerButtons.allTextContents()
+      const validPair = labels.find((label) => firstOptions.some((first) => label.includes(first)) && secondOptions.some((second) => label.includes(second)))
+      if (!validPair) throw new Error('Gültige Paarung ist nicht auswählbar.')
+      await page.getByRole('button', { name: validPair, exact: true }).click()
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 1) {
@@ -246,14 +284,7 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
 
   await onboard(page, 'Messen')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   const referenceAnswers = new Map([
     ['einem Apfel', '200 g'], ['einer Packung Butter', '250 g'], ['einer Packung Mehl', '1 kg'],
@@ -270,11 +301,16 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
 
     if (await clock.isVisible().catch(() => false)) {
       seen.add('time')
-      const description = await clock.getAttribute('aria-label')
-      const match = description?.match(/Stunde (\d+), der lange Zeiger zu (\d+) Minuten/)
-      if (!match) throw new Error('Analoge Uhrzeit ist nicht zugänglich beschrieben.')
-      const answer = `${match[1]!.padStart(2, '0')}:${match[2]!.padStart(2, '0')} Uhr`
-      await page.getByRole('button', { name: answer, exact: true }).click()
+      const handRoleAnswer = page.getByRole('button', { name: 'Der lange Zeiger zeigt die Minuten.', exact: true })
+      if (await handRoleAnswer.isVisible().catch(() => false)) {
+        await handRoleAnswer.click()
+      } else {
+        const description = await clock.getAttribute('aria-label')
+        const match = description?.match(/Stunde (\d+), der lange Zeiger zu (\d+) Minuten/)
+        if (!match) throw new Error('Analoge Uhrzeit ist nicht zugänglich beschrieben.')
+        const answer = `${match[1]!.padStart(2, '0')}:${match[2]!.padStart(2, '0')} Uhr`
+        await page.getByRole('button', { name: answer, exact: true }).click()
+      }
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('zeit-375x812.png'), fullPage: true })
     } else {
       const prompt = await page.locator('.exercise-heading h2').textContent() ?? ''
@@ -309,14 +345,7 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
   })
   await onboard(page, 'Form')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
   const seen = new Set<string>()
   for (let focus = 0; focus < 2; focus += 1) {
     await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
@@ -334,9 +363,11 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
       await page.screenshot({ path: testInfo.outputPath('ebene-figur-375x812.png'), fullPage: true })
     } else {
       seen.add('patterns')
-      const sequence = page.locator('.pattern-sequence .pattern-symbol:not(.pattern-symbol--unknown)')
-      const count = await sequence.count()
-      const answer = await sequence.nth(count - 2).evaluate((element) => element.classList.contains('pattern-symbol--kreis') ? 'Kreis' : element.classList.contains('pattern-symbol--quadrat') ? 'Quadrat' : element.classList.contains('pattern-symbol--dreieck') ? 'Dreieck' : 'Stern')
+      const description = await page.locator('.pattern-visual').getAttribute('aria-label') ?? ''
+      const sequence = description.match(/Sichtbare Folge: ([^.]+)\./)?.[1]?.split(', ') ?? []
+      const blockLength = [1, 2, 3].find((length) => sequence.every((symbol, index) => symbol === sequence[index % length]))
+      if (!blockLength) throw new Error(`Kein Wiederholungsblock erkennbar: ${description}`)
+      const answer = sequence.slice(0, blockLength).join(' – ')
       await page.getByRole('button', { name: answer, exact: true }).click()
       expect(await page.locator('.session-page').evaluate((element) => {
         const bounds = element.getBoundingClientRect()
@@ -385,14 +416,7 @@ test('Fläche und Umfang nutzen bekannte Raster, aber maskieren das Ergebnis', a
   })
   await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
   const seen = new Set<string>()
   for (let focus = 0; focus < 2; focus += 1) {
     const grid = page.locator('.unit-grid-visual')
@@ -495,14 +519,7 @@ test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async
 
   await onboard(page, 'Spiegel')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   const source = page.getByRole('img', { name: /Vorlage zum Spiegeln.*Senkrechte Spiegelachse zwischen Feldern/ })
   await expect(source).toBeVisible()
@@ -540,14 +557,7 @@ test('Körperansichten zeigen Gebäude, Richtungen und drei Raster mobil ohne Ov
 
   await onboard(page, 'Würfel')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   await expect(page.getByRole('img', { name: /Würfel.*Vorne und rechts sind markiert/i })).toBeVisible()
   await expect(page.getByText('vorne')).toBeVisible()
@@ -600,14 +610,7 @@ test('Würfelrotation zeigt Achse, Richtung und drei Folgezustände mobil ohne O
   })
   await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   await expect(page.getByRole('img', { name: /Würfel.*90 Grad nach rechts.*senkrechte Achse/i })).toBeVisible()
   await expect(page.getByText('senkrechte Drehachse')).toBeVisible()
@@ -659,14 +662,7 @@ test('Einzelfaltung zeigt Achse, Faltrichtung und drei neutrale Ergebnisse mobil
   })
   await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   await expect(page.getByRole('img', { name: /Faltachse/i }).first()).toBeVisible()
   await expect(page.locator('.folding-grid--axis-vertical').first()).toBeVisible()
@@ -697,15 +693,7 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
 
   await onboard(page, 'Modell')
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-  for (let exercise = 0; exercise < 2; exercise += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    const input = page.getByLabel('Deine Antwort')
-    await input.fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   await expect(page.getByText('1. Was wird gesucht?')).toBeVisible()
   await expect(page.getByText(/Mengenbeziehung|Welche Rechenart/i)).toHaveCount(0)
@@ -791,14 +779,7 @@ test('Schriftliche Addition wird nach den Voraussetzungen mobil vollständig bea
   await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
 
-  for (let warmup = 0; warmup < 2; warmup += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Additionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first + second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishAdditionWarmups(page)
 
   const column = page.locator('.column-calculation')
   await expect(column).toBeVisible()
@@ -878,14 +859,7 @@ test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', asy
   await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
 
-  for (let warmup = 0; warmup < 2; warmup += 1) {
-    const prompt = await page.locator('.exercise-heading h2').textContent()
-    const [first, second] = prompt?.match(/\d+/g)?.map(Number) ?? []
-    if (first === undefined || second === undefined) throw new Error('Subtraktionsvorübung ist nicht lesbar')
-    await page.getByLabel('Deine Antwort').fill(String(first - second))
-    await page.getByRole('button', { name: 'Antwort prüfen' }).click()
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
+  await finishSubtractionWarmups(page)
 
   const column = page.locator('.column-calculation')
   await expect(column).toBeVisible()

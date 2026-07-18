@@ -1,13 +1,15 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.20.1, Katalog 0.19.1, Schema 17, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.21.0, Katalog 0.20.0, Schema 18, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
 | Katalogfeld | Verwendung | Laufzeitwirkung |
 | --- | --- | --- |
 | `difficultyLevels` | Runtime | Zahlenstruktur, Anforderungen, Darstellung und wirksame Lernphase ändern sich |
+| `learningPhaseModel` | Runtime | ordnet jeder Phase eine konkrete Lernhandlung und zulässige Interaktionen zu |
 | `learningPhases` | Review | dokumentiert den vollständigen Kompetenzweg; die Runtimephase stammt aus Lernstand und `difficultyLevels[].learningPhase` |
+| `misconceptionFeedback` | Runtime | verbindet robuste Antwortmuster mit vorsichtig formuliertem Hinweis und passender Remediation |
 | `remediation` | Runtime | Strategie, Folgeschwierigkeit, Darstellung und Unterkompetenzbindung steuern die Folgeaufgabe |
 | `successFeedback` / `errorFeedback` | Runtime | konkrete Rückmeldung ohne behauptete Diagnose |
 | `releaseStatus` | Runtime | nur `active` wird in Sitzungen geplant |
@@ -23,7 +25,7 @@ Stand: App 0.20.1, Katalog 0.19.1, Schema 17, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.20.1
+## Aktive Veränderungen bis 0.21.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -54,6 +56,7 @@ Stand: App 0.20.1, Katalog 0.19.1, Schema 17, Status ready-for-review. Diese Dat
 - App 0.19.0, Katalog 0.18.0 und Schema 17: Ebene Figuren, Muster, Fläche und Umfang sind vier adaptive Kompetenzen. Einheitsfelder und Außenkanten sind bekannte zählbare Informationen; Formname, Fortsetzung und Zahlenwert bleiben bis zur Antwort unbekannt.
 - App 0.20.0, Katalog 0.19.0 und Schema 17: Die Sitzungsplanung wählt je einen Fokus aus Zahlen, Größen, Daten und Geometrie. Eine automatisch erzeugte Curriculum-Matrix und ein 1.000-Seed-Test je aktiver Kompetenz und Stufe sichern den Abgleich; neue mathematische Kompetenzen kommen nicht hinzu.
 - App 0.20.1, Katalog 0.19.1 und Schema 17: Produktive Symmetrie verwendet nur Phasen 1 bis 3 mit Achsen zwischen Zellen. Division trennt vollständiges Gruppieren und Verteilen. `scaffold`-Darstellungen und modellbezogene Tipps sind an den tatsächlich sichtbaren Hilfezustand gebunden.
+- App 0.21.0, Katalog 0.20.0 und Schema 18: Die erste Korrekturgruppe bindet Lernphasen an unterschiedliche Lernhandlungen. Addition/Subtraktion bis 20, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Uhrzeit, Kombinatorik und Muster verwenden phasenspezifische Interaktionen und katalogisierte Fehlvorstellungsrouten. Der genaue Umfang und die bewusst offenen Auditbefunde stehen in `docs/didactic-migration-0.21.0.md`.
 
 ## Bewusst deaktiviert
 

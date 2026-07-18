@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Didaktische Korrekturgruppe 0.21.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Die sechs Lernphasen sind nun als konkrete Lernhandlungen und zulässige Interaktionen im Katalog modelliert; Generator und Runtime verwenden dieses Modell gemeinsam.
+- Addition und Subtraktion bauen den Zehnerübergang über Ergänzen beziehungsweise Zerlegen bis 10 auf. Stellenwert sowie Zerlegen/Zusammensetzen nutzen gebündeltes Material; die höchste Zerlegungsstufe enthält erstmals nichtkanonische Zehnerbündelungen.
+- Nachbarzehner und Nachbarhunderter starten mit Referenzpunkten und decken die beiden gesuchten Grenzen schrittweise auf. Die analoge Uhr berechnet den Stundenzeiger einschließlich Minutenanteil exakt; die Phasenfolge reicht von Zeigerrollen über volle, halbe und Viertelstunden zu Fünfminutenschritten und Zeitspannen.
+- Kombinatorik verlangt das aktive Bilden aller gültigen Paarungen. Musteraufgaben wechseln zwischen kleinstem Wiederholungsblock, Fortsetzung und Fehlerstelle, ohne die gesuchte Lösung in der Darstellung vorwegzunehmen.
+- Antwortoptionen tragen stabile Fehlvorstellungskennungen. Die Runtime nutzt katalogisierte, vorsichtig formulierte Rückmeldung und zeigt nach dem ersten Fehler eine tragende Hilfe, nach wiederholten Fehlern die Remediation.
+- Katalog 0.20.0 und Schema 18 ergänzen `learningPhaseModel`, zulässige Interaktionen und kompetenzspezifische Fehlvorstellungsrouten. Die zentrale Quelle, der öffentliche Katalog, der Fallback und die Curriculum-Matrix bleiben deterministisch identisch.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 372 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das AMD64-Image `mathe-reise:0.21.0-local` beziehungsweise `mathe-reise:local` (`sha256:29afb3875f6db0cac344c9322a497780947390e4e6bbef5fa74c2e58d772741e`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Port 8080 war lokal belegt, daher lief diese Abnahme auf `127.0.0.1:8081`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
 ## Darstellungs- und Runtime-Konsistenz 0.20.1
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Produktive Symmetrie endet bei Phase 3 und verwendet ausschließlich gerade Achsendimensionen mit Achsen zwischen Rasterfeldern; die vorbereiteten Achsensonderfälle bleiben nicht produktiv.

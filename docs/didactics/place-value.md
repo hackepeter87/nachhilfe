@@ -13,13 +13,13 @@ Ziffer wird als Wert angegeben; Stellen werden vertauscht; Null wird ausgelassen
 ## 6. Fachliche Kernidee
 Der Wert einer Ziffer entsteht aus Ziffer und Position im dezimalen Stellenwertsystem.
 ## 7. Methodischer Zugang
-Material legen, Stellenwerttafel lesen, Ziffer bestimmen, danach Stellenwert berechnen.
+Gebündeltes Material zunächst einer Zahl zuordnen, danach Material, Ziffer, Stelle und Wert miteinander verbinden. Erst anschließend wird der Stellenwert ohne vollständige Materialhilfe bestimmt oder die Wirkung einer veränderten Stelle untersucht.
 ## 8. Geeignete Darstellungen
 Hunderterflächen, Zehnerstangen, Einerpunkte und Stellenwerttafel.
 ## 9. Lernprogression
-Alle Stellen besetzt und markiert; eine Null ohne Markierung; mehrere Darstellungen und zweistufige Erklärung.
+Materialgruppe erkennen; Ziffer, Stelle und Wert verbinden; Stellenwert mit sichtbarer Tafel bestimmen; Null als Platzhalter berücksichtigen; selbstständig lösen; im Transfer die Änderung der Hunderterstelle untersuchen.
 ## 10. Aufgabentypen
-Auswahl; Stufe 3 prüft zuerst die Ziffer und anschließend ihren Wert.
+Material und Zahl zuordnen, Ziffer beziehungsweise Stellenwert auswählen und im Transfer die Auswirkung einer Stellenänderung bestimmen.
 ## 11. Hilfestufen
 Gesuchte Spalte hervorheben; Ziffer und Einheit getrennt benennen; Materialdarstellung zeigen.
 ## 12. Remediation

@@ -1,6 +1,6 @@
 import { integer, pick, seededRandom, shuffle } from './random'
-import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, ExerciseStep, SkillId } from './types'
-import { getSkillContent, getTaskCatalog, renderCatalogText, WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
+import type { AnswerOption, Difficulty, Exercise, ExerciseRepresentation, ExerciseStep, LearningPhase, SkillId } from './types'
+import { getLearningPhaseModel, getSkillContent, getTaskCatalog, renderCatalogText, WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 import type { WordModelType } from '../content/catalog'
 import { createShiftDistractor, flipGrid, mirrorGrid, reflectGrid } from './symmetry'
 import {
@@ -28,6 +28,7 @@ const base = (skillId: SkillId, seed: number, difficulty: Difficulty, values: Re
   skillId,
   difficulty,
   learningPhase: getSkillContent(skillId).difficultyLevels[difficulty - 1].learningPhase,
+  learningAction: getLearningPhaseModel(getSkillContent(skillId).difficultyLevels[difficulty - 1].learningPhase).learningAction,
   title: getSkillLabel(skillId),
   variant: { seed, key: `${skillId}:${JSON.stringify(values)}`, values },
   testMetadata: {
@@ -63,6 +64,7 @@ function contentFor(skillId: SkillId, values: Record<string, number | string>, d
 interface DistractorCandidate<T> {
   value: T
   misconception: string
+  misconceptionId?: string
 }
 
 function numberOptions(random: () => number, correct: number, candidates: Array<DistractorCandidate<number>>): AnswerOption[] {
@@ -78,7 +80,8 @@ function numberOptions(random: () => number, correct: number, candidates: Array<
     ...distinct.slice(0, 2).map((candidate) => ({
       value: String(candidate.value),
       label: String(candidate.value),
-      misconception: candidate.misconception
+      misconception: candidate.misconception,
+      misconceptionId: candidate.misconceptionId
     }))
   ])
 }
@@ -90,7 +93,7 @@ function textOptions(random: () => number, correct: string, candidates: Array<Di
   if (distinct.length < 2) throw new Error(`Zu wenige plausible Distraktoren für „${correct}“.`)
   return shuffle(random, [
     { value: correct, label: correct },
-    ...distinct.slice(0, 2).map((candidate) => ({ value: candidate.value, label: candidate.value, misconception: candidate.misconception }))
+    ...distinct.slice(0, 2).map((candidate) => ({ value: candidate.value, label: candidate.value, misconception: candidate.misconception, misconceptionId: candidate.misconceptionId }))
   ])
 }
 
@@ -116,45 +119,116 @@ function representation(
   }
 }
 
+function optionId(value: string, index: number): string {
+  const normalized = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  return normalized ? `${normalized}-${index + 1}` : `option-${index + 1}`
+}
+
+function normalizeOptions(exercise: Exercise, options: AnswerOption[] | undefined, correctAnswer: string, scope: string): AnswerOption[] | undefined {
+  if (!options) return undefined
+  const routes = getSkillContent(exercise.skillId).misconceptionFeedback ?? []
+  return options.map((option, index) => {
+    const route = routes.find((candidate) => candidate.id === option.misconceptionId || candidate.misconception === option.misconception)
+    return {
+      ...option,
+      id: option.id ?? `${scope}-${optionId(option.value, index)}`,
+      correct: option.value === correctAnswer,
+      misconceptionId: option.misconceptionId ?? route?.id,
+      misconceptionFeedback: option.misconceptionFeedback ?? route?.feedback
+    }
+  })
+}
+
 function withMetadata(exercise: Exercise): Exercise {
+  const options = normalizeOptions(exercise, exercise.options, exercise.correctAnswer, exercise.typeId)
+  const steps = exercise.steps?.map((step) => ({
+    ...step,
+    options: normalizeOptions(exercise, step.options, step.correctAnswer, `${exercise.typeId}-${step.id}`)
+  }))
   return {
     ...exercise,
+    options,
+    steps,
     testMetadata: {
       ...exercise.testMetadata,
       representation: exercise.representation?.kind ?? 'none',
       distractorSources: [
-        ...(exercise.options ?? []),
-        ...(exercise.steps?.flatMap((step) => step.options ?? []) ?? [])
+        ...(options ?? []),
+        ...(steps?.flatMap((step) => step.options ?? []) ?? [])
       ].filter((option) => option.misconception).map((option) => option.misconception!)
     }
   }
 }
 
-function addition(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function addition(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
-  const bridge = difficulty > 1 && (focus === 'addition-bridge-10' || difficulty > 1)
-  const first = bridge ? integer(random, difficulty === 3 ? 7 : 4, 9) : integer(random, 1, 8)
-  const second = bridge
+  const conceptPhase = phase === 'activate' || phase === 'understand'
+  const bridge = conceptPhase || (difficulty > 1 && (focus === 'addition-bridge-10' || difficulty > 1))
+  const first = bridge ? integer(random, difficulty === 3 ? 7 : 6, 9) : integer(random, 1, 8)
+  let second = bridge
     ? integer(random, 11 - first, Math.min(difficulty === 3 ? 20 - first : 18 - first, 9))
     : integer(random, 1, 10 - first)
+  if (phase === 'transfer' && second === first) second = second > 2 ? second - 1 : second + 1
   const answer = first + second
   const toTen = Math.min(second, 10 - first)
   const rest = second - toTen
   const values = { first, second, answer, toTen, rest }
+  const shared = { ...base('addition', seed, difficulty, values), ...contentFor('addition', values, difficulty) }
+  if (phase === 'activate') {
+    const missing = 10 - first
+    return withMetadata({
+      ...shared,
+      typeId: 'addition-activate-complement-to-ten', subskillId: 'addition-complement-10',
+      prompt: `Welche Zahl ergänzt ${first} bis 10?`, answerMode: 'choice', correctAnswer: String(missing),
+      options: numberOptions(random, missing, [
+        { value: Math.max(0, missing - 1), misconception: 'Beim Ergänzen wird ein Punkt ausgelassen', misconceptionId: 'addition-bridge-step' },
+        { value: missing + 1, misconception: 'Beim Ergänzen wird ein Punkt zu viel gezählt', misconceptionId: 'addition-bridge-step' },
+        { value: first, misconception: 'Die bekannte Menge wird als Ergänzung übernommen', misconceptionId: 'addition-operation-reversal' }
+      ]),
+      representation: representation('addition', difficulty, 'ten-frame', 'Ergänzen zur Zehn', { first, second: missing }, ['second'])
+    })
+  }
+  if (phase === 'understand') {
+    const split = `${toTen} und ${rest}`
+    return withMetadata({
+      ...shared,
+      typeId: 'addition-understand-bridge', subskillId: 'addition-bridge-10',
+      prompt: `Wie zerlegst du ${second}, damit du von ${first} zuerst bis 10 kommst?`, answerMode: 'choice', correctAnswer: split,
+      options: textOptions(random, split, [
+        { value: `${Math.max(0, toTen - 1)} und ${rest + 1}`, misconception: 'Der erste Teil ergänzt nicht genau bis 10', misconceptionId: 'addition-bridge-step' },
+        { value: `${rest} und ${toTen}`, misconception: 'Die Zerlegung wird in unpassender Reihenfolge genutzt', misconceptionId: 'addition-bridge-step' },
+        { value: `${toTen} und ${Math.max(0, rest - 1)}`, misconception: 'Die Teile ergeben nicht den zweiten Summanden', misconceptionId: 'addition-bridge-step' }
+      ]),
+      representation: representation('addition', difficulty, 'ten-frame', 'Zwei bekannte Mengen in Zehnerfeldern', { first, second })
+    })
+  }
+  if (phase === 'transfer') {
+    const correct = `${second} + ${first} = ${answer}`
+    return withMetadata({
+      ...shared,
+      typeId: 'addition-transfer-commutative', subskillId: bridge ? 'addition-bridge-10' : 'addition-within-10',
+      prompt: `Welche Tauschaufgabe hat dasselbe Ergebnis wie ${first} + ${second}?`, answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `${second} − ${first} = ${Math.abs(second - first)}`, misconception: 'Tauschen mit Wechsel der Rechenart verwechselt', misconceptionId: 'addition-operation-reversal' },
+        { value: `${first} + ${first} = ${first * 2}`, misconception: 'Ein Summand wurde doppelt verwendet', misconceptionId: 'addition-bridge-step' }
+      ]),
+      representation: representation('addition', difficulty, 'ten-frame', 'Dieselben beiden Mengen in getauschter Reihenfolge', { first, second })
+    })
+  }
   return withMetadata({
-    ...base('addition', seed, difficulty, values),
-    ...contentFor('addition', values, difficulty),
+    ...shared,
     typeId: 'addition-to-20',
     subskillId: bridge ? 'addition-bridge-10' : 'addition-within-10',
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('addition', difficulty, 'number-line', 'Schritte auf dem Rechenstrich', { start: first, end: answer, marker: first, step: second, jumps: [{ from: first, to: answer, label: `+${second}` }] }, ['end'])
+    representation: representation('addition', difficulty, 'number-line', 'Zerlegt bis 10 rechnen', { start: first, end: answer, marker: first, step: second, jumps: bridge ? [{ from: first, to: 10, label: `+${toTen}` }, { from: 10, to: answer, label: `+${rest}` }] : [{ from: first, to: answer, label: `+${second}` }] }, ['end'])
   })
 }
 
-function subtraction(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function subtraction(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
-  const bridge = difficulty > 1 && (focus === 'subtraction-bridge-10' || difficulty > 1)
+  const conceptPhase = phase === 'activate' || phase === 'understand'
+  const bridge = conceptPhase || (difficulty > 1 && (focus === 'subtraction-bridge-10' || difficulty > 1))
   const first = integer(random, difficulty === 3 ? 17 : bridge ? 12 : 5, difficulty === 2 ? 16 : bridge ? 20 : 10)
   let second = integer(random, 1, Math.min(first, 9))
   if (bridge && first - second >= 10) second = Math.min(first, first - 9 + integer(random, 0, 2))
@@ -162,14 +236,53 @@ function subtraction(seed: number, difficulty: Difficulty, focus?: string): Exer
   const toTen = bridge ? Math.min(second, first - 10) : 0
   const rest = second - toTen
   const values = { first, second, answer, toTen, rest }
+  const shared = { ...base('subtraction', seed, difficulty, values), ...contentFor('subtraction', values, difficulty) }
+  if (phase === 'activate') {
+    const probe = `${answer} + ${second} = ${first}`
+    return withMetadata({
+      ...shared,
+      typeId: 'subtraction-activate-part-whole', subskillId: 'subtraction-part-whole',
+      prompt: `Welche Plusaufgabe zeigt, wie ${first} in ${answer} und ${second} zerlegt ist?`, answerMode: 'choice', correctAnswer: probe,
+      options: textOptions(random, probe, [
+        { value: `${first} + ${second} = ${first + second}`, misconception: 'Die Gesamtmenge wird noch einmal addiert', misconceptionId: 'subtraction-number-order' },
+        { value: `${second} − ${answer} = ${Math.abs(second - answer)}`, misconception: 'Teil und Ganzes werden vertauscht', misconceptionId: 'subtraction-number-order' }
+      ]),
+      representation: representation('subtraction', difficulty, 'ten-frame', 'Zwei Teile einer bekannten Gesamtmenge', { first: answer, second })
+    })
+  }
+  if (phase === 'understand') {
+    const split = `${toTen} und ${rest}`
+    return withMetadata({
+      ...shared,
+      typeId: 'subtraction-understand-bridge', subskillId: 'subtraction-bridge-10',
+      prompt: `Wie zerlegst du ${second}, damit du von ${first} zuerst bis 10 zurückgehst?`, answerMode: 'choice', correctAnswer: split,
+      options: textOptions(random, split, [
+        { value: `${Math.max(0, toTen - 1)} und ${rest + 1}`, misconception: 'Der erste Rücksprung endet nicht bei 10', misconceptionId: 'subtraction-counting-start' },
+        { value: `${rest} und ${toTen}`, misconception: 'Die Rücksprünge werden in unpassender Reihenfolge genutzt', misconceptionId: 'subtraction-counting-start' },
+        { value: `${toTen} und ${Math.max(0, rest - 1)}`, misconception: 'Die Teile ergeben nicht den Subtrahenden', misconceptionId: 'subtraction-counting-start' }
+      ]),
+      representation: representation('subtraction', difficulty, 'ten-frame', 'Bekannte Gesamtmenge und weggenommener Teil', { first, second })
+    })
+  }
+  if (phase === 'transfer') {
+    const probe = `${answer} + ${second} = ${first}`
+    return withMetadata({
+      ...shared,
+      typeId: 'subtraction-transfer-plus-check', subskillId: bridge ? 'subtraction-bridge-10' : 'subtraction-within-10',
+      prompt: `Welche Plusaufgabe prüft ${first} − ${second} = ${answer}?`, answerMode: 'choice', correctAnswer: probe,
+      options: textOptions(random, probe, [
+        { value: `${first} + ${second} = ${first + second}`, misconception: 'Ausgangszahl statt Unterschied ergänzt', misconceptionId: 'subtraction-number-order' },
+        { value: `${second} + ${first} = ${first + second}`, misconception: 'Beide bekannten Zahlen addiert', misconceptionId: 'subtraction-number-order' }
+      ])
+    })
+  }
   return withMetadata({
-    ...base('subtraction', seed, difficulty, values),
-    ...contentFor('subtraction', values, difficulty),
+    ...shared,
     typeId: 'subtraction-to-20',
     subskillId: bridge ? 'subtraction-bridge-10' : 'subtraction-within-10',
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('subtraction', difficulty, 'number-line', 'Schritte zurück auf dem Rechenstrich', { start: first, end: answer, marker: first, step: second, jumps: [{ from: first, to: answer, label: `−${second}` }] }, ['end'])
+    representation: representation('subtraction', difficulty, 'number-line', 'Zerlegt über 10 zurückrechnen', { start: first, end: answer, marker: first, step: second, jumps: bridge ? [{ from: first, to: 10, label: `−${toTen}` }, { from: 10, to: answer, label: `−${rest}` }] : [{ from: first, to: answer, label: `−${second}` }] }, ['end'])
   })
 }
 
@@ -222,7 +335,7 @@ function division(seed: number, difficulty: Difficulty, focus?: string): Exercis
   })
 }
 
-function placeValue(seed: number, difficulty: Difficulty): Exercise {
+function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const hundreds = integer(random, 1, 9)
   let tens = integer(random, 1, 9)
@@ -243,9 +356,13 @@ function placeValue(seed: number, difficulty: Difficulty): Exercise {
     ...(tens === 0 ? ['Zehner'] : []),
     ...(ones === 0 ? ['Einer'] : [])
   ] as Array<'Zehner' | 'Einer'>
-  const position = difficulty >= 2 && zeroPositions.length > 0
+  const conceptPhase = phase === 'activate' || phase === 'understand'
+  const availablePositions = (['Hunderter', 'Zehner', 'Einer'] as const).filter((candidate) =>
+    candidate === 'Hunderter' ? true : candidate === 'Zehner' ? tens !== 0 : ones !== 0
+  )
+  const position = !conceptPhase && difficulty >= 2 && zeroPositions.length > 0
     ? pick(random, zeroPositions)
-    : pick(random, ['Hunderter', 'Zehner', 'Einer'] as const)
+    : pick(random, availablePositions)
   const digit = position === 'Hunderter' ? hundreds : position === 'Zehner' ? tens : ones
   const answer = position === 'Hunderter' ? digit * 100 : position === 'Zehner' ? digit * 10 : digit
   const values = { number, position, digit, answer }
@@ -280,9 +397,52 @@ function placeValue(seed: number, difficulty: Difficulty): Exercise {
       successFeedback: renderCatalogText(stepText.valueSuccess, values)
     }
   ] : undefined
+  const shared = { ...base('place-value', seed, difficulty, values), ...contentFor('place-value', values, difficulty) }
+  const material = representation('place-value', difficulty, 'place-value-material', 'Stellenwertmaterial', { hundreds, tens, ones })
+  if (phase === 'activate') {
+    const correct = position === 'Hunderter' ? `${digit} Hunderterflächen` : position === 'Zehner' ? `${digit} Zehnerstangen` : `${digit} Einerpunkte`
+    return withMetadata({
+      ...shared,
+      typeId: 'place-value-activate-material', prompt: `Welche Materialgruppe zeigt die ${position} von ${number}?`,
+      answerMode: 'choice', correctAnswer: correct, representation: material,
+      options: textOptions(random, correct, [
+        { value: `${digit} Einerpunkte`, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' },
+        { value: `${digit} Zehnerstangen`, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' },
+        { value: `${digit} Hunderterflächen`, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' }
+      ])
+    })
+  }
+  if (phase === 'understand') {
+    const correct = `${digit} ${position} haben den Wert ${answer}`
+    return withMetadata({
+      ...shared,
+      typeId: 'place-value-understand-digit-value', prompt: 'Welche Aussage verbindet Ziffer, Stelle und Wert richtig?',
+      answerMode: 'choice', correctAnswer: correct, representation: material,
+      options: textOptions(random, correct, [
+        { value: `${digit} ${position} haben den Wert ${digit}`, misconception: 'Ziffer und Stellenwert werden gleichgesetzt.', misconceptionId: 'place-value-digit-as-value' },
+        { value: `${digit} ${position} haben den Wert ${digit * (position === 'Hunderter' ? 10 : position === 'Zehner' ? 100 : 10)}`, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' },
+        { value: `${digit} ${position} haben den Wert ${digit * (position === 'Einer' ? 100 : 1)}`, misconception: 'Ziffer und Stellenwert werden gleichgesetzt.', misconceptionId: 'place-value-digit-as-value' }
+      ])
+    })
+  }
+  if (phase === 'transfer') {
+    const grows = hundreds < 9
+    const target = grows ? number + 100 : number - 100
+    const correct = String(target)
+    return withMetadata({
+      ...shared,
+      typeId: 'place-value-transfer-hundred-change', prompt: `${grows ? 'Erhöhe' : 'Verringere'} nur die Hunderterstelle von ${number} um 1. Welche Zahl entsteht?`,
+      answerMode: 'choice', correctAnswer: correct,
+      options: numberOptions(random, target, [
+        { value: grows ? number + 10 : number - 10, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' },
+        { value: grows ? number + 1 : number - 1, misconception: 'Ziffer und Stellenwert werden gleichgesetzt.', misconceptionId: 'place-value-digit-as-value' },
+        { value: number, misconception: 'Die Stellenwertänderung wurde nicht ausgeführt', misconceptionId: 'place-value-digit-as-value' }
+      ]),
+      representation: representation('place-value', difficulty, 'place-value', 'Stellenwerttafel', { hundreds, tens, ones, highlight: 'hundreds' })
+    })
+  }
   return withMetadata({
-    ...base('place-value', seed, difficulty, values),
-    ...contentFor('place-value', values, difficulty),
+    ...shared,
     typeId: 'digit-place-value',
     answerMode: difficulty === 3 ? 'guided-choice' : 'choice',
     correctAnswer: String(answer),
@@ -295,24 +455,49 @@ function placeValue(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
-function decompose(seed: number, difficulty: Difficulty): Exercise {
+function decompose(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
-  const hundreds = integer(random, 1, 9)
+  let hundreds = integer(random, 1, 9)
   let tens = integer(random, 1, 9)
   let ones = integer(random, 1, 9)
   if (difficulty === 2) {
     if (random() < 0.5) tens = 0
     else ones = 0
   } else if (difficulty === 3) {
-    tens = 0
-    ones = 0
+    hundreds = integer(random, 1, 7)
+    tens = integer(random, 10, 19)
+    ones = integer(random, 0, 9)
   }
   const number = hundreds * 100 + tens * 10 + ones
   const answer = `${hundreds * 100} + ${tens * 10} + ${ones}`
   const values = { number, answer, hundreds, tens, ones, hundredsValue: hundreds * 100, tensValue: tens * 10 }
+  const shared = { ...base('decompose', seed, difficulty, values), ...contentFor('decompose', values, difficulty) }
+  const material = representation('decompose', difficulty, 'place-value-material', 'Stellenwertmaterial zur Zahl', { hundreds, tens, ones })
+  if (phase === 'activate') {
+    return withMetadata({
+      ...shared,
+      typeId: 'decompose-activate-material-count', prompt: 'Wie viele Zehnerstangen siehst du?', answerMode: 'choice', correctAnswer: String(tens),
+      options: numberOptions(random, tens, [
+        { value: hundreds, misconception: 'Zehner und Hunderter werden vertauscht.', misconceptionId: 'decompose-place-swap' },
+        { value: ones, misconception: 'Ziffern werden ohne Stellenwert addiert.', misconceptionId: 'decompose-digits-without-value' },
+        { value: Math.max(0, tens - 1), misconception: 'Eine Zehnerstange wurde ausgelassen', misconceptionId: 'decompose-digits-without-value' },
+        { value: tens + 1, misconception: 'Eine Zehnerstange wurde zu viel gezählt', misconceptionId: 'decompose-digits-without-value' },
+        { value: tens + 2, misconception: 'Zehnerstangen und Einerpunkte wurden vermischt', misconceptionId: 'decompose-place-swap' }
+      ]), representation: material
+    })
+  }
+  if (phase === 'understand') {
+    return withMetadata({
+      ...shared,
+      typeId: 'decompose-understand-material-to-sum', prompt: 'Welche Zerlegung beschreibt das Material?', answerMode: 'choice', correctAnswer: answer,
+      options: textOptions(random, answer, [
+        { value: `${hundreds} + ${tens} + ${ones}`, misconception: 'Ziffern werden ohne Stellenwert addiert.', misconceptionId: 'decompose-digits-without-value' },
+        { value: `${tens * 100} + ${hundreds * 10} + ${ones}`, misconception: 'Zehner und Hunderter werden vertauscht.', misconceptionId: 'decompose-place-swap' }
+      ]), representation: material
+    })
+  }
   return withMetadata({
-    ...base('decompose', seed, difficulty, values),
-    ...contentFor('decompose', values, difficulty),
+    ...shared,
     typeId: 'decompose-number',
     answerMode: 'choice',
     correctAnswer: answer,
@@ -326,23 +511,49 @@ function decompose(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
-function compose(seed: number, difficulty: Difficulty): Exercise {
+function compose(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
-  const hundreds = integer(random, 1, 9)
+  let hundreds = integer(random, 1, 9)
   let tens = integer(random, 1, 9)
   let ones = integer(random, 1, 9)
   if (difficulty === 2) {
     if (random() < 0.5) tens = 0
     else ones = 0
   } else if (difficulty === 3) {
-    tens = 0
-    ones = 0
+    hundreds = integer(random, 1, 7)
+    tens = integer(random, 10, 19)
+    ones = integer(random, 0, 9)
   }
   const answer = hundreds * 100 + tens * 10 + ones
   const values = { hundreds, tens, ones, answer, hundredsValue: hundreds * 100, tensValue: tens * 10 }
+  const shared = { ...base('compose', seed, difficulty, values), ...contentFor('compose', values, difficulty) }
+  const material = representation('compose', difficulty, 'place-value-material', 'Stellenwertmaterial zum Zusammensetzen', { hundreds, tens, ones })
+  if (phase === 'activate') {
+    const correct = `${hundreds} H, ${tens} Z und ${ones} E`
+    return withMetadata({
+      ...shared,
+      typeId: 'compose-activate-sort-material', prompt: 'Welche Stellenangaben passen zum Material?', answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `${tens} H, ${hundreds} Z und ${ones} E`, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
+        { value: `${hundreds} H, ${ones} Z und ${tens} E`, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
+        { value: `${hundreds === 9 ? 8 : hundreds + 1} H, ${tens} Z und ${ones} E`, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
+        { value: `${hundreds} H, ${tens === 19 ? 18 : tens + 1} Z und ${ones} E`, misconception: 'Nullen als Platzhalter fehlen.', misconceptionId: 'compose-missing-zero' }
+      ]), representation: material
+    })
+  }
+  if (phase === 'understand') {
+    return withMetadata({
+      ...shared,
+      typeId: 'compose-understand-material-to-number', prompt: 'Welche Zahl entsteht aus dem Material?', answerMode: 'choice', correctAnswer: String(answer),
+      options: numberOptions(random, answer, [
+        { value: hundreds * 100 + ones * 10 + tens, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
+        { value: tens * 100 + hundreds * 10 + ones, misconception: 'Stellen werden in falscher Reihenfolge notiert.', misconceptionId: 'compose-place-order' },
+        { value: Number(`${hundreds}${tens}${ones}`.replace(/0/g, '')), misconception: 'Nullen als Platzhalter fehlen.', misconceptionId: 'compose-missing-zero' }
+      ]), representation: material
+    })
+  }
   return withMetadata({
-    ...base('compose', seed, difficulty, values),
-    ...contentFor('compose', values, difficulty),
+    ...shared,
     typeId: 'compose-number',
     answerMode: 'number',
     correctAnswer: String(answer),
@@ -350,7 +561,7 @@ function compose(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
-function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100): Exercise {
+function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const intervalStart = integer(random, 1, unit === 10 ? 99 : 9) * unit
   const offset = difficulty === 1
@@ -364,13 +575,62 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100): Exerci
   const answer = `${lower} und ${upper}`
   const skillId: SkillId = unit === 10 ? 'neighbor-tens' : 'neighbor-hundreds'
   const values = { number, lower, upper }
+  const shared = { ...base(skillId, seed, difficulty, values), ...contentFor(skillId, values, difficulty) }
+  const referenceStart = unit === 10 ? Math.floor(number / 100) * 100 : 0
+  const referenceEnd = unit === 10 ? Math.min(1000, referenceStart + 100) : 1000
+  const numberLine = representation(skillId, difficulty, 'number-line', 'Zahlenstrahl mit bekannten Referenzmarken', {
+    start: referenceStart, end: referenceEnd, marker: number, step: unit, tickStep: unit, lower, upper
+  }, ['lower', 'upper'])
+  if (phase === 'activate') {
+    const full = random() < 0.5 ? lower : upper
+    return withMetadata({
+      ...shared,
+      typeId: `${skillId}-activate-full-number`, prompt: `Welche Zahl ist ein voller ${unit === 10 ? 'Zehner' : 'Hunderter'}?`,
+      answerMode: 'choice', correctAnswer: String(full),
+      options: numberOptions(random, full, [
+        { value: number, misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' },
+        { value: Math.max(0, full - 1), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' },
+        { value: Math.min(1000, full + unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' }
+      ]), representation: numberLine
+    })
+  }
+  if (phase === 'understand') {
+    const lowerOptions = numberOptions(random, lower, [
+      { value: Math.max(0, lower - unit), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' },
+      { value: upper, misconception: unit === 10 ? 'Nur der kleinere Zehner wird betrachtet.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-one-sided' : 'neighbor-hundreds-wrong-interval' },
+      { value: Math.floor(number / (unit / 10)) * (unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' }
+    ])
+    const upperOptions = numberOptions(random, upper, [
+      { value: lower, misconception: unit === 10 ? 'Nur der kleinere Zehner wird betrachtet.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-one-sided' : 'neighbor-hundreds-wrong-interval' },
+      { value: Math.min(1000, upper + unit), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' },
+      { value: Math.ceil(number / (unit / 10)) * (unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' }
+    ])
+    const steps: ExerciseStep[] = [
+      { id: 'lower', prompt: `Welcher ${unit === 10 ? 'Zehner' : 'Hunderter'} liegt direkt unter ${number}?`, interaction: 'mark', options: lowerOptions, correctAnswer: String(lower), errorFeedback: shared.errorFeedback, successFeedback: `Der untere Nachbar ist ${lower}.` },
+      { id: 'upper', prompt: `Welcher ${unit === 10 ? 'Zehner' : 'Hunderter'} folgt direkt danach?`, interaction: 'mark', options: upperOptions, correctAnswer: String(upper), errorFeedback: shared.errorFeedback, successFeedback: `Der obere Nachbar ist ${upper}.` }
+    ]
+    return withMetadata({ ...shared, typeId: `${skillId}-guided-boundaries`, answerMode: 'guided-choice', correctAnswer: answer, steps, representation: numberLine })
+  }
+  if (phase === 'transfer') {
+    const lowerDistance = number - lower
+    const upperDistance = upper - number
+    const nearer = lowerDistance === upperDistance ? 'gleich weit' : lowerDistance < upperDistance ? String(lower) : String(upper)
+    return withMetadata({
+      ...shared,
+      typeId: `${skillId}-transfer-nearer`, prompt: `Zu welchem Nachbarn liegt ${number} näher?`, answerMode: 'choice', correctAnswer: nearer,
+      options: textOptions(random, nearer, [
+        { value: String(lower), misconception: unit === 10 ? 'Nur der kleinere Zehner wird betrachtet.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-one-sided' : 'neighbor-hundreds-wrong-interval' },
+        { value: String(upper), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' },
+        { value: 'gleich weit', misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' }
+      ]), representation: numberLine
+    })
+  }
   return withMetadata({
-    ...base(skillId, seed, difficulty, values),
-    ...contentFor(skillId, values, difficulty),
+    ...shared,
     typeId: unit === 10 ? 'neighbor-tens' : 'neighbor-hundreds',
     answerMode: 'choice',
     correctAnswer: answer,
-    representation: representation(skillId, difficulty, 'number-line', 'Ausschnitt aus dem Zahlenstrahl', { start: lower, end: upper, marker: number, step: unit }, ['start', 'end']),
+    representation: numberLine,
     options: textOptions(random, answer, [
       { value: `${Math.max(0, lower - unit)} und ${lower}`, misconception: 'Intervall zu weit links' },
       { value: `${upper} und ${Math.min(1000, upper + unit)}`, misconception: 'Intervall zu weit rechts' },
@@ -580,7 +840,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   }
   const questionStep: ExerciseStep = {
     id: 'question',
-    interaction: 'choice',
+    interaction: 'select',
     prompt: renderCatalogText(stepsContent.questionPrompt, values),
     options: textOptions(random, question, template.questionDistractors.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Bekannte Angabe statt gesuchter Menge gewählt'
@@ -591,7 +851,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   }
   const relevantStep: ExerciseStep = {
     id: 'relevant',
-    interaction: 'choice',
+    interaction: 'select',
     prompt: renderCatalogText(stepsContent.relevantPrompt, values),
     options: textOptions(random, relevant, template.relevantDistractors.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Wichtige Handlung oder benötigte Menge ausgelassen'
@@ -615,7 +875,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     }
     : {
       id: 'model',
-      interaction: 'choice',
+      interaction: 'select',
       prompt: stepsContent.modelPrompt,
       options: wordModelOptions(random, template.modelType, template.modelDistractors, values),
       correctAnswer: template.modelType,
@@ -624,7 +884,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     }
   const equationStep: ExerciseStep = {
     id: 'equation',
-    interaction: 'choice',
+    interaction: 'select',
     prompt: stepsContent.equationPrompt,
     options: textOptions(random, equation, template.equationDistractors.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Rechnung beschreibt ein anderes Mengenbild'
@@ -635,7 +895,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   }
   const calculateStep: ExerciseStep = {
     id: 'calculate',
-    interaction: 'number',
+    interaction: 'guided-number',
     prompt: renderCatalogText(stepsContent.calculatePrompt, values),
     correctAnswer: String(intermediate),
     errorFeedback: stepsContent.calculateError,
@@ -643,7 +903,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   }
   const secondEquationStep: ExerciseStep | undefined = template.secondOperation ? {
     id: 'second-equation',
-    interaction: 'choice',
+    interaction: 'select',
     prompt: renderCatalogText(stepsContent.secondEquationPrompt, values),
     options: textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Zweite Veränderung in die falsche Richtung gerechnet'
@@ -654,7 +914,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   } : undefined
   const finalCalculationStep: ExerciseStep | undefined = template.secondOperation ? {
     id: 'final-calculation',
-    interaction: 'number',
+    interaction: 'guided-number',
     prompt: renderCatalogText(stepsContent.finalCalculationPrompt, values),
     correctAnswer: String(result),
     errorFeedback: stepsContent.finalCalculationError,
@@ -668,7 +928,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const correctPlausibility = plausibilityOptions[template.plausibility.options.findIndex((option) => option.correct)]!.value
   const plausibilityStep: ExerciseStep = {
     id: 'plausibility',
-    interaction: 'choice',
+    interaction: 'select',
     prompt: renderCatalogText(template.plausibility.prompt, values),
     options: shuffle(random, plausibilityOptions),
     correctAnswer: correctPlausibility,
@@ -677,7 +937,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   }
   const checkStep: ExerciseStep = {
     id: 'check',
-    interaction: 'choice',
+    interaction: 'select',
     prompt: stepsContent.checkPrompt,
     options: textOptions(random, answerSentence, [
       { value: renderCatalogText(template.answer, { ...templateValues, result: Math.max(0, result - 1) }), misconception: 'Antwortsatz mit falschem Ergebnis' },
@@ -703,8 +963,9 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     .map((definition) => {
       const step = stepById[definition.id]
       if (!step) throw new Error(`Katalogschritt ${definition.id} kann für ${template.id} nicht erzeugt werden.`)
-      const expectedInteraction = definition.interaction === 'model-by-difficulty' ? modelInteraction : definition.interaction
-      const actualInteraction = step.interaction ?? 'choice'
+      const catalogInteraction = definition.interaction === 'model-by-difficulty' ? modelInteraction : definition.interaction
+      const expectedInteraction = catalogInteraction === 'choice' ? 'select' : catalogInteraction === 'number' ? 'guided-number' : catalogInteraction
+      const actualInteraction = step.interaction ?? 'select'
       if (actualInteraction !== expectedInteraction) throw new Error(`Interaktion für ${definition.id} weicht vom Katalog ab.`)
       const hasRepresentation = Boolean(step.representation || step.options?.every((option) => option.representation))
       if ((definition.representation === 'word-model') !== hasRepresentation) {
@@ -880,7 +1141,7 @@ function writtenAdditionSteps(values: Record<string, number | string>, difficult
     successFeedback: string
   ): ExerciseStep => ({
     id,
-    interaction: 'number',
+    interaction: 'guided-number',
     prompt: renderCatalogText(prompt, values),
     correctAnswer: String(correctAnswer),
     errorFeedback: renderCatalogText(errorFeedback, values),
@@ -1031,7 +1292,7 @@ function writtenSubtractionSteps(values: Record<string, number | string>, diffic
     successFeedback: string
   ): ExerciseStep => ({
     id,
-    interaction: 'number',
+    interaction: 'guided-number',
     prompt: renderCatalogText(prompt, values),
     correctAnswer: String(correctAnswer),
     errorFeedback: renderCatalogText(errorFeedback, values),
@@ -1326,7 +1587,7 @@ export function formatClockTime(hour: number, minute: number): string {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} Uhr`
 }
 
-function time(seed: number, difficulty: Difficulty): Exercise {
+function time(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().quantityContent.time
   let correctAnswer: string
@@ -1336,21 +1597,47 @@ function time(seed: number, difficulty: Difficulty): Exercise {
   let strategy: string
   let subskillId: string
   let representationValues: ExerciseRepresentation['values']
-  if (difficulty < 3) {
+  const timePhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
+  if (timePhase === 'activate') {
     const hour = integer(random, 1, 12)
-    const minute = difficulty === 1 ? pick(random, [0, 30]) : pick(random, [5, 10, 15, 20, 25, 35, 40, 45, 50, 55])
-    correctAnswer = formatClockTime(hour, minute)
-    taskPrompt = content.readPrompt
-    quantityExplanation = renderCatalogText(content.readExplanation, { time: correctAnswer })
-    strategy = difficulty === 1
-      ? 'Der kurze Zeiger nennt die Stunde. Der lange Zeiger steht bei 12 für 00 und bei 6 für 30 Minuten.'
-      : 'Lies den langen Zeiger in Fünferschritten und prüfe danach den kurzen Zeiger.'
-    subskillId = difficulty === 1 ? 'time-full-half-hours' : 'time-five-minute-reading'
+    const minute = pick(random, [0, 30])
+    correctAnswer = 'Der lange Zeiger zeigt die Minuten.'
+    taskPrompt = 'Welcher Zeiger zeigt die Minuten?'
+    quantityExplanation = 'Der lange Zeiger erreicht die Minutenmarken am Rand. Der kürzere Zeiger zeigt die Stunde und wandert dabei weiter.'
+    strategy = 'Vergleiche Form und Länge der beiden Zeiger.'
+    subskillId = 'time-hand-roles'
     representationValues = { mode: 'read', hour, minute, answerLabel: correctAnswer }
     options = textOptions(random, correctAnswer, [
-      { value: formatClockTime(hour === 12 ? 1 : hour + 1, minute), misconception: 'Stundenzeiger eine Stunde zu weit gelesen' },
-      { value: formatClockTime(hour, (minute + 15) % 60), misconception: 'Minutenzeiger um eine Viertelstunde versetzt gelesen' },
-      { value: formatClockTime(hour === 1 ? 12 : hour - 1, minute), misconception: 'Stundenzeiger eine Stunde zu früh gelesen' }
+      { value: 'Der kurze Zeiger zeigt die Minuten.', misconception: 'Stunden- und Minutenzeiger werden vertauscht.', misconceptionId: 'time-hands-swapped' },
+      { value: 'Beide Zeiger zeigen immer dasselbe.', misconception: 'Stunden- und Minutenzeiger werden vertauscht.', misconceptionId: 'time-hands-swapped' }
+    ])
+  } else if (timePhase !== 'transfer') {
+    const hour = integer(random, 1, 12)
+    const minute = timePhase === 'understand'
+      ? 0
+      : timePhase === 'guided-practice'
+        ? 30
+        : timePhase === 'independent-practice'
+          ? pick(random, [15, 45])
+          : pick(random, [5, 10, 20, 25, 35, 40, 50, 55])
+    correctAnswer = formatClockTime(hour, minute)
+    taskPrompt = minute === 30
+      ? 'Welche digitale Uhrzeit zeigt die Uhr? Der kurze Zeiger steht zwischen zwei Stunden.'
+      : content.readPrompt
+    quantityExplanation = renderCatalogText(content.readExplanation, { time: correctAnswer })
+    strategy = timePhase === 'understand'
+      ? 'Der lange Zeiger steht für 00 Minuten auf der 12. Der kurze Zeiger zeigt genau auf die volle Stunde.'
+      : timePhase === 'guided-practice'
+        ? 'Bei einer halben Stunde steht der lange Zeiger auf 6 und der kurze genau zwischen zwei Stundenzahlen. „Halb zwei“ ist 01:30 Uhr.'
+        : timePhase === 'independent-practice'
+          ? 'Die 3 bedeutet 15 Minuten, die 6 bedeutet 30 Minuten und die 9 bedeutet 45 Minuten.'
+          : 'Lies den langen Zeiger in Fünferschritten und prüfe danach, wie weit der kurze Zeiger schon gewandert ist.'
+    subskillId = timePhase === 'understand' ? 'time-full-hours' : timePhase === 'guided-practice' ? 'time-full-half-hours' : timePhase === 'independent-practice' ? 'time-quarter-hours' : 'time-five-minute-reading'
+    representationValues = { mode: 'read', hour, minute, answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, [
+      { value: formatClockTime(hour === 12 ? 1 : hour + 1, minute), misconception: 'Stunden- und Minutenzeiger werden vertauscht.', misconceptionId: 'time-hands-swapped' },
+      { value: formatClockTime(hour, (minute + 15) % 60), misconception: 'Stunden- und Minutenzeiger werden vertauscht.', misconceptionId: 'time-hands-swapped' },
+      { value: formatClockTime(hour === 1 ? 12 : hour - 1, minute), misconception: 'Stunden- und Minutenzeiger werden vertauscht.', misconceptionId: 'time-hands-swapped' }
     ])
   } else {
     const startMinutes = integer(random, 32, 62) * 15
@@ -1371,14 +1658,14 @@ function time(seed: number, difficulty: Difficulty): Exercise {
     options = numberOptions(random, durationMinutes, [
       { value: durationMinutes - 15, misconception: 'Eine Viertelstunde ausgelassen' },
       { value: durationMinutes + 15, misconception: 'Eine Viertelstunde zu viel gezählt' },
-      { value: Math.abs(endMinute - startMinute), misconception: 'Nur die Minutenzahlen voneinander abgezogen' }
+      { value: Math.abs(endMinute - startMinute), misconception: 'Bei einer Zeitspanne werden nur die Minutenzahlen voneinander abgezogen.', misconceptionId: 'time-duration-minute-difference' }
     ]).map((option) => ({ ...option, label: `${option.value} Minuten` }))
   }
   const values = { taskPrompt, quantityExplanation, strategy, answer: correctAnswer }
   return withMetadata({
     ...base('time', seed, difficulty, values),
     ...contentFor('time', values, difficulty),
-    typeId: difficulty === 3 ? 'time-duration' : 'time-read-clock',
+    typeId: timePhase === 'activate' ? 'time-identify-hand' : timePhase === 'understand' ? 'time-full-hour' : timePhase === 'guided-practice' ? 'time-half-hour' : timePhase === 'independent-practice' ? 'time-quarter-hour' : timePhase === 'automate' ? 'time-five-minute' : 'time-duration',
     subskillId,
     answerMode: 'choice',
     correctAnswer,
@@ -1528,7 +1815,7 @@ function planeShapes(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
-function patterns(seed: number, difficulty: Difficulty): Exercise {
+function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().planeGeometry
   const symbols = shuffle(random, [...content.patternSymbols])
@@ -1544,20 +1831,65 @@ function patterns(seed: number, difficulty: Difficulty): Exercise {
     patternKey: sequence.join('|')
   }
   const options = textOptions(random, correctAnswer, symbols.filter((symbol) => symbol !== correctAnswer).map((symbol) => ({ value: symbol, misconception: 'Musterblock an der falschen Stelle fortgesetzt' })))
+  const shared = { ...base('patterns', seed, difficulty, values), ...contentFor('patterns', values, difficulty) }
+  const strip = (shown: string[], answerLabel = correctAnswer) => representation('patterns', difficulty, 'pattern-strip', content.displayLabels.pattern, {
+    sequenceCount: shown.length,
+    blockLength: block.length,
+    answerLabel,
+    highlightBlocks: phase === 'activate' || phase === 'understand' ? 1 : 0,
+    taskMode: phase === 'transfer' ? 'identify-error' : 'continue',
+    ...Object.fromEntries(shown.map((symbol, index) => [`symbol${index}`, symbol]))
+  }, ['answerLabel'])
+  if (phase === 'activate') {
+    const correctBlock = block.join(' – ')
+    return withMetadata({
+      ...shared,
+      typeId: 'pattern-activate-find-block', subskillId: difficulty === 1 ? 'pattern-ab' : 'pattern-abc',
+      prompt: 'Welcher kleinste Block wiederholt sich?', answerMode: 'choice', correctAnswer: correctBlock,
+      options: textOptions(random, correctBlock, [
+        { value: block[block.length - 1]!, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
+        { value: [...block].reverse().join(' – '), misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' },
+        { value: sequence.slice(0, block.length + 1).join(' – '), misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' }
+      ]), representation: strip(sequence)
+    })
+  }
+  if (phase === 'understand') {
+    const restart = block.length + 1
+    return withMetadata({
+      ...shared,
+      typeId: 'pattern-understand-restart', subskillId: difficulty === 1 ? 'pattern-ab' : 'pattern-abc',
+      prompt: 'An welcher Stelle beginnt der Musterblock zum ersten Mal wieder von vorn?', answerMode: 'choice', correctAnswer: String(restart),
+      options: numberOptions(random, restart, [
+        { value: block.length, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
+        { value: block.length + 2, misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' },
+        { value: 1, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' }
+      ]), representation: strip(sequence)
+    })
+  }
+  if (phase === 'transfer') {
+    const errorIndex = Math.min(sequence.length - 2, block.length + 1)
+    const corrupted = [...sequence]
+    corrupted[errorIndex] = symbols.find((symbol) => symbol !== sequence[errorIndex])!
+    const correctPosition = String(errorIndex + 1)
+    return withMetadata({
+      ...shared,
+      typeId: 'pattern-transfer-identify-error', subskillId: 'pattern-complex-block',
+      prompt: 'An welcher Stelle ist der Musterfehler?', answerMode: 'choice', correctAnswer: correctPosition,
+      options: numberOptions(random, errorIndex + 1, [
+        { value: Math.max(1, errorIndex), misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' },
+        { value: errorIndex + 2, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
+        { value: block.length, misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' }
+      ]), representation: strip(corrupted, correctPosition)
+    })
+  }
   return withMetadata({
-    ...base('patterns', seed, difficulty, values),
-    ...contentFor('patterns', values, difficulty),
+    ...shared,
     typeId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-repeated-element',
     subskillId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-complex-block',
     answerMode: 'choice',
     correctAnswer,
     options,
-    representation: representation('patterns', difficulty, 'pattern-strip', content.displayLabels.pattern, {
-      sequenceCount: sequence.length,
-      blockLength: block.length,
-      answerLabel: correctAnswer,
-      ...Object.fromEntries(sequence.map((symbol, index) => [`symbol${index}`, symbol]))
-    }, ['answerLabel'])
+    representation: strip(sequence)
   })
 }
 
@@ -2075,39 +2407,67 @@ function combinationRepresentation(template: CombinationTemplate): ExerciseRepre
   }
 }
 
-function combinatorics(seed: number, difficulty: Difficulty): Exercise {
+function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const templates = getTaskCatalog().chanceContent.combinationTemplates.filter((template) => template.difficulty === difficulty)
   const template = pick(random, templates)
   const answer = combinationCount(template)
   const generatedValues = { templateId: template.id, firstCount: template.firstOptions.length, secondCount: template.secondOptions.length, answer }
   const generatedContent = contentFor('combinatorics', generatedValues, difficulty)
+  const allowedPairs = template.firstOptions.flatMap((first) => template.secondOptions
+    .filter((second) => !template.excludedPair || template.excludedPair[0] !== first || template.excludedPair[1] !== second)
+    .map((second) => ({ value: `${first} + ${second}`, label: `${first} mit ${second}` })))
+  const pairingAnswer = allowedPairs.map((option) => option.value).sort().join('|')
+  if (phase === 'activate') {
+    const correct = allowedPairs[0]!
+    return withMetadata({
+      ...base('combinatorics', seed, difficulty, generatedValues), ...generatedContent,
+      prompt: `Welche Auswahl nimmt genau eine Möglichkeit aus „${template.firstLabel}“ und eine aus „${template.secondLabel}“?`,
+      typeId: 'combinations-identify-pair', subskillId: 'combinations-systematic', answerMode: 'choice', correctAnswer: correct.value,
+      options: textOptions(random, correct.value, [
+        { value: `${template.firstOptions[0]} + ${template.firstOptions[1] ?? template.firstOptions[0]}`, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' },
+        { value: `${template.secondOptions[0]} + ${template.secondOptions[1] ?? template.secondOptions[0]}`, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' }
+      ]).map((option) => ({ ...option, label: option.value.replace(' + ', ' mit ') })),
+      representation: combinationRepresentation(template)
+    })
+  }
+  const buildStep: ExerciseStep = {
+    id: 'pairings', prompt: 'Baue alle erlaubten Paarungen. Halte eine Wahl links fest und gehe rechts der Reihe nach durch.',
+    interaction: 'build-pairing', options: allowedPairs, expectedSelections: allowedPairs.map((option) => option.value), correctAnswer: pairingAnswer,
+    errorFeedback: 'Es fehlt noch eine erlaubte Paarung. Gehe links und rechts der Reihe nach durch.',
+    successFeedback: 'Alle erlaubten Paarungen sind vollständig und ohne Doppelung erfasst.'
+  }
+  const countStep: ExerciseStep = {
+    id: 'count', prompt: 'Wie viele verschiedene Paarungen hast du gebaut?', interaction: 'select',
+    options: numberOptions(random, answer, [
+      { value: answer - 1, misconception: 'Eine Auswahl wird ausgelassen.', misconceptionId: 'combinations-missing' },
+      { value: answer + 1, misconception: template.excludedPair ? 'Eine ausgeschlossene Kombination wird trotzdem mitgezählt.' : 'Möglichkeiten werden doppelt gezählt.', misconceptionId: template.excludedPair ? 'combinations-excluded' : 'combinations-duplicate' },
+      { value: template.firstOptions.length + template.secondOptions.length, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' }
+    ]), correctAnswer: String(answer), errorFeedback: generatedContent.errorFeedback, successFeedback: generatedContent.successFeedback
+  }
   return withMetadata({
     ...base('combinatorics', seed, difficulty, generatedValues), ...generatedContent,
     prompt: template.question || getTaskCatalog().chanceContent.combinationCountPrompt,
-    typeId: difficulty === 1 ? 'combinations-2x2' : difficulty === 2 ? 'combinations-3x2' : 'combinations-with-exclusion',
+    typeId: phase === 'understand' ? 'combinations-understand-build' : difficulty === 1 ? 'combinations-2x2' : difficulty === 2 ? 'combinations-3x2' : 'combinations-with-exclusion',
     subskillId: difficulty === 3 ? 'combinations-one-exclusion' : 'combinations-systematic',
-    answerMode: 'choice', correctAnswer: String(answer),
-    options: numberOptions(random, answer, [
-      { value: answer - 1, misconception: 'Eine erlaubte Möglichkeit ausgelassen' },
-      { value: answer + 1, misconception: 'Eine Möglichkeit doppelt gezählt oder die Ausnahme mitgezählt' },
-      { value: template.firstOptions.length + template.secondOptions.length, misconception: 'Auswahlmöglichkeiten addiert statt Paarungen gebildet' }
-    ]),
+    answerMode: 'guided-choice', correctAnswer: String(answer),
+    steps: phase === 'understand' ? [buildStep] : [buildStep, countStep],
     representation: combinationRepresentation(template)
   })
 }
 
-export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string): Exercise {
-  switch (skillId) {
-    case 'addition': return addition(seed, difficulty, focus)
-    case 'subtraction': return subtraction(seed, difficulty, focus)
+export function generateExercise(skillId: SkillId, seed: number, difficulty: Difficulty = 1, focus?: string, phase?: LearningPhase): Exercise {
+  const generated: Exercise = (() => {
+    switch (skillId) {
+    case 'addition': return addition(seed, difficulty, focus, phase)
+    case 'subtraction': return subtraction(seed, difficulty, focus, phase)
     case 'multiplication': return multiplication(seed, difficulty, focus)
     case 'division': return division(seed, difficulty, focus)
-    case 'place-value': return placeValue(seed, difficulty)
-    case 'decompose': return decompose(seed, difficulty)
-    case 'compose': return compose(seed, difficulty)
-    case 'neighbor-tens': return neighbors(seed, difficulty, 10)
-    case 'neighbor-hundreds': return neighbors(seed, difficulty, 100)
+    case 'place-value': return placeValue(seed, difficulty, phase)
+    case 'decompose': return decompose(seed, difficulty, phase)
+    case 'compose': return compose(seed, difficulty, phase)
+    case 'neighbor-tens': return neighbors(seed, difficulty, 10, phase)
+    case 'neighbor-hundreds': return neighbors(seed, difficulty, 100, phase)
     case 'round-tens': return rounding(seed, difficulty, 10)
     case 'round-hundreds': return rounding(seed, difficulty, 100)
     case 'addition-1000': return addition1000(seed, difficulty)
@@ -2125,14 +2485,22 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'read-tables': return readTables(seed, difficulty)
     case 'read-charts': return readCharts(seed, difficulty)
     case 'probability': return probability(seed, difficulty)
-    case 'combinatorics': return combinatorics(seed, difficulty)
-    case 'time': return time(seed, difficulty)
+    case 'combinatorics': return combinatorics(seed, difficulty, phase)
+    case 'time': return time(seed, difficulty, phase)
     case 'mass': return measurementQuantity('mass', seed, difficulty)
     case 'capacity': return measurementQuantity('capacity', seed, difficulty)
     case 'plane-shapes': return planeShapes(seed, difficulty)
-    case 'patterns': return patterns(seed, difficulty)
+    case 'patterns': return patterns(seed, difficulty, phase)
     case 'area': return area(seed, difficulty)
-    case 'perimeter': return perimeter(seed, difficulty)
+      case 'perimeter': return perimeter(seed, difficulty)
+    }
+  })()
+  if (!phase) return generated
+  return {
+    ...generated,
+    learningPhase: phase,
+    learningAction: getLearningPhaseModel(phase).learningAction,
+    testMetadata: { ...generated.testMetadata, learningPhase: phase }
   }
 }
 

@@ -48,20 +48,45 @@ export type LearningPhase =
   | 'automate'
   | 'transfer'
 
+export type LearningAction =
+  | 'recall-foundation'
+  | 'inspect-relationship'
+  | 'solve-with-structure'
+  | 'solve-independently'
+  | 'retrieve-without-time-pressure'
+  | 'apply-in-new-context'
+
+export type InteractionKind =
+  | 'select'
+  | 'mark'
+  | 'match'
+  | 'order'
+  | 'complete-model'
+  | 'guided-number'
+  | 'place-value-input'
+  | 'identify-error'
+  | 'choose-strategy'
+  | 'build-pairing'
+  | 'continue'
+
 export interface Hint {
   level: 1 | 2
   text: string
 }
 
 export interface AnswerOption {
+  id?: string
   value: string
   label: string
+  correct?: boolean
   grid?: number[][]
   representation?: ExerciseRepresentation
   misconception?: string
+  misconceptionId?: string
+  misconceptionFeedback?: string
 }
 
-export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'grouping-model' | 'sharing-model' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper' | 'data-display' | 'chance-display' | 'combination-display' | 'clock' | 'mass-scale' | 'capacity-vessel' | 'shape-grid' | 'pattern-strip' | 'unit-squares' | 'perimeter-path'
+export type RepresentationKind = 'ten-frame' | 'place-value' | 'place-value-material' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'grouping-model' | 'sharing-model' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper' | 'data-display' | 'chance-display' | 'combination-display' | 'clock' | 'mass-scale' | 'capacity-vessel' | 'shape-grid' | 'pattern-strip' | 'unit-squares' | 'perimeter-path'
 
 export interface NumberLineJump {
   from: number
@@ -93,8 +118,9 @@ export interface ExerciseStep {
   id: string
   curriculumStage?: string
   prompt: string
-  interaction?: 'choice' | 'number' | 'continue'
+  interaction?: InteractionKind
   options?: AnswerOption[]
+  expectedSelections?: string[]
   representation?: ExerciseRepresentation
   continueLabel?: string
   correctAnswer: string
@@ -114,6 +140,7 @@ export interface Exercise {
   skillId: SkillId
   difficulty: Difficulty
   learningPhase: LearningPhase
+  learningAction: LearningAction
   title: string
   prompt: string
   answerMode: AnswerMode
@@ -160,6 +187,7 @@ export interface AttemptResult {
   correct: boolean
   hintsUsed: number
   attempts: number
+  detectedMisconceptions?: string[]
   completedAt: string
 }
 
