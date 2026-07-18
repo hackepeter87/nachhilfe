@@ -1,6 +1,6 @@
 {
   "schemaVersion": 18,
-  "catalogVersion": "0.23.0",
+  "catalogVersion": "0.24.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -2406,7 +2406,25 @@
       "misconceptions": [
         "Einer, Zehner und Hunderter werden nicht stellengerecht ausgerichtet.",
         "Der Übertrag wird vergessen oder in derselben Spalte noch einmal addiert.",
-        "Eine zweistellige Spaltensumme wird vollständig in die Ergebniszeile geschrieben."
+        "Eine zweistellige Spaltensumme wird vollständig in die Ergebniszeile geschrieben.",
+        "Die Umkehraufgabe wird nicht von der Summe aus gebildet."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "written-addition-whole-column-sum",
+          "misconception": "Eine zweistellige Spaltensumme wird vollständig in die Ergebniszeile geschrieben.",
+          "feedback": "Schreibe nur die Einerziffer unten. Die Zehnerziffer gehört als Übertrag in die nächste Spalte."
+        },
+        {
+          "id": "written-addition-carry-column",
+          "misconception": "Der Übertrag wird vergessen oder in derselben Spalte noch einmal addiert.",
+          "feedback": "Der neue Zehner wird genau einmal in der nächsten Spalte mitgerechnet."
+        },
+        {
+          "id": "written-addition-probe-operation",
+          "misconception": "Die Umkehraufgabe wird nicht von der Summe aus gebildet.",
+          "feedback": "Beginne die Probe mit der Summe und ziehe einen Summanden ab. Dann muss der andere Summand entstehen."
+        }
       ],
       "hints": [
         "Beginne rechts bei den Einern und rechne immer nur eine Spalte.",
@@ -2502,7 +2520,7 @@
           "id": "activate",
           "goal": "Summanden in Hunderter, Zehner und Einer zerlegen und stellengerecht anordnen.",
           "exerciseTypes": [
-            "written-addition:no-carry"
+            "written-addition:activate-alignment"
           ],
           "releaseStatus": "active"
         },
@@ -2510,7 +2528,7 @@
           "id": "understand",
           "goal": "Spaltendarstellung und Stellenwerttafel als denselben Rechenvorgang verstehen.",
           "exerciseTypes": [
-            "written-addition:no-carry"
+            "written-addition:understand-carry"
           ],
           "releaseStatus": "active"
         },
@@ -2518,7 +2536,7 @@
           "id": "guided-practice",
           "goal": "Ohne Übertrag von rechts nach links spaltenweise addieren.",
           "exerciseTypes": [
-            "written-addition:difficulty-1"
+            "written-addition:guided-columns"
           ],
           "releaseStatus": "active"
         },
@@ -2526,7 +2544,7 @@
           "id": "independent-practice",
           "goal": "Einen sichtbaren Einer-zu-Zehner-Übertrag korrekt notieren und einmal mitrechnen.",
           "exerciseTypes": [
-            "written-addition:difficulty-2"
+            "written-addition:visible-carry"
           ],
           "releaseStatus": "active"
         },
@@ -2534,7 +2552,7 @@
           "id": "automate",
           "goal": "Genau einen Übertrag selbstständig erkennen und ausführen.",
           "exerciseTypes": [
-            "written-addition:difficulty-3"
+            "written-addition:self-carry"
           ],
           "releaseStatus": "active"
         },
@@ -2542,7 +2560,7 @@
           "id": "transfer",
           "goal": "Den Übertrag anhand des Stellenwerts begründen und das Ergebnis überschlagen.",
           "exerciseTypes": [
-            "written-addition:difficulty-3"
+            "written-addition:transfer-inverse-check"
           ],
           "releaseStatus": "active"
         }
@@ -2743,7 +2761,33 @@
         "Einer, Zehner und Hunderter werden nicht stellengerecht ausgerichtet.",
         "Die kleinere Ziffer wird unabhängig von der Rechenrichtung von der größeren abgezogen.",
         "Nach dem Entbündeln wird die abgebende Stelle nicht um eins vermindert.",
-        "Die Entbündelung wird in einer weiteren Spalte unnötig fortgesetzt."
+        "Die Entbündelung wird in einer weiteren Spalte unnötig fortgesetzt.",
+        "Beim Entbündeln wird die Stelle nicht in zehn kleinere Einheiten getauscht.",
+        "Die Tauschrichtung wird umgekehrt.",
+        "Die Ausgangszahl wird statt der Differenz ergänzt.",
+        "Für die Probe wird erneut subtrahiert."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "written-subtraction-exchange-value",
+          "misconception": "Beim Entbündeln wird die Stelle nicht in zehn kleinere Einheiten getauscht.",
+          "feedback": "Eine Einheit der linken Stelle wird zu zehn Einheiten der aktuellen Stelle."
+        },
+        {
+          "id": "written-subtraction-exchange-direction",
+          "misconception": "Die Tauschrichtung wird umgekehrt.",
+          "feedback": "Entbündeln geht von einer größeren Stelle zu zehn kleineren Einheiten, nicht umgekehrt."
+        },
+        {
+          "id": "written-subtraction-probe-start",
+          "misconception": "Die Ausgangszahl wird statt der Differenz ergänzt.",
+          "feedback": "Beginne die Probe mit der Differenz und addiere den Subtrahenden."
+        },
+        {
+          "id": "written-subtraction-probe-operation",
+          "misconception": "Für die Probe wird erneut subtrahiert.",
+          "feedback": "Die Subtraktion wird mit der umgekehrten Rechenart Addition geprüft."
+        }
       ],
       "hints": [
         "Beginne rechts bei den Einern. Reicht die obere Stelle nicht, entbündele genau eine Einheit der linken Nachbarstelle.",
@@ -2840,7 +2884,7 @@
           "id": "activate",
           "goal": "Minuend und Subtrahend in Hunderter, Zehner und Einer zerlegen und stellengerecht anordnen.",
           "exerciseTypes": [
-            "written-subtraction:no-unbundling"
+            "written-subtraction:activate-alignment"
           ],
           "releaseStatus": "active"
         },
@@ -2848,7 +2892,7 @@
           "id": "understand",
           "goal": "Eine Einheit der linken Stelle als zehn Einheiten der aktuellen Stelle verstehen.",
           "exerciseTypes": [
-            "written-subtraction:visible-unbundling"
+            "written-subtraction:understand-unbundling"
           ],
           "releaseStatus": "active"
         },
@@ -2856,7 +2900,7 @@
           "id": "guided-practice",
           "goal": "Ohne Entbündelung von rechts nach links spaltenweise subtrahieren.",
           "exerciseTypes": [
-            "written-subtraction:difficulty-1"
+            "written-subtraction:guided-columns"
           ],
           "releaseStatus": "active"
         },
@@ -2864,7 +2908,7 @@
           "id": "independent-practice",
           "goal": "Eine sichtbare Einer-Entbündelung korrekt ausführen und alle Stellen anpassen.",
           "exerciseTypes": [
-            "written-subtraction:difficulty-2"
+            "written-subtraction:visible-unbundling"
           ],
           "releaseStatus": "active"
         },
@@ -2872,7 +2916,7 @@
           "id": "automate",
           "goal": "Genau eine Entbündelung selbstständig erkennen und mit einer Additionsprobe prüfen.",
           "exerciseTypes": [
-            "written-subtraction:difficulty-3"
+            "written-subtraction:self-unbundling"
           ],
           "releaseStatus": "active"
         },
@@ -2880,7 +2924,7 @@
           "id": "transfer",
           "goal": "Die Entbündelung anhand des Stellenwerts begründen und die Umkehrbeziehung zur Addition nutzen.",
           "exerciseTypes": [
-            "written-subtraction:difficulty-3"
+            "written-subtraction:transfer-addition-check"
           ],
           "releaseStatus": "active"
         }

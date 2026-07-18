@@ -358,6 +358,29 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(hard.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds'])
   })
 
+  it('setzt alle Lernphasen der schriftlichen Addition als verschiedene Handlungen um', () => {
+    const expectedTypes = {
+      activate: 'written-addition-activate-alignment',
+      understand: 'written-addition-understand-carry',
+      'guided-practice': 'written-addition-guided-columns',
+      'independent-practice': 'written-addition-visible-carry',
+      automate: 'written-addition-to-1000',
+      transfer: 'written-addition-transfer-inverse-check'
+    } as const
+    for (const phase of Object.keys(expectedTypes) as Array<keyof typeof expectedTypes>) {
+      const typeIds = new Set<string>()
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('written-addition', seed, 3, undefined, phase)
+        typeIds.add(exercise.typeId)
+        expect(exercise.learningPhase).toBe(phase)
+        expect(exercise.correctAnswer.length).toBeGreaterThan(0)
+        if (phase === 'activate') expect(exercise.representation?.valueRoles.unknownValues).toContain('second')
+        if (phase === 'understand' || phase === 'transfer') expect(exercise.options).toHaveLength(3)
+      }
+      expect(typeIds).toEqual(new Set([expectedTypes[phase]]))
+    }
+  })
+
   it('erzeugt schriftliche Subtraktionen mit höchstens genau einer vorgesehenen Entbündelung', () => {
     const unbundlings = (first: number, second: number) => {
       const ones = first % 10 < second % 10 ? 1 : 0
@@ -407,6 +430,29 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(medium.steps?.map((step) => step.id)).toEqual(['unbundle', 'ones', 'tens', 'hundreds'])
     expect(hard.representation?.visibility).toBe('hint')
     expect(hard.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds', 'check'])
+  })
+
+  it('setzt alle Lernphasen der schriftlichen Subtraktion als verschiedene Handlungen um', () => {
+    const expectedTypes = {
+      activate: 'written-subtraction-activate-alignment',
+      understand: 'written-subtraction-understand-unbundling',
+      'guided-practice': 'written-subtraction-guided-columns',
+      'independent-practice': 'written-subtraction-visible-unbundling',
+      automate: 'written-subtraction-to-1000',
+      transfer: 'written-subtraction-transfer-addition-check'
+    } as const
+    for (const phase of Object.keys(expectedTypes) as Array<keyof typeof expectedTypes>) {
+      const typeIds = new Set<string>()
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('written-subtraction', seed, 3, undefined, phase)
+        typeIds.add(exercise.typeId)
+        expect(exercise.learningPhase).toBe(phase)
+        expect(exercise.correctAnswer.length).toBeGreaterThan(0)
+        if (phase === 'activate') expect(exercise.representation?.valueRoles.unknownValues).toContain('second')
+        if (phase === 'understand' || phase === 'transfer') expect(exercise.options).toHaveLength(3)
+      }
+      expect(typeIds).toEqual(new Set([expectedTypes[phase]]))
+    }
   })
 
   it('liefert eine konkrete Remediation mit leichterer verwandter Aufgabe', () => {

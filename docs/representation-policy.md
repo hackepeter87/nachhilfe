@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.24.0, Katalog 0.23.0, Schema 18.
+Stand: App 0.25.0, Katalog 0.24.0, Schema 18.
 
 ## Verbindliche Regel
 

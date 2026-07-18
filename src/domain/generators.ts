@@ -1424,8 +1424,12 @@ function writtenAdditionSteps(values: Record<string, number | string>, difficult
   return steps
 }
 
-function writtenAddition(seed: number, difficulty: Difficulty): Exercise {
+function writtenAddition(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+  const calculationLevel: Difficulty = phase === 'activate' || phase === 'guided-practice' ? 1
+    : phase === 'understand' || phase === 'independent-practice' ? 2
+      : phase === 'automate' || phase === 'transfer' ? 3
+        : difficulty
   let firstHundreds: number
   let firstTens: number
   let firstOnes: number
@@ -1434,14 +1438,14 @@ function writtenAddition(seed: number, difficulty: Difficulty): Exercise {
   let secondOnes: number
   let carryColumn = 'none'
 
-  if (difficulty === 1) {
+  if (calculationLevel === 1) {
     firstHundreds = integer(random, 2, 6)
     secondHundreds = integer(random, 1, 9 - firstHundreds)
     firstTens = integer(random, 1, 8)
     secondTens = integer(random, 1, 9 - firstTens)
     firstOnes = integer(random, 1, 8)
     secondOnes = integer(random, 1, 9 - firstOnes)
-  } else if (difficulty === 2 || random() < 0.5) {
+  } else if (calculationLevel === 2 || random() < 0.5) {
     carryColumn = 'tens'
     firstHundreds = integer(random, 2, 6)
     secondHundreds = integer(random, 1, 8 - firstHundreds)
@@ -1469,28 +1473,76 @@ function writtenAddition(seed: number, difficulty: Difficulty): Exercise {
     onesResult: answer % 10,
     tensResult: Math.floor(answer / 10) % 10,
     hundredsResult: Math.floor(answer / 100),
-    carry: difficulty === 1 ? 0 : 1,
+    carry: calculationLevel === 1 ? 0 : 1,
     carryColumn
   }
-  return withMetadata({
+  const shared = {
     ...base('written-addition', seed, difficulty, values),
     ...contentFor('written-addition', values, difficulty),
-    typeId: 'written-addition-to-1000',
-    subskillId: difficulty === 1
+    subskillId: calculationLevel === 1
       ? 'written-addition-no-carry'
       : carryColumn === 'tens'
         ? 'written-addition-ones-carry'
         : 'written-addition-tens-carry',
+  }
+  const column = representation('written-addition', difficulty, 'column-calculation', 'Schriftliche Addition in der Stellenwerttafel', {
+    first,
+    second,
+    operation: '+',
+    carry: calculationLevel === 1 ? 0 : 1,
+    carryColumn
+  }, ['result'])
+  if (phase === 'activate') {
+    return withMetadata({
+      ...shared,
+      typeId: 'written-addition-activate-alignment',
+      prompt: `Ordne ${second} stellengerecht unter ${first} ein. Welche Zahl gehört in die zweite Zeile?`,
+      answerMode: 'guided-number',
+      correctAnswer: String(second),
+      steps: [{
+        id: 'second', interaction: 'place-value-input', prompt: 'Trage den zweiten Summanden stellengerecht ein.', correctAnswer: String(second),
+        errorFeedback: 'Achte auf die Stellen: Einer unter Einer, Zehner unter Zehner und Hunderter unter Hunderter.',
+        successFeedback: 'Die Stellen sind richtig ausgerichtet.'
+      }],
+      representation: { ...column, visibility: 'always', valueRoles: { knownValues: column.valueRoles.knownValues.filter((key) => key !== 'second'), unknownValues: ['second', 'result'], revealedValues: [] } }
+    })
+  }
+  if (phase === 'understand') {
+    const onesSum = firstOnes + secondOnes
+    const correct = `${onesSum % 10} Einer unten, 1 Zehner in die nächste Spalte`
+    return withMetadata({
+      ...shared,
+      typeId: 'written-addition-understand-carry',
+      prompt: `${firstOnes} Einer plus ${secondOnes} Einer sind ${onesSum} Einer. Was bedeutet das für die Spaltenschreibweise?`,
+      answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `${onesSum} unten vollständig eintragen`, misconception: 'Die zweistellige Spaltensumme wird vollständig in die Ergebniszeile geschrieben.', misconceptionId: 'written-addition-whole-column-sum' },
+        { value: `${onesSum % 10} Einer unten, 1 Zehner in derselben Spalte noch einmal addieren`, misconception: 'Der Übertrag wird in derselben Spalte noch einmal addiert.', misconceptionId: 'written-addition-carry-column' }
+      ]),
+      representation: { ...column, visibility: 'always' }
+    })
+  }
+  if (phase === 'transfer') {
+    const probe = `${answer} − ${second} = ${first}`
+    return withMetadata({
+      ...shared,
+      typeId: 'written-addition-transfer-inverse-check',
+      prompt: `Welche Umkehraufgabe prüft ${first} + ${second} = ${answer}?`,
+      answerMode: 'choice', correctAnswer: probe,
+      options: textOptions(random, probe, [
+        { value: `${answer} + ${second} = ${answer + second}`, misconception: 'Für die Probe wird noch einmal addiert.', misconceptionId: 'written-addition-probe-operation' },
+        { value: `${first} − ${second} = ${Math.abs(first - second)}`, misconception: 'Die Summe wird in der Probe nicht verwendet.', misconceptionId: 'written-addition-probe-operation' }
+      ]),
+      representation: { ...column, visibility: 'always' }
+    })
+  }
+  return withMetadata({
+    ...shared,
+    typeId: phase === 'guided-practice' ? 'written-addition-guided-columns' : phase === 'independent-practice' ? 'written-addition-visible-carry' : 'written-addition-to-1000',
     answerMode: 'guided-number',
     correctAnswer: String(answer),
-    steps: writtenAdditionSteps(values, difficulty),
-    representation: representation('written-addition', difficulty, 'column-calculation', 'Schriftliche Addition in der Stellenwerttafel', {
-      first,
-      second,
-      operation: '+',
-      carry: difficulty === 2 ? 1 : 0,
-      carryColumn
-    }, ['result'])
+    steps: writtenAdditionSteps(values, calculationLevel),
+    representation: column
   })
 }
 
@@ -1623,8 +1675,12 @@ function writtenSubtractionSteps(values: Record<string, number | string>, diffic
   return steps
 }
 
-function writtenSubtraction(seed: number, difficulty: Difficulty): Exercise {
+function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+  const calculationLevel: Difficulty = phase === 'activate' || phase === 'guided-practice' ? 1
+    : phase === 'understand' || phase === 'independent-practice' ? 2
+      : phase === 'automate' || phase === 'transfer' ? 3
+        : difficulty
   let firstHundreds: number
   let firstTens: number
   let firstOnes: number
@@ -1633,14 +1689,14 @@ function writtenSubtraction(seed: number, difficulty: Difficulty): Exercise {
   let secondOnes: number
   let unbundleFrom: 'none' | 'tens' | 'hundreds' = 'none'
 
-  if (difficulty === 1) {
+  if (calculationLevel === 1) {
     firstHundreds = integer(random, 4, 9)
     secondHundreds = integer(random, 1, firstHundreds - 1)
     firstTens = integer(random, 1, 9)
     secondTens = integer(random, 0, firstTens)
     firstOnes = integer(random, 1, 9)
     secondOnes = integer(random, 0, firstOnes)
-  } else if (difficulty === 2 || random() < 0.5) {
+  } else if (calculationLevel === 2 || random() < 0.5) {
     unbundleFrom = 'tens'
     firstHundreds = integer(random, 4, 9)
     secondHundreds = integer(random, 1, firstHundreds - 1)
@@ -1668,28 +1724,76 @@ function writtenSubtraction(seed: number, difficulty: Difficulty): Exercise {
     onesResult: answer % 10,
     tensResult: Math.floor(answer / 10) % 10,
     hundredsResult: Math.floor(answer / 100),
-    unbundle: difficulty === 1 ? 0 : 1,
+    unbundle: calculationLevel === 1 ? 0 : 1,
     unbundleFrom
   }
-  return withMetadata({
+  const shared = {
     ...base('written-subtraction', seed, difficulty, values),
     ...contentFor('written-subtraction', values, difficulty),
-    typeId: 'written-subtraction-to-1000',
-    subskillId: difficulty === 1
+    subskillId: calculationLevel === 1
       ? 'written-subtraction-no-unbundling'
       : unbundleFrom === 'tens'
         ? 'written-subtraction-ones-unbundling'
         : 'written-subtraction-tens-unbundling',
+  }
+  const column = representation('written-subtraction', difficulty, 'column-calculation', 'Schriftliche Subtraktion in der Stellenwerttafel', {
+    first,
+    second,
+    operation: '−',
+    unbundle: calculationLevel === 1 ? 0 : 1,
+    unbundleFrom
+  }, ['result'])
+  if (phase === 'activate') {
+    return withMetadata({
+      ...shared,
+      typeId: 'written-subtraction-activate-alignment',
+      prompt: `Ordne ${second} stellengerecht unter ${first} ein. Welche Zahl gehört in die zweite Zeile?`,
+      answerMode: 'guided-number', correctAnswer: String(second),
+      steps: [{
+        id: 'second', interaction: 'place-value-input', prompt: 'Trage den Subtrahenden stellengerecht ein.', correctAnswer: String(second),
+        errorFeedback: 'Achte auf die Stellen: Einer unter Einer, Zehner unter Zehner und Hunderter unter Hunderter.',
+        successFeedback: 'Die Stellen sind richtig ausgerichtet.'
+      }],
+      representation: { ...column, visibility: 'always', valueRoles: { knownValues: column.valueRoles.knownValues.filter((key) => key !== 'second'), unknownValues: ['second', 'result'], revealedValues: [] } }
+    })
+  }
+  if (phase === 'understand') {
+    const unit = unbundleFrom === 'tens' ? 'Zehner' : 'Hunderter'
+    const exchanged = unbundleFrom === 'tens' ? '10 Einer' : '10 Zehner'
+    const correct = `1 ${unit} wird zu ${exchanged}`
+    return withMetadata({
+      ...shared,
+      typeId: 'written-subtraction-understand-unbundling',
+      prompt: `In der rechten Spalte reicht die obere Stelle nicht aus. Was wird entbündelt?`,
+      answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `1 ${unit} wird zu 1 ${unbundleFrom === 'tens' ? 'Einer' : 'Zehner'}`, misconception: 'Beim Entbündeln wird die Stelle nicht in zehn kleinere Einheiten getauscht.', misconceptionId: 'written-subtraction-exchange-value' },
+        { value: `10 ${unit} werden zu 1 ${unbundleFrom === 'tens' ? 'Einer' : 'Zehner'}`, misconception: 'Die Tauschrichtung wird umgekehrt.', misconceptionId: 'written-subtraction-exchange-direction' }
+      ]),
+      representation: { ...column, visibility: 'always' }
+    })
+  }
+  if (phase === 'transfer') {
+    const probe = `${answer} + ${second} = ${first}`
+    return withMetadata({
+      ...shared,
+      typeId: 'written-subtraction-transfer-addition-check',
+      prompt: `Welche Additionsprobe prüft ${first} − ${second} = ${answer}?`,
+      answerMode: 'choice', correctAnswer: probe,
+      options: textOptions(random, probe, [
+        { value: `${first} + ${second} = ${first + second}`, misconception: 'Die Ausgangszahl wird statt der Differenz ergänzt.', misconceptionId: 'written-subtraction-probe-start' },
+        { value: `${answer} − ${second} = ${Math.max(0, answer - second)}`, misconception: 'Für die Probe wird erneut subtrahiert.', misconceptionId: 'written-subtraction-probe-operation' }
+      ]),
+      representation: { ...column, visibility: 'always' }
+    })
+  }
+  return withMetadata({
+    ...shared,
+    typeId: phase === 'guided-practice' ? 'written-subtraction-guided-columns' : phase === 'independent-practice' ? 'written-subtraction-visible-unbundling' : 'written-subtraction-to-1000',
     answerMode: 'guided-number',
     correctAnswer: String(answer),
-    steps: writtenSubtractionSteps(values, difficulty),
-    representation: representation('written-subtraction', difficulty, 'column-calculation', 'Schriftliche Subtraktion in der Stellenwerttafel', {
-      first,
-      second,
-      operation: '−',
-      unbundle: difficulty === 1 ? 0 : 1,
-      unbundleFrom
-    }, ['result'])
+    steps: writtenSubtractionSteps(values, calculationLevel),
+    representation: column
   })
 }
 
@@ -2831,9 +2935,9 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'round-tens': return rounding(seed, difficulty, 10, phase)
     case 'round-hundreds': return rounding(seed, difficulty, 100, phase)
     case 'addition-1000': return addition1000(seed, difficulty, phase)
-    case 'written-addition': return writtenAddition(seed, difficulty)
+    case 'written-addition': return writtenAddition(seed, difficulty, phase)
     case 'subtraction-1000': return subtraction1000(seed, difficulty, phase)
-    case 'written-subtraction': return writtenSubtraction(seed, difficulty)
+    case 'written-subtraction': return writtenSubtraction(seed, difficulty, phase)
     case 'complement-1000': return complement1000(seed, difficulty, phase)
     case 'money': return money(seed, difficulty)
     case 'lengths': return lengths(seed, difficulty)

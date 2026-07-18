@@ -289,6 +289,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const digits = (value: number) => [Math.floor(value / 100), Math.floor(value / 10) % 10, value % 10]
     const firstDigits = digits(first)
     const secondDigits = digits(second)
+    const secondVisible = isValueVisible('second')
     const answerDigits = digits(operation === '+' ? first + second : first - second)
     const revealedDigits = Array.isArray(values.revealedDigits) && values.revealedDigits.length === 3 &&
       values.revealedDigits.every((digit, index) => typeof digit === 'number' && Number.isInteger(digit) &&
@@ -325,7 +326,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
           <span className="column-operation" />
           <div className="column-row">{firstDigits.map((digit, index) => <strong className={adjustedDigits[index] !== null ? 'column-cell--source-adjusted' : ''} key={index}>{digit}</strong>)}</div>
           <span className="column-operation">{operation}</span>
-          <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{digit}</strong>)}</div>
+          <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{secondVisible ? digit : '?'}</strong>)}</div>
           <span className="column-operation" />
           <div className="column-row column-row--result">
             {revealedDigits.map((digit, index) => <strong className={activeColumn === ['hundreds', 'tens', 'ones'][index] ? 'column-cell--active' : ''} key={index}>{digit < 0 ? '?' : digit}</strong>)}

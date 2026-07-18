@@ -404,6 +404,21 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'written-subtraction', correct: true }))
   })
 
+  it('startet schriftliche Verfahren mit einer neutralen stellengerechten Anordnung', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('written-addition', 71, 1, undefined, 'activate')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const rows = container.querySelectorAll('.column-equation .column-row')
+
+    expect(rows[1]).toHaveTextContent('???')
+    expect(container.querySelector('.column-row--result')).toHaveTextContent('???')
+    expect(screen.queryByText(exercise.correctAnswer)).not.toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('Dein Ergebnis'), exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    expect(rows[1]).toHaveTextContent(exercise.correctAnswer)
+  })
+
   it('zeigt bei einer falschen Entbündelung eine konkrete Tauschhilfe', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('written-subtraction', 42, 2)

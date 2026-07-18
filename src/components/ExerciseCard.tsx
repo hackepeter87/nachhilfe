@@ -151,7 +151,9 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
         },
         values: {
           ...exercise.representation.values,
-          carry: completedStepAnswers.carry ? exercise.representation.values.carry : 0,
+          carry: completedStepAnswers.carry || (exercise.difficulty === 3 && completedStepAnswers.hundreds)
+            ? exercise.representation.values.carry
+            : 0,
           unbundle: exercise.representation.values.operation === '−' && (exercise.difficulty === 3 || completedStepAnswers.unbundle)
             ? exercise.representation.values.unbundle
             : 0,

@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Schriftliche Verfahren 0.25.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Schriftliche Addition und Subtraktion wurden als gemeinsamer Stellenwert- und Prüfstrang auf den Qualitätsstandard ab 0.21 migriert.
+- Alle sechs Lernphasen besitzen unterschiedliche mathematische Handlungen: Zahlen stellengerecht anordnen, Bündeln beziehungsweise Entbündeln verstehen, ohne Übergang geführt rechnen, einen sichtbaren Übergang bearbeiten, einen Übergang selbstständig erkennen und die Rechnung mit der Umkehraufgabe prüfen.
+- Die Spaltendarstellung startet neutral. Der zweite Operand und alle Ergebnisziffern bleiben bis zum jeweiligen erfolgreichen Bearbeitungsschritt maskiert; ein Übertrag erscheint erst nach seiner Bearbeitung.
+- Katalogisierte Fehlvorstellungsrouten unterscheiden vollständige zweistellige Spaltensummen, falsch platzierte Überträge, falsche Tauschrichtung und ungeeignete Probeaufgaben.
+- Katalog 0.24.0 bleibt bei Schema 18. Mehrere Überträge, Entbündelungen über Nullstellen und schriftliche Multiplikation beziehungsweise Division bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 395 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.25.0-local` beziehungsweise `mathe-reise:local` (`sha256:9163786b4082b0b4e4c7e5e834d72517077ab71cf68b5ba5523313f731daf1a8`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8085`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Runden und Abschätzen 0.24.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Runden auf Zehner und Hunderter wurde als gemeinsamer Abstands- und Genauigkeitsstrang auf den Qualitätsstandard ab 0.21 migriert.
