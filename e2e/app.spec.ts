@@ -41,6 +41,12 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
       await page.getByRole('button', { name: 'Ergebnis prüfen' }).evaluate((button: HTMLButtonElement) => button.click())
       continue
     }
+    const equationInput = page.getByLabel('Deine Rechnung')
+    if (await equationInput.isVisible().catch(() => false)) {
+      await equationInput.fill('0 + 0 = ?')
+      await page.getByRole('button', { name: 'Rechnung prüfen' }).evaluate((button: HTMLButtonElement) => button.click())
+      continue
+    }
     const numberInput = page.getByLabel('Deine Antwort')
     if (await numberInput.isVisible().catch(() => false)) {
       await numberInput.fill('9999')
@@ -153,9 +159,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.24.0',
-    schemaVersion: 18,
-    appVersion: '0.25.0'
+    catalogVersion: '0.25.0',
+    schemaVersion: 19,
+    appVersion: '0.26.0'
   })
 
   await page.reload()
@@ -691,6 +697,30 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   })
 
   await onboard(page, 'Modell')
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('mathe-reise')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('progress', 'readwrite')
+      transaction.objectStore('progress').put({
+        skillId: 'word-problem', attempts: 2, correctAnswers: 1, hintsUsed: 0,
+        lastPracticedAt: '2026-07-17T10:00:00.000Z', difficulty: 1,
+        learningPhase: 'guided-practice', mastery: 35, recentErrors: 0,
+        correctStreak: 1, lastVariantKey: null, status: 'learning', subskills: {}
+      })
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+    database.close()
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map((registration) => registration.unregister()))
+    const cacheNames = await caches.keys()
+    await Promise.all(cacheNames.map((name) => caches.delete(name)))
+  })
+  await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishAdditionWarmups(page)
 
@@ -715,12 +745,11 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('sachaufgabe-modell-375x812.png'), fullPage: true })
   await page.getByRole('button', { name: 'Weiter zur Rechnung' }).click()
-  const equationButton = page.getByRole('button', { name: /^\d+ \+ \d+ = \?$/ })
-  const equation = await equationButton.textContent()
-  if (!equation) throw new Error('Passende Rechnung fehlt')
-  const [first, second] = equation.match(/\d+/g)?.map(Number) ?? []
+  const story = await page.locator('.exercise-heading h2').textContent()
+  const [first, second] = story?.match(/\d+/g)?.map(Number) ?? []
   if (first === undefined || second === undefined) throw new Error('Rechnung ist nicht lesbar')
-  await equationButton.click()
+  await page.getByLabel('Deine Rechnung').fill(`${first} + ${second} = ?`)
+  await page.getByRole('button', { name: 'Rechnung prüfen' }).click()
   await page.getByLabel('Dein Ergebnis').fill(String(first + second))
   await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
   await page.getByRole('button', { name: new RegExp(`Das Ergebnis ${first + second} ist größer`) }).click()

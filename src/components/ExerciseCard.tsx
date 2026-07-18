@@ -118,7 +118,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const submitNumber = (event: FormEvent) => {
     event.preventDefault()
     if (!answer.trim()) return
-    if (currentStep && ['guided-number', 'place-value-input'].includes(currentInteraction)) checkStepAnswer(answer)
+    if (currentStep && ['guided-number', 'guided-equation', 'place-value-input'].includes(currentInteraction)) checkStepAnswer(answer)
     else checkRegularAnswer(answer)
   }
 
@@ -269,6 +269,15 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
               <div className="number-row">
                 <input id="guided-number-answer" inputMode="numeric" pattern="[0-9]*" autoComplete="off" value={answer} onChange={(event) => setAnswer(event.target.value.replace(/[^0-9]/g, '').slice(0, 4))} />
                 <button className="icon-button icon-button--primary" type="submit" aria-label="Ergebnis prüfen" title="Ergebnis prüfen"><Send aria-hidden="true" /></button>
+              </div>
+            </form>
+          )}
+          {currentInteraction === 'guided-equation' && (
+            <form className="number-answer" onSubmit={submitNumber}>
+              <label htmlFor="guided-equation-answer">Deine Rechnung</label>
+              <div className="number-row">
+                <input id="guided-equation-answer" inputMode="text" autoComplete="off" value={answer} onChange={(event) => setAnswer(event.target.value.replace(/[^0-9+\-−·:*/= ?]/g, '').slice(0, 28))} />
+                <button className="icon-button icon-button--primary" type="submit" aria-label="Rechnung prüfen" title="Rechnung prüfen"><Send aria-hidden="true" /></button>
               </div>
             </form>
           )}

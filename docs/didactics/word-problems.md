@@ -19,14 +19,14 @@ Ein Schlüsselwort entscheidet; alle Zahlen müssen verwendet werden; eine bekan
 Die Handlung und die gesuchte Größe bestimmen die Mengenbeziehung. Technische Beziehung und Operation bleiben intern; der Kinderablauf arbeitet mit konkreten Situationen, Bildern und Gleichungen.
 
 ## 7. Methodischer Zugang
-Der Katalog dokumentiert die Folge Geschichte verstehen, gesuchte Größe erkennen, wichtige Angaben bestimmen, Modell wählen, Gleichung bilden, selbst rechnen, Ergebnis prüfen und im Antwortsatz auf die Geschichte beziehen. `wordProblemSteps.runtimeSequence` ist die verbindliche Reihenfolge der Runtime. Jede Aufgabe durchläuft diese acht fachlichen Stationen; nur die zweite Gleichung und zweite Berechnung sind ausdrücklich an `second-operation` gebunden.
+Der Katalog dokumentiert die Folge Geschichte verstehen, gesuchte Größe erkennen, wichtige Angaben bestimmen, Modell wählen, Gleichung bilden, selbst rechnen, Ergebnis prüfen und im Antwortsatz auf die Geschichte beziehen. `wordProblemSteps.runtimeSequence` definiert die vollständige Reihenfolge; `phaseSequences` legt fest, welche zusammenhängenden Stationen in jeder Lernphase tatsächlich bearbeitet werden. Nur die zweite Gleichung und zweite Berechnung sind ausdrücklich an `second-operation` gebunden.
 
 ## 8. Geeignete Darstellungen
 Aktiv sind Veränderungs-, Teil-Ganzes-, Vergleichs-, Ergänzungs- und zweistufige Balkenmodelle sowie Gruppenbilder für unbekannte Gesamtzahl oder unbekannte Gruppengröße. Jedes Modell trägt intern `unknownQuantity`; der Renderer lehnt eine unpassende Kennung sichtbar ab. Alle Bilder zeigen nur bekannte Zahlen, die gesuchte Zahl bleibt bis nach der eigenen Berechnung `?`.
 
 ## 9. Lernprogression
-- **Stufe 1:** Suchgröße und wichtige Angaben klären; das korrekte unbekanntenhaltige Modell gemeinsam untersuchen; Gleichung wählen, Ergebnis selbst eingeben, plausibilisieren und Antwort prüfen.
-- **Stufe 2:** denselben Ablauf nutzen und genau ein passendes Modell aus drei konkreten Bildern auswählen.
+- **Stufe 1:** Suchgröße und wichtige Angaben klären; das korrekte unbekanntenhaltige Modell gemeinsam untersuchen; Gleichung selbst eintragen, Ergebnis eingeben, plausibilisieren und Antwort prüfen.
+- **Stufe 2:** denselben Ablauf nutzen, genau ein passendes Modell aus drei konkreten Bildern auswählen und die Gleichung selbst eintragen.
 - **Stufe 3:** eine unwichtige Angabe unterscheiden und ausgewählte zweischrittige Situationen im selben Ablauf bearbeiten.
 
 Die Schwierigkeit entsteht durch mathematische Selbstständigkeit und zusätzliche relevante Handlungsschritte, nicht durch künstlich lange Texte.
@@ -50,7 +50,7 @@ Eine Wiederholungsaufgabe behält die fachliche Grundlage, verändert aber Zahle
 Suchgröße, konkrete Handlung, Modelltyp, Gleichung, berechnetes Ergebnis und Antwortsatz sind konsistent. Jede Modellwahl besitzt genau eine passende Darstellung und zwei plausible Alternativen.
 
 ## 16. Grenzen der aktuellen Umsetzung
-Freie Skizzen, frei formulierte Antwortsätze und alternative selbst notierte Rechenwege werden nicht bewertet. Komplexere mehrstufige Modellierungen bleiben offen. Geld und Längen sind eigenständige Größenkompetenzen und keine bloße Textverkleidung.
+Freie Skizzen, frei formulierte Antwortsätze und alternative Rechenwege werden nicht bewertet. Eine strukturgleiche Gleichung wird selbst eingetragen; mobile Alternativen `*` und `/` werden als Mal- und Geteiltzeichen akzeptiert. Komplexere mehrstufige Modellierungen bleiben offen. Geld und Längen sind eigenständige Größenkompetenzen und keine bloße Textverkleidung.
 
 ## 17. Punkte für die Gesamtprüfung
 Sprachliche Zugänglichkeit, Lebensnähe, Qualität der visuellen Modelle und tatsächliche Förderwirkung benötigen eine menschliche didaktische Prüfung und Unterrichtserprobung. Eine Lehrkraftfreigabe ist nicht dokumentiert; automatisierte Konsistenzprüfungen belegen keine pädagogische Wirksamkeit.

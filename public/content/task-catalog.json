@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 18,
-  "catalogVersion": "0.24.0",
+  "schemaVersion": 19,
+  "catalogVersion": "0.25.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -40,6 +40,7 @@
         "select",
         "complete-model",
         "guided-number",
+        "guided-equation",
         "place-value-input",
         "build-pairing"
       ],
@@ -51,6 +52,7 @@
       "allowedInteractions": [
         "select",
         "guided-number",
+        "guided-equation",
         "place-value-input",
         "order",
         "build-pairing"
@@ -63,6 +65,7 @@
       "allowedInteractions": [
         "select",
         "guided-number",
+        "guided-equation",
         "place-value-input"
       ],
       "purpose": "Bereits verstandene Grundaufgaben ohne Zeitdruck sicher abrufen."
@@ -75,7 +78,8 @@
         "choose-strategy",
         "match",
         "order",
-        "complete-model"
+        "complete-model",
+        "guided-equation"
       ],
       "purpose": "Verständnis auf eine neue Darstellung, Begründung oder Fehlersituation übertragen."
     }
@@ -1930,7 +1934,38 @@
       "supportGoal": "Eine Geschichte verstehen, die gesuchte Größe bestimmen, ein passendes Mengenbild wählen und daraus Rechnung und Antwort entwickeln.",
       "misconceptions": [
         "Eine Rechenart wird nur aus einem einzelnen Schlüsselwort abgeleitet.",
-        "Ein Balkenbild wird gelesen, ohne bekannte und gesuchte Größen zu unterscheiden."
+        "Ein Balkenbild wird gelesen, ohne bekannte und gesuchte Größen zu unterscheiden.",
+        "Bekannte Angabe statt gesuchter Menge gewählt",
+        "Wichtige Handlung oder benötigte Menge ausgelassen",
+        "Größenbeziehung falsch eingeschätzt",
+        "Antwortsatz mit falschem Ergebnis"
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "word-problem-known-as-unknown",
+          "misconception": "Bekannte Angabe statt gesuchter Menge gewählt",
+          "feedback": "Diese Menge steht schon in der Geschichte. Suche die Menge, nach der am Ende gefragt wird."
+        },
+        {
+          "id": "word-problem-relevant-information",
+          "misconception": "Wichtige Handlung oder benötigte Menge ausgelassen",
+          "feedback": "Verfolge die Handlung in Reihenfolge. Jede Menge, die etwas verändert oder verglichen wird, gehört ins Modell."
+        },
+        {
+          "id": "word-problem-keyword-operation",
+          "misconception": "Eine Rechenart wird nur aus einem einzelnen Schlüsselwort abgeleitet.",
+          "feedback": "Entscheide nicht nach einem einzelnen Wort. Prüfe im Bild, ob Mengen dazukommen, weggehen, verglichen oder verteilt werden."
+        },
+        {
+          "id": "word-problem-plausibility",
+          "misconception": "Größenbeziehung falsch eingeschätzt",
+          "feedback": "Vergleiche Ergebnis und bekannte Mengen: Muss die gesuchte Menge durch die Handlung größer, kleiner oder gleich groß werden?"
+        },
+        {
+          "id": "word-problem-answer-context",
+          "misconception": "Antwortsatz mit falschem Ergebnis",
+          "feedback": "Der Antwortsatz muss genau die gesuchte Menge, dein Ergebnis und die passende Einheit nennen."
+        }
       ],
       "hints": [
         "Kläre zuerst: Was ist bekannt und was wird gesucht?",
@@ -2024,25 +2059,25 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Gesuchte und bekannte Mengen in einer kurzen Geschichte unterscheiden.",
           "exerciseTypes": [
-            "word-problem:entry"
+            "word-problem:activate"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Bekannte Größen und die offene Suchgröße in einem sichtbaren Modell untersuchen.",
           "exerciseTypes": [
-            "word-problem:representation"
+            "word-problem:understand"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
           "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
           "exerciseTypes": [
-            "word-problem:difficulty-1"
+            "word-problem:guided-practice"
           ],
           "releaseStatus": "active"
         },
@@ -2050,23 +2085,23 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "word-problem:difficulty-2"
+            "word-problem:independent-practice"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Eine vertraute Situation ohne Modellwahl sicher in eine selbst eingetragene Rechnung übertragen.",
           "exerciseTypes": [
-            "word-problem:difficulty-3"
+            "word-problem:automate"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Unwichtige Angaben oder zwei Veränderungen modellieren und das Ergebnis an der Situation prüfen.",
           "exerciseTypes": [
-            "word-problem:difficulty-3"
+            "word-problem:transfer"
           ],
           "releaseStatus": "active"
         }
@@ -6256,7 +6291,7 @@
         "id": "equation",
         "progressionId": "form-equation",
         "condition": "always",
-        "interaction": "choice",
+        "interaction": "equation-by-phase",
         "representation": "none"
       },
       {
@@ -6270,7 +6305,7 @@
         "id": "second-equation",
         "progressionId": "form-equation",
         "condition": "second-operation",
-        "interaction": "choice",
+        "interaction": "equation-by-phase",
         "representation": "none"
       },
       {
@@ -6295,6 +6330,52 @@
         "representation": "none"
       }
     ],
+    "phaseSequences": {
+      "activate": [
+        "question",
+        "relevant"
+      ],
+      "understand": [
+        "question",
+        "model"
+      ],
+      "guided-practice": [
+        "question",
+        "relevant",
+        "model",
+        "equation",
+        "calculate",
+        "plausibility",
+        "check"
+      ],
+      "independent-practice": [
+        "question",
+        "relevant",
+        "model",
+        "equation",
+        "calculate",
+        "plausibility",
+        "check"
+      ],
+      "automate": [
+        "question",
+        "equation",
+        "calculate",
+        "plausibility",
+        "check"
+      ],
+      "transfer": [
+        "question",
+        "relevant",
+        "model",
+        "equation",
+        "calculate",
+        "second-equation",
+        "final-calculation",
+        "plausibility",
+        "check"
+      ]
+    },
     "modelInteractionByDifficulty": {
       "1": "continue",
       "2": "choice",

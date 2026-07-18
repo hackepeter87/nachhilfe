@@ -30,7 +30,7 @@ import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisp
 import { isValidCombinationTemplate, isValidProbabilityTemplate, type CombinationTemplate, type ProbabilityTemplate } from '../domain/chance'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 18
+export const CATALOG_SCHEMA_VERSION = 19
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -336,9 +336,10 @@ export interface WordProblemSteps {
     id: 'question' | 'relevant' | 'model' | 'equation' | 'calculate' | 'second-equation' | 'final-calculation' | 'plausibility' | 'check'
     progressionId: 'identify-unknown' | 'identify-relevant' | 'choose-model' | 'form-equation' | 'calculate' | 'check-result' | 'answer-in-context'
     condition: 'always' | 'second-operation'
-    interaction: 'choice' | 'number' | 'model-by-difficulty'
+    interaction: 'choice' | 'number' | 'model-by-difficulty' | 'equation-by-phase'
     representation: 'none' | 'word-model'
   }>
+  phaseSequences: Record<LearningPhase, Array<'question' | 'relevant' | 'model' | 'equation' | 'calculate' | 'second-equation' | 'final-calculation' | 'plausibility' | 'check'>>
   modelInteractionByDifficulty: {
     '1': 'continue'
     '2': 'choice'
@@ -739,7 +740,7 @@ function hasValidRequirements(value: unknown): boolean {
 
 const LEARNING_PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
 const LEARNING_ACTIONS: LearningAction[] = ['recall-foundation', 'inspect-relationship', 'solve-with-structure', 'solve-independently', 'retrieve-without-time-pressure', 'apply-in-new-context']
-const INTERACTION_KINDS: InteractionKind[] = ['select', 'mark', 'match', 'order', 'complete-model', 'guided-number', 'place-value-input', 'identify-error', 'choose-strategy', 'build-pairing', 'continue']
+const INTERACTION_KINDS: InteractionKind[] = ['select', 'mark', 'match', 'order', 'complete-model', 'guided-number', 'guided-equation', 'place-value-input', 'identify-error', 'choose-strategy', 'build-pairing', 'continue']
 const CONTENT_STATUSES: ContentStatus[] = ['draft', 'ready-for-review', 'active', 'disabled']
 const WORD_MODEL_TYPES: WordModelType[] = [
   'change-increase', 'change-decrease', 'part-whole', 'comparison', 'missing-part',
@@ -871,9 +872,9 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     ['question', 'identify-unknown', 'always', 'choice', 'none'],
     ['relevant', 'identify-relevant', 'always', 'choice', 'none'],
     ['model', 'choose-model', 'always', 'model-by-difficulty', 'word-model'],
-    ['equation', 'form-equation', 'always', 'choice', 'none'],
+    ['equation', 'form-equation', 'always', 'equation-by-phase', 'none'],
     ['calculate', 'calculate', 'always', 'number', 'none'],
-    ['second-equation', 'form-equation', 'second-operation', 'choice', 'none'],
+    ['second-equation', 'form-equation', 'second-operation', 'equation-by-phase', 'none'],
     ['final-calculation', 'calculate', 'second-operation', 'number', 'none'],
     ['plausibility', 'check-result', 'always', 'choice', 'none'],
     ['check', 'answer-in-context', 'always', 'choice', 'none']
@@ -881,6 +882,19 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
   if (!Array.isArray(value.runtimeSequence) || value.runtimeSequence.length !== expectedRuntime.length ||
     !value.runtimeSequence.every((step, index) => isRecord(step) &&
       [step.id, step.progressionId, step.condition, step.interaction, step.representation].every((entry, fieldIndex) => entry === expectedRuntime[index]![fieldIndex]))) return false
+  const expectedPhaseSequences: Record<LearningPhase, string[]> = {
+    activate: ['question', 'relevant'],
+    understand: ['question', 'model'],
+    'guided-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
+    'independent-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
+    automate: ['question', 'equation', 'calculate', 'plausibility', 'check'],
+    transfer: ['question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check']
+  }
+  const phaseSequences = value.phaseSequences
+  if (!isRecord(phaseSequences) || !Object.entries(expectedPhaseSequences).every(([phase, sequence]) => {
+    const actual = phaseSequences[phase]
+    return Array.isArray(actual) && actual.length === sequence.length && actual.every((id, index) => id === sequence[index])
+  })) return false
   return isRecord(value.modelInteractionByDifficulty) && value.modelInteractionByDifficulty['1'] === 'continue' &&
     value.modelInteractionByDifficulty['2'] === 'choice' && value.modelInteractionByDifficulty['3'] === 'choice'
 }

@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Mathematisches Modellieren 0.26.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Sachaufgaben wurden als vollständiger Modellierungsprozess auf den Qualitätsstandard ab 0.21 migriert.
+- Die sechs Lernphasen besitzen katalogisierte unterschiedliche Folgen: Suchgröße und Angaben aktivieren, das unbekanntenhaltige Modell verstehen, den vollständigen Weg geführt oder selbstständig bearbeiten, vertraute Situationen verdichten und komplexere beziehungsweise zweischrittige Situationen übertragen.
+- Rechnungen werden in den produktiven Lernphasen selbst eingetragen. Die Runtime akzeptiert für Mal und Geteilt sowohl `·` und `:` als auch die mobilen Eingabealternativen `*` und `/`.
+- Modelle zeigen alle bekannten Größen, maskieren die gesuchte Größe und bleiben mit Geschichte, Rechnung, Plausibilitätsprüfung und Antwortsatz synchron.
+- Katalogisierte Fehlvorstellungsrouten reagieren auf bekannte statt gesuchte Mengen, ausgelassene Angaben, Schlüsselwortheuristik, unplausible Größenbeziehungen und unpassende Antwortsätze.
+- Katalog 0.25.0 und Schema 19 ergänzen validierte `phaseSequences` und `guided-equation`. Freie Skizzen, frei formulierte Antwortsätze und lange komplexe Mehrschrittprobleme bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 398 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.26.0-local` beziehungsweise `mathe-reise:local` (`sha256:bb3d6c1086419c104b3195f3a87dafd893867b377777c5750d61b7b7e3a22581`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8086`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Schriftliche Verfahren 0.25.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Schriftliche Addition und Subtraktion wurden als gemeinsamer Stellenwert- und Prüfstrang auf den Qualitätsstandard ab 0.21 migriert.

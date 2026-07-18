@@ -1023,10 +1023,14 @@ function wordModelOptions(
   }))).map((option, index) => ({ ...option, label: `Bild ${String.fromCharCode(65 + index)}` }))
 }
 
-function wordProblem(seed: number, difficulty: Difficulty): Exercise {
+function wordProblem(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const catalog = getTaskCatalog()
-  const template = pick(random, catalog.wordProblems.filter((candidate) => candidate.minDifficulty <= difficulty))
+  const modellingLevel: Difficulty = phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1
+    : phase === 'independent-practice' || phase === 'automate' ? 2
+      : phase === 'transfer' ? 3
+        : difficulty
+  const template = pick(random, catalog.wordProblems.filter((candidate) => candidate.minDifficulty <= modellingLevel))
   const stepsContent = catalog.wordProblemSteps
   const first = integer(random, template.firstRange.min, template.firstRange.max)
   const secondMax = template.operation === '−' ? Math.min(template.secondRange.max, first - 1) : template.secondRange.max
@@ -1035,7 +1039,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const total = template.relationship === 'sharing' ? first * second : 0
   const intermediate = template.operation === '+' ? first + second : template.operation === '−' ? first - second : template.operation === ':' ? second : first * second
   const result = template.secondOperation === '+' ? intermediate + third : template.secondOperation === '−' ? intermediate - third : intermediate
-  const irrelevant = difficulty === 3 ? (template.irrelevant ?? '') : ''
+  const irrelevant = modellingLevel === 3 ? (template.irrelevant ?? '') : ''
   const templateValues = { first, second, third, total, intermediate, result, irrelevant, secondOperation: template.secondOperation ?? '' }
   const story = renderCatalogText(template.story, templateValues)
     .replace(/\s+/g, ' ')
@@ -1052,14 +1056,15 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     operation: template.operation,
     secondOperation: template.secondOperation ?? '',
     story, answerSentence, question, irrelevant, equation, secondEquation, modelHint,
-    templateId: template.id
+    templateId: template.id,
+    phase: phase ?? ''
   }
   const questionStep: ExerciseStep = {
     id: 'question',
     interaction: 'select',
     prompt: renderCatalogText(stepsContent.questionPrompt, values),
     options: textOptions(random, question, template.questionDistractors.map((text) => ({
-      value: renderCatalogText(text, values), misconception: 'Bekannte Angabe statt gesuchter Menge gewählt'
+      value: renderCatalogText(text, values), misconception: 'Bekannte Angabe statt gesuchter Menge gewählt', misconceptionId: 'word-problem-known-as-unknown'
     }))),
     correctAnswer: question,
     errorFeedback: stepsContent.questionError,
@@ -1070,14 +1075,16 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     interaction: 'select',
     prompt: renderCatalogText(stepsContent.relevantPrompt, values),
     options: textOptions(random, relevant, template.relevantDistractors.map((text) => ({
-      value: renderCatalogText(text, values), misconception: 'Wichtige Handlung oder benötigte Menge ausgelassen'
+      value: renderCatalogText(text, values), misconception: 'Wichtige Handlung oder benötigte Menge ausgelassen', misconceptionId: 'word-problem-relevant-information'
     }))),
     correctAnswer: relevant,
     errorFeedback: renderCatalogText(stepsContent.relevantError, values),
     successFeedback: renderCatalogText(stepsContent.relevantSuccess, values)
   }
   const model = wordModelRepresentation(template.modelType, values, 'Passendes Mengenbild mit offener gesuchter Größe', template.modelType)
-  const modelInteraction = stepsContent.modelInteractionByDifficulty[String(difficulty) as '1' | '2' | '3']
+  const modelInteraction = phase === 'understand' || phase === 'guided-practice'
+    ? 'continue'
+    : stepsContent.modelInteractionByDifficulty[String(modellingLevel) as '1' | '2' | '3']
   const modelStep: ExerciseStep = modelInteraction === 'continue'
     ? {
       id: 'model',
@@ -1100,10 +1107,10 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     }
   const equationStep: ExerciseStep = {
     id: 'equation',
-    interaction: 'select',
+    interaction: phase ? 'guided-equation' : 'select',
     prompt: stepsContent.equationPrompt,
-    options: textOptions(random, equation, template.equationDistractors.map((text) => ({
-      value: renderCatalogText(text, values), misconception: 'Rechnung beschreibt ein anderes Mengenbild'
+    options: phase ? undefined : textOptions(random, equation, template.equationDistractors.map((text) => ({
+      value: renderCatalogText(text, values), misconception: 'Rechnung beschreibt ein anderes Mengenbild', misconceptionId: 'word-problem-keyword-operation'
     }))),
     correctAnswer: equation,
     errorFeedback: renderCatalogText(template.equationError, values),
@@ -1119,9 +1126,9 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   }
   const secondEquationStep: ExerciseStep | undefined = template.secondOperation ? {
     id: 'second-equation',
-    interaction: 'select',
+    interaction: phase ? 'guided-equation' : 'select',
     prompt: renderCatalogText(stepsContent.secondEquationPrompt, values),
-    options: textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
+    options: phase ? undefined : textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Zweite Veränderung in die falsche Richtung gerechnet'
     }))),
     correctAnswer: secondEquation,
@@ -1139,7 +1146,8 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   const plausibilityOptions = template.plausibility.options.map((option) => ({
     value: renderCatalogText(option.label, values),
     label: renderCatalogText(option.label, values),
-    misconception: option.correct ? undefined : 'Größenbeziehung falsch eingeschätzt'
+    misconception: option.correct ? undefined : 'Größenbeziehung falsch eingeschätzt',
+    misconceptionId: option.correct ? undefined : 'word-problem-plausibility'
   }))
   const correctPlausibility = plausibilityOptions[template.plausibility.options.findIndex((option) => option.correct)]!.value
   const plausibilityStep: ExerciseStep = {
@@ -1156,8 +1164,8 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     interaction: 'select',
     prompt: stepsContent.checkPrompt,
     options: textOptions(random, answerSentence, [
-      { value: renderCatalogText(template.answer, { ...templateValues, result: Math.max(0, result - 1) }), misconception: 'Antwortsatz mit falschem Ergebnis' },
-      { value: renderCatalogText(template.answer, { ...templateValues, result: result + 2 }), misconception: 'Antwortsatz mit falschem Ergebnis' }
+      { value: renderCatalogText(template.answer, { ...templateValues, result: Math.max(0, result - 1) }), misconception: 'Antwortsatz mit falschem Ergebnis', misconceptionId: 'word-problem-answer-context' },
+      { value: renderCatalogText(template.answer, { ...templateValues, result: result + 2 }), misconception: 'Antwortsatz mit falschem Ergebnis', misconceptionId: 'word-problem-answer-context' }
     ]),
     correctAnswer: answerSentence,
     errorFeedback: stepsContent.checkError,
@@ -1174,13 +1182,16 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
     plausibility: plausibilityStep,
     check: checkStep
   }
+  const phaseSequence = phase ? stepsContent.phaseSequences[phase] : stepsContent.runtimeSequence.map((definition) => definition.id)
   const steps = stepsContent.runtimeSequence
-    .filter((definition) => definition.condition === 'always' || Boolean(template.secondOperation))
+    .filter((definition) => phaseSequence.includes(definition.id) && (definition.condition === 'always' || Boolean(template.secondOperation)))
     .map((definition) => {
       const step = stepById[definition.id]
       if (!step) throw new Error(`Katalogschritt ${definition.id} kann für ${template.id} nicht erzeugt werden.`)
       const catalogInteraction = definition.interaction === 'model-by-difficulty' ? modelInteraction : definition.interaction
-      const expectedInteraction = catalogInteraction === 'choice' ? 'select' : catalogInteraction === 'number' ? 'guided-number' : catalogInteraction
+      const expectedInteraction = definition.id === 'equation' || definition.id === 'second-equation'
+        ? phase ? 'guided-equation' : 'select'
+        : catalogInteraction === 'choice' ? 'select' : catalogInteraction === 'number' ? 'guided-number' : catalogInteraction
       const actualInteraction = step.interaction ?? 'select'
       if (actualInteraction !== expectedInteraction) throw new Error(`Interaktion für ${definition.id} weicht vom Katalog ab.`)
       const hasRepresentation = Boolean(step.representation || step.options?.every((option) => option.representation))
@@ -1192,7 +1203,7 @@ function wordProblem(seed: number, difficulty: Difficulty): Exercise {
   return withMetadata({
     ...base('word-problem', seed, difficulty, values),
     ...contentFor('word-problem', values, difficulty),
-    typeId: 'guided-word-problem',
+    typeId: phase ? `word-problem-${phase}` : 'guided-word-problem',
     subskillId: `word-${template.relationship}`,
     answerMode: 'guided-word',
     correctAnswer: answerSentence,
@@ -2941,7 +2952,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'complement-1000': return complement1000(seed, difficulty, phase)
     case 'money': return money(seed, difficulty)
     case 'lengths': return lengths(seed, difficulty)
-    case 'word-problem': return wordProblem(seed, difficulty)
+    case 'word-problem': return wordProblem(seed, difficulty, phase)
     case 'symmetry': return symmetry(seed, difficulty, focus)
     case 'body-views': return bodyViews(seed, difficulty)
     case 'cube-rotation': return cubeRotation(seed, difficulty, focus)
@@ -2973,6 +2984,10 @@ export function isAnswerCorrect(exercise: Exercise, answer: string): boolean {
 }
 
 export function isStepAnswerCorrect(step: ExerciseStep, answer: string): boolean {
+  if (step.interaction === 'guided-equation') {
+    const normalize = (value: string) => value.replaceAll('*', '·').replaceAll('/', ':').replaceAll('-', '−').replace(/\s+/g, '')
+    return normalize(answer) === normalize(step.correctAnswer)
+  }
   return answer === step.correctAnswer
 }
 

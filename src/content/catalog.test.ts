@@ -31,8 +31,8 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(18)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.24.0')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(19)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.25.0')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -336,5 +336,14 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(resolveTaskCatalog({ schemaVersion: 999 })).toBe(FALLBACK_TASK_CATALOG)
     await expect(loadTaskCatalog(async () => ({ ok: true, json: async () => ({ schemaVersion: 999 }) }))).resolves.toBe(FALLBACK_TASK_CATALOG)
     await expect(loadTaskCatalog(async () => { throw new Error('offline') })).resolves.toBe(FALLBACK_TASK_CATALOG)
+  })
+
+  it('akzeptiert einen fokussierten Sachaufgabenkatalog für die mobile Abnahme', () => {
+    const focused = structuredClone(FALLBACK_TASK_CATALOG)
+    focused.skills.forEach((skill) => {
+      if (!['addition', 'word-problem'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    focused.wordProblems = focused.wordProblems.filter((template) => template.id === 'shells-addition')
+    expect(resolveTaskCatalog(focused)).toBe(focused)
   })
 })

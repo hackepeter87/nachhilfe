@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 18
+export const CATALOG_SCHEMA_VERSION = 19
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -539,7 +539,7 @@ export function validateCatalog(catalog) {
   }
   const phaseIds = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
   const actions = ['recall-foundation', 'inspect-relationship', 'solve-with-structure', 'solve-independently', 'retrieve-without-time-pressure', 'apply-in-new-context']
-  const interactions = ['select', 'mark', 'match', 'order', 'complete-model', 'guided-number', 'place-value-input', 'identify-error', 'choose-strategy', 'build-pairing', 'continue']
+  const interactions = ['select', 'mark', 'match', 'order', 'complete-model', 'guided-number', 'guided-equation', 'place-value-input', 'identify-error', 'choose-strategy', 'build-pairing', 'continue']
   if (!Array.isArray(catalog.learningPhaseModel) || catalog.learningPhaseModel.length !== phaseIds.length ||
     !catalog.learningPhaseModel.every((phase) => isRecord(phase) && phaseIds.includes(phase.id) && actions.includes(phase.learningAction) &&
       isText(phase.purpose) && Array.isArray(phase.allowedInteractions) && phase.allowedInteractions.length > 0 &&
@@ -613,9 +613,9 @@ export function validateCatalog(catalog) {
     ['question', 'identify-unknown', 'always', 'choice', 'none'],
     ['relevant', 'identify-relevant', 'always', 'choice', 'none'],
     ['model', 'choose-model', 'always', 'model-by-difficulty', 'word-model'],
-    ['equation', 'form-equation', 'always', 'choice', 'none'],
+    ['equation', 'form-equation', 'always', 'equation-by-phase', 'none'],
     ['calculate', 'calculate', 'always', 'number', 'none'],
-    ['second-equation', 'form-equation', 'second-operation', 'choice', 'none'],
+    ['second-equation', 'form-equation', 'second-operation', 'equation-by-phase', 'none'],
     ['final-calculation', 'calculate', 'second-operation', 'number', 'none'],
     ['plausibility', 'check-result', 'always', 'choice', 'none'],
     ['check', 'answer-in-context', 'always', 'choice', 'none']
@@ -624,6 +624,19 @@ export function validateCatalog(catalog) {
     !catalog.wordProblemSteps.runtimeSequence.every((step, index) => isRecord(step) &&
       [step.id, step.progressionId, step.condition, step.interaction, step.representation].every((entry, fieldIndex) => entry === expectedRuntime[index][fieldIndex]))) {
     fail('wordProblemSteps.runtimeSequence weicht vom vollständigen Modellierungsablauf ab')
+  }
+  const expectedPhaseSequences = {
+    activate: ['question', 'relevant'],
+    understand: ['question', 'model'],
+    'guided-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
+    'independent-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
+    automate: ['question', 'equation', 'calculate', 'plausibility', 'check'],
+    transfer: ['question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check']
+  }
+  if (!isRecord(catalog.wordProblemSteps.phaseSequences) || !Object.entries(expectedPhaseSequences).every(([phase, sequence]) =>
+    Array.isArray(catalog.wordProblemSteps.phaseSequences[phase]) && catalog.wordProblemSteps.phaseSequences[phase].length === sequence.length &&
+    catalog.wordProblemSteps.phaseSequences[phase].every((id, index) => id === sequence[index]))) {
+    fail('wordProblemSteps.phaseSequences ist ungültig')
   }
   const modelInteractions = catalog.wordProblemSteps.modelInteractionByDifficulty
   if (!isRecord(modelInteractions) || modelInteractions['1'] !== 'continue' || modelInteractions['2'] !== 'choice' || modelInteractions['3'] !== 'choice') {

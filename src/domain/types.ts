@@ -63,6 +63,7 @@ export type InteractionKind =
   | 'order'
   | 'complete-model'
   | 'guided-number'
+  | 'guided-equation'
   | 'place-value-input'
   | 'identify-error'
   | 'choose-strategy'

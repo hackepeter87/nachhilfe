@@ -478,6 +478,28 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('lässt das Kind die Rechnung einer geführten Sachaufgabe selbst eintragen', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('word-problem', 42, 1, undefined, 'guided-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    for (const step of exercise.steps ?? []) {
+      if (step.id === 'equation') {
+        expect(screen.getByLabelText('Deine Rechnung')).toHaveValue('')
+        await user.type(screen.getByLabelText('Deine Rechnung'), step.correctAnswer)
+        await user.click(screen.getByRole('button', { name: 'Rechnung prüfen' }))
+        expect(screen.getByText(/Rechne selbst/)).toBeVisible()
+        break
+      }
+      if (step.interaction === 'continue') await user.click(screen.getByRole('button', { name: step.continueLabel ?? 'Weiter' }))
+      else {
+        const correct = step.options?.find((option) => option.value === step.correctAnswer)
+        if (!correct) throw new Error(`Richtige Option für ${step.id} fehlt`)
+        await user.click(screen.getByRole('button', { name: correct.label }))
+      }
+    }
+  })
+
   it('zeigt positives Zwischenfeedback bei Sachaufgaben grün', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('word-problem', 42, 1)

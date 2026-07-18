@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.25.0, Katalog 0.24.0, Schema 18, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.26.0, Katalog 0.25.0, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -25,7 +25,9 @@ Stand: App 0.25.0, Katalog 0.24.0, Schema 18, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.25.0
+## Aktive Veränderungen bis 0.26.0
+
+- App 0.26.0, Katalog 0.25.0 und Schema 19: Sachaufgaben verwenden katalogisierte Phasenfolgen und eine selbst eingetragene Rechnung innerhalb des Modellierungsprozesses. Details stehen in `docs/didactic-migration-0.26.0.md`.
 
 - App 0.25.0, Katalog 0.24.0 und Schema 18: Schriftliche Addition und Subtraktion trennen Stellenordnung, Bündelungshandlung, geführtes Verfahren, selbstständigen Übergang und Umkehrprobe. Details stehen in `docs/didactic-migration-0.25.0.md`.
 

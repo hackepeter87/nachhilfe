@@ -26,15 +26,15 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 
 ```json
 {
-  "schemaVersion": 18,
-  "catalogVersion": "0.24.0",
+  "schemaVersion": 19,
+  "catalogVersion": "0.25.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review"
 }
 ```
 
-Schema 18 ergänzt ein verbindliches `learningPhaseModel` mit konkreten Lernhandlungen und zulässigen Interaktionen sowie optionale kompetenzspezifische `misconceptionFeedback`-Routen. Rechenlogik und Fehleranalyse bleiben in TypeScript; der Katalog liefert die fachlichen Texte und ordnet erkannte Antwortmuster vorsichtig einer passenden Hilfe zu. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
+Schema 18 ergänzt ein verbindliches `learningPhaseModel` mit konkreten Lernhandlungen und zulässigen Interaktionen sowie optionale kompetenzspezifische `misconceptionFeedback`-Routen. Schema 19 ergänzt katalogisierte Sachaufgabenfolgen je Lernphase und die selbst eingetragene Gleichung als zulässige Interaktion. Rechenlogik und Fehleranalyse bleiben in TypeScript; der Katalog liefert die fachlichen Texte und ordnet erkannte Antwortmuster vorsichtig einer passenden Hilfe zu. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
 
 - `schemaVersion` bezeichnet die technische JSON-Struktur. Eine inkompatible Änderung erfordert kompatiblen Anwendungscode.
 - `catalogVersion` bezeichnet die fachliche Inhaltsversion und folgt SemVer.
@@ -74,7 +74,7 @@ npm run curriculum:check  # automatisch erzeugte Kompetenzmatrix separat prüfen
 
 Die Validierung prüft Metadaten, bekannte und eindeutige Kompetenz-IDs, Pflichtfelder, Platzhalter, Zahlenbereiche, Sachaufgaben, Symmetrievarianten und eindeutige Optionen. `npm run build` führt `catalog:check` automatisch vor Vite aus. CI führt dieselbe Prüfung explizit aus.
 
-Schema 6 ersetzt die frühere kindseitige Auswahl technischer Mengenbeziehungen und Rechenarten durch konkrete `situation`-, `modelType`- und `equation`-Felder. Schema 7 trennt bei Symmetrie Rasterdimension, Progressionsphase, Achsenposition, Figurenkomplexität und Distraktorähnlichkeit. Schema 8 ergänzt katalogisierte Schritte für die schriftliche Addition. Schema 9 ergänzt `spatialViews` mit geprüften Würfelgebäuden und Blickrichtungen. Schema 10 ergänzt die verbindliche Sachaufgabenfolge `runtimeSequence`, die Schwierigkeit der Modellinteraktion und eine achtstufige Progression einschließlich wichtiger Angaben. Schema 11 ergänzt `spatialRotations`; die Schemas 12 bis 17 ergänzen Falten, Darstellungsrollen, Daten, Stochastik, Größen und ebene Geometrie. Schema 18 macht Lernhandlung, Interaktionsumfang und Fehlvorstellungsrouten für die erste didaktische Korrekturgruppe explizit. Generator, Renderer und Validierung müssen gemeinsam mit der jeweiligen Schemaversion ausgeliefert werden. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
+Schema 6 ersetzt die frühere kindseitige Auswahl technischer Mengenbeziehungen und Rechenarten durch konkrete `situation`-, `modelType`- und `equation`-Felder. Schema 7 trennt bei Symmetrie Rasterdimension, Progressionsphase, Achsenposition, Figurenkomplexität und Distraktorähnlichkeit. Schema 8 ergänzt katalogisierte Schritte für die schriftliche Addition. Schema 9 ergänzt `spatialViews` mit geprüften Würfelgebäuden und Blickrichtungen. Schema 10 ergänzt die verbindliche Sachaufgabenfolge `runtimeSequence`, die Schwierigkeit der Modellinteraktion und eine achtstufige Progression einschließlich wichtiger Angaben. Schema 11 ergänzt `spatialRotations`; die Schemas 12 bis 17 ergänzen Falten, Darstellungsrollen, Daten, Stochastik, Größen und ebene Geometrie. Schema 18 macht Lernhandlung, Interaktionsumfang und Fehlvorstellungsrouten für die erste didaktische Korrekturgruppe explizit. Schema 19 bindet die verkürzten beziehungsweise vollständigen Modellierungswege der Sachaufgaben an den Katalog. Generator, Renderer und Validierung müssen gemeinsam mit der jeweiligen Schemaversion ausgeliefert werden. Runtime-, Review- und Planned-Felder sind in [didactic-catalog-review.md](didactic-catalog-review.md) abgegrenzt.
 
 ## Sitzungen und Altdaten
 
@@ -98,8 +98,8 @@ Der stabile Pfad `/content/task-catalog.json` wird mit `Cache-Control: no-cache,
 Für Releases sollte das Image zusätzlich zum lokalen Namen unveränderlich mit der App-Version oder einem Commit-Hash getaggt werden:
 
 ```bash
-docker build --platform linux/amd64 -t mathe-reise:0.25.0 -t mathe-reise:local .
-docker run --rm -p 8080:8080 mathe-reise:0.25.0
+docker build --platform linux/amd64 -t mathe-reise:0.26.0 -t mathe-reise:local .
+docker run --rm -p 8080:8080 mathe-reise:0.26.0
 ```
 
 Ein Rollback startet das vorherige Image erneut unter derselben HTTPS-Origin. Browserseitige Lernstände werden dadurch nicht gelöscht. Die technische Versionsanzeige nennt die aktive App- und Katalogversion; bestehende Sessions behalten ihre ursprünglichen Metadaten.

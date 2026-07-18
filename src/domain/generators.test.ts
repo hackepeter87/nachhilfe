@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, roundToUnit } from './generators'
+import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, isStepAnswerCorrect, roundToUnit } from './generators'
 import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
 import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSide } from './symmetry'
@@ -517,6 +517,28 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(easy.steps?.find((step) => step.id === 'model')).toMatchObject({ interaction: 'continue', representation: expect.any(Object) })
     expect(medium.steps?.find((step) => step.id === 'model')?.options).toHaveLength(3)
     expect(hard.steps?.find((step) => step.id === 'relevant')).toBeDefined()
+  })
+
+  it('folgt in jeder Sachaufgaben-Lernphase exakt der katalogisierten Modellierungsfolge', () => {
+    const phases = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer'] as const
+    const catalog = getTaskCatalog()
+    for (const phase of phases) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('word-problem', seed, 3, undefined, phase)
+        const expected = catalog.wordProblemSteps.phaseSequences[phase]
+          .filter((id) => !['second-equation', 'final-calculation'].includes(id) || Boolean(exercise.variant.values.secondOperation))
+        expect(exercise.steps?.map((step) => step.id)).toEqual(expected)
+        expect(exercise.learningPhase).toBe(phase)
+        expect(exercise.typeId).toBe(`word-problem-${phase}`)
+        for (const step of exercise.steps ?? []) {
+          if (step.id === 'equation' || step.id === 'second-equation') {
+            expect(step.interaction).toBe('guided-equation')
+            expect(step.options).toBeUndefined()
+            expect(isStepAnswerCorrect(step, step.correctAnswer.replaceAll('·', '*').replaceAll(':', '/'))).toBe(true)
+          }
+        }
+      }
+    }
   })
 
   it('steuert Symmetrie über didaktische Parameter statt feste Rastergrößen', () => {

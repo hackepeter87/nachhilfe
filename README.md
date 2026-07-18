@@ -141,7 +141,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.25.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.26.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -182,6 +182,6 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.25.0
+## Release-Stand 0.26.0
 
-Version 0.25.0 führt keine neue Kompetenz ein. Schriftliche Addition und Subtraktion verwenden nun sechs unterschiedliche Lernhandlungen: Stellen ausrichten, Bündeln beziehungsweise Entbündeln verstehen, spaltenweise geführt rechnen, genau einen Übergang selbstständig bearbeiten und mit der Umkehraufgabe prüfen. Katalog 0.24.0 bleibt bei Schema 18; Details stehen in [docs/didactic-migration-0.25.0.md](docs/didactic-migration-0.25.0.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md). Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt.
+Version 0.26.0 führt keine neue Kompetenz ein. Sachaufgaben verwenden nun katalogisierte phasenspezifische Modellierungsfolgen: Gesuchtes und relevante Angaben klären, ein unbekanntenhaltiges Modell untersuchen oder auswählen, die Rechnung selbst eintragen, berechnen, plausibilisieren und im Antwortsatz auf die Geschichte beziehen. Katalog 0.25.0 und Schema 19 ergänzen die verbindlichen Phasenfolgen und die mobile Gleichungseingabe; Details stehen in [docs/didactic-migration-0.26.0.md](docs/didactic-migration-0.26.0.md) und [RELEASE_NOTES.md](RELEASE_NOTES.md). Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt.
