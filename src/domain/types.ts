@@ -61,7 +61,7 @@ export interface AnswerOption {
   misconception?: string
 }
 
-export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper' | 'data-display' | 'chance-display' | 'combination-display' | 'clock' | 'mass-scale' | 'capacity-vessel' | 'shape-grid' | 'pattern-strip' | 'unit-squares' | 'perimeter-path'
+export type RepresentationKind = 'place-value' | 'column-calculation' | 'number-line' | 'bar-model' | 'groups' | 'grouping-model' | 'sharing-model' | 'money' | 'length' | 'cube-building' | 'cube-view' | 'cube-rotation' | 'folding-paper' | 'data-display' | 'chance-display' | 'combination-display' | 'clock' | 'mass-scale' | 'capacity-vessel' | 'shape-grid' | 'pattern-strip' | 'unit-squares' | 'perimeter-path'
 
 export interface NumberLineJump {
   from: number
@@ -79,7 +79,7 @@ export interface DifficultyRequirements {
 
 export interface ExerciseRepresentation {
   kind: RepresentationKind
-  visibility: 'always' | 'hint'
+  visibility: 'always' | 'hint' | 'scaffold'
   label: string
   values: Record<string, number | string | number[] | NumberLineJump[]>
   valueRoles: {

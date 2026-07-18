@@ -627,53 +627,61 @@ export function MathRepresentation({ representation }: { representation: Exercis
     )
   }
 
+  if (representation.kind === 'grouping-model' || representation.kind === 'sharing-model') {
+    const total = Number(values.total)
+    const groupCount = Number(values.groupCount)
+    const groupSize = Number(values.groupSize)
+    const expectedUnknown = representation.kind === 'grouping-model' ? 'groupCount' : 'groupSize'
+    const catalogModelIsConsistent = modelType === undefined ||
+      (representation.kind === 'sharing-model' && modelType === 'equal-groups-share' && values.unknownQuantity === 'group-size')
+    const isValid = Number.isInteger(total) && total >= 4 && total <= 100 &&
+      isValidGroupValue(groupCount) && isValidGroupValue(groupSize) && groupCount * groupSize === total &&
+      unknown.has(expectedUnknown) && catalogModelIsConsistent
+    if (!isValid) {
+      return <div className="math-visual math-visual--error" role="alert">Das Divisionsmodell enthält unvollständige oder widersprüchliche Mengenangaben.</div>
+    }
+    const answerVisible = isValueVisible(expectedUnknown)
+    const grouping = representation.kind === 'grouping-model'
+    const accessibleAnswer = answerVisible ? (grouping ? groupCount : groupSize) : 'unbekannt'
+    return (
+      <div
+        className={`math-visual division-model division-model--${grouping ? 'grouping' : 'sharing'}`}
+        role="img"
+        aria-label={grouping
+          ? `${total} Punkte werden vollständig in gleich große Gruppen mit je ${groupSize} Punkten gruppiert. Anzahl der Gruppen: ${accessibleAnswer}.`
+          : `${total} Punkte werden vollständig auf ${groupCount} gleich große Gruppen verteilt. Punkte je Gruppe: ${accessibleAnswer}.`}
+      >
+        <div className="known-pool" aria-hidden="true">
+          <strong>{total} Punkte insgesamt</strong>
+          <span>{Array.from({ length: total }, (_, item) => <i key={item} />)}</span>
+        </div>
+        <span className="model-arrow" aria-hidden="true">↓</span>
+        <span className="model-caption">{grouping ? `Immer ${groupSize} Punkte zusammen` : `Auf ${groupCount} Gruppen verteilen`}</span>
+        <div className="division-partition" aria-hidden="true">
+          {Array.from({ length: groupCount }, (_, group) => (
+            <span
+              className="visual-group division-group"
+              key={group}
+              style={{ '--point-columns': Math.min(groupSize, 5) } as CSSProperties}
+            >
+              {Array.from({ length: groupSize }, (_, item) => <i key={item} />)}
+            </span>
+          ))}
+        </div>
+        <strong>{grouping
+          ? <>Zähle die Gruppen: {answerVisible ? groupCount : '?'}</>
+          : <>Punkte in jeder Gruppe: {answerVisible ? groupSize : '?'}</>}
+        </strong>
+      </div>
+    )
+  }
+
   if (representation.kind === 'groups') {
     if (isCatalogWordModel && (!hasValidUnknownQuantity || !unknown.has(expectedUnknownQuantity!))) {
       return <div className="math-visual math-visual--error" role="alert">Das Gruppenbild benennt die unbekannte Größe nicht eindeutig.</div>
     }
     const groups = Number(values.groups)
     const size = Number(values.size)
-    if (modelType === 'division-groups') {
-      const total = Number(values.total)
-      if (!Number.isInteger(total) || total < 2 || total > 100 || !isValidGroupValue(size) || !isValidGroupValue(groups) || total / size !== groups) {
-        return <div className="math-visual math-visual--error" role="alert">Das Divisionsbild enthält ungültige Mengenangaben.</div>
-      }
-      const groupsVisible = isValueVisible('groups')
-      return (
-        <div className="math-visual word-model word-groups-model" role="img" aria-label={`${total} Punkte werden in Gruppen mit je ${size} Punkten geteilt. Anzahl der Gruppen ${groupsVisible ? total / size : 'unbekannt'}.`}>
-          <div className="known-pool" aria-hidden="true">
-            <strong>{total} insgesamt</strong>
-            <span>{Array.from({ length: total }, (_, item) => <i key={item} />)}</span>
-          </div>
-          <span className="model-arrow" aria-hidden="true">↓</span>
-          <span className="visual-group sample-group" aria-hidden="true" style={{ '--point-columns': Math.min(size, 5) } as CSSProperties}>
-            {Array.from({ length: size }, (_, item) => <i key={item} />)}
-          </span>
-          <strong>Wie viele Gruppen? {groupsVisible ? total / size : '?'}</strong>
-        </div>
-      )
-    }
-    if (modelType === 'equal-groups-share') {
-      const total = Number(values.total)
-      if (!isValidGroupValue(groups) || !Number.isInteger(total) || total < 2 || total > 100) {
-        return <div className="math-visual math-visual--error" role="alert">Das Verteilbild enthält ungültige Mengenangaben.</div>
-      }
-      const groupSizeVisible = isValueVisible('group-size')
-      const groupSize = total / groups
-      return (
-        <div className="math-visual word-model word-groups-model" role="img" aria-label={`${total} Punkte werden auf ${groups} gleich große Gruppen verteilt. Punkte je Gruppe: ${groupSizeVisible ? groupSize : 'unbekannt'}.`}>
-          <div className="known-pool" aria-hidden="true">
-            <strong>{total} insgesamt</strong>
-            <span>{Array.from({ length: total }, (_, item) => <i key={item} />)}</span>
-          </div>
-          <span className="model-arrow" aria-hidden="true">↓</span>
-          <div className="unknown-groups" aria-hidden="true">
-            {Array.from({ length: groups }, (_, group) => <span className="visual-group visual-group--unknown" key={group}>{groupSizeVisible ? groupSize : '?'}</span>)}
-          </div>
-          <strong>Wie viele kommen in jede Gruppe? {groupSizeVisible ? groupSize : '?'}</strong>
-        </div>
-      )
-    }
     if (!isValidGroupValue(groups) || !isValidGroupValue(size)) {
       return (
         <div className="math-visual math-visual--error" role="alert">

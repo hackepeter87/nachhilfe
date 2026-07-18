@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(17)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.19.0')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.19.1')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -158,12 +158,12 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(validateTaskCatalog(catalog)).toBe(false)
   })
 
-  it('bildet die fünf didaktischen Symmetriephasen ohne frühen Achsensonderfall ab', () => {
+  it('trennt die drei produktiven Symmetriephasen von den späteren Achsensonderfällen', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     const skill = catalog.skills.find((candidate) => candidate.id === 'symmetry')!
     expect(skill.learningPhases.map((phase) => phase.exerciseTypes)).toEqual([
       ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
-      ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-4', 'symmetry:phase-5']
+      ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-3']
     ])
     expect(catalog.symmetry.progression.map((phase) => phase.phase)).toEqual([1, 2, 3, 4, 5])
     expect(catalog.symmetry.entryRationale).toMatch(/Gerade Raster.*eindeutig.*Sonderfall/i)
@@ -171,6 +171,7 @@ describe('versionierter Aufgabenkatalog', () => {
       template.axisPosition === 'between-cells' && (template.axis === 'vertical' ? template.grid[0]!.length : template.grid.length) % 2 === 0
     )).toBe(true)
     expect(catalog.symmetry.templates.filter((template) => template.progressionPhase <= 2).every((template) => template.axis === 'vertical')).toBe(true)
+    expect(skill.learningPhases.flatMap((phase) => phase.exerciseTypes).some((type) => /phase-[45]$/.test(type))).toBe(false)
     expect(catalog.symmetry.templates.filter((template) => template.progressionPhase === 4).every((template) =>
       template.axisPosition === 'through-cells' && hasOccupiedAxisCell(template.grid, template.axis)
     )).toBe(true)

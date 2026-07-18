@@ -52,4 +52,29 @@ describe('curriculare Gesamtintegration', () => {
     }
     expect(generated).toBe(activeSkills.length * 3 * 1_000)
   }, 60_000)
+
+  it('hält Hilfetexte, Darstellungsverfügbarkeit und katalogisierte Sichtbarkeit synchron', () => {
+    const visualReference = /(Balken|Bild|Diagramm|Gefäß|Gruppe|Material|Messstrecke|Münz|Punktefeld|Raster|Rechenstrich|Stellenwerttafel|Tabelle|Waage|Zahlenstrahl)/i
+    for (const skill of getTaskCatalog().skills.filter((candidate) => candidate.releaseStatus === 'active')) {
+      for (const level of skill.difficultyLevels) {
+        const exercise = generateExercise(skill.id, 8_000 + level.level, level.level)
+        if (skill.id === 'symmetry') {
+          expect(exercise.sourceGrid, `${skill.id}/Stufe ${level.level}`).toBeDefined()
+          continue
+        }
+        if (skill.id === 'word-problem') {
+          const modelStep = exercise.steps?.find((step) => step.id === 'model')
+          expect(modelStep?.representation || modelStep?.options?.every((option) => option.representation), `${skill.id}/Stufe ${level.level}`).toBeTruthy()
+          continue
+        }
+        expect(exercise.representation, `${skill.id}/Stufe ${level.level}`).toBeDefined()
+        const expectedVisibility = level.representation === 'none' ? 'scaffold' : level.representation
+        expect(exercise.representation?.visibility, `${skill.id}/Stufe ${level.level}`).toBe(expectedVisibility)
+        if (level.representation === 'none') {
+          expect(exercise.hints.some((hint) => visualReference.test(hint.text)), `${skill.id}/Stufe ${level.level}: Tipp verweist auf verborgene Darstellung`).toBe(false)
+        }
+        expect(skill.remediation.representation.trim().length, `${skill.id}: Remediation ohne Darstellungsangabe`).toBeGreaterThan(0)
+      }
+    }
+  })
 })

@@ -227,11 +227,17 @@ describe('MathRepresentation Sachaufgabenmodelle', () => {
 
   it('zeigt beim Verteilen die Gesamtmenge und unbekannte Gruppengrößen', () => {
     const { container } = render(<MathRepresentation representation={{
-      kind: 'groups', visibility: 'always', label: 'Verteilen',
-      values: { modelType: 'equal-groups-share', unknownQuantity: 'group-size', groups: 4, total: 24 }
+      kind: 'sharing-model', visibility: 'always', label: 'Verteilen',
+      values: { modelType: 'equal-groups-share', unknownQuantity: 'group-size', groupCount: 4, groupSize: 6, total: 24 },
+      valueRoles: {
+        knownValues: ['modelType', 'unknownQuantity', 'groupCount', 'total'],
+        unknownValues: ['groupSize'],
+        revealedValues: []
+      }
     }} />)
-    expect(screen.getByRole('img', { name: '24 Punkte werden auf 4 gleich große Gruppen verteilt. Punkte je Gruppe: unbekannt.' })).toBeVisible()
-    expect(container.querySelectorAll('.visual-group--unknown')).toHaveLength(4)
+    expect(screen.getByRole('img', { name: '24 Punkte werden vollständig auf 4 gleich große Gruppen verteilt. Punkte je Gruppe: unbekannt.' })).toBeVisible()
+    expect(container.querySelectorAll('.division-group')).toHaveLength(4)
+    expect(container.querySelectorAll('.division-group i')).toHaveLength(24)
     expect(container).not.toHaveTextContent('6')
   })
 
@@ -475,15 +481,52 @@ describe('MathRepresentation mathematische Rollen', () => {
     expect(container.querySelector('.ruler-labels')).toHaveTextContent('014 cm20 cm')
   })
 
-  it('stellt Division als bekannte Gesamtmenge und Gruppengröße ohne Quotient dar', () => {
+  it('stellt den vollständigen Gruppierungsprozess ohne numerische Gruppenanzahl dar', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{
-      kind: 'groups', visibility: 'always', label: '24 durch 6',
-      values: { modelType: 'division-groups', total: 24, size: 6, groups: 4 },
-      valueRoles: { knownValues: ['modelType', 'total', 'size'], unknownValues: ['groups'], revealedValues: [] }
+      kind: 'grouping-model', visibility: 'always', label: 'Vollständiges Gruppierungsmodell',
+      values: { total: 24, groupSize: 6, groupCount: 4 },
+      valueRoles: { knownValues: ['total', 'groupSize'], unknownValues: ['groupCount'], revealedValues: [] }
     }} />)
-    expect(screen.getByRole('img', { name: /Anzahl der Gruppen unbekannt/ })).toBeVisible()
-    expect(container.querySelectorAll('.sample-group i')).toHaveLength(6)
-    expect(container).toHaveTextContent('Wie viele Gruppen? ?')
+    expect(screen.getByRole('img', { name: /vollständig.*Gruppen mit je 6 Punkten.*Anzahl der Gruppen: unbekannt/i })).toBeVisible()
+    expect(container.querySelectorAll('.division-group')).toHaveLength(4)
+    expect(container.querySelectorAll('.division-group i')).toHaveLength(24)
+    expect(container).toHaveTextContent('Zähle die Gruppen: ?')
+    expect(container).not.toHaveTextContent('Zähle die Gruppen: 4')
+  })
+
+  it.each([
+    ['grouping-model', 'groupCount', 'Zähle die Gruppen: 4'],
+    ['sharing-model', 'groupSize', 'Punkte in jeder Gruppe: 6']
+  ] as const)('deckt im %s nur die erfolgreich bearbeitete Größe numerisch auf', (kind, unknownKey, revealedText) => {
+    const representation: ExerciseRepresentation = {
+      kind,
+      visibility: 'always',
+      label: 'Divisionsmodell',
+      values: { total: 24, groupCount: 4, groupSize: 6 },
+      valueRoles: {
+        knownValues: kind === 'grouping-model' ? ['total', 'groupSize'] : ['total', 'groupCount'],
+        unknownValues: [unknownKey],
+        revealedValues: []
+      }
+    }
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
+    expect(container).toHaveTextContent('?')
+    expect(container).not.toHaveTextContent(revealedText)
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: [unknownKey] }
+    }} />)
+    expect(container).toHaveTextContent(revealedText)
+  })
+
+  it('lehnt eine unvollständig aufgeteilte Gesamtmenge sichtbar ab', () => {
+    render(<RuntimeMathRepresentation representation={{
+      kind: 'grouping-model', visibility: 'always', label: 'Ungültig',
+      values: { total: 25, groupCount: 4, groupSize: 6 },
+      valueRoles: { knownValues: ['total', 'groupSize'], unknownValues: ['groupCount'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('widersprüchliche Mengenangaben')
   })
 
   it('ergänzt eine erfolgreich bearbeitete unbekannte Menge im Balkenmodell', () => {

@@ -32,18 +32,18 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
     const guidedNumberInput = page.getByLabel('Dein Ergebnis')
     if (await guidedNumberInput.isVisible().catch(() => false)) {
       await guidedNumberInput.fill('9999')
-      await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
+      await page.getByRole('button', { name: 'Ergebnis prüfen' }).evaluate((button: HTMLButtonElement) => button.click())
       continue
     }
     const numberInput = page.getByLabel('Deine Antwort')
     if (await numberInput.isVisible().catch(() => false)) {
       await numberInput.fill('9999')
-      await page.getByRole('button', { name: 'Antwort prüfen' }).click()
+      await page.getByRole('button', { name: 'Antwort prüfen' }).evaluate((button: HTMLButtonElement) => button.click())
       continue
     }
     const option = page.locator('.answer-option:visible, .symmetry-option:visible').first()
     if (await option.isVisible().catch(() => false)) {
-      await option.click()
+      await option.evaluate((button: HTMLButtonElement) => button.click())
       continue
     }
     await page.waitForTimeout(50)
@@ -109,9 +109,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.19.0',
+    catalogVersion: '0.19.1',
     schemaVersion: 17,
-    appVersion: '0.20.0'
+    appVersion: '0.20.1'
   })
 
   await page.reload()
@@ -451,6 +451,36 @@ test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt',
   expect(counts.totalPoints).toBe(counts.groups * counts.pointsPerGroup[0]!)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('punktgruppen-375x812.png'), fullPage: true })
+})
+
+test('Division zeigt mobil die vollständige Gruppierung oder Verteilung ohne numerische Lösung', async ({ page }, testInfo) => {
+  await page.route('**/content/task-catalog.json', async (route) => {
+    const response = await route.fetch()
+    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+    catalog.skills.forEach((skill) => {
+      if (['addition', 'subtraction', 'multiplication'].includes(skill.id)) skill.releaseStatus = 'disabled'
+    })
+    await route.fulfill({ response, json: catalog })
+  })
+
+  await onboard(page, 'Teilen')
+  await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+  const model = page.locator('.division-model').first()
+  await expect(model).toBeVisible()
+  await expect(model).toHaveAttribute('aria-label', /vollständig.*unbekannt/i)
+  await expect(model.locator(':scope > strong').last()).toContainText('?')
+  const counts = await model.evaluate((element) => ({
+    pool: element.querySelectorAll('.known-pool i').length,
+    partition: element.querySelectorAll('.division-partition i').length,
+    groups: element.querySelectorAll('.division-group').length,
+    pointsPerGroup: [...element.querySelectorAll('.division-group')].map((group) => group.querySelectorAll('i').length)
+  }))
+  expect(counts.pool).toBeGreaterThanOrEqual(4)
+  expect(counts.partition).toBe(counts.pool)
+  expect(counts.groups).toBeGreaterThanOrEqual(2)
+  expect(new Set(counts.pointsPerGroup).size).toBe(1)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('division-vollstaendig-375x812.png'), fullPage: true })
 })
 
 test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async ({ page }, testInfo) => {

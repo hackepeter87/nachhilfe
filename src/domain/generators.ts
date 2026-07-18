@@ -101,11 +101,11 @@ function representation(
   label: string,
   values: ExerciseRepresentation['values'],
   unknownValues: string[] = []
-): ExerciseRepresentation | undefined {
+): ExerciseRepresentation {
   const visibility = getSkillContent(skillId).difficultyLevels[difficulty - 1].representation
-  return visibility === 'none' ? undefined : {
+  return {
     kind,
-    visibility,
+    visibility: visibility === 'none' ? 'scaffold' : visibility,
     label,
     values,
     valueRoles: {
@@ -199,15 +199,26 @@ function division(seed: number, difficulty: Difficulty, focus?: string): Exercis
   const divisor = focusedDivisor && rows.includes(focusedDivisor) ? focusedDivisor : pick(random, rows)
   const quotient = integer(random, 2, difficulty === 1 ? Math.min(10, Math.floor(50 / divisor)) : 10)
   const dividend = divisor * quotient
-  const values = { dividend, divisor, quotient }
+  const situation = random() < 0.5 ? 'grouping' : 'sharing'
+  const values = { dividend, divisor, quotient, situation }
+  const grouping = situation === 'grouping'
   return withMetadata({
     ...base('division', seed, difficulty, values),
     ...contentFor('division', values, difficulty),
-    typeId: 'inverse-division',
+    typeId: grouping ? 'division-grouping' : 'division-sharing',
     subskillId: `division-by-${divisor}`,
     answerMode: 'number',
     correctAnswer: String(quotient),
-    representation: representation('division', difficulty, 'groups', `${dividend} Dinge in Gruppen zu je ${divisor} teilen`, { modelType: 'division-groups', total: dividend, size: divisor, groups: quotient }, ['groups'])
+    representation: representation(
+      'division',
+      difficulty,
+      grouping ? 'grouping-model' : 'sharing-model',
+      grouping ? getSkillContent('division').representations[0]! : getSkillContent('division').representations[1]!,
+      grouping
+        ? { total: dividend, groupSize: divisor, groupCount: quotient }
+        : { total: dividend, groupCount: divisor, groupSize: quotient },
+      [grouping ? 'groupCount' : 'groupSize']
+    )
   })
 }
 
@@ -478,7 +489,11 @@ function wordModelRepresentation(
   label: string,
   sourceModelType: WordModelType
 ): ExerciseRepresentation {
-  const kind = modelType.startsWith('equal-groups') ? 'groups' : 'bar-model'
+  const kind = modelType === 'equal-groups-total'
+    ? 'groups'
+    : modelType === 'equal-groups-share'
+      ? 'sharing-model'
+      : 'bar-model'
   const sourceFirst = Number(values.first)
   const sourceSecond = Number(values.second)
   const sourceTotal = Number(values.total)
@@ -486,7 +501,15 @@ function wordModelRepresentation(
   const first = isSharingStory ? sourceTotal : sourceFirst
   const second = isSharingStory ? sourceFirst : sourceSecond
   const unknownQuantity = WORD_MODEL_UNKNOWN_QUANTITY[modelType]
-  const representationValues: ExerciseRepresentation['values'] = {
+  const representationValues: ExerciseRepresentation['values'] = modelType === 'equal-groups-share'
+    ? {
+        modelType,
+        unknownQuantity,
+        total: sourceTotal,
+        groupCount: sourceFirst,
+        groupSize: sourceSecond
+      }
+    : {
     modelType,
     unknownQuantity,
     first,
@@ -496,14 +519,15 @@ function wordModelRepresentation(
     groups: sourceFirst,
     ...(modelType === 'equal-groups-total' && !isSharingStory ? { size: sourceSecond } : {})
   }
+  const representationUnknownValues = modelType === 'equal-groups-share' ? ['groupSize'] : [unknownQuantity]
   return {
     kind,
     visibility: 'always',
     label,
     values: representationValues,
     valueRoles: {
-      knownValues: Object.keys(representationValues).filter((key) => key !== unknownQuantity),
-      unknownValues: [unknownQuantity],
+      knownValues: Object.keys(representationValues).filter((key) => !representationUnknownValues.includes(key)),
+      unknownValues: representationUnknownValues,
       revealedValues: []
     }
   }
@@ -733,9 +757,9 @@ function arithmetic1000Steps(
   }]
 }
 
-function symmetryProgressionPhase(difficulty: Difficulty, focus?: string): 1 | 2 | 3 | 4 | 5 {
-  const match = focus?.match(/^symmetry-phase-([1-5])$/)
-  const requested = match ? Number(match[1]) as 1 | 2 | 3 | 4 | 5 : undefined
+function symmetryProgressionPhase(difficulty: Difficulty, focus?: string): 1 | 2 | 3 {
+  const match = focus?.match(/^symmetry-phase-([1-3])$/)
+  const requested = match ? Number(match[1]) as 1 | 2 | 3 : undefined
   if (requested) {
     const expectedDifficulty = requested === 1 ? 1 : requested === 2 ? 2 : 3
     if (expectedDifficulty === difficulty) return requested

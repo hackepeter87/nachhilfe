@@ -1,8 +1,8 @@
 {
   "schemaVersion": 17,
-  "catalogVersion": "0.19.0",
+  "catalogVersion": "0.19.1",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-17",
+  "releasedAt": "2026-07-18",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -469,18 +469,18 @@
       "id": "division",
       "label": "Umkehraufgaben",
       "curriculumArea": "Zahlen und Operationen",
-      "supportGoal": "Division ohne Rest als Umkehrung der Multiplikation nutzen.",
+      "supportGoal": "Division ohne Rest als Gruppieren und Verteilen verstehen und als Umkehrung der Multiplikation nutzen.",
       "misconceptions": [
-        "Dividend und Divisor werden vertauscht.",
-        "Die Gruppen sind nicht gleich groß."
+        "Gruppenanzahl und Gruppengröße werden verwechselt.",
+        "Die Gesamtmenge wird nicht vollständig oder nicht gleichmäßig aufgeteilt."
       ],
       "hints": [
         "Welche Zahl mal {divisor} ergibt {dividend}?",
         "Nutze die Umkehraufgabe: {divisor} · ? = {dividend}."
       ],
       "prompt": "{dividend} : {divisor} = ?",
-      "errorFeedback": "Die Gruppen müssen gleich groß sein. Nutze die passende Malaufgabe.",
-      "explanation": "{divisor} · {quotient} = {dividend}. Deshalb ist {dividend} : {divisor} = {quotient}.",
+      "errorFeedback": "Prüfe, welche Größe bekannt ist: die Größe jeder Gruppe oder die Anzahl der Gruppen. Die Gesamtmenge muss vollständig aufgeteilt sein.",
+      "explanation": "Beim Gruppieren wird die Anzahl gleich großer Gruppen gesucht, beim Verteilen die Größe jeder Gruppe. {divisor} · {quotient} = {dividend}. Deshalb ist {dividend} : {divisor} = {quotient}.",
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
@@ -502,13 +502,14 @@
         "Umkehraufgaben kennen"
       ],
       "representations": [
-        "Gruppenbild",
+        "Vollständiges Gruppierungsmodell",
+        "Vollständiges Verteilmodell",
         "Aufgabenfamilie"
       ],
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Teilen durch 2, 5 oder 10 mit Gruppenbild",
+          "description": "Gruppieren und Verteilen durch 2, 5 oder 10 mit vollständigem Punktebild",
           "numberRange": "Dividend bis 50",
           "representation": "always",
           "requirements": {
@@ -522,7 +523,7 @@
         },
         {
           "level": 2,
-          "description": "Teilen durch 3, 4 oder 6; Gruppenbild auf Hilfe",
+          "description": "Gruppieren und Verteilen durch 3, 4 oder 6; passendes Modell auf Hilfe",
           "numberRange": "Dividend bis 60",
           "representation": "hint",
           "requirements": {
@@ -536,7 +537,7 @@
         },
         {
           "level": 3,
-          "description": "Teilen durch 6, 7, 8 oder 9 ohne sichtbares Gruppenbild",
+          "description": "Gruppieren und Verteilen durch 6, 7, 8 oder 9; vollständiges Modell erst in der Remediation",
           "numberRange": "Dividend bis 90",
           "representation": "none",
           "requirements": {
@@ -549,12 +550,12 @@
           "learningPhase": "automate"
         }
       ],
-      "workedExample": "42 : 6: Suche 6 · ? = 42. 6 · 7 = 42, also ist das Ergebnis 7.",
-      "successFeedback": "Das Ergebnis der Geteiltaufgabe stimmt.",
+      "workedExample": "42 : 6 kann bedeuten: Gruppen zu je 6 bilden und die 7 Gruppen zählen oder auf 6 Gruppen verteilen und je 7 bestimmen. 6 · 7 = 42.",
+      "successFeedback": "Du hast die Gesamtmenge vollständig in gleich große Gruppen aufgeteilt.",
       "remediation": {
-        "strategy": "Die Menge wird noch einmal in sichtbare gleich große Gruppen gelegt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Umkehraufgaben“ mit kleinen Zahlen und sichtbarem Material neu auf.",
-        "representation": "Gruppenbild",
+        "strategy": "Lege die gesamte Menge im passenden Gruppierungs- oder Verteilmodell vollständig in gleich große Gruppen.",
+        "foundationStrategy": "Nutze eine kleinere Gesamtmenge und lege jeden Punkt sichtbar in genau eine gleich große Gruppe.",
+        "representation": "Vollständiges Gruppierungs- oder Verteilmodell",
         "keepSubskill": true
       },
       "transferPrompt": "Bilde aus den drei Zahlen eine weitere Mal- oder Geteiltaufgabe.",
@@ -1814,11 +1815,11 @@
       "id": "symmetry",
       "label": "Spiegelbilder",
       "curriculumArea": "Raum und Form",
-      "supportGoal": "Das Spiegelprinzip über gleiche Achsenabstände verstehen und achsenfeste Felder erst später als eigenen Sachverhalt erkennen.",
+      "supportGoal": "Das Spiegelprinzip über gleiche Achsenabstände an Achsen zwischen Rasterfeldern verstehen.",
       "misconceptions": [
         "Eine Verschiebung wird als Spiegelung gewählt.",
         "Oben und unten werden statt links und rechts vertauscht.",
-        "Ein Feld auf der Spiegelachse wird unnötig versetzt."
+        "Der Abstand eines Feldes zur Spiegelachse wird verändert."
       ],
       "hints": [
         "Suche die grüne Spiegelachse und vergleiche den Abstand jedes Feldes zu ihr.",
@@ -1826,7 +1827,7 @@
       ],
       "prompt": "Welches Bild ist das genaue Spiegelbild an der {axis} grünen Spiegelachse?",
       "errorFeedback": "Das Bild passt noch nicht genau. Vergleiche Seite und Abstand jedes Feldes zur grünen Achse.",
-      "explanation": "Beim Spiegeln liegt jedes Feld auf der anderen Seite im gleichen Abstand. Verläuft die Achse durch Felder, bleiben diese Felder an ihrem Platz.",
+      "explanation": "Beim Spiegeln liegt jedes Feld auf der anderen Seite im gleichen Abstand. In den produktiven Aufgaben liegt die Achse immer zwischen Rasterfeldern.",
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
@@ -1878,8 +1879,8 @@
         },
         {
           "level": 3,
-          "description": "Phasen 3 bis 5: waagerechte Achsen, später Achsen durch Felder und gemischter Transfer",
-          "numberRange": "Gerade und erst im sicheren Transfer ungerade Raster; Komplexität steuert die Anforderung",
+          "description": "Phase 3: waagerechte Achsen zwischen Reihen mit komplexeren Figuren und plausiblen Distraktoren",
+          "numberRange": "Gerade Raster; Figur, Abstand, Orientierung und Distraktoren steuern die Anforderung",
           "representation": "none",
           "requirements": {
             "requiresNeighborIdentification": false,
@@ -1891,7 +1892,7 @@
           "learningPhase": "transfer"
         }
       ],
-      "workedExample": "Ein Feld zwei Spalten links von der Achse liegt im Spiegel zwei Spalten rechts. Ein später eingeführtes Feld auf der Achse bleibt stehen.",
+      "workedExample": "Ein Feld zwei Spalten links von der Achse liegt im Spiegel zwei Spalten rechts. Seite und Abstand ändern sich kontrolliert.",
       "successFeedback": "Du hast Seite und Abstand zur Spiegelachse richtig zugeordnet.",
       "remediation": {
         "strategy": "Nur ein Feld wird zuerst über die sichtbar markierte Achse gespiegelt.",
@@ -1899,7 +1900,7 @@
         "representation": "Gerades Raster mit sichtbarer Spiegelachse",
         "keepSubskill": true
       },
-      "transferPrompt": "Beschreibe, was sich ändert und was gleich bleibt, wenn die Achse durch eine Reihe oder Spalte verläuft.",
+      "transferPrompt": "Übertrage das Spiegelprinzip von einer senkrechten auf eine waagerechte Achse und beschreibe gleichen Abstand und Seitenwechsel.",
       "releaseStatus": "active",
       "learningPhases": [
         {
@@ -1946,8 +1947,7 @@
           "id": "transfer",
           "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
           "exerciseTypes": [
-            "symmetry:phase-4",
-            "symmetry:phase-5"
+            "symmetry:phase-3"
           ],
           "releaseStatus": "active"
         }
@@ -5970,8 +5970,8 @@
       },
       {
         "phase": 4,
-        "title": "Felder auf der Achse",
-        "goal": "Verstehen, dass Felder auf einer durch Zellen verlaufenden Achse unverändert bleiben.",
+        "title": "Spätere Erweiterung: Felder auf der Achse",
+        "goal": "Als eigener, derzeit nicht produktiver Lerninhalt verstehen, dass Felder auf einer durch Zellen verlaufenden Achse unverändert bleiben.",
         "gridParity": "odd",
         "axes": [
           "vertical",
@@ -5987,8 +5987,8 @@
       },
       {
         "phase": 5,
-        "title": "Gemischter Transfer",
-        "goal": "Achsenlage und Achsenposition in gemischten Aufgaben selbstständig beachten.",
+        "title": "Spätere Erweiterung: gemischter Transfer",
+        "goal": "Erst nach der gesonderten Einführung achsenfester Felder Achsenlage und Achsenposition gemischt beachten.",
         "gridParity": "mixed",
         "axes": [
           "vertical",

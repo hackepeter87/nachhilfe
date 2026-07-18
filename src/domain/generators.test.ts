@@ -43,7 +43,7 @@ describe('deterministische Aufgabengeneratoren', () => {
           expect(modelStep).toBeDefined()
           expect(modelStep?.representation || modelStep?.options?.every((option) => option.representation)).toBeTruthy()
         } else if (expected === 'none') {
-          expect(exercise.representation).toBeUndefined()
+          expect(exercise.representation?.visibility).toBe('scaffold')
         } else {
           expect(exercise.representation).toBeDefined()
           expect(exercise.representation?.visibility).toBe(expected)
@@ -85,6 +85,7 @@ describe('deterministische Aufgabengeneratoren', () => {
   })
 
   it('hält Faktoren, Divisoren und Quotienten im kleinen Einmaleins und bildet Gruppen exakt ab', () => {
+    const divisionSituations = new Set<string>()
     for (const difficulty of [1, 2, 3] as const) {
       for (let seed = 1; seed <= 1_000; seed += 1) {
         const multiplication = generateExercise('multiplication', seed, difficulty)
@@ -95,25 +96,38 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(second).toBeGreaterThanOrEqual(2)
         expect(second).toBeLessThanOrEqual(10)
         expect(first * second).toBe(Number(multiplication.correctAnswer))
-        if (difficulty < 3) expect(multiplication.representation?.values).toMatchObject({ groups: first, size: second })
-        else expect(multiplication.representation).toBeUndefined()
+        expect(multiplication.representation?.values).toMatchObject({ groups: first, size: second })
+        expect(multiplication.representation?.visibility).toBe(difficulty === 1 ? 'always' : difficulty === 2 ? 'hint' : 'scaffold')
 
         const division = generateExercise('division', seed, difficulty)
         const dividend = Number(division.variant.values.dividend)
         const divisor = Number(division.variant.values.divisor)
         const quotient = Number(division.variant.values.quotient)
+        divisionSituations.add(division.typeId)
         expect(divisor).toBeGreaterThanOrEqual(2)
         expect(divisor).toBeLessThanOrEqual(10)
         expect(quotient).toBeGreaterThanOrEqual(2)
         expect(quotient).toBeLessThanOrEqual(10)
         expect(divisor * quotient).toBe(dividend)
-        if (difficulty < 3) {
-          expect(division.representation?.values).toMatchObject({ modelType: 'division-groups', total: dividend, size: divisor, groups: quotient })
-          expect(division.representation?.valueRoles.unknownValues).toContain('groups')
+        expect(division.representation?.values.total).toBe(dividend)
+        if (division.typeId === 'division-grouping') {
+          expect(division.representation).toMatchObject({
+            kind: 'grouping-model',
+            values: { groupSize: divisor, groupCount: quotient },
+            valueRoles: { unknownValues: ['groupCount'] }
+          })
+        } else {
+          expect(division).toMatchObject({ typeId: 'division-sharing' })
+          expect(division.representation).toMatchObject({
+            kind: 'sharing-model',
+            values: { groupCount: divisor, groupSize: quotient },
+            valueRoles: { unknownValues: ['groupSize'] }
+          })
         }
-        else expect(division.representation).toBeUndefined()
+        expect(division.representation?.visibility).toBe(difficulty === 1 ? 'always' : difficulty === 2 ? 'hint' : 'scaffold')
       }
     }
+    expect(divisionSituations).toEqual(new Set(['division-grouping', 'division-sharing']))
   })
 
   it.each([
@@ -206,7 +220,7 @@ describe('deterministische Aufgabengeneratoren', () => {
 
   it('fragt Nullstellen als Ziffer und Stellenwert tatsächlich ab', () => {
     for (const difficulty of [2, 3] as const) {
-      for (let seed = 1; seed <= 100; seed += 1) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
         const exercise = generateExercise('place-value', seed, difficulty)
         expect(exercise.variant.values.digit).toBe(0)
         expect(exercise.correctAnswer).toBe('0')
@@ -445,7 +459,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(new Set([easy.variant.key, medium.variant.key, hard.variant.key]).size).toBeGreaterThan(1)
     expect(easy.representation?.visibility).toBe('always')
     expect(medium.representation?.visibility).toBe('hint')
-    expect(hard.representation).toBeUndefined()
+    expect(hard.representation?.visibility).toBe('scaffold')
   })
 
   it('steigert bei Sachaufgaben die selbstständige Modellwahl', () => {
@@ -467,8 +481,8 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(Math.max(easy.sourceGrid!.length, easy.sourceGrid![0]!.length)).toBeGreaterThanOrEqual(Math.min(medium.sourceGrid!.length, medium.sourceGrid![0]!.length))
   })
 
-  it('spiegelt in allen fünf Phasen passend zur sichtbaren Achse', () => {
-    for (const progressionPhase of [1, 2, 3, 4, 5] as const) {
+  it('spiegelt in allen drei produktiven Phasen passend zur sichtbaren Achse', () => {
+    for (const progressionPhase of [1, 2, 3] as const) {
       const difficulty = progressionPhase === 1 ? 1 : progressionPhase === 2 ? 2 : 3
       for (let seed = 1; seed <= 100; seed += 1) {
         const exercise = generateExercise('symmetry', seed, difficulty, `symmetry-phase-${progressionPhase}`)
@@ -485,14 +499,14 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
-  it('führt ungerade Raster ausschließlich in den hohen Progressionsphasen ein', () => {
-    for (const progressionPhase of [1, 2, 3, 4, 5] as const) {
+  it('verwendet in sämtlichen produktiven Symmetriephasen ausschließlich gerade Achsendimensionen', () => {
+    for (const progressionPhase of [1, 2, 3] as const) {
       const difficulty = progressionPhase === 1 ? 1 : progressionPhase === 2 ? 2 : 3
       for (let seed = 1; seed <= 50; seed += 1) {
         const exercise = generateExercise('symmetry', seed, difficulty, `symmetry-phase-${progressionPhase}`)
         const relevantSize = exercise.symmetry?.axis === 'vertical' ? exercise.sourceGrid![0]!.length : exercise.sourceGrid!.length
-        if (progressionPhase <= 3) expect(relevantSize % 2).toBe(0)
-        if (progressionPhase === 4) expect(relevantSize % 2).toBe(1)
+        expect(relevantSize % 2).toBe(0)
+        expect(exercise.symmetry?.axisPosition).toBe('between-cells')
       }
     }
   })
@@ -721,9 +735,9 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
-  it('verwendet ausschließlich explizite Symmetrievorlagen der jeweiligen Progressionsphase', () => {
+  it('verwendet ausschließlich explizite produktive Symmetrievorlagen der jeweiligen Progressionsphase', () => {
     const templates = getTaskCatalog().symmetry.templates
-    for (const progressionPhase of [1, 2, 3, 4, 5] as const) {
+    for (const progressionPhase of [1, 2, 3] as const) {
       const difficulty = progressionPhase === 1 ? 1 : progressionPhase === 2 ? 2 : 3
       const allowed = new Set(templates.filter((template) => template.progressionPhase === progressionPhase).map((template) => JSON.stringify(template.grid)))
       for (let seed = 1; seed <= 100; seed += 1) {

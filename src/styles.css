@@ -838,6 +838,17 @@ p {
 .sequence-model small { font-size: .6rem; color: #557060; }
 .sequence-model b { color: #2876a8; }
 .word-groups-model { justify-items: center; }
+.division-model { display: grid; justify-items: center; gap: 9px; overflow: hidden; }
+.division-partition {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+}
+.division-model--grouping .division-group { border-color: #315d45; }
+.division-model--sharing .division-group { border-style: dashed; border-color: #2876a8; background: #eef7fb; }
+.division-model > strong { color: #244d38; text-align: center; }
 .groups-question { flex-basis: 100%; }
 .known-pool { display: grid; justify-items: center; gap: 6px; }
 .known-pool > span { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; max-width: 220px; }

@@ -541,7 +541,7 @@ export function validateCatalog(catalog) {
   const symmetrySkill = catalog.skills.find((skill) => skill.id === 'symmetry')
   const expectedSymmetryExerciseTypes = [
     ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
-    ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-4', 'symmetry:phase-5']
+    ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-3']
   ]
   if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) {
     fail('Symmetrie-Lernphasen passen nicht zur fünfphasigen Progression')

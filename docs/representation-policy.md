@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.20.0, Katalog 0.19.0, Schema 17.
+Stand: App 0.20.1, Katalog 0.19.1, Schema 17.
 
 ## Verbindliche Regel
 
@@ -22,7 +22,7 @@ Der Renderer lehnt doppelte, überlappende, unvollständige oder unzulässig auf
 | Rechenstrich bis 1000 | Teilsprünge nannten Zwischen- und Zielwerte. | Rechenschritte dürfen sichtbar sein, numerische Ziele bleiben maskiert. |
 | Nachbarzehner/-hunderter | Beide gesuchten Nachbarn waren beschriftet. | Nur die gegebene Zahl ist beschriftet; beide Nachbarn bleiben `?`. |
 | Ergänzen | Sprungbeschriftungen ergaben unmittelbar die gesuchte Ergänzung. | Start und bekannte Zielzahl bleiben sichtbar; Sprünge bleiben bis zur Lösung unbekannt. |
-| Gruppenbild Division | Die Anzahl gezeichneter Gruppen entsprach bereits dem Quotienten. | Gesamtmenge und eine bekannte Gruppengröße werden gezeigt; die Anzahl der Gruppen bleibt offen. |
+| Division | Die Anzahl gezeichneter Gruppen wurde nur durch eine einzelne Beispielgruppe angedeutet; Gruppieren und Verteilen waren nicht getrennt. | Gruppierungs- und Verteilmodell verarbeiten die vollständige Gesamtmenge. Die gesuchte Anzahl beziehungsweise Gruppengröße bleibt numerisch `?`, während der Aufteilungsprozess vollständig sichtbar ist. |
 | Geld | Der summierte Betrag stand im `aria-label`. | Einzelne bekannte Münzen bleiben sichtbar; der Gesamtbetrag ist visuell und für Screenreader unbekannt. |
 | Messstrecke | Der gesuchte Endwert stand als Zahl und im `aria-label`. | Die Strecke bleibt messbar, ihr Zahlenwert wird bis zur Lösung durch `?` ersetzt. |
 | Balkenmodelle | Gesuchte Teile waren bereits maskiert. | Die bestehende Maskierung bleibt verbindlich und verwendet dieselben Rollen. |
@@ -43,6 +43,8 @@ Bei Rundungsaufgaben dürfen die beiden bekannten Nachbarzahlen als Entscheidung
 5. Aufdeckung erfolgt ausschließlich über `revealedValues` nach erfolgreicher Bearbeitung.
 6. Ungültige Rollen oder Darstellungsdaten erzeugen einen sichtbaren Fehler statt einer fachlich falschen Grafik.
 7. Neue Kompetenzen ergänzen Generator-, Renderer-, Komponenten- und mobile E2E-Tests für die Maskierung.
+8. `visibility: scaffold` bedeutet: nicht initial und nicht durch einen normalen Tipp sichtbar, sondern ausschließlich zusammen mit der Remediation nach wiederholten Fehlern.
+9. Ein Hilfetext darf eine Darstellung nur benennen, wenn sie im selben Bearbeitungsschritt sichtbar ist oder durch genau diesen Tipp eingeblendet wird.
 
 ## Abgrenzung
 

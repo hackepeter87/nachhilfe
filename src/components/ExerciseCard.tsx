@@ -37,9 +37,10 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
 
   const currentStep = exercise.steps?.[stepIndex]
   const currentInteraction = currentStep?.interaction ?? 'choice'
+  const visibleHintLimit = exercise.answerMode === 'guided-word' && currentStep?.id !== 'model' ? 1 : 2
 
   const showNextHint = () => {
-    setHintsShown((current) => Math.min(2, current + 1))
+    setHintsShown((current) => Math.min(visibleHintLimit, current + 1))
   }
 
   const registerWrongAnswer = (feedback: string) => {
@@ -181,7 +182,11 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
         <h2 id="exercise-title" ref={headingRef} tabIndex={-1}>{exercise.prompt}</h2>
       </div>
 
-      {exercise.answerMode !== 'guided-word' && presentationRepresentation && (presentationRepresentation.visibility === 'always' || hintsShown > 0 || answerState === 'scaffold') && (
+      {exercise.answerMode !== 'guided-word' && presentationRepresentation && (
+        presentationRepresentation.visibility === 'always' ||
+        (presentationRepresentation.visibility === 'hint' && hintsShown > 0) ||
+        answerState === 'scaffold'
+      ) && (
         <MathRepresentation representation={presentationRepresentation} />
       )}
 
@@ -240,15 +245,21 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
 
       {answerState === 'answering' && (
         <div className="help-area">
-          <button className="text-button" type="button" onClick={showNextHint} disabled={hintsShown >= 2}>
+          <button className="text-button" type="button" onClick={showNextHint} disabled={hintsShown >= visibleHintLimit}>
             <HelpCircle aria-hidden="true" />
-            {hintsShown === 0 ? 'Ich brauche einen Tipp' : hintsShown === 1 ? 'Noch ein Tipp' : 'Beide Tipps geöffnet'}
+            {hintsShown === 0
+              ? 'Ich brauche einen Tipp'
+              : hintsShown < visibleHintLimit
+                ? 'Noch ein Tipp'
+                : visibleHintLimit === 1
+                  ? 'Tipp geöffnet'
+                  : 'Beide Tipps geöffnet'}
           </button>
           {hintsShown > 0 && (
             <div className="hint" aria-live="polite">
               <Lightbulb aria-hidden="true" />
               <div>
-                {exercise.hints.slice(0, hintsShown).map((hint) => <p key={hint.level}>{hint.text}</p>)}
+                {exercise.hints.slice(0, Math.min(hintsShown, visibleHintLimit)).map((hint) => <p key={hint.level}>{hint.text}</p>)}
               </div>
             </div>
           )}
@@ -262,6 +273,15 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
           <Lightbulb aria-hidden="true" />
           <div>
             <h3>Wir lösen es gemeinsam.</h3>
+            {exercise.answerMode === 'guided-word' && presentationRepresentation && <MathRepresentation representation={presentationRepresentation} />}
+            {exercise.answerMode === 'symmetry' && exercise.sourceGrid && (
+              <GridPicture
+                grid={exercise.sourceGrid}
+                label="Vorlage zum gemeinsamen Spiegeln"
+                axis={exercise.symmetry?.axis}
+                axisPosition={exercise.symmetry?.axisPosition}
+              />
+            )}
             <p>{exercise.remediation.strategy}</p>
             <p>{exercise.explanation}</p>
             <button className="primary-button" type="button" onClick={finish}>

@@ -19,13 +19,13 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.19.0',
+      catalogVersion: '0.19.1',
       schemaVersion: 17,
-      appVersion: '0.20.0'
+      appVersion: '0.20.1'
     })
   })
 
-  it('führt Achsenzellen erst im sicheren Symmetrietransfer ein', () => {
+  it('hält auch sicheren Symmetrietransfer auf geraden Rastern zwischen Feldern', () => {
     const automated = {
       ...createSkillProgress('symmetry'),
       attempts: 6,
@@ -34,24 +34,10 @@ describe('Sitzungsplanung', () => {
       mastery: 86,
       status: 'secure' as const
     }
-    const firstTransfer = { ...automated, learningPhase: 'transfer' as const, mastery: 94 }
-    const mixedTransfer = {
-      ...firstTransfer,
-      subskills: {
-        'symmetry-phase-4': {
-          attempts: 3,
-          correctAnswers: 3,
-          hintsUsed: 0,
-          mastery: 71,
-          recentErrors: 0,
-          lastPracticedAt: '2026-07-17T08:00:00.000Z'
-        }
-      }
-    }
+    const transfer = { ...automated, learningPhase: 'transfer' as const, mastery: 94 }
 
     expect(createSessionPlan({ symmetry: automated }, 601).exercises.at(-1)?.symmetry?.progressionPhase).toBe(3)
-    expect(createSessionPlan({ symmetry: firstTransfer }, 602).exercises.at(-1)?.symmetry).toMatchObject({ progressionPhase: 4, axisPosition: 'through-cells' })
-    expect(createSessionPlan({ symmetry: mixedTransfer }, 603).exercises.at(-1)?.symmetry?.progressionPhase).toBe(5)
+    expect(createSessionPlan({ symmetry: transfer }, 602).exercises.at(-1)?.symmetry).toMatchObject({ progressionPhase: 3, axisPosition: 'between-cells' })
   })
 
   it('bindet eine laufende Runde unveränderlich an ihren Releasekontext', () => {
@@ -68,7 +54,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.19.0')
+      expect(runningSession.catalogVersion).toBe('0.19.1')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -233,7 +219,7 @@ describe('Sitzungsplanung', () => {
     expect(understandingExercise).toMatchObject({ difficulty: 1, learningPhase: 'understand' })
     expect(understandingExercise?.representation?.visibility).toBe('always')
     expect(transferExercise).toMatchObject({ difficulty: 3, learningPhase: 'transfer' })
-    expect(transferExercise?.representation).toBeUndefined()
+    expect(transferExercise?.representation?.visibility).toBe('scaffold')
   })
 
   it('erzeugt nach einem Fehler eine leichtere, andere Wiederholung', () => {

@@ -1,6 +1,6 @@
 # Didaktisches Gesamtmodell
 
-Stand: App 0.20.0, Katalog 0.19.0, Schema 17. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen. Für alle Kompetenzpfade gilt zusätzlich die [Darstellungsrichtlinie](../representation-policy.md).
+Stand: App 0.20.1, Katalog 0.19.1, Schema 17. Verbindliche curriculare Quelle ist der [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html). Die Zuordnung orientiert sich an den Inhaltsbereichen Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten und an den Prozessen Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen. Für alle Kompetenzpfade gilt zusätzlich die [Darstellungsrichtlinie](../representation-policy.md).
 
 ## Lernphasen
 

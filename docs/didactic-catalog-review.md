@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.20.0, Katalog 0.19.0, Schema 17, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.20.1, Katalog 0.19.1, Schema 17, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -23,7 +23,7 @@ Stand: App 0.20.0, Katalog 0.19.0, Schema 17, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.20.0
+## Aktive Veränderungen bis 0.20.1
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -53,6 +53,7 @@ Stand: App 0.20.0, Katalog 0.19.0, Schema 17, Status ready-for-review. Diese Dat
 - App 0.18.0, Katalog 0.17.0 und Schema 16: Zeit, Masse und Rauminhalt verwenden getrennte adaptive Kompetenzen. Uhr, Waage und Messgefäß zeigen ausschließlich bekannte Angaben; Uhrzeit, Zeitspanne oder Mengenwert bleiben bis zur richtigen Antwort unbekannt.
 - App 0.19.0, Katalog 0.18.0 und Schema 17: Ebene Figuren, Muster, Fläche und Umfang sind vier adaptive Kompetenzen. Einheitsfelder und Außenkanten sind bekannte zählbare Informationen; Formname, Fortsetzung und Zahlenwert bleiben bis zur Antwort unbekannt.
 - App 0.20.0, Katalog 0.19.0 und Schema 17: Die Sitzungsplanung wählt je einen Fokus aus Zahlen, Größen, Daten und Geometrie. Eine automatisch erzeugte Curriculum-Matrix und ein 1.000-Seed-Test je aktiver Kompetenz und Stufe sichern den Abgleich; neue mathematische Kompetenzen kommen nicht hinzu.
+- App 0.20.1, Katalog 0.19.1 und Schema 17: Produktive Symmetrie verwendet nur Phasen 1 bis 3 mit Achsen zwischen Zellen. Division trennt vollständiges Gruppieren und Verteilen. `scaffold`-Darstellungen und modellbezogene Tipps sind an den tatsächlich sichtbaren Hilfezustand gebunden.
 
 ## Bewusst deaktiviert
 

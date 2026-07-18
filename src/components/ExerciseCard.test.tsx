@@ -132,6 +132,34 @@ describe('ExerciseCard', () => {
     expect(screen.getByRole('img', { name: 'Stellenwerttafel' })).toBeVisible()
   })
 
+  it('zeigt eine reine Remediation-Darstellung weder initial noch nach einem Tipp', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('addition', 42, 3)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    expect(exercise.representation?.visibility).toBe('scaffold')
+    expect(screen.queryByRole('img', { name: /Rechenstrich/ })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /tipp/i }))
+    expect(screen.queryByRole('img', { name: /Rechenstrich/ })).not.toBeInTheDocument()
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await user.type(screen.getByLabelText('Deine Antwort'), '99')
+      await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    }
+    expect(screen.getByRole('img', { name: /Rechenstrich/ })).toBeVisible()
+  })
+
+  it('zeigt einen modellbezogenen Sachaufgabentipp nur beim sichtbaren Modellschritt', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('word-problem', 42, 1)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: 'Ich brauche einen Tipp' }))
+    expect(screen.getByText(exercise.hints[0].text)).toBeVisible()
+    expect(screen.queryByText(exercise.hints[1].text)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tipp geöffnet' })).toBeDisabled()
+  })
+
   it('zeigt mathematische Teilsprünge erst mit der Zahlenstrahl-Hilfe', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('addition-1000', 42, 2)

@@ -7,10 +7,11 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 8_000 },
   fullyParallel: false,
+  workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: externalBaseUrl ?? 'http://127.0.0.1:4173',
-    trace: 'retain-on-failure',
+    trace: process.env.CI ? 'retain-on-failure' : 'off',
     serviceWorkers: 'allow'
   },
   webServer: externalBaseUrl ? undefined : {

@@ -111,12 +111,7 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
   if (skillId === 'symmetry') {
     if (difficulty === 1) return 'symmetry-phase-1'
     if (difficulty === 2) return 'symmetry-phase-2'
-    const skillProgress = progress.symmetry
-    if (skillProgress?.learningPhase !== 'transfer') return 'symmetry-phase-3'
-    const axisCellProgress = skillProgress.subskills?.['symmetry-phase-4']
-    return axisCellProgress && axisCellProgress.attempts >= 3 && axisCellProgress.mastery >= 65
-      ? 'symmetry-phase-5'
-      : 'symmetry-phase-4'
+    return 'symmetry-phase-3'
   }
   if (skillId === 'cube-rotation') {
     const candidates = difficulty === 1
@@ -194,7 +189,11 @@ function applyLearningPhase(exercise: Exercise, phase: LearningPhase): Exercise 
     representation: exercise.representation
       ? {
           ...exercise.representation,
-          visibility: exercise.representation.visibility === 'always' || showRepresentation ? 'always' : 'hint'
+          visibility: exercise.representation.visibility === 'scaffold'
+            ? 'scaffold'
+            : exercise.representation.visibility === 'always' || showRepresentation
+              ? 'always'
+              : 'hint'
         }
       : exercise.representation,
     testMetadata: { ...exercise.testMetadata, learningPhase: phase }

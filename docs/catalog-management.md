@@ -27,14 +27,14 @@ Das aktuelle Schema verwendet diese getrennten Metadaten:
 ```json
 {
   "schemaVersion": 17,
-  "catalogVersion": "0.19.0",
+  "catalogVersion": "0.19.1",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-17",
+  "releasedAt": "2026-07-18",
   "status": "ready-for-review"
 }
 ```
 
-Schema 17 ergänzt `planeGeometry` für Figuren-, Muster-, Flächen- und Umfangsbezeichnungen; die mathematische Rasterlogik bleibt in TypeScript. Die verpflichtende `representationPolicy` trennt weiterhin bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
+Schema 17 umfasst weiterhin `planeGeometry`; Katalog 0.19.1 präzisiert ohne Schemaänderung die produktive Symmetrieprogression sowie Gruppierungs- und Verteilmodelle. Die verpflichtende `representationPolicy` trennt bekannte, gesuchte und nach erfolgreicher Bearbeitung aufgedeckte Größen; Details stehen in [representation-policy.md](representation-policy.md).
 
 - `schemaVersion` bezeichnet die technische JSON-Struktur. Eine inkompatible Änderung erfordert kompatiblen Anwendungscode.
 - `catalogVersion` bezeichnet die fachliche Inhaltsversion und folgt SemVer.

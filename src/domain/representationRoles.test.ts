@@ -39,7 +39,6 @@ describe('mathematische Rollen aller Darstellungen', () => {
       addition: ['end'],
       subtraction: ['end'],
       multiplication: ['total'],
-      division: ['groups'],
       'neighbor-tens': ['start', 'end'],
       'neighbor-hundreds': ['start', 'end'],
       'addition-1000': ['result'],
@@ -64,5 +63,17 @@ describe('mathematische Rollen aller Darstellungen', () => {
       expect(exercise.representation?.valueRoles.unknownValues, skillId).toEqual(expect.arrayContaining(expected!))
       expect(exercise.representation?.valueRoles.revealedValues, skillId).toEqual([])
     }
+  })
+
+  it('maskiert bei Division genau die zur Situation passende Gruppengröße', () => {
+    const encountered = new Set<string>()
+    for (let seed = 1; seed <= 100; seed += 1) {
+      const exercise = generateExercise('division', seed, 1)
+      const unknowns = exercise.representation?.valueRoles.unknownValues ?? []
+      expect(unknowns).toHaveLength(1)
+      expect(['groupCount', 'groupSize']).toContain(unknowns[0])
+      encountered.add(unknowns[0]!)
+    }
+    expect(encountered).toEqual(new Set(['groupCount', 'groupSize']))
   })
 })

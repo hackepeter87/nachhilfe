@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Darstellungs- und Runtime-Konsistenz 0.20.1
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Produktive Symmetrie endet bei Phase 3 und verwendet ausschließlich gerade Achsendimensionen mit Achsen zwischen Rasterfeldern; die vorbereiteten Achsensonderfälle bleiben nicht produktiv.
+- Division trennt Gruppieren und Verteilen in zwei vollständige Modelle. Alle Punkte der Gesamtmenge werden verarbeitet; Gruppenanzahl beziehungsweise Gruppengröße bleiben bis zur richtigen Lösung numerisch unbekannt.
+- `representation: none` erzeugt eine ausschließlich in der Remediation sichtbare `scaffold`-Darstellung. Normale Tipps können sie nicht vorzeitig einblenden.
+- Modellbezogene Sachaufgabentipps erscheinen nur im sichtbaren Modellschritt. Der Audit aller Darstellungsfamilien ist in `docs/representation-runtime-audit-0.20.1.md` dokumentiert.
+- Katalog 0.19.1 bleibt bei Schema 17 und Status `ready-for-review`. Eine Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 342 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien jeweils gegen Vite Preview und den gehärteten Read-only-Container. Das lokale AMD64-Image `mathe-reise:local` (`sha256:cac679388794f65668b7d6625e06f15845ea500c59fdc4a28831b40fc9e8ea53`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. WebKit bleibt eine Mobile-Safari-Näherung. Podman, ein echtes iPhone und eine externe Lehrkraftprüfung standen nicht zur Verfügung.
+
 ## Curriculare Integration 0.20.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Eine vollständige Runde enthält weiterhin zwei adaptive Grundaufgaben und jetzt je einen Fokus aus Zahlen, Größen, Daten und Geometrie sowie Sachaufgabe und Symmetrie.
