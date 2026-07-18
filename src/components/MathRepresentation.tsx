@@ -225,13 +225,31 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const hundreds = Number(values.hundreds)
     const tens = Number(values.tens)
     const ones = Number(values.ones)
-    const valid = [hundreds, tens, ones].every((value) => Number.isInteger(value) && value >= 0) && hundreds <= 9 && tens <= 19 && ones <= 19
+    const hasChange = values.changeHundreds !== undefined || values.changeTens !== undefined || values.changeOnes !== undefined
+    const changeHundreds = Number(values.changeHundreds ?? 0)
+    const changeTens = Number(values.changeTens ?? 0)
+    const changeOnes = Number(values.changeOnes ?? 0)
+    const operation = String(values.operation ?? '')
+    const validAmounts = (amounts: number[]) => amounts.every((value) => Number.isInteger(value) && value >= 0) && amounts[0]! <= 9 && amounts[1]! <= 19 && amounts[2]! <= 19
+    const valid = validAmounts([hundreds, tens, ones]) && (!hasChange || (validAmounts([changeHundreds, changeTens, changeOnes]) && ['+', '−'].includes(operation)))
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Das Stellenwertmaterial enthält ungültige Mengen.</div>
+    const material = (amounts: [number, number, number], keyPrefix: string) => (
+      <div className="place-material">
+        {amounts.map((amount, placeIndex) => (
+          <section key={`${keyPrefix}-${placeIndex}`}>
+            <b>{['H', 'Z', 'E'][placeIndex]}</b>
+            <div>{Array.from({ length: amount }, (_, index) => (
+              <i className={placeIndex === 0 ? 'hundred-flat' : placeIndex === 1 ? 'ten-rod' : 'one-dot'} key={index} />
+            ))}</div>
+          </section>
+        ))}
+      </div>
+    )
     return (
-      <div className="math-visual place-material" role="img" aria-label={`${representation.label}. ${hundreds} Hunderterflächen, ${tens} Zehnerstangen und ${ones} Einerpunkte.`}>
-        <section><b>H</b><div>{Array.from({ length: hundreds }, (_, index) => <i className="hundred-flat" key={index} />)}</div></section>
-        <section><b>Z</b><div>{Array.from({ length: tens }, (_, index) => <i className="ten-rod" key={index} />)}</div></section>
-        <section><b>E</b><div>{Array.from({ length: ones }, (_, index) => <i className="one-dot" key={index} />)}</div></section>
+      <div className="math-visual place-material-stack" role="img" aria-label={`${representation.label}. Ausgangszahl: ${hundreds} Hunderterflächen, ${tens} Zehnerstangen und ${ones} Einerpunkte.${hasChange ? ` Veränderung ${operation}: ${changeHundreds} Hunderterflächen, ${changeTens} Zehnerstangen und ${changeOnes} Einerpunkte.` : ''}`}>
+        {hasChange && <strong>Ausgangszahl</strong>}
+        {material([hundreds, tens, ones], 'start')}
+        {hasChange && <><strong>{operation} Veränderungsmenge</strong>{material([changeHundreds, changeTens, changeOnes], 'change')}</>}
       </div>
     )
   }

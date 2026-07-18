@@ -36,6 +36,23 @@ export function analyzeWrongAnswer(exercise: Exercise, rawAnswer: string): Misco
     if (answer * Number(values.divisor) !== Number(values.dividend)) return feedbackFor(exercise, 'division-incomplete-partition')
     return feedbackFor(exercise, 'division-operation-choice')
   }
+  if (exercise.skillId === 'addition-1000' && Number.isFinite(answer)) {
+    if (answer < Number(values.first)) return feedbackFor(exercise, 'addition-1000-bridge-direction')
+    if (answer === Number(values.bridge)) return feedbackFor(exercise, 'addition-1000-bridge-omitted')
+    if (Math.abs(answer - correct) <= 10) return feedbackFor(exercise, 'addition-1000-rest-step')
+    return feedbackFor(exercise, 'addition-1000-place-confusion')
+  }
+  if (exercise.skillId === 'subtraction-1000' && Number.isFinite(answer)) {
+    if (answer > Number(values.first)) return feedbackFor(exercise, 'subtraction-1000-operation-direction')
+    if (answer === Number(values.bridge)) return feedbackFor(exercise, 'subtraction-1000-bridge-omitted')
+    if (Math.abs(answer - correct) <= 10) return feedbackFor(exercise, 'subtraction-1000-rest-step')
+    return feedbackFor(exercise, 'subtraction-1000-place-confusion')
+  }
+  if (exercise.skillId === 'complement-1000' && Number.isFinite(answer)) {
+    if (answer < 0 || answer >= Number(values.target)) return feedbackFor(exercise, 'complement-1000-target-direction')
+    if (Math.abs(answer - correct) <= 10) return feedbackFor(exercise, 'complement-1000-counting-target')
+    return feedbackFor(exercise, 'complement-1000-bridge-step')
+  }
   if (exercise.skillId === 'place-value' && Number.isFinite(answer)) {
     if (answer === Number(values.digit) && answer !== correct) return feedbackFor(exercise, 'place-value-digit-as-value')
     return feedbackFor(exercise, 'place-value-column-confusion')

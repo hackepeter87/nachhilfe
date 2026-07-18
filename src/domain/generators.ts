@@ -1159,16 +1159,17 @@ function arithmetic1000Steps(
   values: Record<string, number | string>,
   bridge: number,
   answer: number,
-  bridgeUnit: 10 | 100
+  bridgeUnit: 10 | 100,
+  skill: 'addition' | 'subtraction'
 ): ExerciseStep[] {
   const content = getTaskCatalog().strategySteps.arithmetic1000
   return [{
     id: 'bridge',
     prompt: renderCatalogText(content.bridgePrompt, values),
     options: numberOptions(random, bridge, [
-      { value: bridge - bridgeUnit, misconception: 'Nachbarzahl in der falschen Richtung gewählt' },
-      { value: bridge + bridgeUnit, misconception: 'Einen Nachbar zu weit gegangen' },
-      { value: Number(values.first), misconception: 'Noch keinen Rechenschritt ausgeführt' }
+      { value: bridge - bridgeUnit, misconception: 'Nachbarzahl in der falschen Richtung gewählt', misconceptionId: `${skill}-1000-bridge-direction` },
+      { value: bridge + bridgeUnit, misconception: 'Einen Nachbar zu weit gegangen', misconceptionId: `${skill}-1000-bridge-direction` },
+      { value: Number(values.first), misconception: 'Noch keinen Rechenschritt ausgeführt', misconceptionId: `${skill}-1000-bridge-omitted` }
     ]),
     correctAnswer: String(bridge),
     errorFeedback: renderCatalogText(content.bridgeError, values),
@@ -1177,9 +1178,9 @@ function arithmetic1000Steps(
     id: 'result',
     prompt: renderCatalogText(content.resultPrompt, values),
     options: numberOptions(random, answer, [
-      { value: answer - 1, misconception: 'Einerfehler im Restschritt' },
-      { value: answer + 1, misconception: 'Einerfehler im Restschritt' },
-      { value: bridge, misconception: 'Nach dem Zwischenschritt aufgehört' }
+      { value: answer - 1, misconception: 'Einerfehler im Restschritt', misconceptionId: `${skill}-1000-rest-step` },
+      { value: answer + 1, misconception: 'Einerfehler im Restschritt', misconceptionId: `${skill}-1000-rest-step` },
+      { value: bridge, misconception: 'Nach dem Zwischenschritt aufgehört', misconceptionId: `${skill}-1000-bridge-omitted` }
     ]),
     correctAnswer: String(answer),
     errorFeedback: renderCatalogText(content.resultError, values),
@@ -1251,12 +1252,16 @@ function symmetry(seed: number, difficulty: Difficulty, focus?: string): Exercis
   })
 }
 
-function addition1000(seed: number, difficulty: Difficulty): Exercise {
+function addition1000(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+  const calculationLevel: Difficulty = phase === 'activate' ? 1
+    : phase === 'understand' || phase === 'guided-practice' ? 2
+      : phase === 'automate' || phase === 'transfer' ? 3
+        : difficulty
   let first: number
   let second: number
   let strategy: string
-  if (difficulty === 1) {
+  if (calculationLevel === 1) {
     if (random() < 0.5) {
       const hundreds = integer(random, 2, 7)
       second = integer(random, 1, 9 - hundreds) * 100
@@ -1269,7 +1274,7 @@ function addition1000(seed: number, difficulty: Difficulty): Exercise {
       first = hundreds * 100 + tens * 10
       strategy = `Rechne die Zehner: ${tens} Zehner plus ${second / 10} Zehner.`
     }
-  } else if (difficulty === 2) {
+  } else if (calculationLevel === 2) {
     const ones = integer(random, 6, 9)
     second = integer(random, 11 - ones, 9)
     first = integer(random, 2, 8) * 100 + integer(random, 1, 8) * 10 + ones
@@ -1281,22 +1286,65 @@ function addition1000(seed: number, difficulty: Difficulty): Exercise {
     strategy = `Zerlege ${second} so, dass du zuerst den nächsten Hunderter erreichst.`
   }
   const answer = first + second
-  const bridge = difficulty === 2 ? Math.ceil(first / 10) * 10 : difficulty === 3 ? Math.ceil(first / 100) * 100 : answer
-  const jumps = difficulty === 1 ? [] : numberLineJumps(bridge === answer ? [first, answer] : [first, bridge, answer])
-  const bridgeUnit = difficulty === 3 ? 100 : 10
-  const values = { first, second, answer, bridge, strategy }
+  const bridge = calculationLevel === 2 ? Math.ceil(first / 10) * 10 : calculationLevel === 3 ? Math.ceil(first / 100) * 100 : answer
+  const firstStep = bridge - first
+  const rest = second - firstStep
+  const jumps = calculationLevel === 1 ? numberLineJumps([first, answer]) : numberLineJumps([first, bridge, answer])
+  const bridgeUnit = calculationLevel === 3 ? 100 : 10
+  const values = { first, second, answer, bridge, firstStep, rest, strategy }
+  const shared = { ...base('addition-1000', seed, difficulty, values), ...contentFor('addition-1000', values, difficulty) }
+  const line = representation('addition-1000', difficulty, 'number-line', 'Rechenstrich mit Zwischenziel', { start: first, end: answer, marker: bridge, jumps }, ['end', 'marker', 'jumps'])
+  if (phase === 'activate') {
+    const changedPlace = second % 100 === 0 ? 'Hunderter' : 'Zehner'
+    return withMetadata({
+      ...shared, typeId: 'addition-1000-activate-place', subskillId: 'addition-1000-no-bridge',
+      prompt: `Welche Stelle verändert sich zuerst bei ${first} + ${second}?`, answerMode: 'choice', correctAnswer: changedPlace,
+      options: textOptions(random, changedPlace, [
+        { value: changedPlace === 'Hunderter' ? 'Zehner' : 'Hunderter', misconception: 'Die Stellen der beiden Summanden werden vermischt.', misconceptionId: 'addition-1000-place-confusion' },
+        { value: 'Einer', misconception: 'Die Einer werden verändert, obwohl ein voller Zehner oder Hunderter addiert wird.', misconceptionId: 'addition-1000-place-confusion' }
+      ]),
+      representation: representation('addition-1000', difficulty, 'place-value-material', 'Ausgangszahl als Stellenwertmaterial', {
+        hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10,
+        changeHundreds: Math.floor(second / 100), changeTens: Math.floor(second / 10) % 10, changeOnes: second % 10, operation: '+'
+      })
+    })
+  }
+  if (phase === 'understand') {
+    const split = `${firstStep} und ${rest}`
+    return withMetadata({
+      ...shared, typeId: 'addition-1000-understand-bridge', subskillId: 'addition-1000-ones-bridge',
+      prompt: `Wie zerlegst du ${second}, damit du von ${first} zuerst die nächste volle Zahl erreichst?`, answerMode: 'choice', correctAnswer: split,
+      options: textOptions(random, split, [
+        { value: `${Math.max(1, firstStep - 1)} und ${rest + 1}`, misconception: 'Der erste Schritt erreicht die volle Zahl nicht genau.', misconceptionId: 'addition-1000-bridge-direction' },
+        { value: `${rest} und ${firstStep}`, misconception: 'Die Teilstücke stimmen, aber das hilfreiche Zwischenziel wird nicht zuerst erreicht.', misconceptionId: 'addition-1000-bridge-direction' },
+        { value: `${firstStep} und ${Math.max(0, rest - 1)}`, misconception: 'Beim Zerlegen geht ein Teil des zweiten Summanden verloren.', misconceptionId: 'addition-1000-rest-step' }
+      ]), representation: line
+    })
+  }
+  if (phase === 'transfer') {
+    const correct = `${first} + ${firstStep} + ${rest}`
+    return withMetadata({
+      ...shared, typeId: 'addition-1000-transfer-strategy', subskillId: calculationLevel === 3 ? 'addition-1000-tens-bridge' : 'addition-1000-ones-bridge',
+      prompt: `Welcher Rechenweg nutzt für ${first} + ${second} ein hilfreiches Zwischenziel?`, answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `${first} + ${second} + ${rest}`, misconception: 'Der Rest wird doppelt addiert.', misconceptionId: 'addition-1000-rest-step' },
+        { value: `${first} − ${firstStep} + ${rest}`, misconception: 'Der erste Schritt geht in die falsche Richtung.', misconceptionId: 'addition-1000-bridge-direction' }
+      ]), representation: line
+    })
+  }
   return withMetadata({
-    ...base('addition-1000', seed, difficulty, values),
-    ...contentFor('addition-1000', values, difficulty),
-    typeId: 'addition-to-1000',
-    subskillId: difficulty === 1 ? 'addition-1000-no-bridge' : difficulty === 2 ? 'addition-1000-ones-bridge' : 'addition-1000-tens-bridge',
-    answerMode: difficulty === 1 ? 'number' : 'guided-choice',
+    ...shared,
+    typeId: phase === 'guided-practice' ? 'addition-1000-guided-bridge' : 'addition-to-1000',
+    subskillId: calculationLevel === 1 ? 'addition-1000-no-bridge' : calculationLevel === 2 ? 'addition-1000-ones-bridge' : 'addition-1000-tens-bridge',
+    answerMode: phase === 'guided-practice' || (!phase && calculationLevel > 1) ? 'guided-choice' : 'number',
     correctAnswer: String(answer),
-    steps: difficulty === 1 ? undefined : arithmetic1000Steps(random, values, bridge, answer, bridgeUnit),
-    representation: representation('addition-1000', difficulty, difficulty === 1 ? 'place-value' : 'number-line', 'Rechenweg in Teilschritten', {
-      start: first, end: answer, jumps,
-      hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10
-    }, difficulty === 1 ? ['result'] : ['end'])
+    steps: phase === 'guided-practice' || (!phase && calculationLevel > 1) ? arithmetic1000Steps(random, values, bridge, answer, bridgeUnit, 'addition') : undefined,
+    representation: calculationLevel === 1
+      ? representation('addition-1000', difficulty, 'place-value-material', 'Ausgangszahl und Veränderungsmenge als Stellenwertmaterial', {
+          hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10,
+          changeHundreds: Math.floor(second / 100), changeTens: Math.floor(second / 10) % 10, changeOnes: second % 10, operation: '+'
+        })
+      : line
   })
 }
 
@@ -1399,19 +1447,23 @@ function writtenAddition(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
-function subtraction1000(seed: number, difficulty: Difficulty): Exercise {
+function subtraction1000(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+  const calculationLevel: Difficulty = phase === 'activate' ? 1
+    : phase === 'understand' || phase === 'guided-practice' ? 3
+      : phase === 'automate' || phase === 'transfer' ? 3
+        : difficulty
   let first: number
   let second: number
   let strategy: string
   let bridge: number
   let bridgeUnit: 10 | 100 = 10
-  if (difficulty === 1) {
+  if (calculationLevel === 1) {
     first = integer(random, 4, 9) * 100
     second = integer(random, 1, Math.floor(first / 100) - 1) * 100
     bridge = first - second
     strategy = `Ziehe ${second / 100} Hunderter von ${first / 100} Hundertern ab.`
-  } else if (difficulty === 2) {
+  } else if (calculationLevel === 2) {
     const tens = integer(random, 4, 9)
     second = integer(random, 1, tens) * 10
     first = integer(random, 3, 9) * 100 + tens * 10 + integer(random, 0, 9)
@@ -1434,20 +1486,62 @@ function subtraction1000(seed: number, difficulty: Difficulty): Exercise {
     }
   }
   const answer = first - second
-  const jumps = difficulty === 1 ? [] : numberLineJumps(bridge === answer ? [first, answer] : [first, bridge, answer])
-  const values = { first, second, answer, bridge, strategy }
+  const firstStep = first - bridge
+  const rest = second - firstStep
+  const jumps = calculationLevel === 1 ? numberLineJumps([first, answer]) : numberLineJumps(bridge === answer ? [first, answer] : [first, bridge, answer])
+  const values = { first, second, answer, bridge, firstStep, rest, strategy }
+  const shared = { ...base('subtraction-1000', seed, difficulty, values), ...contentFor('subtraction-1000', values, difficulty) }
+  const line = representation('subtraction-1000', difficulty, 'number-line', 'Rechenstrich mit Zwischenziel', { start: first, end: answer, marker: bridge, jumps }, ['end', 'marker', 'jumps'])
+  if (phase === 'activate') {
+    return withMetadata({
+      ...shared, typeId: 'subtraction-1000-activate-direction', subskillId: 'subtraction-1000-hundreds',
+      prompt: `In welche Richtung verändert sich ${first}, wenn du ${second} abziehst?`, answerMode: 'choice', correctAnswer: 'Die Zahl wird kleiner.',
+      options: textOptions(random, 'Die Zahl wird kleiner.', [
+        { value: 'Die Zahl wird größer.', misconception: 'Minus wird als Vergrößern verstanden.', misconceptionId: 'subtraction-1000-operation-direction' },
+        { value: 'Die Zahl bleibt gleich.', misconception: 'Der Subtrahend wird nicht als Veränderung genutzt.', misconceptionId: 'subtraction-1000-bridge-omitted' }
+      ]),
+      representation: representation('subtraction-1000', difficulty, 'place-value-material', 'Ausgangszahl und Veränderungsmenge als Stellenwertmaterial', {
+        hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10,
+        changeHundreds: Math.floor(second / 100), changeTens: Math.floor(second / 10) % 10, changeOnes: second % 10, operation: '−'
+      })
+    })
+  }
+  if (phase === 'understand') {
+    const split = `${firstStep} und ${rest}`
+    return withMetadata({
+      ...shared, typeId: 'subtraction-1000-understand-bridge', subskillId: bridgeUnit === 10 ? 'subtraction-1000-ones-unbundling' : 'subtraction-1000-tens-unbundling',
+      prompt: `Wie zerlegst du ${second}, damit du von ${first} zuerst zur vollen Zahl zurückgehst?`, answerMode: 'choice', correctAnswer: split,
+      options: textOptions(random, split, [
+        { value: `${firstStep + 1} und ${Math.max(0, rest - 1)}`, misconception: 'Der erste Rücksprung geht an der vollen Zahl vorbei.', misconceptionId: 'subtraction-1000-bridge-direction' },
+        { value: `${rest} und ${firstStep}`, misconception: 'Die Teilstücke stimmen, aber das Zwischenziel wird nicht zuerst erreicht.', misconceptionId: 'subtraction-1000-bridge-direction' },
+        { value: `${firstStep} und ${rest + 1}`, misconception: 'Beim Zerlegen wird zu viel abgezogen.', misconceptionId: 'subtraction-1000-rest-step' }
+      ]), representation: line
+    })
+  }
+  if (phase === 'transfer') {
+    const probe = `${answer} + ${second} = ${first}`
+    return withMetadata({
+      ...shared, typeId: 'subtraction-1000-transfer-plus-check', subskillId: bridgeUnit === 10 ? 'subtraction-1000-ones-unbundling' : 'subtraction-1000-tens-unbundling',
+      prompt: `Welche Plusaufgabe prüft ${first} − ${second} = ${answer}?`, answerMode: 'choice', correctAnswer: probe,
+      options: textOptions(random, probe, [
+        { value: `${first} + ${second} = ${first + second}`, misconception: 'Die Ausgangszahl wird statt des Unterschieds ergänzt.', misconceptionId: 'subtraction-1000-operation-direction' },
+        { value: `${answer} + ${firstStep} = ${answer + firstStep}`, misconception: 'Nur der erste Teilschritt wird für die Probe genutzt.', misconceptionId: 'subtraction-1000-bridge-omitted' }
+      ]), representation: line
+    })
+  }
   return withMetadata({
-    ...base('subtraction-1000', seed, difficulty, values),
-    ...contentFor('subtraction-1000', values, difficulty),
-    typeId: 'subtraction-to-1000',
-    subskillId: difficulty === 1 ? 'subtraction-1000-hundreds' : difficulty === 2 ? 'subtraction-1000-no-unbundling' : bridgeUnit === 10 ? 'subtraction-1000-ones-unbundling' : 'subtraction-1000-tens-unbundling',
-    answerMode: difficulty === 3 ? 'guided-choice' : 'number',
+    ...shared,
+    typeId: phase === 'guided-practice' ? 'subtraction-1000-guided-bridge' : 'subtraction-to-1000',
+    subskillId: calculationLevel === 1 ? 'subtraction-1000-hundreds' : calculationLevel === 2 ? 'subtraction-1000-no-unbundling' : bridgeUnit === 10 ? 'subtraction-1000-ones-unbundling' : 'subtraction-1000-tens-unbundling',
+    answerMode: phase === 'guided-practice' || (!phase && calculationLevel === 3) ? 'guided-choice' : 'number',
     correctAnswer: String(answer),
-    steps: difficulty === 3 ? arithmetic1000Steps(random, values, bridge, answer, bridgeUnit) : undefined,
-    representation: representation('subtraction-1000', difficulty, difficulty === 1 ? 'place-value' : 'number-line', 'Rechenweg in Teilschritten', {
-      start: first, end: answer, jumps,
-      hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10
-    }, difficulty === 1 ? ['result'] : ['end'])
+    steps: phase === 'guided-practice' || (!phase && calculationLevel === 3) ? arithmetic1000Steps(random, values, bridge, answer, bridgeUnit, 'subtraction') : undefined,
+    representation: calculationLevel === 1
+      ? representation('subtraction-1000', difficulty, 'place-value-material', 'Ausgangszahl und Veränderungsmenge als Stellenwertmaterial', {
+          hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10,
+          changeHundreds: Math.floor(second / 100), changeTens: Math.floor(second / 10) % 10, changeOnes: second % 10, operation: '−'
+        })
+      : line
   })
 }
 
@@ -1552,27 +1646,77 @@ function writtenSubtraction(seed: number, difficulty: Difficulty): Exercise {
   })
 }
 
-function complement1000(seed: number, difficulty: Difficulty): Exercise {
+function complement1000(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
-  const targetUnit = difficulty === 1 ? 10 : 100
-  const target = difficulty === 1 ? integer(random, 12, 90) * 10 : integer(random, 2, 10) * 100
-  const gap = difficulty === 1 ? integer(random, 1, 9) : difficulty === 2 ? integer(random, 11, 59) : integer(random, 11, 79)
+  const calculationLevel: Difficulty = phase === 'activate' ? 1
+    : phase === 'understand' || phase === 'guided-practice' ? 2
+      : phase === 'automate' || phase === 'transfer' ? 3
+        : difficulty
+  const targetUnit = calculationLevel === 1 ? 10 : 100
+  const target = calculationLevel === 1 ? integer(random, 12, 90) * 10 : integer(random, 2, 10) * 100
+  const gap = calculationLevel === 1 ? integer(random, 1, 9) : calculationLevel === 2 ? integer(random, 11, 59) : integer(random, 11, 79)
   const first = target - gap
   const answer = target - first
   const nextTen = Math.ceil(first / 10) * 10
   const jumps = nextTen > first && nextTen < target ? numberLineJumps([first, nextTen, target]) : numberLineJumps([first, target])
-  const strategy = difficulty === 3
+  const strategy = calculationLevel === 3
     ? `Ergänze erst ${nextTen - first} bis ${nextTen} und dann ${target - nextTen} bis ${target}.`
     : `Der Abstand von ${first} bis ${target} ist ${answer}.`
-  const values = { first, target, answer, strategy }
+  const firstStep = nextTen - first
+  const rest = target - nextTen
+  const values = { first, target, answer, nextTen, firstStep, rest, strategy }
+  const shared = { ...base('complement-1000', seed, difficulty, values), ...contentFor('complement-1000', values, difficulty) }
+  const line = representation('complement-1000', difficulty, 'number-line', 'Ergänzen auf dem Rechenstrich', { start: first, end: target, marker: nextTen, jumps }, ['end', 'marker', 'jumps'])
+  if (phase === 'activate') {
+    return withMetadata({
+      ...shared, typeId: 'complement-1000-activate-target', subskillId: 'complement-next-ten',
+      prompt: `Welche volle Zahl kommt nach ${first}?`, answerMode: 'choice', correctAnswer: String(target),
+      options: numberOptions(random, target, [
+        { value: target - 10, misconception: 'Die volle Zahl vor der Startzahl wurde gewählt.', misconceptionId: 'complement-1000-target-direction' },
+        { value: target + 10, misconception: 'Eine volle Zahl wurde übersprungen.', misconceptionId: 'complement-1000-target-direction' }
+      ]), representation: line
+    })
+  }
+  if (phase === 'understand') {
+    const split = `${firstStep} und ${rest}`
+    return withMetadata({
+      ...shared, typeId: 'complement-1000-understand-split', subskillId: 'complement-next-hundred',
+      prompt: `Wie kannst du den Weg von ${first} bis ${target} in zwei hilfreiche Schritte zerlegen?`, answerMode: 'choice', correctAnswer: split,
+      options: textOptions(random, split, [
+        { value: `${firstStep + 1} und ${Math.max(0, rest - 1)}`, misconception: 'Der erste Schritt endet nicht am nächsten Zehner.', misconceptionId: 'complement-1000-bridge-step' },
+        { value: `${rest} und ${firstStep}`, misconception: 'Die Teilstücke stimmen, aber der nächste Zehner wird nicht zuerst erreicht.', misconceptionId: 'complement-1000-bridge-step' },
+        { value: `${firstStep} und ${rest + 10}`, misconception: 'Der Abstand bis zur Zielzahl wird zu groß gezählt.', misconceptionId: 'complement-1000-counting-target' }
+      ]), representation: line
+    })
+  }
+  if (phase === 'guided-practice') {
+    const steps: ExerciseStep[] = [{
+      id: 'next-ten', prompt: 'Welche Zahl erreichst du mit dem ersten kleinen Sprung?', interaction: 'guided-number', correctAnswer: String(nextTen),
+      errorFeedback: 'Ergänze nur die Einer bis zum nächsten vollen Zehner.', successFeedback: 'Der erste Sprung endet am nächsten Zehner.'
+    }, {
+      id: 'distance', prompt: `Wie viel fehlt insgesamt von ${first} bis ${target}?`, interaction: 'guided-number', correctAnswer: String(answer),
+      errorFeedback: 'Addiere die Länge beider Sprünge, nicht ihre Zielzahlen.', successFeedback: 'Beide Sprünge ergeben zusammen den gesuchten Abstand.'
+    }]
+    return withMetadata({ ...shared, typeId: 'complement-1000-guided-steps', subskillId: 'complement-next-hundred', answerMode: 'guided-number', correctAnswer: String(answer), steps, representation: line })
+  }
+  if (phase === 'transfer') {
+    const equation = `${first} + ${answer} = ${target}`
+    return withMetadata({
+      ...shared, typeId: 'complement-1000-transfer-equation', subskillId: 'complement-next-hundred',
+      prompt: `Welche Plusaufgabe prüft den Abstand von ${first} bis ${target}?`, answerMode: 'choice', correctAnswer: equation,
+      options: textOptions(random, equation, [
+        { value: `${target} + ${answer} = ${target + answer}`, misconception: 'Die Zielzahl wird statt der Startzahl ergänzt.', misconceptionId: 'complement-1000-target-direction' },
+        { value: `${first} + ${target} = ${first + target}`, misconception: 'Start und Ziel werden addiert statt der Abstand ergänzt.', misconceptionId: 'complement-1000-counting-target' }
+      ]), representation: line
+    })
+  }
   return withMetadata({
-    ...base('complement-1000', seed, difficulty, values),
-    ...contentFor('complement-1000', values, difficulty),
+    ...shared,
     typeId: 'complement-to-full-number',
     subskillId: targetUnit === 10 ? 'complement-next-ten' : 'complement-next-hundred',
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('complement-1000', difficulty, 'number-line', 'Ergänzen auf dem Rechenstrich', { start: first, end: target, marker: first, jumps }, ['jumps'])
+    representation: line
   })
 }
 
@@ -2639,11 +2783,11 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'neighbor-hundreds': return neighbors(seed, difficulty, 100, phase)
     case 'round-tens': return rounding(seed, difficulty, 10)
     case 'round-hundreds': return rounding(seed, difficulty, 100)
-    case 'addition-1000': return addition1000(seed, difficulty)
+    case 'addition-1000': return addition1000(seed, difficulty, phase)
     case 'written-addition': return writtenAddition(seed, difficulty)
-    case 'subtraction-1000': return subtraction1000(seed, difficulty)
+    case 'subtraction-1000': return subtraction1000(seed, difficulty, phase)
     case 'written-subtraction': return writtenSubtraction(seed, difficulty)
-    case 'complement-1000': return complement1000(seed, difficulty)
+    case 'complement-1000': return complement1000(seed, difficulty, phase)
     case 'money': return money(seed, difficulty)
     case 'lengths': return lengths(seed, difficulty)
     case 'word-problem': return wordProblem(seed, difficulty)

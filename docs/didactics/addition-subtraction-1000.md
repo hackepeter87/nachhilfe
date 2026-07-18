@@ -17,15 +17,15 @@ Hunderter/Zehner/Einer sortieren, zum nächsten vollen Wert ergänzen und Restsc
 ## 8. Geeignete Darstellungen
 Stellenwertmaterial und Rechenstrich mit mathematisch lückenlosen Sprüngen.
 ## 9. Lernprogression
-Gleiche Stellen ohne Übergang; Einerübergang über den nächsten Zehner; Zehnerübergang über den nächsten Hunderter beziehungsweise Ergänzen über Zwischenzehner.
+Die Aktivierung klärt Stellenwert, Rechenrichtung beziehungsweise volle Zielzahl. Beim Verstehen wird der zweite Summand, der Subtrahend oder der Abstand passend zum vollen Zwischenziel zerlegt. Danach folgen geführte Teilschritte, selbstständige Rechnung, Abruf ohne Zeitdruck und Transfer über Strategiewahl oder Umkehraufgabe. Zahlenbereiche allein definieren keine Lernphase.
 ## 10. Aufgabentypen
-Addition, Subtraktion und Ergänzen zum nächsten Zehner/Hunderter als getrennte Generatoren. Übergangsaufgaben prüfen zuerst die volle Zwischenzahl und danach das Ergebnis.
+Addition, Subtraktion und Ergänzen zum nächsten Zehner/Hunderter bleiben getrennte Generatoren, verwenden aber denselben phasenspezifischen Vertrag. Übergangsaufgaben prüfen zuerst die volle Zwischenzahl und danach das Ergebnis. Im Transfer wird ein Rechenweg beziehungsweise eine passende Umkehraufgabe aktiv ausgewählt.
 ## 11. Hilfestufen
 Veränderte Stelle markieren; Zwischenziel nennen; Sprünge sichtbar machen.
 ## 12. Remediation
 Nur eine Stelle mit Material verändern und danach den zweiten Schritt ergänzen.
 ## 13. Transfer
-Zwei Rechenwege vergleichen oder Ergebnis durch Überschlag plausibilisieren.
+Addition vergleicht Zwischenzielwege, Subtraktion nutzt die Addition als Probe und Ergänzen bildet die passende Plusaufgabe.
 ## 14. Wiederholung
 Unterkompetenzen ohne Übergang, Einerübergang und Zehnerübergang werden getrennt gespeichert.
 ## 15. Erfolgskriterien

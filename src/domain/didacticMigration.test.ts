@@ -5,7 +5,8 @@ import type { LearningPhase, SkillId } from './types'
 
 const migratedSkills: SkillId[] = [
   'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
-  'neighbor-tens', 'neighbor-hundreds', 'time', 'combinatorics', 'patterns'
+  'neighbor-tens', 'neighbor-hundreds', 'time', 'combinatorics', 'patterns',
+  'addition-1000', 'subtraction-1000', 'complement-1000'
 ]
 
 describe('didaktisch migrierte Lernhandlungen', () => {
@@ -132,6 +133,52 @@ describe('didaktisch migrierte Lernhandlungen', () => {
             expect(Number(exercise.variant.values.divisor)).toBeLessThanOrEqual(10)
             expect(Number(exercise.variant.values.quotient)).toBeLessThanOrEqual(10)
             expect(Number(exercise.variant.values.divisor) * Number(exercise.variant.values.quotient)).toBe(Number(exercise.variant.values.dividend))
+          }
+        }
+      }
+    }
+  })
+
+  it('baut Rechenstrategien bis 1000 über Grundlage, Zwischenziel, Übung und Transfer auf', () => {
+    const phases: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+    for (const skillId of ['addition-1000', 'subtraction-1000', 'complement-1000'] as const) {
+      const exercises = phases.map((phase) => generateExercise(skillId, 271, phase === 'automate' || phase === 'transfer' ? 3 : phase === 'independent-practice' ? 2 : 1, undefined, phase))
+      expect(new Set(exercises.map((exercise) => exercise.typeId)).size, skillId).toBeGreaterThanOrEqual(5)
+      expect(exercises.map((exercise) => exercise.learningAction)).toEqual([
+        'recall-foundation', 'inspect-relationship', 'solve-with-structure', 'solve-independently', 'retrieve-without-time-pressure', 'apply-in-new-context'
+      ])
+      expect(exercises[0]?.representation?.visibility).toBe('always')
+      if (skillId !== 'complement-1000') {
+        expect(exercises[0]?.representation?.values.operation).toBe(skillId === 'addition-1000' ? '+' : '−')
+        expect(Number(exercises[0]?.representation?.values.changeHundreds) * 100 + Number(exercises[0]?.representation?.values.changeTens) * 10 + Number(exercises[0]?.representation?.values.changeOnes)).toBe(Number(exercises[0]?.variant.values.second))
+      }
+      expect(exercises[1]?.representation?.valueRoles.unknownValues).toEqual(expect.arrayContaining(['end', 'marker', 'jumps']))
+      expect(exercises[2]?.steps?.length).toBeGreaterThanOrEqual(2)
+      expect(exercises[3]?.answerMode).toBe('number')
+      expect(exercises[4]?.answerMode).toBe('number')
+      expect(exercises[5]?.answerMode).toBe('choice')
+    }
+  })
+
+  it('hält alle phasenspezifischen Rechenwege über 1.000 Seeds korrekt und eindeutig', () => {
+    const phases: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+    for (const phase of phases) {
+      const difficulty = phase === 'automate' || phase === 'transfer' ? 3 : phase === 'independent-practice' ? 2 : 1
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        for (const skillId of ['addition-1000', 'subtraction-1000', 'complement-1000'] as const) {
+          const exercise = generateExercise(skillId, seed, difficulty, undefined, phase)
+          const first = Number(exercise.variant.values.first)
+          const answer = Number(exercise.variant.values.answer)
+          expect(answer, `${skillId}/${phase}/${seed}`).toBeGreaterThanOrEqual(0)
+          expect(answer, `${skillId}/${phase}/${seed}`).toBeLessThanOrEqual(1_000)
+          if (skillId === 'addition-1000') expect(answer).toBe(first + Number(exercise.variant.values.second))
+          if (skillId === 'subtraction-1000') expect(answer).toBe(first - Number(exercise.variant.values.second))
+          if (skillId === 'complement-1000') expect(answer).toBe(Number(exercise.variant.values.target) - first)
+          const optionGroups = [exercise.options ?? [], ...exercise.steps?.map((step) => step.options ?? []) ?? []]
+          optionGroups.forEach((options) => expect(new Set(options.map((option) => option.value)).size, `${skillId}/${phase}/${seed}`).toBe(options.length))
+          if (exercise.representation?.kind === 'number-line') {
+            expect(exercise.representation.valueRoles.unknownValues).toEqual(expect.arrayContaining(['end', 'marker', 'jumps']))
+            expect(exercise.representation.valueRoles.revealedValues).toEqual([])
           }
         }
       }

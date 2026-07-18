@@ -265,17 +265,26 @@ describe('ExerciseCard', () => {
     const user = userEvent.setup()
     const exercise = generateExercise('addition-1000', 42, 2)
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
-    expect(screen.queryByRole('img', { name: 'Rechenweg in Teilschritten' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Rechenstrich mit Zwischenziel' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /tipp/i }))
-    const representation = screen.getByRole('img', { name: /Rechenweg in Teilschritten/ })
+    const representation = screen.getByRole('img', { name: /Rechenstrich mit Zwischenziel/ })
     expect(representation).toBeVisible()
     const jumps = exercise.representation?.values.jumps
     expect(Array.isArray(jumps)).toBe(true)
     if (!Array.isArray(jumps)) throw new Error('Sprünge fehlen')
-    jumps.forEach((jump) => {
-      if (typeof jump === 'number') throw new Error('Ungültiger Zahlenstrahlsprung')
-      expect(screen.getByLabelText(`Rechenschritt ${jump.label} zu einem unbekannten Wert`)).toBeVisible()
-    })
+    expect(screen.getAllByLabelText('Rechenschritt unbekannt zu einem unbekannten Wert')).toHaveLength(jumps.length)
+  })
+
+  it('startet phasenspezifische Rechenstrategien bis 1000 ohne vorausgewählte Antwort', () => {
+    for (const skillId of ['addition-1000', 'subtraction-1000', 'complement-1000'] as const) {
+      const exercise = generateExercise(skillId, 73, 1, undefined, 'activate')
+      const { unmount } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+      expect(screen.getByRole('img')).toBeVisible()
+      for (const option of exercise.options ?? []) {
+        expect(screen.getByRole('button', { name: option.label })).toHaveAttribute('data-answer-state', 'idle')
+      }
+      unmount()
+    }
   })
 
   it('prüft Zwischenstation und Ergebnis bei einem Stellenübergang', async () => {

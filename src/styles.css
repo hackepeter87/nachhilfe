@@ -592,6 +592,8 @@ p {
 .ten-frame-dot--filled::after { width: 13px; height: 13px; border-radius: 50%; background: #c84f2c; content: ''; }
 .ten-frame-dot--unknown { background: repeating-linear-gradient(135deg, #eef7fb, #eef7fb 5px, #d8edf6 5px, #d8edf6 10px); }
 .place-material { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.place-material-stack { display: grid; gap: 8px; }
+.place-material-stack > strong { color: #315d45; font-size: .78rem; }
 .place-material section { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 8px; border: 1px solid #b8cabd; background: #fff; text-align: center; }
 .place-material section > div { display: flex; flex-wrap: wrap; justify-content: center; align-content: start; gap: 4px; min-height: 46px; }
 .hundred-flat { width: 27px; height: 27px; border: 1px solid #315d45; background: repeating-linear-gradient(0deg, transparent 0 4px, #8fc5ae 4px 5px), repeating-linear-gradient(90deg, #dceee3 0 4px, #8fc5ae 4px 5px); }

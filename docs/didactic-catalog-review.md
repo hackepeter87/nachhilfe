@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.22.0, Katalog 0.21.0, Schema 18, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.23.0, Katalog 0.22.0, Schema 18, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -25,7 +25,9 @@ Stand: App 0.22.0, Katalog 0.21.0, Schema 18, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.22.0
+## Aktive Veränderungen bis 0.23.0
+
+- App 0.23.0, Katalog 0.22.0 und Schema 18: Addition, Subtraktion und Ergänzen bis 1000 verwenden sechs phasenspezifische Lernhandlungen, gemeinsame maskierte Zwischenzielmodelle und katalogisierte Fehlvorstellungsrouten. Details stehen in `docs/didactic-migration-0.23.0.md`.
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.

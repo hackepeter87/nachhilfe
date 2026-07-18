@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Rechenstrategien bis 1000 in Version 0.23.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Addition, Subtraktion und Ergänzen bis 1000 wurden als gemeinsamer Strategie-Strang auf den Qualitätsstandard ab 0.21 migriert.
+- Alle sechs Lernphasen besitzen unterschiedliche mathematische Handlungen: Stelle oder Richtung aktivieren, Zwischenziel und Zerlegung verstehen, Teilschritte geführt ausführen, selbstständig rechnen, ohne Zeitdruck abrufen und Strategie beziehungsweise Umkehraufgabe übertragen.
+- Rechenstriche führen bekannte Startwerte, aber maskieren Zwischenziel, Sprünge und Ergebnis. Stellenwertmaterial zeigt in der Aktivierung nur die bekannte Ausgangszahl und verrät keine Ergebnismenge.
+- Katalogisierte Fehlvorstellungsrouten unterscheiden Stellenverwechslung, falsche Rechenrichtung, verfehltes Zwischenziel, ausgelassenen Rest und Mitzählen der Zielzahl.
+- Katalog 0.22.0 bleibt bei Schema 18. Mehrere gleichzeitige Übergänge und schriftliche Notation als Einstieg bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 387 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.23.0-local` beziehungsweise `mathe-reise:local` (`sha256:0dda9cec88682845867d074dc5d428383bd7f1e051c89db88c2c3796f732539d`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8083`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Multiplikatives Denken 0.22.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Multiplikation und Division wurden als zusammenhängender Begriffsstrang auf den Qualitätsstandard ab 0.21 migriert.

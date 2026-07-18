@@ -1,6 +1,6 @@
 {
   "schemaVersion": 18,
-  "catalogVersion": "0.21.0",
+  "catalogVersion": "0.22.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -2169,7 +2169,31 @@
       "supportGoal": "Einfache Additionen bis 1000 über Stellenwerte und Teilschritte lösen.",
       "misconceptions": [
         "Stellen werden vermischt.",
-        "Beim Übergang wird der Rest vergessen."
+        "Beim Übergang wird der Rest vergessen.",
+        "Das Zwischenziel liegt in der falschen Richtung.",
+        "Nach dem Zwischenziel wird aufgehört."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "addition-1000-place-confusion",
+          "misconception": "Stellen werden vermischt.",
+          "feedback": "Ordne zuerst beide Zahlen in Hunderter, Zehner und Einer. Verändere nur die Stelle, zu der der zweite Summand gehört."
+        },
+        {
+          "id": "addition-1000-bridge-direction",
+          "misconception": "Das Zwischenziel liegt in der falschen Richtung.",
+          "feedback": "Beim Addieren gehst du vorwärts. Der erste Teilschritt endet genau am nächsten vollen Zehner oder Hunderter."
+        },
+        {
+          "id": "addition-1000-rest-step",
+          "misconception": "Beim Übergang wird der Rest vergessen.",
+          "feedback": "Prüfe deine Zerlegung: erster Schritt und Rest müssen zusammen genau den zweiten Summanden ergeben."
+        },
+        {
+          "id": "addition-1000-bridge-omitted",
+          "misconception": "Nach dem Zwischenziel wird aufgehört.",
+          "feedback": "Das Zwischenziel ist nur der erste Schritt. Addiere danach noch den übrigen Teil."
+        }
       ],
       "hints": [
         "Verändere zuerst nur die Stelle von {second}.",
@@ -2259,31 +2283,31 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "An Stellenwertmaterial erkennen, welche Stelle durch einen vollen Zehner oder Hunderter verändert wird.",
           "exerciseTypes": [
-            "addition-1000:entry"
+            "addition-1000:activate-place"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Den zweiten Summanden so zerlegen, dass zuerst ein hilfreiches volles Zwischenziel erreicht wird.",
           "exerciseTypes": [
-            "addition-1000:representation"
+            "addition-1000:understand-bridge"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Einen Stellenübergang mit geprüftem Zwischenziel und Restschritt ausführen.",
           "exerciseTypes": [
-            "addition-1000:difficulty-1"
+            "addition-1000:guided-bridge"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "goal": "Eine Addition mit genau einem Übergang selbstständig lösen.",
           "exerciseTypes": [
             "addition-1000:difficulty-2"
           ],
@@ -2291,7 +2315,7 @@
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Additionen mit genau einem Zehner- oder Hunderterübergang ohne sichtbare Teilschritte lösen.",
           "exerciseTypes": [
             "addition-1000:difficulty-3"
           ],
@@ -2299,11 +2323,11 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Einen passenden Zwischenzielweg auswählen und seine Teilstücke prüfen.",
           "exerciseTypes": [
-            "addition-1000:difficulty-3"
+            "addition-1000:transfer-strategy"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         }
       ],
       "successCriteria": [
@@ -2475,7 +2499,37 @@
       "supportGoal": "Einfache Subtraktionen bis 1000 stellenweise und über Ergänzen lösen.",
       "misconceptions": [
         "Stellen werden vertauscht.",
-        "Die Zahl wird beim Minusrechnen größer."
+        "Die Zahl wird beim Minusrechnen größer.",
+        "Der Rücksprung verfehlt das volle Zwischenziel.",
+        "Der Restschritt wird falsch gebildet.",
+        "Nach dem Zwischenziel wird aufgehört."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "subtraction-1000-place-confusion",
+          "misconception": "Stellen werden vertauscht.",
+          "feedback": "Ordne Hunderter, Zehner und Einer. Ziehe jede Menge nur von derselben Stelle ab."
+        },
+        {
+          "id": "subtraction-1000-operation-direction",
+          "misconception": "Die Zahl wird beim Minusrechnen größer.",
+          "feedback": "Beim Subtrahieren gehst du von der Ausgangszahl zurück. Das Ergebnis muss kleiner als die Ausgangszahl sein."
+        },
+        {
+          "id": "subtraction-1000-bridge-direction",
+          "misconception": "Der Rücksprung verfehlt das volle Zwischenziel.",
+          "feedback": "Zerlege den Subtrahenden so, dass der erste Rücksprung genau am vorherigen vollen Zehner oder Hunderter endet."
+        },
+        {
+          "id": "subtraction-1000-rest-step",
+          "misconception": "Der Restschritt wird falsch gebildet.",
+          "feedback": "Erster Rücksprung und Rest müssen zusammen genau den Subtrahenden ergeben."
+        },
+        {
+          "id": "subtraction-1000-bridge-omitted",
+          "misconception": "Nach dem Zwischenziel wird aufgehört.",
+          "feedback": "Das Zwischenziel ist noch nicht das Ergebnis. Gehe danach den restlichen Teil zurück."
+        }
       ],
       "hints": [
         "Verändere zuerst nur die Stelle von {second}.",
@@ -2565,31 +2619,31 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Am Stellenwertmaterial die Richtung einer Subtraktion sicher bestimmen.",
           "exerciseTypes": [
-            "subtraction-1000:entry"
+            "subtraction-1000:activate-direction"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Den Subtrahenden für ein hilfreiches volles Zwischenziel passend zerlegen.",
           "exerciseTypes": [
-            "subtraction-1000:representation"
+            "subtraction-1000:understand-bridge"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Einen Stellenübergang mit geprüftem Zwischenziel und Restschritt ausführen.",
           "exerciseTypes": [
-            "subtraction-1000:difficulty-1"
+            "subtraction-1000:guided-bridge"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "goal": "Eine Subtraktion mit höchstens einem Übergang selbstständig lösen.",
           "exerciseTypes": [
             "subtraction-1000:difficulty-2"
           ],
@@ -2597,7 +2651,7 @@
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Subtraktionen mit genau einem Übergang ohne sichtbare Teilschritte lösen.",
           "exerciseTypes": [
             "subtraction-1000:difficulty-3"
           ],
@@ -2605,11 +2659,11 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Das Ergebnis mit der passenden Addition als Umkehraufgabe prüfen.",
           "exerciseTypes": [
-            "subtraction-1000:difficulty-3"
+            "subtraction-1000:transfer-plus-check"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         }
       ],
       "successCriteria": [
@@ -2783,7 +2837,26 @@
       "supportGoal": "Zum nächsten Zehner oder Hunderter ergänzen.",
       "misconceptions": [
         "Die volle Zielzahl wird mitgezählt.",
-        "Die Differenz wird in falscher Richtung gebildet."
+        "Die Differenz wird in falscher Richtung gebildet.",
+        "Die Zielzahl wird in der falschen Richtung gewählt.",
+        "Das Zwischenziel wird nicht genau erreicht."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "complement-1000-target-direction",
+          "misconception": "Die Zielzahl wird in der falschen Richtung gewählt.",
+          "feedback": "Gesucht ist eine größere volle Zielzahl. Gehe von der Startzahl vorwärts."
+        },
+        {
+          "id": "complement-1000-counting-target",
+          "misconception": "Die volle Zielzahl wird mitgezählt.",
+          "feedback": "Zähle die Schritte zwischen Start und Ziel. Die Zielzahl selbst ist kein zusätzlicher Schritt."
+        },
+        {
+          "id": "complement-1000-bridge-step",
+          "misconception": "Das Zwischenziel wird nicht genau erreicht.",
+          "feedback": "Ergänze zuerst nur die Einer bis zum nächsten Zehner. Danach gehst du in vollen Zehnerschritten weiter."
+        }
       ],
       "hints": [
         "Gehe von {first} aus bis zur nächsten vollen Zahl.",
@@ -2872,31 +2945,31 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Die nächste größere volle Zielzahl zu einer Startzahl bestimmen.",
           "exerciseTypes": [
-            "complement-1000:entry"
+            "complement-1000:activate-target"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Den Abstand über den nächsten Zehner in zwei lückenlose Schritte zerlegen.",
           "exerciseTypes": [
-            "complement-1000:representation"
+            "complement-1000:understand-split"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Zwischenziel und gesamten Abstand nacheinander bestimmen.",
           "exerciseTypes": [
-            "complement-1000:difficulty-1"
+            "complement-1000:guided-steps"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "goal": "Zum nächsten Hunderter selbstständig ergänzen.",
           "exerciseTypes": [
             "complement-1000:difficulty-2"
           ],
@@ -2904,7 +2977,7 @@
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Abstände bis zum nächsten Hunderter sicher und ohne Zeitdruck bestimmen.",
           "exerciseTypes": [
             "complement-1000:difficulty-3"
           ],
@@ -2912,11 +2985,11 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Den Abstand mit einer passenden Plusaufgabe prüfen.",
           "exerciseTypes": [
-            "complement-1000:difficulty-3"
+            "complement-1000:transfer-equation"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         }
       ],
       "successCriteria": [
