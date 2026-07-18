@@ -145,7 +145,8 @@ function selectSubskill(skillId: SkillId, progress: ProgressMap, seed: number, d
       : skillId === 'multiplication'
         ? (difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]).map((row) => `times-${row}`)
         : skillId === 'division'
-          ? (difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]).map((row) => `division-by-${row}`)
+          ? (difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9])
+              .flatMap((row) => [`division-grouping-by-${row}`, `division-sharing-by-${row}`])
           : []
   if (candidates.length === 0) return undefined
   const random = seededRandom(seed)

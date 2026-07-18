@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.21.0, Katalog 0.20.0, Schema 18, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.22.0, Katalog 0.21.0, Schema 18, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 ## Feldmatrix
 
@@ -25,7 +25,7 @@ Stand: App 0.21.0, Katalog 0.20.0, Schema 18, Status ready-for-review. Diese Dat
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.21.0
+## Aktive Veränderungen bis 0.22.0
 
 - Stellenwert Stufe 3: Ziffer bestimmen, danach Wert der Ziffer bestimmen.
 - Runden Stufe 2: Nachbarzahlen und Rundungsergebnis; Stufe 3 zusätzlich Begründung.
@@ -57,6 +57,7 @@ Stand: App 0.21.0, Katalog 0.20.0, Schema 18, Status ready-for-review. Diese Dat
 - App 0.20.0, Katalog 0.19.0 und Schema 17: Die Sitzungsplanung wählt je einen Fokus aus Zahlen, Größen, Daten und Geometrie. Eine automatisch erzeugte Curriculum-Matrix und ein 1.000-Seed-Test je aktiver Kompetenz und Stufe sichern den Abgleich; neue mathematische Kompetenzen kommen nicht hinzu.
 - App 0.20.1, Katalog 0.19.1 und Schema 17: Produktive Symmetrie verwendet nur Phasen 1 bis 3 mit Achsen zwischen Zellen. Division trennt vollständiges Gruppieren und Verteilen. `scaffold`-Darstellungen und modellbezogene Tipps sind an den tatsächlich sichtbaren Hilfezustand gebunden.
 - App 0.21.0, Katalog 0.20.0 und Schema 18: Die erste Korrekturgruppe bindet Lernphasen an unterschiedliche Lernhandlungen. Addition/Subtraktion bis 20, Stellenwert, Zerlegen/Zusammensetzen, Nachbarzehner/-hunderter, Uhrzeit, Kombinatorik und Muster verwenden phasenspezifische Interaktionen und katalogisierte Fehlvorstellungsrouten. Der genaue Umfang und die bewusst offenen Auditbefunde stehen in `docs/didactic-migration-0.21.0.md`.
+- App 0.22.0, Katalog 0.21.0 und Schema 18: Multiplikation und Division folgen phasenspezifischen Lernhandlungen. Division führt Gruppieren und Verteilen als getrennte adaptive Unterkompetenzen; Aufgabenfamilien werden im Transfer tatsächlich bearbeitet. Details stehen in `docs/didactic-migration-0.22.0.md`.
 
 ## Bewusst deaktiviert
 

@@ -19,9 +19,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.20.0',
+      catalogVersion: '0.21.0',
       schemaVersion: 18,
-      appVersion: '0.21.0'
+      appVersion: '0.22.0'
     })
   })
 
@@ -54,7 +54,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.20.0')
+      expect(runningSession.catalogVersion).toBe('0.21.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -191,6 +191,28 @@ describe('Sitzungsplanung', () => {
     }
     expect(multiplicationSelections).toBeGreaterThan(additionSelections)
     expect(rowSevenSelections).toBeGreaterThan(0)
+  })
+
+  it('führt Gruppieren und Verteilen als getrennte adaptive Divisionsunterkompetenzen', () => {
+    const weakDivision = {
+      ...createSkillProgress('division'),
+      mastery: 18,
+      recentErrors: 2,
+      difficulty: 2 as const,
+      learningPhase: 'independent-practice' as const,
+      subskills: {
+        'division-grouping-by-4': { attempts: 5, correctAnswers: 1, hintsUsed: 2, mastery: 10, recentErrors: 3, lastPracticedAt: null },
+        'division-sharing-by-4': { attempts: 5, correctAnswers: 5, hintsUsed: 0, mastery: 92, recentErrors: 0, lastPracticedAt: new Date().toISOString() }
+      }
+    }
+    let groupingSelections = 0
+    let sharingSelections = 0
+    for (let seed = 1; seed <= 300; seed += 1) {
+      const warmups = createSessionPlan({ division: weakDivision }, seed).exercises.slice(0, 2)
+      groupingSelections += warmups.filter((exercise) => exercise.subskillId === 'division-grouping-by-4').length
+      sharingSelections += warmups.filter((exercise) => exercise.subskillId === 'division-sharing-by-4').length
+    }
+    expect(groupingSelections).toBeGreaterThan(sharingSelections)
   })
 
   it('bevorzugt einen schwachen Fokusbereich über viele Sitzungen', () => {

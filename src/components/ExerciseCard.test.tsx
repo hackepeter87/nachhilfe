@@ -156,6 +156,49 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
+  it('führt die multiplikative Aufgabenfamilie als zwei Transferhandlungen aus', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('multiplication', 120, 3, 'times-7', 'transfer')
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    const [commutative, inverse] = exercise.steps ?? []
+    if (!commutative || !inverse) throw new Error('Transferhandlungen fehlen')
+
+    await user.click(screen.getByRole('button', { name: commutative.correctAnswer }))
+    expect(screen.getByRole('heading', { name: new RegExp(inverse.prompt) })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: inverse.correctAnswer }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, subskillId: 'times-7' }))
+  })
+
+  it('trennt beim geführten Dividieren Arbeitsplan und Ergebnis', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('division', 125, 1, 'division-grouping-by-5', 'guided-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    const [relationship, result] = exercise.steps ?? []
+    if (!relationship || !result) throw new Error('Divisionsschritte fehlen')
+
+    expect(screen.getByRole('img', { name: /vollständig in gleich große Gruppen/ })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: relationship.correctAnswer }))
+    expect(screen.getByLabelText('Dein Ergebnis')).toHaveValue('')
+    await user.type(screen.getByLabelText('Dein Ergebnis'), result.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, subskillId: 'division-grouping-by-5' }))
+  })
+
+  it('reagiert bei Multiplikation auf das Addieren der Faktoren mit passender Hilfe', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('multiplication', 128, 2, 'times-4', 'independent-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const addedFactors = String(Number(exercise.variant.values.first) + Number(exercise.variant.values.second))
+
+    await user.type(screen.getByLabelText('Deine Antwort'), addedFactors)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(screen.getByText(/Faktoren addiert/)).toBeVisible()
+  })
+
   it('deckt eine unbekannte Darstellungsgröße erst nach richtiger Lösung auf', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('addition', 42, 1)

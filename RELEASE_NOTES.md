@@ -1,5 +1,16 @@
 # Mathe-Reise
 
+## Multiplikatives Denken 0.22.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Multiplikation und Division wurden als zusammenhängender Begriffsstrang auf den Qualitätsstandard ab 0.21 migriert.
+- Multiplikation führt von gleich großen Gruppen über wiederholte Addition und gestütztes Rechnen bis zur Tausch- und Umkehraufgabe. Division unterscheidet Gruppieren und Verteilen in Lernhandlung, Darstellung, Text und adaptiver Unterkompetenz.
+- Alle sechs Lernphasen erzeugen unterschiedliche mathematische Handlungen. Transfer besteht jeweils aus zwei tatsächlich bearbeiteten Schritten und nicht nur aus einem angezeigten Katalogtext.
+- Katalogisierte Fehlvorstellungskennungen steuern Rückmeldungen zu addierten Faktoren, ausgelassenen Gruppen, vertauschten Gruppenrollen und unvollständiger Aufteilung. Freie Eingaben werden nur bei robusten Mustern zugeordnet.
+- Katalog 0.21.0 bleibt bei Schema 18, weil keine neue Datenstruktur nötig war. Die zentrale Quelle, der öffentliche Katalog, der Fallback und die Curriculum-Matrix sind identisch.
+- Restdivision, schriftliche Multiplikation/Division und freie sprachliche Modellkonstruktion bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Typecheck, Lint, 381 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.22.0-local` beziehungsweise `mathe-reise:local` (`sha256:a33cdbc648eac0009ef51b23a13e213ce9f8db377f72c01df52c25df4d6b609a`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8082`. Podman war nicht installiert; WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Didaktische Korrekturgruppe 0.21.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Die sechs Lernphasen sind nun als konkrete Lernhandlungen und zulässige Interaktionen im Katalog modelliert; Generator und Runtime verwenden dieses Modell gemeinsam.

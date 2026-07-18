@@ -31,8 +31,7 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
     }
     const pairingOptions = page.locator('.pairing-option[aria-pressed="false"]')
     if (await pairingOptions.first().isVisible().catch(() => false)) {
-      const count = await pairingOptions.count()
-      for (let index = 0; index < count; index += 1) await pairingOptions.nth(index).click()
+      while (await pairingOptions.count() > 0) await pairingOptions.first().click()
       await page.getByRole('button', { name: 'Paarungen prüfen' }).click()
       continue
     }
@@ -154,9 +153,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.20.0',
+    catalogVersion: '0.21.0',
     schemaVersion: 18,
-    appVersion: '0.21.0'
+    appVersion: '0.22.0'
   })
 
   await page.reload()

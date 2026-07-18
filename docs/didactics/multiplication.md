@@ -17,9 +17,9 @@ Gruppenbild, wiederholte Addition, Malaufgabe; Tausch- und Nachbaraufgaben als s
 ## 8. Geeignete Darstellungen
 Gleich große Gruppen und strukturierte Punktefelder.
 ## 9. Lernprogression
-2er/5er/10er, danach 3er/4er/6er, schließlich 6er/7er/8er/9er.
+`activate`: gleich große Gruppen erkennen. `understand`: Gruppenbild und wiederholte Addition verbinden. `guided-practice`: mit sichtbarem Gruppenbild rechnen. `independent-practice`: Reihen 3/4/6 mit Darstellung auf Hilfe. `automate`: verstandene Reihen 6/7/8/9 ohne Zeitdruck abrufen. `transfer`: Tausch- und Umkehraufgabe derselben Aufgabenfamilie bilden.
 ## 10. Aufgabentypen
-Zahl eingeben; einzelne Reihen `times-n` besitzen eigenen Lernstand.
+Gruppenbeschreibung auswählen, wiederholte Addition zuordnen, Zahl eingeben und eine Aufgabenfamilie in zwei Schritten bilden. Einzelne Reihen `times-n` besitzen eigenen Lernstand.
 ## 11. Hilfestufen
 Gruppen benennen; wiederholte Summe bilden; Ergebnis am Gruppenbild erklären.
 ## 12. Remediation
@@ -31,6 +31,6 @@ Unsichere Reihen und kürzliche Fehler werden höher gewichtet, sichere Reihen b
 ## 15. Erfolgskriterien
 Korrekte Lösung mehrerer Varianten derselben Reihe ohne Zeitdruck und ohne vollständige Hilfe.
 ## 16. Grenzen der aktuellen Umsetzung
-Tausch- und Nachbaraufgaben sind methodisch vorgesehen, aber noch keine eigenen Aufgabenblöcke.
+Tausch- und Umkehraufgaben sind produktive Transferhandlungen. Ableitungsstrategien über Verdoppeln/Halbieren und Nachbarreihen werden in Hilfen genutzt, aber noch nicht als eigene freie Rechenwegkonstruktion erfasst.
 ## 17. Punkte für die Gesamtprüfung
 Reihenfolge der Reihen und Verständlichkeit der Gruppenbilder im Gesamtprodukt prüfen.

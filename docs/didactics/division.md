@@ -17,9 +17,9 @@ Die Gesamtmenge vollständig gruppieren oder verteilen, die jeweils unbekannte G
 ## 8. Geeignete Darstellungen
 Vollständiges Gruppierungsmodell, vollständiges Verteilmodell und Aufgabenfamilie. Eine einzelne Beispielgruppe reicht nicht als Darstellung des Aufteilungsprozesses.
 ## 9. Lernprogression
-Gruppieren und Verteilen durch 2/5/10 mit sichtbarem Modell, danach 3/4/6 mit Modell auf Hilfe, schließlich 6/7/8/9 mit Modell erst in der Remediation; stets ohne Rest.
+`activate`: anhand bekannter Größen bestimmen, was gesucht ist. `understand`: Gruppieren und Verteilen unterscheiden. `guided-practice`: Arbeitsplan wählen und vollständiges Modell auswerten. `independent-practice`: 3/4/6 mit Modell auf Hilfe. `automate`: verstandene Familien 6/7/8/9 ohne Zeitdruck abrufen. `transfer`: Malprobe und zweite Geteiltaufgabe bilden; stets ohne Rest.
 ## 10. Aufgabentypen
-Zahl eingeben; `division-by-n` wird adaptiv getrennt geführt; Generatoren wechseln deterministisch zwischen Gruppieren und Verteilen; Sachaufgaben nutzen das zum Kontext passende Modell.
+Rollen erkennen, Arbeitsplan wählen, Zahl eingeben und Aufgabenfamilie bilden. `division-grouping-by-n` und `division-sharing-by-n` werden adaptiv getrennt geführt; Sachaufgaben nutzen das zum Kontext passende Modell.
 ## 11. Hilfestufen
 Zuerst klären, ob Divisor Gruppengröße oder Gruppenanzahl bezeichnet. Danach die Gesamtmenge vollständig in gleich große Gruppen legen und die passende Malaufgabe suchen.
 ## 12. Remediation
@@ -31,6 +31,6 @@ Unsichere Divisoren werden häufiger und nach Abstand erneut ausgewählt.
 ## 15. Erfolgskriterien
 Ganzzahliges korrektes Ergebnis und passende Malprobe.
 ## 16. Grenzen der aktuellen Umsetzung
-Division mit Rest und freie sprachliche Modellwahl sind deaktiviert. Die beiden Grundvorstellungen werden aber getrennt erzeugt und dargestellt.
+Division mit Rest und freie sprachliche Modellkonstruktion sind deaktiviert. Die beiden Grundvorstellungen werden getrennt erzeugt, dargestellt, im Lernstand geführt und remediert.
 ## 17. Punkte für die Gesamtprüfung
 Prüfen, ob Gruppenanzahl und Gruppengröße sprachlich eindeutig bleiben.

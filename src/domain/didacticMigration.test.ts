@@ -4,7 +4,7 @@ import { generateExercise } from './generators'
 import type { LearningPhase, SkillId } from './types'
 
 const migratedSkills: SkillId[] = [
-  'addition', 'subtraction', 'place-value', 'decompose', 'compose',
+  'addition', 'subtraction', 'multiplication', 'division', 'place-value', 'decompose', 'compose',
   'neighbor-tens', 'neighbor-hundreds', 'time', 'combinatorics', 'patterns'
 ]
 
@@ -79,6 +79,62 @@ describe('didaktisch migrierte Lernhandlungen', () => {
       expect(pairing?.options).toHaveLength(Number(exercise.correctAnswer))
       expect([...pairing?.expectedSelections ?? []].sort().join('|')).toBe(pairing?.correctAnswer)
       expect(exercise.steps?.[1]?.id).toBe('count')
+    }
+  })
+
+  it('baut Multiplikation über Gruppen, wiederholte Addition und Aufgabenfamilien auf', () => {
+    const activate = generateExercise('multiplication', 221, 1, 'times-5', 'activate')
+    const understand = generateExercise('multiplication', 221, 1, 'times-5', 'understand')
+    const guided = generateExercise('multiplication', 221, 1, 'times-5', 'guided-practice')
+    const transfer = generateExercise('multiplication', 221, 3, 'times-7', 'transfer')
+
+    expect(activate.typeId).toBe('multiplication-activate-equal-groups')
+    expect(activate.representation).toMatchObject({ kind: 'groups', visibility: 'always' })
+    expect(understand.typeId).toBe('multiplication-understand-repeated-addition')
+    expect(understand.correctAnswer.split(' + ')).toHaveLength(Number(understand.variant.values.first))
+    expect(guided.typeId).toBe('small-multiplication')
+    expect(transfer.typeId).toBe('multiplication-transfer-fact-family')
+    expect(transfer.steps?.map((step) => step.id)).toEqual(['commutative', 'inverse'])
+    expect(transfer.steps?.every((step) => step.interaction === 'choose-strategy')).toBe(true)
+  })
+
+  it('trennt Division produktiv in Gruppieren und Verteilen', () => {
+    const grouping = generateExercise('division', 311, 2, 'division-grouping-by-4', 'guided-practice')
+    const sharing = generateExercise('division', 311, 2, 'division-sharing-by-4', 'guided-practice')
+
+    expect(grouping.typeId).toBe('division-guided-grouping')
+    expect(grouping.subskillId).toBe('division-grouping-by-4')
+    expect(grouping.representation?.kind).toBe('grouping-model')
+    expect(grouping.steps?.map((step) => step.id)).toEqual(['relationship', 'result'])
+    expect(sharing.typeId).toBe('division-guided-sharing')
+    expect(sharing.subskillId).toBe('division-sharing-by-4')
+    expect(sharing.representation?.kind).toBe('sharing-model')
+    expect(grouping.prompt).not.toBe(sharing.prompt)
+  })
+
+  it('erzeugt über 1.000 Seeds eindeutige multiplikative Lernhandlungen', () => {
+    const phases: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
+    for (const phase of phases) {
+      const difficulty = phase === 'independent-practice' ? 2 : phase === 'automate' || phase === 'transfer' ? 3 : 1
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        for (const skillId of ['multiplication', 'division'] as const) {
+          const exercise = generateExercise(skillId, seed, difficulty, undefined, phase)
+          const optionGroups = [exercise.options ?? [], ...exercise.steps?.map((step) => step.options ?? []) ?? []]
+          for (const options of optionGroups) expect(new Set(options.map((option) => option.value)).size, `${skillId}/${phase}/${seed}`).toBe(options.length)
+          for (const step of exercise.steps ?? []) {
+            if (step.options) expect(step.options.filter((option) => option.value === step.correctAnswer), `${skillId}/${phase}/${seed}/${step.id}`).toHaveLength(1)
+          }
+          if (skillId === 'multiplication') {
+            expect(Number(exercise.variant.values.first)).toBeLessThanOrEqual(10)
+            expect(Number(exercise.variant.values.second)).toBeLessThanOrEqual(10)
+            expect(Number(exercise.variant.values.first) * Number(exercise.variant.values.second)).toBe(Number(exercise.variant.values.answer))
+          } else {
+            expect(Number(exercise.variant.values.divisor)).toBeLessThanOrEqual(10)
+            expect(Number(exercise.variant.values.quotient)).toBeLessThanOrEqual(10)
+            expect(Number(exercise.variant.values.divisor) * Number(exercise.variant.values.quotient)).toBe(Number(exercise.variant.values.dividend))
+          }
+        }
+      }
     }
   })
 

@@ -286,52 +286,221 @@ function subtraction(seed: number, difficulty: Difficulty, focus?: string, phase
   })
 }
 
-function multiplication(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function multiplication(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const rows = difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]
   const focusedRow = focus?.startsWith('times-') ? Number(focus.slice(6)) : undefined
   const first = focusedRow && rows.includes(focusedRow) ? focusedRow : pick(random, rows)
-  const second = integer(random, 2, difficulty === 1 ? Math.min(10, Math.floor(50 / first)) : 10)
+  let second = integer(random, 2, difficulty === 1 ? Math.min(10, Math.floor(50 / first)) : 10)
+  if (phase === 'transfer' && second === first) second = second === 10 ? 9 : second + 1
   const answer = first * second
   const values = { first, second, answer, sumExpression: Array.from({ length: first }, () => second).join(' + ') }
+  const shared = { ...base('multiplication', seed, difficulty, values), ...contentFor('multiplication', values, difficulty) }
+  const groupRepresentation = representation('multiplication', difficulty, 'groups', `${first} gleich große Gruppen`, { groups: first, size: second, total: answer }, ['total'])
+
+  if (phase === 'activate') {
+    const correct = `${first} Gruppen mit je ${second} Punkten`
+    return withMetadata({
+      ...shared,
+      typeId: 'multiplication-activate-equal-groups', subskillId: `times-${first}`,
+      prompt: 'Welche Aussage beschreibt das Gruppenbild?', answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `${second} Gruppen mit je ${first} Punkten`, misconception: 'Anzahl und Größe der Gruppen werden vertauscht.', misconceptionId: 'multiplication-group-roles' },
+        { value: `${first} Gruppen mit je ${second === 10 ? 9 : second + 1} Punkten`, misconception: 'In jeder Gruppe wird ein Punkt zu viel oder zu wenig berücksichtigt.', misconceptionId: 'multiplication-group-count' },
+        { value: `${first + second} einzelne Punkte`, misconception: 'Die beiden Faktoren werden addiert.', misconceptionId: 'multiplication-add-factors' }
+      ]),
+      representation: { ...groupRepresentation, visibility: 'always' }
+    })
+  }
+
+  if (phase === 'understand') {
+    const correct = values.sumExpression
+    const oneGroupMissing = Array.from({ length: Math.max(1, first - 1) }, () => second).join(' + ')
+    const oneGroupExtra = Array.from({ length: first + 1 }, () => second).join(' + ')
+    return withMetadata({
+      ...shared,
+      typeId: 'multiplication-understand-repeated-addition', subskillId: `times-${first}`,
+      prompt: `Welche Plusaufgabe beschreibt ${first} gleich große Gruppen mit je ${second} Punkten?`, answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: `${first} + ${second}`, misconception: 'Die beiden Faktoren werden addiert.', misconceptionId: 'multiplication-add-factors' },
+        { value: oneGroupMissing, misconception: 'Eine Gruppe wird ausgelassen.', misconceptionId: 'multiplication-group-count' },
+        { value: oneGroupExtra, misconception: 'Eine Gruppe wird zu viel gezählt.', misconceptionId: 'multiplication-group-count' }
+      ]),
+      representation: { ...groupRepresentation, visibility: 'always' }
+    })
+  }
+
+  if (phase === 'transfer') {
+    const swap = `${second} · ${first} = ${answer}`
+    const inverse = `${answer} : ${first} = ${second}`
+    return withMetadata({
+      ...shared,
+      typeId: 'multiplication-transfer-fact-family', subskillId: `times-${first}`,
+      prompt: `Nutze die Aufgabenfamilie von ${first} · ${second} = ${answer}.`, answerMode: 'guided-choice', correctAnswer: String(answer),
+      steps: [
+        {
+          id: 'commutative', prompt: 'Welche Tauschaufgabe hat dasselbe Ergebnis?', interaction: 'choose-strategy',
+          options: textOptions(random, swap, [
+            { value: `${first} + ${second} = ${first + second}`, misconception: 'Die beiden Faktoren werden addiert.', misconceptionId: 'multiplication-add-factors' },
+            { value: `${second} · ${second} = ${second * second}`, misconception: 'Eine Gruppengröße wird doppelt verwendet.', misconceptionId: 'multiplication-group-roles' }
+          ]), correctAnswer: swap,
+          errorFeedback: 'Beim Tauschen wechseln Anzahl und Größe der Gruppen ihre Plätze. Das Ergebnis bleibt gleich.',
+          successFeedback: 'Die Tauschaufgabe verwendet dieselben beiden Faktoren.'
+        },
+        {
+          id: 'inverse', prompt: 'Welche Geteiltaufgabe gehört zu derselben Aufgabenfamilie?', interaction: 'choose-strategy',
+          options: textOptions(random, inverse, [
+            { value: `${answer + first} : ${first} = ${second + 1}`, misconception: 'Eine benachbarte, aber nicht dieselbe Aufgabenfamilie wird verwendet.', misconceptionId: 'multiplication-inverse-direction' },
+            { value: `${answer} : ${answer} = 1`, misconception: 'Die Gesamtmenge wird durch sich selbst geteilt.', misconceptionId: 'multiplication-inverse-direction' }
+          ]), correctAnswer: inverse,
+          errorFeedback: `Nutze ${first} · ${second} = ${answer}: Teile die Gesamtmenge durch die Anzahl der Gruppen.`,
+          successFeedback: 'Die Geteiltaufgabe kehrt die Malaufgabe passend um.'
+        }
+      ],
+      representation: { ...groupRepresentation, visibility: 'always' }
+    })
+  }
+
   return withMetadata({
-    ...base('multiplication', seed, difficulty, values),
-    ...contentFor('multiplication', values, difficulty),
+    ...shared,
     typeId: 'small-multiplication',
     subskillId: `times-${first}`,
     answerMode: 'number',
     correctAnswer: String(answer),
-    representation: representation('multiplication', difficulty, 'groups', `${first} gleich große Gruppen`, { groups: first, size: second, total: answer }, ['total'])
+    representation: groupRepresentation
   })
 }
 
-function division(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function division(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const rows = difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]
-  const focusedDivisor = focus?.startsWith('division-by-') ? Number(focus.slice(12)) : undefined
+  const focusedSituation = focus?.startsWith('division-grouping-by-')
+    ? 'grouping'
+    : focus?.startsWith('division-sharing-by-')
+      ? 'sharing'
+      : undefined
+  const focusedDivisor = focus?.startsWith('division-grouping-by-')
+    ? Number(focus.slice(21))
+    : focus?.startsWith('division-sharing-by-')
+      ? Number(focus.slice(20))
+      : focus?.startsWith('division-by-')
+        ? Number(focus.slice(12))
+        : undefined
   const divisor = focusedDivisor && rows.includes(focusedDivisor) ? focusedDivisor : pick(random, rows)
   const quotient = integer(random, 2, difficulty === 1 ? Math.min(10, Math.floor(50 / divisor)) : 10)
   const dividend = divisor * quotient
-  const situation = random() < 0.5 ? 'grouping' : 'sharing'
+  const situation = focusedSituation ?? (random() < 0.5 ? 'grouping' : 'sharing')
   const values = { dividend, divisor, quotient, situation }
   const grouping = situation === 'grouping'
+  const subskillId = `division-${situation}-by-${divisor}`
+  const shared = { ...base('division', seed, difficulty, values), ...contentFor('division', values, difficulty) }
+  const divisionRepresentation = representation(
+    'division',
+    difficulty,
+    grouping ? 'grouping-model' : 'sharing-model',
+    grouping ? getSkillContent('division').representations[0]! : getSkillContent('division').representations[1]!,
+    grouping
+      ? { total: dividend, groupSize: divisor, groupCount: quotient }
+      : { total: dividend, groupCount: divisor, groupSize: quotient },
+    [grouping ? 'groupCount' : 'groupSize']
+  )
+
+  if (phase === 'activate') {
+    const correct = grouping ? 'die Anzahl der Gruppen' : 'die Punkte in jeder Gruppe'
+    return withMetadata({
+      ...shared,
+      typeId: `division-activate-${situation}`, subskillId,
+      prompt: grouping
+        ? `${dividend} Punkte werden immer zu ${divisor} Punkten zusammengelegt. Was wird gesucht?`
+        : `${dividend} Punkte werden auf ${divisor} Gruppen verteilt. Was wird gesucht?`,
+      answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: grouping ? 'die Punkte in jeder Gruppe' : 'die Anzahl der Gruppen', misconception: 'Gruppenanzahl und Gruppengröße werden verwechselt.', misconceptionId: 'division-group-roles' },
+        { value: 'die Gesamtzahl der Punkte', misconception: 'Eine bereits bekannte Größe wird als gesucht behandelt.', misconceptionId: 'division-known-total' }
+      ]),
+      representation: { ...divisionRepresentation, visibility: 'always' }
+    })
+  }
+
+  if (phase === 'understand') {
+    const correct = grouping
+      ? `${dividend} Punkte, immer ${divisor} je Gruppe, gesucht sind die Gruppen`
+      : `${dividend} Punkte, ${divisor} Gruppen, gesucht sind die Punkte je Gruppe`
+    return withMetadata({
+      ...shared,
+      typeId: `division-understand-${situation}`, subskillId,
+      prompt: 'Welche Beschreibung passt zu den bekannten und unbekannten Größen?', answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, [
+        { value: grouping ? `${dividend} Punkte, ${divisor} Gruppen, gesucht sind die Punkte je Gruppe` : `${dividend} Punkte, immer ${divisor} je Gruppe, gesucht sind die Gruppen`, misconception: 'Gruppenanzahl und Gruppengröße werden verwechselt.', misconceptionId: 'division-group-roles' },
+        { value: `${quotient} Punkte sind bekannt, gesucht ist die Gesamtmenge`, misconception: 'Eine unbekannte Größe wird als bekannt behandelt.', misconceptionId: 'division-known-total' }
+      ]),
+      representation: { ...divisionRepresentation, visibility: 'always' }
+    })
+  }
+
+  if (phase === 'guided-practice') {
+    const relation = grouping
+      ? `Immer ${divisor} Punkte bilden eine Gruppe.`
+      : `Die Punkte werden auf ${divisor} Gruppen verteilt.`
+    return withMetadata({
+      ...shared,
+      typeId: `division-guided-${situation}`, subskillId,
+      prompt: grouping ? 'Gruppiere die Gesamtmenge vollständig.' : 'Verteile die Gesamtmenge vollständig.',
+      answerMode: 'guided-number', correctAnswer: String(quotient),
+      steps: [
+        {
+          id: 'relationship', prompt: 'Welcher Arbeitsplan passt?', interaction: 'complete-model',
+          options: textOptions(random, relation, [
+            { value: grouping ? `Die Punkte werden auf ${divisor} Gruppen verteilt.` : `Immer ${divisor} Punkte bilden eine Gruppe.`, misconception: 'Gruppieren und Verteilen werden verwechselt.', misconceptionId: 'division-group-roles' },
+            { value: 'Ein Teil der Punkte darf übrig bleiben.', misconception: 'Die Gesamtmenge wird nicht vollständig aufgeteilt.', misconceptionId: 'division-incomplete-partition' }
+          ]), correctAnswer: relation,
+          errorFeedback: 'Prüfe, ob die Gruppengröße oder die Gruppenanzahl vorgegeben ist.',
+          successFeedback: 'Der Arbeitsplan passt zu den bekannten Größen.'
+        },
+        {
+          id: 'result', prompt: grouping ? 'Wie viele Gruppen entstehen?' : 'Wie viele Punkte liegen in jeder Gruppe?', interaction: 'guided-number',
+          correctAnswer: String(quotient), errorFeedback: shared.errorFeedback, successFeedback: shared.successFeedback
+        }
+      ],
+      representation: { ...divisionRepresentation, visibility: 'always' }
+    })
+  }
+
+  if (phase === 'transfer') {
+    const probe = `${divisor} · ${quotient} = ${dividend}`
+    const inverse = `${dividend} : ${quotient} = ${divisor}`
+    return withMetadata({
+      ...shared,
+      typeId: `division-transfer-fact-family-${situation}`, subskillId,
+      prompt: `Prüfe ${dividend} : ${divisor} = ${quotient} mit der Aufgabenfamilie.`, answerMode: 'guided-choice', correctAnswer: String(quotient),
+      steps: [
+        {
+          id: 'probe', prompt: 'Welche Malaufgabe ist die passende Probe?', interaction: 'choose-strategy',
+          options: textOptions(random, probe, [
+            { value: `${divisor} + ${quotient} = ${divisor + quotient}`, misconception: 'Divisor und Ergebnis werden addiert.', misconceptionId: 'division-operation-choice' },
+            { value: `${quotient} · ${quotient} = ${quotient * quotient}`, misconception: 'Gruppenanzahl und Gruppengröße werden verwechselt.', misconceptionId: 'division-group-roles' },
+            { value: `${divisor} · ${quotient === 2 ? 3 : quotient - 1} = ${divisor * (quotient === 2 ? 3 : quotient - 1)}`, misconception: 'Eine Gruppe wird ausgelassen oder zu viel verwendet.', misconceptionId: 'division-incomplete-partition' }
+          ]), correctAnswer: probe, errorFeedback: 'Multipliziere Gruppenanzahl und Gruppengröße. So muss wieder die Gesamtmenge entstehen.', successFeedback: 'Die Malprobe ergibt wieder die Gesamtmenge.'
+        },
+        {
+          id: 'inverse', prompt: 'Welche zweite Geteiltaufgabe gehört zu denselben drei Zahlen?', interaction: 'choose-strategy',
+          options: textOptions(random, inverse, [
+            { value: `${quotient} : ${divisor} = ${Math.floor(quotient / divisor)}`, misconception: 'Die Gesamtmenge steht nicht am Anfang der Geteiltaufgabe.', misconceptionId: 'division-known-total' },
+            { value: `${dividend} : ${dividend} = 1`, misconception: 'Die Gesamtmenge wird durch sich selbst geteilt.', misconceptionId: 'division-operation-choice' }
+          ]), correctAnswer: inverse, errorFeedback: 'Beginne wieder mit der Gesamtmenge und teile diesmal durch das andere bekannte Ergebnis.', successFeedback: 'Beide Geteiltaufgaben gehören zur selben Aufgabenfamilie.'
+        }
+      ],
+      representation: { ...divisionRepresentation, visibility: 'hint' }
+    })
+  }
+
   return withMetadata({
-    ...base('division', seed, difficulty, values),
-    ...contentFor('division', values, difficulty),
+    ...shared,
     typeId: grouping ? 'division-grouping' : 'division-sharing',
-    subskillId: `division-by-${divisor}`,
+    subskillId,
     answerMode: 'number',
     correctAnswer: String(quotient),
-    representation: representation(
-      'division',
-      difficulty,
-      grouping ? 'grouping-model' : 'sharing-model',
-      grouping ? getSkillContent('division').representations[0]! : getSkillContent('division').representations[1]!,
-      grouping
-        ? { total: dividend, groupSize: divisor, groupCount: quotient }
-        : { total: dividend, groupCount: divisor, groupSize: quotient },
-      [grouping ? 'groupCount' : 'groupSize']
-    )
+    representation: divisionRepresentation
   })
 }
 
@@ -2461,8 +2630,8 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     switch (skillId) {
     case 'addition': return addition(seed, difficulty, focus, phase)
     case 'subtraction': return subtraction(seed, difficulty, focus, phase)
-    case 'multiplication': return multiplication(seed, difficulty, focus)
-    case 'division': return division(seed, difficulty, focus)
+    case 'multiplication': return multiplication(seed, difficulty, focus, phase)
+    case 'division': return division(seed, difficulty, focus, phase)
     case 'place-value': return placeValue(seed, difficulty, phase)
     case 'decompose': return decompose(seed, difficulty, phase)
     case 'compose': return compose(seed, difficulty, phase)

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 18,
-  "catalogVersion": "0.20.0",
+  "catalogVersion": "0.21.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -416,7 +416,31 @@
       "supportGoal": "Kernaufgaben des kleinen Einmaleins über gleich große Gruppen verstehen.",
       "misconceptions": [
         "Faktoren werden addiert.",
-        "Eine Gruppe wird zu viel oder zu wenig gezählt."
+        "Eine Gruppe wird zu viel oder zu wenig gezählt.",
+        "Anzahl und Größe der Gruppen werden vertauscht.",
+        "Tausch- und Umkehraufgaben werden nicht als Aufgabenfamilie erkannt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "multiplication-add-factors",
+          "misconception": "Faktoren werden addiert.",
+          "feedback": "Vielleicht hast du die beiden Faktoren addiert. Prüfe stattdessen, wie oft die gleich große Gruppe vorkommt."
+        },
+        {
+          "id": "multiplication-group-count",
+          "misconception": "Eine Gruppe wird zu viel oder zu wenig gezählt.",
+          "feedback": "Gehe Gruppe für Gruppe vor und prüfe, ob jede gleich große Gruppe genau einmal berücksichtigt ist."
+        },
+        {
+          "id": "multiplication-group-roles",
+          "misconception": "Anzahl und Größe der Gruppen werden vertauscht.",
+          "feedback": "Unterscheide: Die erste Zahl nennt hier die Anzahl der Gruppen, die zweite die Punkte in jeder Gruppe."
+        },
+        {
+          "id": "multiplication-inverse-direction",
+          "misconception": "Tausch- und Umkehraufgaben werden nicht als Aufgabenfamilie erkannt.",
+          "feedback": "Verwende genau dieselben drei Zahlen. Eine Umkehraufgabe beginnt mit der Gesamtmenge."
+        }
       ],
       "hints": [
         "{first} · {second} bedeutet: {second} wird {first}-mal genommen.",
@@ -506,19 +530,19 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Gleich große Gruppen in einem Punktebild erkennen und Anzahl sowie Gruppengröße benennen.",
           "exerciseTypes": [
-            "multiplication:entry"
+            "multiplication:recognize-equal-groups"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Gleich große Gruppen mit wiederholter Addition und Malaufgabe verbinden.",
           "exerciseTypes": [
-            "multiplication:representation"
+            "multiplication:connect-repeated-addition"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
@@ -546,11 +570,11 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Aus einer Malaufgabe die Tauschaufgabe und eine passende Umkehraufgabe bilden.",
           "exerciseTypes": [
-            "multiplication:difficulty-3"
+            "multiplication:fact-family-transfer"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         }
       ],
       "successCriteria": [
@@ -566,7 +590,31 @@
       "supportGoal": "Division ohne Rest als Gruppieren und Verteilen verstehen und als Umkehrung der Multiplikation nutzen.",
       "misconceptions": [
         "Gruppenanzahl und Gruppengröße werden verwechselt.",
-        "Die Gesamtmenge wird nicht vollständig oder nicht gleichmäßig aufgeteilt."
+        "Die Gesamtmenge wird nicht vollständig oder nicht gleichmäßig aufgeteilt.",
+        "Eine bereits bekannte Größe wird als gesucht behandelt.",
+        "Gruppieren und Verteilen werden als derselbe Vorgang behandelt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "division-group-roles",
+          "misconception": "Gruppenanzahl und Gruppengröße werden verwechselt.",
+          "feedback": "Prüfe zuerst, was vorgegeben ist: die Anzahl der Gruppen oder die Punkte in jeder Gruppe."
+        },
+        {
+          "id": "division-incomplete-partition",
+          "misconception": "Die Gesamtmenge wird nicht vollständig oder nicht gleichmäßig aufgeteilt.",
+          "feedback": "Lege jeden Punkt genau einmal ab. Am Ende müssen alle Gruppen gleich groß und alle Punkte verteilt sein."
+        },
+        {
+          "id": "division-known-total",
+          "misconception": "Eine bereits bekannte Größe wird als gesucht behandelt.",
+          "feedback": "Die Gesamtmenge ist schon bekannt. Gesucht ist entweder die Gruppenanzahl oder die Größe jeder Gruppe."
+        },
+        {
+          "id": "division-operation-choice",
+          "misconception": "Gruppieren und Verteilen werden als derselbe Vorgang behandelt.",
+          "feedback": "Eine passende Malprobe verbindet Gruppenanzahl und Gruppengröße wieder mit der Gesamtmenge."
+        }
       ],
       "hints": [
         "Welche Zahl mal {divisor} ergibt {dividend}?",
@@ -657,25 +705,25 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "An den bekannten Größen erkennen, ob Gruppenanzahl oder Gruppengröße gesucht ist.",
           "exerciseTypes": [
-            "division:entry"
+            "division:identify-unknown-role"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Gruppieren und Verteilen anhand der bekannten und unbekannten Größen unterscheiden.",
           "exerciseTypes": [
-            "division:representation"
+            "division:distinguish-grouping-sharing"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Die Gesamtmenge mit passendem Arbeitsplan vollständig gruppieren oder verteilen.",
           "exerciseTypes": [
-            "division:difficulty-1"
+            "division:complete-partition-with-model"
           ],
           "releaseStatus": "active"
         },
@@ -697,11 +745,11 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Eine Division mit Malprobe und zweiter Umkehraufgabe als Aufgabenfamilie prüfen.",
           "exerciseTypes": [
-            "division:difficulty-3"
+            "division:fact-family-transfer"
           ],
-          "releaseStatus": "ready-for-review"
+          "releaseStatus": "active"
         }
       ],
       "successCriteria": [

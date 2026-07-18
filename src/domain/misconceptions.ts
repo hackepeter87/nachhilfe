@@ -26,6 +26,16 @@ export function analyzeWrongAnswer(exercise: Exercise, rawAnswer: string): Misco
     }
     if (Math.abs(answer - correct) === 1) return feedbackFor(exercise, 'subtraction-counting-start')
   }
+  if (exercise.skillId === 'multiplication' && Number.isFinite(answer)) {
+    if (answer === Number(values.first) + Number(values.second)) return feedbackFor(exercise, 'multiplication-add-factors')
+    if (Math.abs(answer - correct) === Number(values.second)) return feedbackFor(exercise, 'multiplication-group-count')
+    return feedbackFor(exercise, 'multiplication-group-roles')
+  }
+  if (exercise.skillId === 'division' && Number.isFinite(answer)) {
+    if (answer === Number(values.divisor)) return feedbackFor(exercise, 'division-group-roles')
+    if (answer * Number(values.divisor) !== Number(values.dividend)) return feedbackFor(exercise, 'division-incomplete-partition')
+    return feedbackFor(exercise, 'division-operation-choice')
+  }
   if (exercise.skillId === 'place-value' && Number.isFinite(answer)) {
     if (answer === Number(values.digit) && answer !== correct) return feedbackFor(exercise, 'place-value-digit-as-value')
     return feedbackFor(exercise, 'place-value-column-confusion')
