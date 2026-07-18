@@ -1,5 +1,7 @@
 # Körperansichten
 
+Migration 0.29: Blickrichtung erkennen, Projektion verstehen, Vorderansicht geführt zuordnen, Ansichten selbstständig wechseln, flüssig abrufen und eine fehlerhafte Projektion analysieren sind sechs getrennte Lernhandlungen. Die Dreistufenbeschreibung unten staffelt Zahlen und Figuren innerhalb dieser Phasen.
+
 ## 1. Bezug zum Förderbedarf
 Räumliche Gebäude und ebene Ansichten müssen als zwei Darstellungen desselben Gegenstands verbunden werden. Der Einstieg trennt diese Idee bewusst von mentaler Rotation und verdeckten Würfeln.
 ## 2. Lehrplanbereich

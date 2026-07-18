@@ -1,6 +1,8 @@
 # Würfel und räumliche Rotation
 
-Status: `active` ab App 0.14.0, Katalog 0.13.0 und Schema 11. Eine externe Lehrkraftfreigabe liegt nicht vor.
+Status: `active`; auf den sechsphasigen Standard migriert in App 0.29.0 und Katalog 0.28.0 bei Schema 19. Eine externe Lehrkraftfreigabe liegt nicht vor.
+
+Die aktuelle Folge lautet: Drehrichtung lesen, Gegenrichtung als Rückweg verstehen, Vierteldrehung geführt verfolgen, selbstständig drehen, bekannte Vierteldrehungen flüssig zuordnen und im Transfer eine entgegengesetzte Drehung als Fehler analysieren.
 
 ## 1. Bezug zum Förderbedarf
 Räumliche Lageänderungen verlangen, einen Gegenstand trotz veränderter Orientierung als denselben Gegenstand zu erkennen. Die Kompetenz baut auf den festen Körperansichten auf und führt genau eine kontrollierte Lageänderung ein.

@@ -1,5 +1,7 @@
 # Raster-Symmetrie
 
+Status: `active`; auf sechs eigenständige Lernhandlungen migriert in App 0.29.0 und Katalog 0.28.0 bei Schema 19. Die aktuelle Folge führt vom Seitenwechsel über gleichen Achsenabstand, geführte und selbstständige Spiegelung sowie wechselnde Achsenlagen zur Analyse einer Spiegelung an der falschen Achse.
+
 ## 1. Bezug zum Förderbedarf
 Spiegelung soll als abstandsgleiche Zuordnung verstanden und von Verschiebung sowie Spiegelung an einer falschen Achse unterschieden werden.
 ## 2. Lehrplanbereich

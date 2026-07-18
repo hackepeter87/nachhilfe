@@ -1,6 +1,8 @@
 # Falten und Spiegeln
 
-Status: `active` ab App 0.15.0, Katalog 0.14.0 und Schema 12. Eine externe Lehrkraftfreigabe liegt nicht vor.
+Status: `active`; auf den sechsphasigen Standard migriert in App 0.29.0 und Katalog 0.28.0 bei Schema 19. Eine externe Lehrkraftfreigabe liegt nicht vor.
+
+Die aktuelle Folge lautet: bewegte Papierhälfte erkennen, gleichen Achsenabstand verstehen, Punktfaltung geführt verfolgen, selbstständig falten, Achsenlagen flüssig wechseln und im Transfer einen einfachen Faltschnitt aufklappen.
 
 ## 1. Bezug zum Förderbedarf
 Falten verbindet eine reale Bewegung mit dem bereits aufgebauten Spiegelprinzip. Die Kompetenz beschränkt sich auf genau eine sichtbare Faltung, damit Bewegungsrichtung, Achse und gleicher Abstand gemeinsam verstanden werden können.

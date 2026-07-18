@@ -159,9 +159,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.27.0',
+    catalogVersion: '0.28.0',
     schemaVersion: 19,
-    appVersion: '0.28.0'
+    appVersion: '0.29.0'
   })
 
   await page.reload()
@@ -365,7 +365,7 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
     if (await shape.isVisible().catch(() => false)) {
       seen.add('plane-shapes')
       const outline = shape.locator('.shape-outline')
-      const answer = await outline.evaluate((element) => element.classList.contains('shape-outline--square') ? 'Quadrat' : element.classList.contains('shape-outline--rectangle') ? 'Rechteck' : 'Dreieck')
+      const answer = await outline.evaluate((element) => element.classList.contains('shape-outline--triangle') ? '3' : '4')
       await page.getByRole('button', { name: answer, exact: true }).click()
       expect(await page.locator('.session-page').evaluate((element) => {
         const bounds = element.getBoundingClientRect()
@@ -392,7 +392,7 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
   expect(seen).toEqual(new Set(['plane-shapes', 'patterns']))
 })
 
-test('Fläche und Umfang nutzen bekannte Raster, aber maskieren das Ergebnis', async ({ page }, testInfo) => {
+test('Fläche und Umfang beginnen mit unterschiedlichen Einheiten und maskieren das Ergebnis', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
     const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
@@ -434,18 +434,18 @@ test('Fläche und Umfang nutzen bekannte Raster, aber maskieren das Ergebnis', a
     await expect(grid).toBeVisible()
     await expect(grid.locator('.quantity-result')).toHaveText('Ergebnis: ?')
     await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
-    let answer: number
+    let answer: string
     if (await grid.evaluate((element) => element.classList.contains('unit-grid-visual--area'))) {
       seen.add('area')
-      answer = await grid.locator('.unit-cell--filled').count()
+      answer = 'Ein gefülltes Einheitsquadrat.'
       await page.screenshot({ path: testInfo.outputPath('flaeche-375x812.png'), fullPage: true })
     } else {
       seen.add('perimeter')
-      answer = await grid.locator('.unit-cell--filled').evaluateAll((cells) => cells.reduce((sum, cell) => sum + ['top', 'right', 'bottom', 'left'].filter((edge) => cell.classList.contains(`unit-cell--edge-${edge}`)).length, 0))
+      answer = 'Eine Seite eines Einheitsquadrats.'
       await page.screenshot({ path: testInfo.outputPath('umfang-375x812.png'), fullPage: true })
     }
     await page.getByRole('button', { name: String(answer), exact: true }).click()
-    await expect(grid.locator('.quantity-result')).toHaveText(`Ergebnis: ${answer}`)
+    await expect(grid.locator('.quantity-result')).not.toHaveText('Ergebnis: ?')
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 1) {
       await page.setViewportSize({ width: 812, height: 375 })
@@ -556,7 +556,7 @@ test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('symmetrie-achse-375x812.png'), fullPage: true })
 })
 
-test('Körperansichten zeigen Gebäude, Richtungen und drei Raster mobil ohne Overflow', async ({ page }, testInfo) => {
+test('Körperansichten beginnen mit der Blickrichtung und bleiben mobil ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
     const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
@@ -571,9 +571,11 @@ test('Körperansichten zeigen Gebäude, Richtungen und drei Raster mobil ohne Ov
   await finishAdditionWarmups(page)
 
   await expect(page.getByRole('img', { name: /Würfel.*Vorne und rechts sind markiert/i })).toBeVisible()
-  await expect(page.getByText('vorne')).toBeVisible()
-  await expect(page.getByText('rechts')).toBeVisible()
-  await expect(page.getByRole('img', { name: /Ansicht [ABC]/ })).toHaveCount(3)
+  await expect(page.getByText('vorne', { exact: true })).toBeVisible()
+  await expect(page.getByText('rechts', { exact: true })).toBeVisible()
+  await expect(page.getByRole('img', { name: /Ansicht [ABC]/ })).toHaveCount(0)
+  await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+  await page.getByRole('button', { name: 'Vorderansicht', exact: true }).click()
   expect(await page.locator('.iso-cube').count()).toBeGreaterThanOrEqual(2)
   expect(await page.locator('.iso-cube').count()).toBeLessThanOrEqual(3)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
@@ -585,7 +587,7 @@ test('Körperansichten zeigen Gebäude, Richtungen und drei Raster mobil ohne Ov
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('koerperansichten-812x375.png'), fullPage: true })
 })
 
-test('Würfelrotation zeigt Achse, Richtung und drei Folgezustände mobil ohne Overflow', async ({ page }, testInfo) => {
+test('Würfelrotation beginnt mit Achse und Drehrichtung mobil ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
     const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
@@ -623,11 +625,14 @@ test('Würfelrotation zeigt Achse, Richtung und drei Folgezustände mobil ohne O
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishAdditionWarmups(page)
 
-  await expect(page.getByRole('img', { name: /Würfel.*90 Grad nach rechts.*senkrechte Achse/i })).toBeVisible()
+  const rotation = page.locator('.cube-rotation-visual')
+  await expect(rotation).toBeVisible()
   await expect(page.getByText('senkrechte Drehachse')).toBeVisible()
-  await expect(page.getByText('90 Grad nach rechts', { exact: true })).toBeVisible()
-  await expect(page.getByRole('img', { name: /Gebäude [ABC].*nach der Drehung/i })).toHaveCount(3)
+  const turnLabel = (await rotation.locator('.rotation-turn text').textContent())?.trim()
+  expect(turnLabel).toMatch(/^90 Grad nach (links|rechts)$/)
+  await expect(page.getByRole('img', { name: /Gebäude [ABC].*nach der Drehung/i })).toHaveCount(0)
   await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
+  await page.getByRole('button', { name: turnLabel!, exact: true }).click()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wuerfelrotation-375x812.png'), fullPage: true })
 
@@ -637,7 +642,7 @@ test('Würfelrotation zeigt Achse, Richtung und drei Folgezustände mobil ohne O
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wuerfelrotation-812x375.png'), fullPage: true })
 })
 
-test('Einzelfaltung zeigt Achse, Faltrichtung und drei neutrale Ergebnisse mobil ohne Overflow', async ({ page }, testInfo) => {
+test('Einzelfaltung beginnt mit Achse und bewegter Papierhälfte mobil ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
     const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
@@ -678,7 +683,10 @@ test('Einzelfaltung zeigt Achse, Faltrichtung und drei neutrale Ergebnisse mobil
   await expect(page.getByRole('img', { name: /Faltachse/i }).first()).toBeVisible()
   await expect(page.locator('.folding-grid--axis-vertical').first()).toBeVisible()
   await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
-  await expect(page.getByRole('img', { name: /Bild [ABC]/ })).toHaveCount(3)
+  await expect(page.getByRole('img', { name: /Bild [ABC]/ })).toHaveCount(0)
+  const foldLabel = (await page.locator('.folding-instruction span').textContent())?.trim()
+  expect(foldLabel).toBeTruthy()
+  await page.getByRole('button', { name: foldLabel!, exact: true }).click()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('falten-375x812.png'), fullPage: true })
 

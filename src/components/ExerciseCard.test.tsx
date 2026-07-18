@@ -101,7 +101,7 @@ describe('ExerciseCard', () => {
     if (!unchanged) throw new Error('Die Rotationsaufgabe enthält keinen Unverändert-Distraktor.')
 
     await user.click(screen.getByRole('button', { name: new RegExp(unchanged.label) }))
-    expect(screen.getByText(exercise.errorFeedback)).toHaveTextContent(/Pfeilrichtung.*auffällige Ecke/i)
+    expect(screen.getByText(unchanged.misconceptionFeedback!)).toHaveTextContent(/Lageänderung.*auffällige Ecke/i)
     await user.click(screen.getByRole('button', { name: /Tipp/i }))
     expect(screen.getByText(exercise.hints[0].text)).toHaveTextContent(/auffällige Ecke/i)
   })

@@ -558,11 +558,15 @@ export function validateCatalog(catalog) {
   catalog.skills.forEach((skill) => validateSkill(skill, numberRange))
   const symmetrySkill = catalog.skills.find((skill) => skill.id === 'symmetry')
   const expectedSymmetryExerciseTypes = [
-    ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
-    ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-3']
+    ['symmetry:symmetry-identify-side-change'],
+    ['symmetry:symmetry-understand-equal-distance'],
+    ['symmetry:symmetry-mirror-guided'],
+    ['symmetry:symmetry-mirror-independent'],
+    ['symmetry:symmetry-mirror-fluent'],
+    ['symmetry:symmetry-analyze-wrong-axis']
   ]
   if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) {
-    fail('Symmetrie-Lernphasen passen nicht zur fünfphasigen Progression')
+    fail('Symmetrie-Lernphasen passen nicht zur produktiven Progression')
   }
   if (!Array.isArray(catalog.preparedTopics) || catalog.preparedTopics.length !== 1) fail('preparedTopics muss genau das deaktivierte Thema Raumvorstellung enthalten')
   requireUnique(catalog.preparedTopics.map((topic) => topic.id), 'preparedTopics IDs')

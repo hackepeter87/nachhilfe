@@ -1256,10 +1256,12 @@ function symmetryProgressionPhase(difficulty: Difficulty, focus?: string): 1 | 2
   return difficulty === 1 ? 1 : difficulty === 2 ? 2 : 3
 }
 
-function symmetry(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function symmetry(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const symmetryContent = getTaskCatalog().symmetry
-  const progressionPhase = symmetryProgressionPhase(difficulty, focus)
+  const progressionPhase = phase === undefined ? symmetryProgressionPhase(difficulty, focus)
+    : phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1
+      : phase === 'independent-practice' ? 2 : 3
   const template = pick(random, symmetryContent.templates.filter((candidate) => candidate.progressionPhase === progressionPhase))
   const sourceGrid = template.grid.map((row) => [...row])
   const horizontal = template.axis === 'horizontal'
@@ -1280,17 +1282,24 @@ function symmetry(seed: number, difficulty: Difficulty, focus?: string): Exercis
     distractorSimilarity: template.distractorSimilarity
   }
   const options = shuffle(random, [
-    { value: 'mirror', label: symmetryContent.optionLabels[0], grid: correct },
-    { value: 'shift', label: symmetryContent.optionLabels[1], grid: shift, misconception: 'Spiegelung mit Verschiebung verwechselt' },
-    { value: 'wrong-axis', label: symmetryContent.optionLabels[2], grid: wrongAxis, misconception: 'An der falschen Achse gespiegelt' }
+    { value: 'mirror', label: symmetryContent.optionLabels[0], grid: correct, misconception: phase === 'transfer' ? 'Das korrekte Spiegelbild wird statt des gesuchten Achsenfehlers gewählt.' : undefined, misconceptionId: phase === 'transfer' ? 'symmetry-error-analysis' : undefined },
+    { value: 'shift', label: symmetryContent.optionLabels[1], grid: shift, misconception: 'Spiegelung mit Verschiebung verwechselt.', misconceptionId: 'symmetry-shift' },
+    { value: 'wrong-axis', label: symmetryContent.optionLabels[2], grid: wrongAxis, misconception: phase === 'transfer' ? undefined : 'An der falschen Achse gespiegelt.', misconceptionId: phase === 'transfer' ? undefined : 'symmetry-wrong-axis' }
   ])
   const guidance = symmetryContent.guidance[template.axisPosition]
+  const typeId = phase === 'activate' ? 'symmetry-identify-side-change' : phase === 'understand' ? 'symmetry-understand-equal-distance' : phase === 'guided-practice' ? 'symmetry-mirror-guided' : phase === 'independent-practice' ? 'symmetry-mirror-independent' : phase === 'automate' ? 'symmetry-mirror-fluent' : phase === 'transfer' ? 'symmetry-analyze-wrong-axis' : 'grid-symmetry'
+  const prompt = phase === 'activate' ? 'Welches Bild liegt auf der anderen Seite der grünen Achse statt nur verschoben zu sein?'
+    : phase === 'understand' ? 'Welches Bild hält für jedes Feld Seite und gleichen Abstand zur grünen Achse ein?'
+      : phase === 'transfer' ? 'Welches Bild zeigt den typischen Fehler, dass an der falschen Achse gespiegelt wurde?'
+        : renderCatalogText(getSkillContent('symmetry').prompt, values)
+  const correctAnswer = phase === 'transfer' ? 'wrong-axis' : 'mirror'
   return withMetadata({
     ...base('symmetry', seed, difficulty, values),
     ...contentFor('symmetry', values, difficulty),
-    typeId: 'grid-symmetry',
+    prompt,
+    typeId,
     answerMode: 'symmetry',
-    correctAnswer: 'mirror',
+    correctAnswer,
     sourceGrid,
     subskillId: `symmetry-phase-${progressionPhase}`,
     symmetry: {
@@ -1303,9 +1312,9 @@ function symmetry(seed: number, difficulty: Difficulty, focus?: string): Exercis
       { level: 1, text: guidance.hint1 },
       { level: 2, text: guidance.hint2 }
     ],
-    successFeedback: guidance.successFeedback,
+    successFeedback: phase === 'transfer' ? 'Du hast erkannt, welche Achse beim fehlerhaften Spiegelbild vertauscht wurde.' : guidance.successFeedback,
     errorFeedback: guidance.errorFeedback,
-    explanation: guidance.explanation,
+    explanation: phase === 'transfer' ? `Das gesuchte Fehlerbild wurde an der anderen Achsenrichtung gespiegelt. ${guidance.explanation}` : guidance.explanation,
     options
   })
 }
@@ -2300,45 +2309,75 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
   })
 }
 
-function planeShapes(seed: number, difficulty: Difficulty): Exercise {
+function planeShapes(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().planeGeometry
   const shapeTypes = ['square', 'rectangle', 'triangle'] as const
+  const shapePhase = phase ?? (difficulty === 1 ? 'guided-practice' : difficulty === 2 ? 'independent-practice' : 'transfer')
+  const effectiveDifficulty: Difficulty = shapePhase === 'activate' || shapePhase === 'understand' || shapePhase === 'guided-practice' || shapePhase === 'automate'
+    ? 1 : shapePhase === 'independent-practice' ? 2 : 3
   let correctAnswer: string
   let taskPrompt: string
   let typeId: string
   let subskillId: string
   let representationValues: ExerciseRepresentation['values']
   let options: AnswerOption[]
-  if (difficulty === 1) {
+  if (shapePhase === 'activate') {
+    const shapeType = pick(random, shapeTypes)
+    const corners = shapeType === 'triangle' ? 3 : 4
+    correctAnswer = String(corners)
+    taskPrompt = 'Beobachte die Außenform. Wie viele Ecken hat sie?'
+    typeId = 'shape-observe-corners'
+    subskillId = 'shape-features'
+    representationValues = { mode: 'identify', shapeType, answerLabel: content.shapeLabels[shapeType] }
+    options = numberOptions(random, corners, [
+      { value: corners - 1, misconception: 'Eine Ecke wird ausgelassen.', misconceptionId: 'shape-corner-count' },
+      { value: corners + 1, misconception: 'Eine Seite wird doppelt als Ecke gezählt.', misconceptionId: 'shape-corner-count' }
+    ])
+  } else if (shapePhase === 'understand') {
+    const shapeType = pick(random, shapeTypes)
+    const descriptions = {
+      square: 'Vier gleich lange Seiten und vier Ecken.',
+      rectangle: 'Vier Ecken; gegenüberliegende Seiten sind gleich lang.',
+      triangle: 'Drei Seiten und drei Ecken.'
+    }
+    correctAnswer = descriptions[shapeType]
+    taskPrompt = 'Welche Beschreibung passt genau zur sichtbaren Außenform?'
+    typeId = 'shape-connect-features'
+    subskillId = 'shape-features'
+    representationValues = { mode: 'identify', shapeType, answerLabel: content.shapeLabels[shapeType] }
+    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({
+      value: descriptions[candidate], misconception: 'Die Figur wird nur nach einem einzelnen Merkmal beurteilt.', misconceptionId: 'shape-single-feature'
+    })))
+  } else if (shapePhase === 'guided-practice' || shapePhase === 'automate') {
     const shapeType = pick(random, shapeTypes)
     correctAnswer = content.shapeLabels[shapeType]
-    taskPrompt = 'Welche ebene Figur siehst du?'
-    typeId = 'shape-identify'
+    taskPrompt = shapePhase === 'guided-practice' ? 'Welche ebene Figur siehst du? Nutze Seiten und Ecken.' : 'Welche Figur passt zu den sichtbaren Seiten und Ecken?'
+    typeId = shapePhase === 'guided-practice' ? 'shape-identify-guided' : 'shape-identify-fluent'
     subskillId = 'shape-recognition'
     representationValues = { mode: 'identify', shapeType, answerLabel: correctAnswer }
-    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({ value: content.shapeLabels[candidate], misconception: 'Außenform anhand eines falschen Merkmals bestimmt' })))
-  } else if (difficulty === 2) {
+    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({ value: content.shapeLabels[candidate], misconception: 'Außenform anhand eines falschen Merkmals bestimmt.', misconceptionId: 'shape-single-feature' })))
+  } else if (shapePhase === 'independent-practice') {
     const shapeType = pick(random, ['square', 'rectangle'] as const)
     const partCount = random() < 0.55 ? 2 : 4
     correctAnswer = String(partCount)
     taskPrompt = 'In wie viele Teile ist die ganze Figur sichtbar zerlegt?'
-    typeId = 'shape-decompose'
+    typeId = 'shape-decompose-independent'
     subskillId = 'shape-decomposition'
     representationValues = { mode: 'decompose', shapeType, partCount, answerLabel: correctAnswer }
     options = numberOptions(random, partCount, [
-      { value: partCount === 2 ? 3 : 2, misconception: 'Außenbereiche statt Teilflächen gezählt' },
-      { value: partCount + 1, misconception: 'Außenrand als zusätzliche Teilung gezählt' },
-      { value: partCount * 2, misconception: 'Jede sichtbare Linie doppelt gezählt' }
+      { value: partCount === 2 ? 3 : 2, misconception: 'Außenbereiche statt Teilflächen gezählt.', misconceptionId: 'shape-part-count' },
+      { value: partCount + 1, misconception: 'Außenrand als zusätzliche Teilung gezählt.', misconceptionId: 'shape-part-count' },
+      { value: partCount * 2, misconception: 'Jede sichtbare Linie doppelt gezählt.', misconceptionId: 'shape-part-count' }
     ])
   } else {
     const shapeType = pick(random, ['square', 'rectangle'] as const)
     correctAnswer = content.shapeLabels[shapeType]
     taskPrompt = 'Welche ganze Außenform entsteht aus den beiden sichtbaren Teilen?'
-    typeId = 'shape-compose'
+    typeId = 'shape-compose-transfer'
     subskillId = 'shape-composition'
     representationValues = { mode: 'compose', shapeType, partCount: 2, answerLabel: correctAnswer }
-    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({ value: content.shapeLabels[candidate], misconception: 'Teilform statt äußerer Gesamtform gewählt' })))
+    options = textOptions(random, correctAnswer, shapeTypes.filter((candidate) => candidate !== shapeType).map((candidate) => ({ value: content.shapeLabels[candidate], misconception: 'Teilform statt äußerer Gesamtform gewählt.', misconceptionId: 'shape-part-whole' })))
   }
   const values = {
     taskPrompt,
@@ -2354,7 +2393,7 @@ function planeShapes(seed: number, difficulty: Difficulty): Exercise {
     answerMode: 'choice',
     correctAnswer,
     options,
-    representation: representation('plane-shapes', difficulty, 'shape-grid', content.displayLabels.shape, representationValues, ['answerLabel'])
+    representation: representation('plane-shapes', effectiveDifficulty, 'shape-grid', content.displayLabels.shape, representationValues, ['answerLabel'])
   })
 }
 
@@ -2379,7 +2418,7 @@ function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): 
     sequenceCount: shown.length,
     blockLength: block.length,
     answerLabel,
-    highlightBlocks: phase === 'activate' || phase === 'understand' ? 1 : 0,
+    highlightBlocks: phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1 : 0,
     taskMode: phase === 'transfer' ? 'identify-error' : 'continue',
     ...Object.fromEntries(shown.map((symbol, index) => [`symbol${index}`, symbol]))
   }, ['answerLabel'])
@@ -2425,9 +2464,29 @@ function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): 
       ]), representation: strip(corrupted, correctPosition)
     })
   }
+  if (phase === 'automate') {
+    const nextTwo = [block[visibleLength % block.length]!, block[(visibleLength + 1) % block.length]!]
+    const correctChunk = nextTwo.join(' – ')
+    const chunkCandidates = [
+      [...nextTwo].reverse().join(' – '),
+      `${nextTwo[0]} – ${nextTwo[0]}`,
+      `${block[(visibleLength + 1) % block.length]} – ${block[(visibleLength + 2) % block.length]}`,
+      ...symbols.flatMap((firstSymbol) => symbols.map((secondSymbol) => `${firstSymbol} – ${secondSymbol}`))
+    ].filter((value, index, all) => value !== correctChunk && all.indexOf(value) === index)
+    return withMetadata({
+      ...shared,
+      typeId: 'pattern-automate-next-pair', subskillId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-complex-block',
+      prompt: 'Welche zwei Zeichen setzen den Musterblock ohne Lücke fort?', answerMode: 'choice', correctAnswer: correctChunk,
+      options: textOptions(random, correctChunk, chunkCandidates.map((value, index) => ({
+        value,
+        misconception: index % 2 === 0 ? 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.' : 'Nur das letzte Zeichen wird wiederholt.',
+        misconceptionId: index % 2 === 0 ? 'patterns-block-order' : 'patterns-repeat-last'
+      }))), representation: strip(sequence, correctChunk)
+    })
+  }
   return withMetadata({
     ...shared,
-    typeId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-repeated-element',
+    typeId: phase === 'guided-practice' ? 'pattern-guided-continue' : phase === 'independent-practice' ? 'pattern-independent-continue' : difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-repeated-element',
     subskillId: difficulty === 1 ? 'pattern-ab' : difficulty === 2 ? 'pattern-abc' : 'pattern-complex-block',
     answerMode: 'choice',
     correctAnswer,
@@ -2449,12 +2508,22 @@ function unitFigure(random: () => number, difficulty: Difficulty) {
   return { rows, columns, cells: Array.from({ length: rows * columns }, () => 1) }
 }
 
-function area(seed: number, difficulty: Difficulty): Exercise {
+function area(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().planeGeometry
-  const figure = unitFigure(random, difficulty)
+  const areaPhase = phase ?? 'guided-practice'
+  const effectiveDifficulty: Difficulty = phase === undefined ? difficulty
+    : areaPhase === 'activate' || areaPhase === 'understand' || areaPhase === 'guided-practice' ? 1
+      : areaPhase === 'independent-practice' || areaPhase === 'automate' ? 2 : 3
+  const figure = unitFigure(random, effectiveDifficulty)
   const answer = areaInUnitSquares(figure.rows, figure.columns, [...figure.cells])
-  const taskPrompt = 'Wie viele Einheitsquadrate bedecken die grüne Fläche?'
+  const conceptualPhase = phase === 'activate' || phase === 'understand' || phase === 'transfer'
+  const conceptualAnswer = phase === 'activate' ? 'Ein gefülltes Einheitsquadrat.' : 'Alle gefüllten Einheitsquadrate zählen.'
+  const taskPrompt = phase === 'activate' ? 'Was ist in diesem Raster eine Flächeneinheit?'
+    : areaPhase === 'understand' ? 'Welche Handlung bestimmt die bedeckte Fläche?'
+      : areaPhase === 'transfer' ? 'Ein Kind zählt nur die Außenkanten. Wie bestimmt man stattdessen die Fläche?'
+        : areaPhase === 'automate' ? `Das Raster hat ${figure.rows} Reihen. Wie viele gefüllte Einheitsquadrate sind es insgesamt?`
+          : 'Wie viele Einheitsquadrate bedecken die grüne Fläche?'
   const values = {
     taskPrompt,
     answer,
@@ -2465,27 +2534,42 @@ function area(seed: number, difficulty: Difficulty): Exercise {
   return withMetadata({
     ...base('area', seed, difficulty, values),
     ...contentFor('area', values, difficulty),
-    typeId: difficulty === 3 ? 'area-irregular-unit-squares' : 'area-rectangle-unit-squares',
-    subskillId: difficulty === 3 ? 'area-irregular' : 'area-structured-count',
+    typeId: phase === undefined ? (difficulty === 3 ? 'area-irregular-unit-squares' : 'area-rectangle-unit-squares') : areaPhase === 'activate' ? 'area-identify-unit' : areaPhase === 'understand' ? 'area-understand-covering' : areaPhase === 'guided-practice' ? 'area-count-guided' : areaPhase === 'independent-practice' ? 'area-count-independent' : areaPhase === 'automate' ? 'area-count-fluent' : 'area-analyze-boundary-error',
+    subskillId: effectiveDifficulty === 3 ? 'area-irregular' : 'area-structured-count',
     answerMode: 'choice',
-    correctAnswer: String(answer),
-    options: numberOptions(random, answer, [
-      { value: answer - 1, misconception: 'Ein gefülltes Feld ausgelassen' },
-      { value: answer + 1, misconception: 'Ein leeres Feld mitgezählt' },
-      { value: figure.rows + figure.columns, misconception: 'Reihen und Spalten addiert' }
-    ]),
-    representation: representation('area', difficulty, 'unit-squares', content.displayLabels.area, { rows: figure.rows, columns: figure.columns, cells: [...figure.cells], answerLabel: String(answer) }, ['answerLabel'])
+    correctAnswer: conceptualPhase ? conceptualAnswer : String(answer),
+    options: conceptualPhase
+      ? textOptions(random, conceptualAnswer, [
+          { value: 'Nur die Außenkanten zählen.', misconception: 'Randlänge und Fläche werden verwechselt.', misconceptionId: 'area-perimeter-confusion' },
+          { value: 'Nur die Rasterlinien zählen.', misconception: 'Gitterlinien werden statt bedeckter Einheiten gezählt.', misconceptionId: 'area-grid-lines' }
+        ])
+      : numberOptions(random, answer, [
+          { value: answer - 1, misconception: 'Ein gefülltes Feld ausgelassen.', misconceptionId: 'area-cell-count' },
+          { value: answer + 1, misconception: 'Ein leeres Feld mitgezählt.', misconceptionId: 'area-cell-count' },
+          { value: figure.rows + figure.columns, misconception: 'Reihen und Spalten addiert.', misconceptionId: 'area-row-column' }
+        ]),
+    representation: representation('area', effectiveDifficulty, 'unit-squares', content.displayLabels.area, { rows: figure.rows, columns: figure.columns, cells: [...figure.cells], answerLabel: String(answer) }, ['answerLabel'])
   })
 }
 
-function perimeter(seed: number, difficulty: Difficulty): Exercise {
+function perimeter(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().planeGeometry
-  const figure = unitFigure(random, difficulty)
+  const perimeterPhase = phase ?? 'guided-practice'
+  const effectiveDifficulty: Difficulty = phase === undefined ? difficulty
+    : perimeterPhase === 'activate' || perimeterPhase === 'understand' || perimeterPhase === 'guided-practice' ? 1
+      : perimeterPhase === 'independent-practice' || perimeterPhase === 'automate' ? 2 : 3
+  const figure = unitFigure(random, effectiveDifficulty)
   const cells = [...figure.cells]
   const answer = perimeterInUnitEdges(figure.rows, figure.columns, cells)
   const areaValue = areaInUnitSquares(figure.rows, figure.columns, cells)
-  const taskPrompt = 'Wie viele Längeneinheiten ist der vollständig markierte Außenrand lang?'
+  const conceptualPhase = phase === 'activate' || phase === 'understand' || phase === 'transfer'
+  const conceptualAnswer = phase === 'activate' ? 'Eine Seite eines Einheitsquadrats.' : 'Den geschlossenen Außenrand entlanggehen.'
+  const taskPrompt = phase === 'activate' ? 'Was ist in diesem Raster eine Längeneinheit am Rand?'
+    : perimeterPhase === 'understand' ? 'Welche Handlung bestimmt den Umfang?'
+      : perimeterPhase === 'transfer' ? 'Ein Kind zählt alle gefüllten Kästchen. Wie bestimmt man stattdessen den Umfang?'
+        : perimeterPhase === 'automate' ? 'Verfolge den markierten Rand einmal vollständig. Wie lang ist er?'
+          : 'Wie viele Längeneinheiten ist der vollständig markierte Außenrand lang?'
   const values = {
     taskPrompt,
     answer,
@@ -2496,26 +2580,34 @@ function perimeter(seed: number, difficulty: Difficulty): Exercise {
   return withMetadata({
     ...base('perimeter', seed, difficulty, values),
     ...contentFor('perimeter', values, difficulty),
-    typeId: difficulty === 3 ? 'perimeter-irregular-path' : 'perimeter-rectangle-path',
-    subskillId: difficulty === 3 ? 'perimeter-irregular' : 'perimeter-trace-border',
+    typeId: phase === undefined ? (difficulty === 3 ? 'perimeter-irregular-path' : 'perimeter-rectangle-path') : perimeterPhase === 'activate' ? 'perimeter-identify-unit-edge' : perimeterPhase === 'understand' ? 'perimeter-understand-boundary' : perimeterPhase === 'guided-practice' ? 'perimeter-trace-guided' : perimeterPhase === 'independent-practice' ? 'perimeter-trace-independent' : perimeterPhase === 'automate' ? 'perimeter-trace-fluent' : 'perimeter-analyze-area-error',
+    subskillId: effectiveDifficulty === 3 ? 'perimeter-irregular' : 'perimeter-trace-border',
     answerMode: 'choice',
-    correctAnswer: String(answer),
-    options: numberOptions(random, answer, [
-      { value: answer - 2, misconception: 'Eine Randseite ausgelassen' },
-      { value: answer + 2, misconception: 'Eine Innenkante mitgezählt' },
-      { value: areaValue, misconception: 'Einheitsquadrate statt Randkanten gezählt' }
-    ]),
-    representation: representation('perimeter', difficulty, 'perimeter-path', content.displayLabels.perimeter, { rows: figure.rows, columns: figure.columns, cells, answerLabel: String(answer) }, ['answerLabel'])
+    correctAnswer: conceptualPhase ? conceptualAnswer : String(answer),
+    options: conceptualPhase
+      ? textOptions(random, conceptualAnswer, [
+          { value: 'Alle gefüllten Einheitsquadrate zählen.', misconception: 'Fläche und Randlänge werden verwechselt.', misconceptionId: 'perimeter-area-confusion' },
+          { value: 'Auch alle Innenkanten mitzählen.', misconception: 'Innenkanten werden als Außenrand behandelt.', misconceptionId: 'perimeter-inner-edge' }
+        ])
+      : numberOptions(random, answer, [
+          { value: answer - 2, misconception: 'Eine Randseite ausgelassen.', misconceptionId: 'perimeter-missing-edge' },
+          { value: answer + 2, misconception: 'Eine Innenkante mitgezählt.', misconceptionId: 'perimeter-inner-edge' },
+          { value: areaValue, misconception: 'Einheitsquadrate statt Randkanten gezählt.', misconceptionId: 'perimeter-area-confusion' }
+        ]),
+    representation: representation('perimeter', effectiveDifficulty, 'perimeter-path', content.displayLabels.perimeter, { rows: figure.rows, columns: figure.columns, cells, answerLabel: String(answer) }, ['answerLabel'])
   })
 }
 
-function bodyViews(seed: number, difficulty: Difficulty): Exercise {
+function bodyViews(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().spatialViews
-  const candidates = content.templates.filter((template) => template.difficulty === difficulty)
-  if (candidates.length === 0) throw new Error(`Keine Körperansicht-Vorlage für Stufe ${difficulty}.`)
+  const effectiveDifficulty: Difficulty = phase === undefined ? difficulty
+    : phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1
+      : phase === 'independent-practice' || phase === 'automate' ? 2 : 3
+  const candidates = content.templates.filter((template) => template.difficulty === effectiveDifficulty)
+  if (candidates.length === 0) throw new Error(`Keine Körperansicht-Vorlage für Stufe ${effectiveDifficulty}.`)
   const template = pick(random, candidates)
-  const directions: CubeViewDirection[] = difficulty === 1 ? ['front'] : difficulty === 2 ? ['front', 'right'] : ['front', 'right', 'top']
+  const directions: CubeViewDirection[] = effectiveDifficulty === 1 ? ['front'] : effectiveDifficulty === 2 ? ['front', 'right'] : ['front', 'right', 'top']
   const direction = pick(random, directions)
   const correct = projectCubeView(template, direction)
   const distractors = createCubeViewDistractors(correct, direction)
@@ -2525,10 +2617,11 @@ function bodyViews(seed: number, difficulty: Difficulty): Exercise {
     { grid: correct, misconception: undefined },
     ...distractors.map((candidate) => ({ grid: candidate.grid, misconception: candidate.misconception }))
   ])
-  const options = shuffled.map((candidate, index): AnswerOption => ({
+  const viewOptions = shuffled.map((candidate, index): AnswerOption => ({
     value: cubeViewKey(candidate.grid),
     label: content.optionLabels[index]!,
     misconception: candidate.misconception,
+    misconceptionId: candidate.misconception === 'mirrored-orientation' ? 'body-view-direction' : candidate.misconception === 'overlooked-cube' ? 'body-view-depth-overcount' : candidate.misconception === 'wrong-stack-height' ? 'body-view-stack-height' : undefined,
     representation: {
       kind: 'cube-view',
       visibility: 'always',
@@ -2538,14 +2631,53 @@ function bodyViews(seed: number, difficulty: Difficulty): Exercise {
     }
   }))
   const skillContent = contentFor('body-views', values, difficulty)
+  let prompt = renderCatalogText(content.prompt, values)
+  let typeId = 'cube-building-view'
+  let correctAnswer = cubeViewKey(correct)
+  let options = viewOptions
+  let explanation = `${content.directionGuidance[direction]} ${skillContent.explanation}`
+  if (phase === 'activate') {
+    prompt = 'Welche Blickrichtung zeigt der grüne Pfeil vorne am Gebäude?'
+    typeId = 'body-view-identify-direction'
+    correctAnswer = content.directionLabels.front
+    options = textOptions(random, correctAnswer, [
+      { value: content.directionLabels.right, misconception: 'Vorne und rechts werden vertauscht.', misconceptionId: 'body-view-direction' },
+      { value: content.directionLabels.top, misconception: 'Die Draufsicht wird mit einem seitlichen Blick verwechselt.', misconceptionId: 'body-view-direction' }
+    ])
+  } else if (phase === 'understand') {
+    prompt = 'Was passiert in einer ebenen Ansicht mit Würfeln, die aus der Blickrichtung genau hintereinander stehen?'
+    typeId = 'body-view-understand-projection'
+    correctAnswer = 'Sie liegen in derselben Rasterspalte; sichtbar bleibt die größte Höhe.'
+    options = textOptions(random, correctAnswer, [
+      { value: 'Jeder Würfel bekommt immer eine eigene Rasterspalte.', misconception: 'Hintereinander stehende Würfel werden doppelt dargestellt.', misconceptionId: 'body-view-depth-overcount' },
+      { value: 'Das ganze Gebäude wird vor dem Zeichnen gedreht.', misconception: 'Ansicht und Drehung werden verwechselt.', misconceptionId: 'body-view-rotation' }
+    ])
+  } else if (phase === 'guided-practice') {
+    typeId = 'body-view-front-guided'
+  } else if (phase === 'independent-practice') {
+    typeId = 'body-view-mixed-independent'
+  } else if (phase === 'automate') {
+    typeId = 'body-view-mixed-fluent'
+  } else if (phase === 'transfer') {
+    const errorCandidate = distractors[0]!
+    correctAnswer = cubeViewKey(errorCandidate.grid)
+    typeId = 'body-view-analyze-error'
+    const errorPrompts = {
+      'mirrored-orientation': 'Welche Zeichnung ist spiegelverkehrt statt aus der markierten Blickrichtung gezeichnet?',
+      'overlooked-cube': 'Welche Zeichnung lässt einen aus der Blickrichtung sichtbaren Würfel aus?',
+      'wrong-stack-height': 'Welche Zeichnung übernimmt eine Stapelhöhe falsch?'
+    }
+    prompt = errorPrompts[errorCandidate.misconception]
+    explanation = `Die fehlerhafte Zeichnung zeigt ${errorCandidate.misconception === 'mirrored-orientation' ? 'eine spiegelverkehrte Orientierung' : errorCandidate.misconception === 'overlooked-cube' ? 'einen ausgelassenen sichtbaren Würfel' : 'eine unpassende Stapelhöhe'}. ${content.directionGuidance[direction]}`
+  }
   return withMetadata({
     ...base('body-views', seed, difficulty, values),
     ...skillContent,
-    prompt: renderCatalogText(content.prompt, values),
-    typeId: 'cube-building-view',
+    prompt,
+    typeId,
     subskillId: `body-view-${direction}`,
     answerMode: 'choice',
-    correctAnswer: cubeViewKey(correct),
+    correctAnswer,
     options,
     representation: {
       kind: 'cube-building',
@@ -2554,18 +2686,21 @@ function bodyViews(seed: number, difficulty: Difficulty): Exercise {
       values: { width: template.width, depth: template.depth, heights: template.heights },
       valueRoles: { knownValues: ['width', 'depth', 'heights'], unknownValues: ['view'], revealedValues: [] }
     },
-    explanation: `${content.directionGuidance[direction]} ${skillContent.explanation}`
+    explanation
   })
 }
 
-function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function cubeRotation(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().spatialRotations
   const requestedTurn = focus === 'cube-rotation-left' ? 'left' : focus === 'cube-rotation-right' ? 'right' : undefined
-  const levelCandidates = content.templates.filter((template) => template.difficulty === difficulty)
+  const effectiveDifficulty: Difficulty = phase === undefined ? difficulty
+    : phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1
+      : phase === 'independent-practice' ? 2 : 3
+  const levelCandidates = content.templates.filter((template) => template.difficulty === effectiveDifficulty)
   const focusedCandidates = requestedTurn ? levelCandidates.filter((template) => template.turn === requestedTurn) : levelCandidates
   const candidates = focusedCandidates.length > 0 ? focusedCandidates : levelCandidates
-  if (candidates.length === 0) throw new Error(`Keine Würfelrotation-Vorlage für Stufe ${difficulty}.`)
+  if (candidates.length === 0) throw new Error(`Keine Würfelrotation-Vorlage für Stufe ${effectiveDifficulty}.`)
   const template = pick(random, candidates)
   const turn = template.turn as CubeTurnDirection
   const correct = rotateCubeBuilding(template, turn)
@@ -2576,10 +2711,11 @@ function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exe
     { building: correct },
     ...distractors
   ])
-  const options = shuffled.map((candidate, index): AnswerOption => ({
+  const rotationOptions = shuffled.map((candidate, index): AnswerOption => ({
     value: cubeBuildingKey(candidate.building),
     label: content.optionLabels[index]!,
     misconception: candidate.misconception,
+    misconceptionId: candidate.misconception === 'not-rotated' ? 'rotation-not-rotated' : candidate.misconception === 'opposite-direction' ? 'rotation-opposite-direction' : undefined,
     representation: {
       kind: 'cube-building',
       visibility: 'always',
@@ -2593,14 +2729,49 @@ function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exe
     }
   }))
   const skillContent = contentFor('cube-rotation', values, difficulty)
+  let prompt = renderCatalogText(content.prompt, values)
+  let typeId = 'cube-building-quarter-turn'
+  let correctAnswer = cubeBuildingKey(correct)
+  let options = rotationOptions
+  let explanation = `${content.turnGuidance[turn]} ${skillContent.explanation}`
+  if (phase === 'activate') {
+    prompt = 'In welche Richtung zeigt der sichtbare Vierteldrehungs-Pfeil?'
+    typeId = 'cube-rotation-identify-direction'
+    correctAnswer = content.turnLabels[turn]
+    options = textOptions(random, correctAnswer, [
+      { value: content.turnLabels[turn === 'left' ? 'right' : 'left'], misconception: 'Links- und Rechtsdrehung werden vertauscht.', misconceptionId: 'rotation-opposite-direction' },
+      { value: '180 Grad drehen', misconception: 'Eine Vierteldrehung wird als halbe Drehung gelesen.', misconceptionId: 'rotation-angle' }
+    ])
+  } else if (phase === 'understand') {
+    const oppositeTurn = turn === 'left' ? 'right' : 'left'
+    prompt = `Welche zweite Drehung bringt das Gebäude nach ${content.turnLabels[turn]} wieder in die Ausgangslage zurück?`
+    typeId = 'cube-rotation-understand-inverse'
+    correctAnswer = content.turnLabels[oppositeTurn]
+    options = textOptions(random, correctAnswer, [
+      { value: content.turnLabels[turn], misconception: 'Die gleiche Richtung wird statt der Gegenrichtung gewählt.', misconceptionId: 'rotation-opposite-direction' },
+      { value: 'Das Gebäude spiegeln', misconception: 'Drehen und Spiegeln werden verwechselt.', misconceptionId: 'rotation-mirror' }
+    ])
+  } else if (phase === 'guided-practice') {
+    typeId = 'cube-rotation-guided-quarter-turn'
+  } else if (phase === 'independent-practice') {
+    typeId = 'cube-rotation-independent-quarter-turn'
+  } else if (phase === 'automate') {
+    typeId = 'cube-rotation-fluent-quarter-turn'
+  } else if (phase === 'transfer') {
+    const opposite = distractors.find((candidate) => candidate.misconception === 'opposite-direction')!
+    prompt = 'Welche Darstellung zeigt den typischen Fehler, dass in die entgegengesetzte Richtung gedreht wurde?'
+    typeId = 'cube-rotation-analyze-opposite'
+    correctAnswer = cubeBuildingKey(opposite.building)
+    explanation = `Die gewählte Fehlerdarstellung gehört zur entgegengesetzten Drehrichtung. ${content.turnGuidance[turn]}`
+  }
   return withMetadata({
     ...base('cube-rotation', seed, difficulty, values),
     ...skillContent,
-    prompt: renderCatalogText(content.prompt, values),
-    typeId: 'cube-building-quarter-turn',
+    prompt,
+    typeId,
     subskillId: `cube-rotation-${turn}`,
     answerMode: 'choice',
-    correctAnswer: cubeBuildingKey(correct),
+    correctAnswer,
     options,
     representation: {
       kind: 'cube-rotation',
@@ -2616,18 +2787,21 @@ function cubeRotation(seed: number, difficulty: Difficulty, focus?: string): Exe
       },
       valueRoles: { knownValues: ['width', 'depth', 'heights', 'turn', 'turnLabel', 'axisLabel'], unknownValues: ['rotated-building'], revealedValues: [] }
     },
-    explanation: `${content.turnGuidance[turn]} ${skillContent.explanation}`
+    explanation
   })
 }
 
-function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise {
+function folding(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().spatialFolding
   const requestedMode = focus === 'fold-cut-unfold' ? 'cut-unfold' : focus === 'fold-point' ? 'point-fold' : undefined
-  const levelCandidates = content.templates.filter((template) => template.difficulty === difficulty)
+  const effectiveDifficulty: Difficulty = phase === undefined ? difficulty
+    : phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1
+      : phase === 'independent-practice' || phase === 'automate' ? 2 : 3
+  const levelCandidates = content.templates.filter((template) => template.difficulty === effectiveDifficulty)
   const focusedCandidates = requestedMode ? levelCandidates.filter((template) => template.mode === requestedMode) : levelCandidates
   const candidates = focusedCandidates.length > 0 ? focusedCandidates : levelCandidates
-  if (candidates.length === 0) throw new Error(`Keine Faltvorlage für Stufe ${difficulty}.`)
+  if (candidates.length === 0) throw new Error(`Keine Faltvorlage für Stufe ${effectiveDifficulty}.`)
   const template = pick(random, candidates)
   const outcomes = createFoldingOutcomes(template as FoldingTemplate)
   const values = {
@@ -2647,10 +2821,11 @@ function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise
       misconception: template.mode === 'point-fold' ? 'Punkt wird verschoben statt gespiegelt' : 'Zweiter Schnitt wird verschoben statt gespiegelt'
     }
   ])
-  const options = resultCandidates.map((candidate, index): AnswerOption => ({
+  const foldingOptions = resultCandidates.map((candidate, index): AnswerOption => ({
     value: foldingCellsKey(candidate.cells),
     label: content.optionLabels[index]!,
     misconception: candidate.misconception,
+    misconceptionId: candidate.misconception?.includes('Ausgangsort') || candidate.misconception?.includes('kein Spiegelpunkt') ? 'folding-point-stays' : candidate.misconception?.includes('verschoben') ? 'folding-shift' : undefined,
     representation: {
       kind: 'folding-paper',
       visibility: 'always',
@@ -2670,14 +2845,43 @@ function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise
     }
   }))
   const skillContent = contentFor('folding', values, difficulty)
+  let prompt = renderCatalogText(template.mode === 'point-fold' ? content.pointPrompt : content.cutPrompt, values)
+  let typeId: string = template.mode
+  let correctAnswer = foldingCellsKey(outcomes.correct)
+  let options = foldingOptions
+  let explanation = `${content.modeGuidance[template.mode]} ${skillContent.explanation}`
+  if (phase === 'activate') {
+    prompt = 'Welche Papierhälfte bewegt sich laut Faltpfeil über die Achse?'
+    typeId = 'folding-identify-moving-side'
+    correctAnswer = content.foldLabels[template.foldSide]
+    const otherSides = Object.entries(content.foldLabels).filter(([side]) => side !== template.foldSide).map(([, label]) => label)
+    options = textOptions(random, correctAnswer, otherSides.map((value) => ({ value, misconception: 'Faltseite oder Faltrichtung wird vertauscht.', misconceptionId: 'folding-moving-side' })))
+  } else if (phase === 'understand') {
+    prompt = 'Welche Beziehung gilt für den Punkt vor und nach einer einzelnen Faltung?'
+    typeId = 'folding-understand-equal-distance'
+    correctAnswer = 'Er liegt auf der anderen Seite im gleichen Abstand zur Faltachse.'
+    options = textOptions(random, correctAnswer, [
+      { value: 'Er bleibt auf derselben Seite am Ausgangsort.', misconception: 'Der Punkt bleibt trotz Faltung am Ausgangsort.', misconceptionId: 'folding-point-stays' },
+      { value: 'Er rutscht parallel zum Papierrand weiter.', misconception: 'Der Punkt wird verschoben statt gespiegelt.', misconceptionId: 'folding-shift' }
+    ])
+  } else if (phase === 'guided-practice') {
+    typeId = 'folding-point-guided'
+  } else if (phase === 'independent-practice') {
+    typeId = 'folding-point-independent'
+  } else if (phase === 'automate') {
+    typeId = 'folding-point-fluent'
+  } else if (phase === 'transfer') {
+    typeId = 'folding-cut-unfold-transfer'
+    explanation = `${content.modeGuidance['cut-unfold']} ${skillContent.explanation}`
+  }
   return withMetadata({
     ...base('folding', seed, difficulty, values),
     ...skillContent,
-    prompt: renderCatalogText(template.mode === 'point-fold' ? content.pointPrompt : content.cutPrompt, values),
-    typeId: template.mode,
+    prompt,
+    typeId,
     subskillId: template.mode === 'point-fold' ? 'fold-point' : 'fold-cut-unfold',
     answerMode: 'choice',
-    correctAnswer: foldingCellsKey(outcomes.correct),
+    correctAnswer,
     options,
     representation: {
       kind: 'folding-paper',
@@ -2696,7 +2900,7 @@ function folding(seed: number, difficulty: Difficulty, focus?: string): Exercise
       },
       valueRoles: { knownValues: ['rows', 'columns', 'axis', 'foldSide', 'mode', 'marks', 'showInstruction', 'axisLabel', 'foldLabel'], unknownValues: ['targetCells'], revealedValues: [] }
     },
-    explanation: `${content.modeGuidance[template.mode]} ${skillContent.explanation}`
+    explanation
   })
 }
 
@@ -3157,10 +3361,10 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'money': return money(seed, difficulty, phase)
     case 'lengths': return lengths(seed, difficulty, phase)
     case 'word-problem': return wordProblem(seed, difficulty, phase)
-    case 'symmetry': return symmetry(seed, difficulty, focus)
-    case 'body-views': return bodyViews(seed, difficulty)
-    case 'cube-rotation': return cubeRotation(seed, difficulty, focus)
-    case 'folding': return folding(seed, difficulty, focus)
+    case 'symmetry': return symmetry(seed, difficulty, focus, phase)
+    case 'body-views': return bodyViews(seed, difficulty, phase)
+    case 'cube-rotation': return cubeRotation(seed, difficulty, focus, phase)
+    case 'folding': return folding(seed, difficulty, focus, phase)
     case 'read-tables': return readTables(seed, difficulty, phase)
     case 'read-charts': return readCharts(seed, difficulty, phase)
     case 'probability': return probability(seed, difficulty, phase)
@@ -3168,10 +3372,10 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'time': return time(seed, difficulty, phase)
     case 'mass': return measurementQuantity('mass', seed, difficulty, phase)
     case 'capacity': return measurementQuantity('capacity', seed, difficulty, phase)
-    case 'plane-shapes': return planeShapes(seed, difficulty)
+    case 'plane-shapes': return planeShapes(seed, difficulty, phase)
     case 'patterns': return patterns(seed, difficulty, phase)
-    case 'area': return area(seed, difficulty)
-      case 'perimeter': return perimeter(seed, difficulty)
+    case 'area': return area(seed, difficulty, phase)
+    case 'perimeter': return perimeter(seed, difficulty, phase)
     }
   })()
   if (!phase) return generated

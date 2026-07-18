@@ -922,8 +922,12 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (new Set(skillIds).size !== SKILL_IDS.length || !SKILL_IDS.every((id) => skillIds.includes(id))) return false
   const symmetrySkill = value.skills.find((skill) => (skill as CatalogSkill).id === 'symmetry') as CatalogSkill | undefined
   const expectedSymmetryExerciseTypes = [
-    ['symmetry:phase-1'], ['symmetry:phase-1'], ['symmetry:phase-1'],
-    ['symmetry:phase-2'], ['symmetry:phase-3'], ['symmetry:phase-3']
+    ['symmetry:symmetry-identify-side-change'],
+    ['symmetry:symmetry-understand-equal-distance'],
+    ['symmetry:symmetry-mirror-guided'],
+    ['symmetry:symmetry-mirror-independent'],
+    ['symmetry:symmetry-mirror-fluent'],
+    ['symmetry:symmetry-analyze-wrong-axis']
   ]
   if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) return false
   if (!Array.isArray(value.preparedTopics) || value.preparedTopics.length !== 1 || !value.preparedTopics.every((topic) =>

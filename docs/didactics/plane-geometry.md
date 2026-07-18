@@ -1,5 +1,7 @@
 # Ebene Figuren, Muster, Fläche und Umfang
 
+Status: `active` in App 0.29.0, Katalog 0.28.0 und Schema 19. Seit 0.29 besitzt jede Kompetenz sechs eigenständige Lernhandlungen von Beobachten und Begründen über geführtes und selbstständiges Anwenden bis zu flüssigem Bearbeiten und Fehleranalyse. Die verbindlichen Typkennungen stehen in der [Curriculum-Matrix](../curriculum-matrix.md), die fachliche Begründung in [didactic-migration-0.29.0.md](../didactic-migration-0.29.0.md).
+
 ## 1. Bezug zum Förderbedarf
 Kinder sollen ebene Formen anhand ihrer Eigenschaften erfassen, Regelmäßigkeiten erkennen und Fläche sowie Umfang als unterschiedliche mathematische Größen aufbauen.
 ## 2. Lehrplanbereich

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.27.0",
+  "catalogVersion": "0.28.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-18",
   "status": "ready-for-review",
@@ -2206,49 +2206,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Eine bekannte Voraufgabe und vertraute Darstellung sicher abrufen.",
+          "goal": "Seitenwechsel gegenüber einer Verschiebung wahrnehmen.",
           "exerciseTypes": [
-            "symmetry:phase-1"
+            "symmetry:symmetry-identify-side-change"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Die mathematische Kernidee an einer sichtbaren Darstellung erklären.",
+          "goal": "Gleichen senkrechten Abstand auf beiden Seiten der Achse untersuchen.",
           "exerciseTypes": [
-            "symmetry:phase-1"
+            "symmetry:symmetry-understand-equal-distance"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Eine einfache Figur an einer senkrechten Achse zwischen Zellen spiegeln.",
           "exerciseTypes": [
-            "symmetry:phase-1"
+            "symmetry:symmetry-mirror-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
+          "goal": "Komplexere Figuren selbstständig an einer senkrechten Achse spiegeln.",
           "exerciseTypes": [
-            "symmetry:phase-2"
+            "symmetry:symmetry-mirror-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Das Spiegelprinzip ohne Zeitdruck auf waagerechte Achsen übertragen.",
           "exerciseTypes": [
-            "symmetry:phase-3"
+            "symmetry:symmetry-mirror-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Ein Spiegelbild mit falschem Achsenbezug gezielt als Fehler analysieren.",
           "exerciseTypes": [
-            "symmetry:phase-3"
+            "symmetry:symmetry-analyze-wrong-axis"
           ],
           "releaseStatus": "active"
         }
@@ -2257,6 +2257,23 @@
         "Die Lösung ist mathematisch korrekt.",
         "Die Aufgabe wird auf dem vorgesehenen Schwierigkeitsniveau ohne vollständiges Vorsagen gelöst.",
         "Nach einem Fehler kann eine verwandte Variante mit passender Hilfe bearbeitet werden."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "symmetry-shift",
+          "misconception": "Eine Verschiebung wird als Spiegelung gewählt.",
+          "feedback": "Eine Spiegelung wechselt die Seite der Achse und behält den senkrechten Abstand. Eine bloße Verschiebung reicht nicht."
+        },
+        {
+          "id": "symmetry-wrong-axis",
+          "misconception": "Oben und unten werden statt links und rechts vertauscht.",
+          "feedback": "Prüfe zuerst, ob die grüne Achse senkrecht oder waagerecht liegt. Nur über diese Achse wird gespiegelt."
+        },
+        {
+          "id": "symmetry-error-analysis",
+          "misconception": "Der Abstand eines Feldes zur Spiegelachse wird verändert.",
+          "feedback": "Vergleiche im Fehlerbild Seite und Abstand jedes Feldes mit der vorgegebenen Achse."
+        }
       ]
     },
     {
@@ -3473,7 +3490,9 @@
       "misconceptions": [
         "Eine Ansicht wird mit dem ganzen räumlichen Bild verwechselt.",
         "Hintereinander stehende Würfel werden in der Vorderansicht doppelt gezählt.",
-        "Vorder- und rechte Seitenansicht werden vertauscht."
+        "Vorder- und rechte Seitenansicht werden vertauscht.",
+        "Eine sichtbare Stapelhöhe wird in der ebenen Ansicht zu hoch oder zu niedrig übertragen.",
+        "Eine Ansicht wird fälschlich durch Drehen des Gebäudes erzeugt."
       ],
       "hints": [
         "Stelle dich gedanklich an die markierte {viewLabel}. Was liegt genau hintereinander?",
@@ -3563,34 +3582,33 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Vorne, rechts und oben an einem fest ausgerichteten Gebäude wiedererkennen.",
+          "goal": "Vorne, rechts und oben am fest ausgerichteten Gebäude unterscheiden.",
           "exerciseTypes": [
-            "body-views:front"
+            "body-views:body-view-identify-direction"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Ein kleines Gebäude Reihe für Reihe in die Vorderansicht übertragen.",
+          "goal": "Hintereinander stehende Würfel als eine Projektionsspalte verstehen.",
           "exerciseTypes": [
-            "body-views:front"
+            "body-views:body-view-understand-projection"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Vorderansichten mit sichtbarer Richtungsmarkierung zuordnen.",
+          "goal": "Eine einfache Vorderansicht mit sichtbarer Richtungsmarkierung zuordnen.",
           "exerciseTypes": [
-            "body-views:front"
+            "body-views:body-view-front-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Zwischen Vorder- und rechter Seitenansicht unterscheiden.",
+          "goal": "Vorder- und rechte Seitenansicht selbstständig unterscheiden.",
           "exerciseTypes": [
-            "body-views:front",
-            "body-views:right"
+            "body-views:body-view-mixed-independent"
           ],
           "releaseStatus": "active"
         },
@@ -3598,18 +3616,15 @@
           "id": "automate",
           "goal": "Bekannte Blickrichtungen an variierten Gebäuden sicher zuordnen.",
           "exerciseTypes": [
-            "body-views:front",
-            "body-views:right"
+            "body-views:body-view-mixed-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Zusätzlich Draufsichten und ähnlichere Ansichten unterscheiden.",
+          "goal": "Eine spiegelverkehrte, unvollständige oder höhenfalsche Ansicht analysieren.",
           "exerciseTypes": [
-            "body-views:front",
-            "body-views:right",
-            "body-views:top"
+            "body-views:body-view-analyze-error"
           ],
           "releaseStatus": "active"
         }
@@ -3618,6 +3633,28 @@
         "Die gewählte Ansicht entspricht der fest markierten Blickrichtung.",
         "Hintereinander stehende Würfel werden korrekt auf dieselbe Rasterposition projiziert.",
         "Vorder-, rechte Seiten- und Draufsicht werden nicht durch Rotation des Gebäudes verwechselt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "body-view-direction",
+          "misconception": "Vorder- und rechte Seitenansicht werden vertauscht.",
+          "feedback": "Nutze die feste Markierung: Grün bezeichnet vorne, Blau rechts und der Blick von oben die Draufsicht."
+        },
+        {
+          "id": "body-view-depth-overcount",
+          "misconception": "Hintereinander stehende Würfel werden in der Vorderansicht doppelt gezählt.",
+          "feedback": "Würfel, die aus der Blickrichtung genau hintereinander stehen, belegen dieselbe Rasterspalte. Sichtbar bleibt die größte Höhe."
+        },
+        {
+          "id": "body-view-stack-height",
+          "misconception": "Eine sichtbare Stapelhöhe wird in der ebenen Ansicht zu hoch oder zu niedrig übertragen.",
+          "feedback": "Prüfe jede sichtbare Rasterspalte und übertrage dort genau die höchste Stapelhöhe."
+        },
+        {
+          "id": "body-view-rotation",
+          "misconception": "Eine Ansicht wird fälschlich durch Drehen des Gebäudes erzeugt.",
+          "feedback": "Das Gebäude bleibt fest stehen. Nur der markierte Blickpunkt ändert, was in der ebenen Ansicht sichtbar ist."
+        }
       ]
     },
     {
@@ -3629,7 +3666,8 @@
         "Das Gebäude bleibt trotz Drehpfeil unverändert.",
         "Links- und Rechtsdrehung werden vertauscht.",
         "Drehen wird mit Spiegeln verwechselt.",
-        "Einzelne Würfel werden verschoben, obwohl das ganze Gebäude gemeinsam gedreht wird."
+        "Einzelne Würfel werden verschoben, obwohl das ganze Gebäude gemeinsam gedreht wird.",
+        "Eine Vierteldrehung wird als halbe Drehung gelesen."
       ],
       "hints": [
         "Verfolge zuerst eine auffällige Ecke. Bei der {turnLabel} dreht sich das ganze Gebäude gemeinsam.",
@@ -3722,52 +3760,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Drehachse, Pfeilrichtung und unverändertes Gebäude benennen.",
+          "goal": "Pfeilrichtung und Vierteldrehung erkennen.",
           "exerciseTypes": [
-            "cube-rotation:right"
+            "cube-rotation:cube-rotation-identify-direction"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Eine auffällige Ecke bei einer Rechtsdrehung verfolgen.",
+          "goal": "Links- und Rechtsdrehung als gegenseitige Umkehrungen verbinden.",
           "exerciseTypes": [
-            "cube-rotation:right"
+            "cube-rotation:cube-rotation-understand-inverse"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Eine einfache L-Grundfläche mit sichtbarer Achse nach rechts drehen.",
+          "goal": "Eine einfache Grundfläche mit sichtbarer Achse geführt drehen.",
           "exerciseTypes": [
-            "cube-rotation:right"
+            "cube-rotation:cube-rotation-guided-quarter-turn"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Links- und Rechtsdrehung unterscheiden und einen Stapel korrekt mitführen.",
+          "goal": "Links- oder Rechtsdrehung mit einem Stapel selbstständig ausführen.",
           "exerciseTypes": [
-            "cube-rotation:left",
-            "cube-rotation:right"
+            "cube-rotation:cube-rotation-independent-quarter-turn"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Bekannte Würfelgebäude nach einer Vierteldrehung sicher wiedererkennen.",
+          "goal": "Komplexere bekannte Gebäude nach einer Vierteldrehung sicher wiedererkennen.",
           "exerciseTypes": [
-            "cube-rotation:left",
-            "cube-rotation:right"
+            "cube-rotation:cube-rotation-fluent-quarter-turn"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Komplexere Grundformen und ähnlichere Fehlzustände über ein erhaltenes Merkmal unterscheiden.",
+          "goal": "Eine Drehung in die entgegengesetzte Richtung gezielt als Fehler analysieren.",
           "exerciseTypes": [
-            "cube-rotation:left",
-            "cube-rotation:right"
+            "cube-rotation:cube-rotation-analyze-opposite"
           ],
           "releaseStatus": "active"
         }
@@ -3777,6 +3812,33 @@
         "Würfelzahl, Nachbarschaften und Stapelhöhen bleiben erhalten.",
         "Ausgangslage, korrekte Drehung und entgegengesetzte Drehung sind eindeutig verschieden.",
         "Die Kompetenz wird erst nach fünf Körperansichtsversuchen und Lernwert 60 adaptiv ausgewählt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "rotation-not-rotated",
+          "misconception": "Das Gebäude bleibt trotz Drehpfeil unverändert.",
+          "feedback": "Der Pfeil verlangt eine Lageänderung. Verfolge eine auffällige Ecke durch genau eine Vierteldrehung."
+        },
+        {
+          "id": "rotation-opposite-direction",
+          "misconception": "Links- und Rechtsdrehung werden vertauscht.",
+          "feedback": "Vergleiche die Pfeilrichtung mit links und rechts und verfolge zuerst nur eine auffällige Ecke."
+        },
+        {
+          "id": "rotation-mirror",
+          "misconception": "Drehen wird mit Spiegeln verwechselt.",
+          "feedback": "Beim Drehen bleiben Nachbarschaften und Stapel erhalten; das Gebäude wird nicht gespiegelt."
+        },
+        {
+          "id": "rotation-whole-building",
+          "misconception": "Einzelne Würfel werden verschoben, obwohl das ganze Gebäude gemeinsam gedreht wird.",
+          "feedback": "Alle Würfel bewegen sich gemeinsam um die Achse. Einzelne Würfel werden nicht verschoben."
+        },
+        {
+          "id": "rotation-angle",
+          "misconception": "Eine Vierteldrehung wird als halbe Drehung gelesen.",
+          "feedback": "Eine Vierteldrehung sind 90 Grad. Zwei Vierteldrehungen wären erst 180 Grad."
+        }
       ]
     },
     {
@@ -3881,33 +3943,33 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Faltachse und bewegte Papierhälfte benennen.",
+          "goal": "Faltachse und bewegte Papierhälfte am Pfeil erkennen.",
           "exerciseTypes": [
-            "folding:point-vertical"
+            "folding:folding-identify-moving-side"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Gleiche Abstände auf beiden Seiten einer senkrechten Faltachse erkennen.",
+          "goal": "Gleichen Abstand auf der anderen Seite der Faltachse begründen.",
           "exerciseTypes": [
-            "folding:point-vertical"
+            "folding:folding-understand-equal-distance"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Einen Punkt mit sichtbarer senkrechter Achse verfolgen.",
+          "goal": "Einen Punkt an einer senkrechten Achse geführt verfolgen.",
           "exerciseTypes": [
-            "folding:point-vertical"
+            "folding:folding-point-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Senkrechte und waagerechte Einzelfaltungen selbstständig unterscheiden.",
+          "goal": "Punkte bei senkrechten und waagerechten Faltungen selbstständig verfolgen.",
           "exerciseTypes": [
-            "folding:point-mixed-axis"
+            "folding:folding-point-independent"
           ],
           "releaseStatus": "active"
         },
@@ -3915,15 +3977,15 @@
           "id": "automate",
           "goal": "Punktlagen bei wechselnder Achse und Richtung sicher vorhersagen.",
           "exerciseTypes": [
-            "folding:point-mixed-axis"
+            "folding:folding-point-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Einen einfachen Faltschnitt beim Aufklappen als Spiegelpaar deuten.",
+          "goal": "Einen einfachen Faltschnitt nach dem Aufklappen als Spiegelpaar bestimmen.",
           "exerciseTypes": [
-            "folding:cut-unfold"
+            "folding:folding-cut-unfold-transfer"
           ],
           "releaseStatus": "active"
         }
@@ -3933,6 +3995,28 @@
         "Der Zielpunkt besitzt denselben senkrechten Abstand zur Achse wie der Ausgangspunkt.",
         "Beim Aufklappen eines einfachen Faltschnitts erscheinen genau zwei symmetrische Markierungen.",
         "Mehrfachfaltungen und Körpernetze werden nicht erzeugt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "folding-point-stays",
+          "misconception": "Der Punkt bleibt beim Falten an seinem Ausgangsort.",
+          "feedback": "Die gefaltete Papierhälfte bewegt den Punkt über die Achse; er bleibt nicht am Ausgangsort."
+        },
+        {
+          "id": "folding-shift",
+          "misconception": "Der Punkt wird parallel verschoben statt mit gleichem Achsenabstand gespiegelt.",
+          "feedback": "Miss den senkrechten Abstand zur Achse. Der Zielpunkt liegt auf der anderen Seite im gleichen Abstand."
+        },
+        {
+          "id": "folding-single-hole",
+          "misconception": "Beim Aufklappen wird nur ein Loch erwartet.",
+          "feedback": "Der Schnitt geht durch beide Papierlagen. Nach dem Aufklappen erscheinen Schnitt und Spiegelstelle gemeinsam."
+        },
+        {
+          "id": "folding-moving-side",
+          "misconception": "Die Faltachse wird mit dem Rand des Papiers verwechselt.",
+          "feedback": "Die markierte Faltachse bleibt fest; nur die durch den Pfeil benannte Papierhälfte bewegt sich darüber."
+        }
       ]
     },
     {
@@ -5266,49 +5350,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Ecken und Seiten erinnern.",
+          "goal": "Ecken an einer sichtbaren Außenform beobachten und zählen.",
           "exerciseTypes": [
-            "plane-shapes:foundation"
+            "plane-shapes:shape-observe-corners"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Außenrand als Formmerkmal verstehen.",
+          "goal": "Seiten und Ecken zu einer passenden Formbeschreibung verbinden.",
           "exerciseTypes": [
-            "plane-shapes:foundation"
+            "plane-shapes:shape-connect-features"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Grundformen sicher erkennen.",
+          "goal": "Grundformen mithilfe ihrer Merkmale erkennen.",
           "exerciseTypes": [
-            "plane-shapes:foundation"
+            "plane-shapes:shape-identify-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Sichtbare Zerlegungen bestimmen.",
+          "goal": "Sichtbare Zerlegungen einer ganzen Figur bestimmen.",
           "exerciseTypes": [
-            "plane-shapes:practice"
+            "plane-shapes:shape-decompose-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Figuren in wechselnder Lage erkennen.",
+          "goal": "Grundformen anhand mehrerer Merkmale sicher zuordnen.",
           "exerciseTypes": [
-            "plane-shapes:practice"
+            "plane-shapes:shape-identify-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Aus Teilen eine ganze Figur begründen.",
+          "goal": "Aus sichtbaren Teilen die lückenlose Außenform bestimmen.",
           "exerciseTypes": [
-            "plane-shapes:transfer"
+            "plane-shapes:shape-compose-transfer"
           ],
           "releaseStatus": "active"
         }
@@ -5317,6 +5401,28 @@
         "Lage und Form werden getrennt.",
         "Teilungslinien werden nicht als Außenkanten gezählt.",
         "Zusammengesetzte Figuren besitzen weder Lücke noch Überlappung."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "shape-corner-count",
+          "misconception": "Die Lage einer Figur wird mit ihrer Form verwechselt.",
+          "feedback": "Fahre den Außenrand einmal ab und markiere jeden Richtungswechsel genau einmal als Ecke."
+        },
+        {
+          "id": "shape-single-feature",
+          "misconception": "Quadrat und Rechteck werden als völlig unabhängige Formen behandelt.",
+          "feedback": "Nutze mehrere Merkmale gemeinsam: Anzahl der Ecken, Seitenlängen und gegenüberliegende Seiten."
+        },
+        {
+          "id": "shape-part-count",
+          "misconception": "Teilungslinien werden für Außenkanten gehalten.",
+          "feedback": "Zähle die vollständig getrennten Teilflächen. Der Außenrand ist keine zusätzliche Teilung."
+        },
+        {
+          "id": "shape-part-whole",
+          "misconception": "Beim Zusammensetzen werden Lücken oder Überlappungen übersehen.",
+          "feedback": "Betrachte nach dem Zusammensetzen nur die lückenlose Außenform, nicht die einzelnen Teilformen."
+        }
       ]
     },
     {
@@ -5435,49 +5541,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Gleiche Symbole ordnen.",
+          "goal": "Den kleinsten wiederholten Musterblock finden.",
           "exerciseTypes": [
-            "patterns:find-smallest-block"
+            "patterns:pattern-activate-find-block"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Wiederholung als Regel verstehen.",
+          "goal": "Den Neustart eines Musterblocks erkennen.",
           "exerciseTypes": [
-            "patterns:identify-restart"
+            "patterns:pattern-understand-restart"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "AB-Folgen fortsetzen.",
+          "goal": "Ein Muster mit markierter Blockstruktur fortsetzen.",
           "exerciseTypes": [
-            "patterns:continue-ab"
+            "patterns:pattern-guided-continue"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "ABC-Folgen fortsetzen.",
+          "goal": "Ein Muster ohne Blockmarkierung fortsetzen.",
           "exerciseTypes": [
-            "patterns:continue-abc"
+            "patterns:pattern-independent-continue"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Blöcke sicher erfassen.",
+          "goal": "Zwei aufeinanderfolgende Zeichen eines verstandenen Blocks sicher ergänzen.",
           "exerciseTypes": [
-            "patterns:continue-complex"
+            "patterns:pattern-automate-next-pair"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Regel eines komplexeren Blocks beschreiben.",
+          "goal": "Eine fehlerhafte Stelle in einem Musterblock identifizieren.",
           "exerciseTypes": [
-            "patterns:identify-error"
+            "patterns:pattern-transfer-identify-error"
           ],
           "releaseStatus": "active"
         }
@@ -5588,49 +5694,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Einheitsquadrate erkennen.",
+          "goal": "Ein gefülltes Einheitsquadrat als Flächeneinheit erkennen.",
           "exerciseTypes": [
-            "area:foundation"
+            "area:area-identify-unit"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Lückenlose Bedeckung verstehen.",
+          "goal": "Fläche als lückenlose Bedeckung mit Einheitsquadraten verstehen.",
           "exerciseTypes": [
-            "area:foundation"
+            "area:area-understand-covering"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Kleine Rechtecke zählen.",
+          "goal": "Kleine rechteckige Flächen geführt zählen.",
           "exerciseTypes": [
-            "area:foundation"
+            "area:area-count-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Reihen strukturiert erfassen.",
+          "goal": "Einheitsquadrate in größeren Rechtecken strukturiert erfassen.",
           "exerciseTypes": [
-            "area:practice"
+            "area:area-count-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Flächen unabhängig von Lage bestimmen.",
+          "goal": "Verstandene Reihenstrukturen ohne Zeitdruck sicher nutzen.",
           "exerciseTypes": [
-            "area:practice"
+            "area:area-count-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Unregelmäßige Flächen geordnet zählen.",
+          "goal": "Die Verwechslung von Außenrand und bedeckter Fläche analysieren.",
           "exerciseTypes": [
-            "area:transfer"
+            "area:area-analyze-boundary-error"
           ],
           "releaseStatus": "active"
         }
@@ -5639,6 +5745,28 @@
         "Nur gefüllte Felder werden gezählt.",
         "Jedes Feld wird genau einmal gezählt.",
         "Die Figur bleibt vollständig im Raster."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "area-cell-count",
+          "misconception": "Nur Quadrate am Rand werden gezählt.",
+          "feedback": "Zur Fläche gehören alle gefüllten Einheitsquadrate, auch die im Inneren."
+        },
+        {
+          "id": "area-row-column",
+          "misconception": "Reihen und Spalten werden addiert statt alle Felder zu erfassen.",
+          "feedback": "Jede Reihe enthält mehrere Felder. Erfasse alle Felder Reihe für Reihe, statt nur Reihen und Spalten zu addieren."
+        },
+        {
+          "id": "area-grid-lines",
+          "misconception": "Leere Rasterfelder werden mitgezählt.",
+          "feedback": "Gezählt werden bedeckte Einheitsquadrate. Leere Felder und reine Gitterlinien gehören nicht zur Fläche."
+        },
+        {
+          "id": "area-perimeter-confusion",
+          "misconception": "Fläche und Umfang werden verwechselt.",
+          "feedback": "Fläche beschreibt die bedeckte Innenseite. Zähle Einheitsquadrate und nicht Außenkanten."
+        }
       ]
     },
     {
@@ -5741,49 +5869,49 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Außen- und Innenkante unterscheiden.",
+          "goal": "Eine Seite eines Einheitsquadrats als Längeneinheit am Rand erkennen.",
           "exerciseTypes": [
-            "perimeter:foundation"
+            "perimeter:perimeter-identify-unit-edge"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "understand",
-          "goal": "Randweg als geschlossene Linie verstehen.",
+          "goal": "Umfang als geschlossenen Außenweg verstehen.",
           "exerciseTypes": [
-            "perimeter:foundation"
+            "perimeter:perimeter-understand-boundary"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Kleine Rechtecke umranden.",
+          "goal": "Den Rand kleiner Rechtecke geführt verfolgen.",
           "exerciseTypes": [
-            "perimeter:foundation"
+            "perimeter:perimeter-trace-guided"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Längere Randwege zählen.",
+          "goal": "Längere Randwege selbstständig vollständig zählen.",
           "exerciseTypes": [
-            "perimeter:practice"
+            "perimeter:perimeter-trace-independent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "automate",
-          "goal": "Randkanten sicher verfolgen.",
+          "goal": "Bekannte Randwege ohne Zeitdruck sicher verfolgen.",
           "exerciseTypes": [
-            "perimeter:practice"
+            "perimeter:perimeter-trace-fluent"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "transfer",
-          "goal": "Unregelmäßige Figuren begründen.",
+          "goal": "Die Verwechslung von Einheitsquadraten und Randkanten analysieren.",
           "exerciseTypes": [
-            "perimeter:transfer"
+            "perimeter:perimeter-analyze-area-error"
           ],
           "releaseStatus": "active"
         }
@@ -5792,6 +5920,28 @@
         "Nur äußere Randkanten werden gezählt.",
         "Der Randweg ist geschlossen und vollständig.",
         "Keine gemeinsame Innenkante wird mitgezählt."
+      ],
+      "misconceptionFeedback": [
+        {
+          "id": "perimeter-area-confusion",
+          "misconception": "Einheitsquadrate werden statt Randkanten gezählt.",
+          "feedback": "Umfang ist die Länge des Außenrandes. Zähle Randkanten statt gefüllter Kästchen."
+        },
+        {
+          "id": "perimeter-inner-edge",
+          "misconception": "Innere gemeinsame Kanten werden mitgezählt.",
+          "feedback": "Gemeinsame Kanten im Inneren gehören nicht zum geschlossenen Außenweg."
+        },
+        {
+          "id": "perimeter-missing-edge",
+          "misconception": "Eine Randseite wird ausgelassen.",
+          "feedback": "Verfolge den Außenrand lückenlos bis zum Startpunkt und markiere jede Randkante genau einmal."
+        },
+        {
+          "id": "perimeter-boundary-concept",
+          "misconception": "Fläche und Umfang werden verwechselt.",
+          "feedback": "Trenne Innenfläche und Rand: Für den Umfang wird nur der geschlossene Randweg gemessen."
+        }
       ]
     }
   ],

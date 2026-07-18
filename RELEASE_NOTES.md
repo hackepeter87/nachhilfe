@@ -1,5 +1,15 @@
 # Mathe-Reise
 
+## Raum und Form 0.29.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Ebene Figuren, Muster, Fläche, Umfang, Symmetrie, Körperansichten, Würfelrotation und Falten wurden auf den Qualitätsstandard ab 0.21 migriert.
+- Jede Kompetenz besitzt sechs fachlich verschiedene Lernhandlungen. Beobachten und Begründen stehen vor Zuordnung, Berechnung oder Transformation; Transfer besteht aus Zusammensetzen oder einer konkreten Fehleranalyse.
+- Fläche beginnt beim Einheitsquadrat, Umfang bei der Einheitskante. Katalogisierte Fehlvorstellungen unterscheiden Bedeckung, Gitterlinien, Innenkanten und Außenrand.
+- Symmetrie verwendet produktiv nur gerade Raster mit Achsen zwischen den Zellen. Körperansichten, Rotation und Falten trennen Blickrichtung, Projektion, Achse, Richtung und Transformation.
+- Katalog 0.28.0 bleibt bei Schema 19. Achsen durch Felder, Formeln, Maßstab, freie 3D-Rotation, Mehrfachfaltungen und Körpernetze bleiben ausgeschlossen. Eine Lehrkraftprüfung, Unterrichtserprobung und ein echter iPhone-Test sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 425 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.29.0-local` beziehungsweise `mathe-reise:local` (`sha256:463c8a8a58a62b1133e5a9b9c4f4351ed907b630d6994a6eecf43bb5a83e5377`) läuft als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldet `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; MIME-, Cache- und Security-Header entsprechen der Containerkonfiguration. Die Container-E2E liefen auf `127.0.0.1:8089`. Podman war nicht installiert; die Compose-Datei wurde mit Docker Compose erfolgreich validiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Daten und Wahrscheinlichkeit 0.28.0
 
 - Tabellen, Diagramme und Wahrscheinlichkeit besitzen nun sechs fachlich verschiedene Lernhandlungen vom Erkennen der Datenrollen beziehungsweise des Ergebnisraums bis zum Transfer.
