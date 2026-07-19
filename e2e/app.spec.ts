@@ -103,6 +103,12 @@ async function finishSubtractionWarmups(page: Page) {
     const partWhole = prompt.match(/wie (\d+) in (\d+) und (\d+) zerlegt/i)
     if (partWhole) {
       await page.getByRole('button', { name: `${partWhole[2]} + ${partWhole[3]} = ${partWhole[1]}`, exact: true }).click()
+    } else if (/Welche Plusaufgabe gehört zur selben Aufgabenfamilie/i.test(prompt)) {
+      const [whole, removed, difference] = prompt.match(/\d+/g)?.map(Number) ?? []
+      if (whole === undefined || removed === undefined || difference === undefined) {
+        throw new Error(`Aufgabenfamilie ist nicht lesbar: ${prompt}`)
+      }
+      await page.getByRole('button', { name: `${difference} + ${removed} = ${whole}`, exact: true }).click()
     } else {
       const [first, second] = prompt.match(/\d+/g)?.map(Number) ?? []
       const input = page.getByLabel('Deine Antwort')
@@ -159,9 +165,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.29.0',
+    catalogVersion: '0.29.1',
     schemaVersion: 19,
-    appVersion: '0.30.0'
+    appVersion: '0.30.1'
   })
 
   await page.reload()
@@ -243,14 +249,14 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
     if (await chance.isVisible().catch(() => false)) {
       seen.add('probability')
       await expect(chance).toHaveAttribute('aria-label', /Mögliche gleich große Felder oder Ergebnisse/)
-      const outcomes = (await chance.locator('.chance-outcomes span').allTextContents()).map((outcome) => outcome.replace(/^[□○●]\s*/, '').trim())
+      const outcomes = (await chance.locator('.chance-outcomes span, .chance-legend span, .coin-faces span').allTextContents()).map((outcome) => outcome.replace(/^[□○●KZ]\s*/, '').trim())
       expect(outcomes.length).toBeGreaterThanOrEqual(2)
       const prompt = await page.locator('.exercise-heading h2').textContent()
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wahrscheinlichkeit-375x812.png'), fullPage: true })
       if (prompt?.includes('im sichtbaren Ergebnisraum enthalten')) {
         await page.getByRole('button', { name: outcomes[0]!, exact: true }).click()
-      } else if (prompt?.includes('alle möglichen Ergebnisse')) {
-        await page.getByRole('button', { name: [...new Set(outcomes)].join(', '), exact: true }).click()
+      } else if (prompt?.includes('Vorhersage')) {
+        await page.getByRole('button', { name: `Es kann ${[...new Set(outcomes)].join(' oder ')} erscheinen.`, exact: true }).click()
       } else {
         const event = ['rot', 'blau', 'grün', 'gelb'].find((color) => prompt?.toLowerCase().includes(color))
         if (!event) throw new Error('Das Ereignis der Zufallsaufgabe ist nicht lesbar.')
@@ -299,7 +305,7 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
 
   const referenceAnswers = new Map([
     ['einem Apfel', '200 g'], ['einer Packung Butter', '250 g'], ['einer Packung Mehl', '1 kg'],
-    ['einem Teelöffel', '5 ml'], ['einem Trinkglas', '250 ml'], ['einer Wasserflasche', '1 l']
+    ['einem Teelöffel', '5 ml'], ['einem Trinkglas', '250 ml'], ['ein kleines Trinkpäckchen', '200 ml']
   ])
   const seen = new Set<string>()
   for (let focus = 0; focus < 3; focus += 1) {
@@ -308,7 +314,7 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
     const capacity = page.locator('.quantity-measure--capacity')
     await expect(clock.or(mass).or(capacity).first()).toBeVisible()
     await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
-    await expect(page.locator('.quantity-result')).toHaveText('Ergebnis: ?')
+    await expect(page.locator('.quantity-result')).toHaveCount(0)
 
     if (await clock.isVisible().catch(() => false)) {
       seen.add('time')
@@ -331,9 +337,9 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
       if (await mass.isVisible().catch(() => false)) seen.add('mass')
       else seen.add('capacity')
       await page.getByRole('button', { name: answer, exact: true }).click()
-      await page.locator('.session-page').screenshot({ path: testInfo.outputPath(`${item.includes('Teelöffel') || item.includes('Trinkglas') || item.includes('Wasserflasche') ? 'rauminhalt' : 'masse'}-375x812.png`), fullPage: true })
+      await page.locator('.session-page').screenshot({ path: testInfo.outputPath(`${item.includes('Teelöffel') || item.includes('Trinkglas') || item.includes('Trinkpäckchen') ? 'rauminhalt' : 'masse'}-375x812.png`), fullPage: true })
     }
-    await expect(page.locator('.quantity-result')).not.toHaveText('Ergebnis: ?')
+    await expect(page.locator('.quantity-result')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 2) {
       await page.setViewportSize({ width: 812, height: 375 })
@@ -360,12 +366,15 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
   const seen = new Set<string>()
   for (let focus = 0; focus < 2; focus += 1) {
     await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
-    await expect(page.locator('.quantity-result')).toHaveText(/\?$/)
+    await expect(page.locator('.quantity-result')).toHaveCount(0)
     const shape = page.locator('.shape-visual')
     if (await shape.isVisible().catch(() => false)) {
       seen.add('plane-shapes')
+      const comparisonAnswer = page.getByRole('button', { name: 'Beide Figuren haben vier Ecken.', exact: true })
       const outline = shape.locator('.shape-outline')
-      const answer = await outline.evaluate((element) => element.classList.contains('shape-outline--triangle') ? '3' : '4')
+      const answer = await comparisonAnswer.isVisible().catch(() => false)
+        ? 'Beide Figuren haben vier Ecken.'
+        : await outline.evaluate((element) => element.classList.contains('shape-outline--triangle') ? 'Dreieck' : element.classList.contains('shape-outline--square') ? 'Quadrat' : 'Rechteck')
       await page.getByRole('button', { name: answer, exact: true }).click()
       expect(await page.locator('.session-page').evaluate((element) => {
         const bounds = element.getBoundingClientRect()
@@ -432,7 +441,7 @@ test('Fläche und Umfang beginnen mit unterschiedlichen Einheiten und maskieren 
   for (let focus = 0; focus < 2; focus += 1) {
     const grid = page.locator('.unit-grid-visual')
     await expect(grid).toBeVisible()
-    await expect(grid.locator('.quantity-result')).toHaveText('Ergebnis: ?')
+    await expect(grid.locator('.quantity-result')).toHaveCount(0)
     await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
     let answer: string
     if (await grid.evaluate((element) => element.classList.contains('unit-grid-visual--area'))) {
@@ -445,7 +454,7 @@ test('Fläche und Umfang beginnen mit unterschiedlichen Einheiten und maskieren 
       await page.screenshot({ path: testInfo.outputPath('umfang-375x812.png'), fullPage: true })
     }
     await page.getByRole('button', { name: String(answer), exact: true }).click()
-    await expect(grid.locator('.quantity-result')).not.toHaveText('Ergebnis: ?')
+    await expect(grid.locator('.quantity-result')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 1) {
       await page.setViewportSize({ width: 812, height: 375 })
@@ -738,11 +747,8 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishAdditionWarmups(page)
 
-  await expect(page.getByText('1. Was wird gesucht?')).toBeVisible()
+  await expect(page.getByText(/1\. Schau auf das Bild/)).toBeVisible()
   await expect(page.getByText(/Mengenbeziehung|Welche Rechenart/i)).toHaveCount(0)
-  await page.getByRole('button', { name: 'Wie viele Muscheln hat Mila jetzt?' }).click()
-  await expect(page.getByText('2. Welche Angaben brauchst du für die ganze Geschichte?')).toBeVisible()
-  await page.getByRole('button', { name: /Muscheln und \d+ neue Muscheln/ }).click()
   const model = page.getByRole('img', { name: /neue Gesamtmenge unbekannt/i })
   await expect(model).toBeVisible()
   await expect(model).toContainText('?')
@@ -754,19 +760,19 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
     return bars[0]!.getBoundingClientRect().width / bars[1]!.getBoundingClientRect().width
   })
   expect(renderedRatio).toBeCloseTo(knownAmount / (knownAmount + addedAmount), 2)
-  await expect(page.locator('.feedback--step-success')).toBeVisible()
+  await expect(page.locator('.feedback--step-success')).toHaveCount(0)
   await expect(page.locator('.feedback--try')).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('sachaufgabe-modell-375x812.png'), fullPage: true })
   await page.getByRole('button', { name: 'Weiter zur Rechnung' }).click()
+  await expect(page.locator('.feedback--step-success')).toBeVisible()
   const story = await page.locator('.exercise-heading h2').textContent()
   const [first, second] = story?.match(/\d+/g)?.map(Number) ?? []
   if (first === undefined || second === undefined) throw new Error('Rechnung ist nicht lesbar')
-  await page.getByLabel('Deine Rechnung').fill(`${first} + ${second} = ?`)
-  await page.getByRole('button', { name: 'Rechnung prüfen' }).click()
+  await expect(model).toBeVisible()
+  await page.getByRole('button', { name: `${first} + ${second} = ?`, exact: true }).click()
   await page.getByLabel('Dein Ergebnis').fill(String(first + second))
   await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
-  await page.getByRole('button', { name: new RegExp(`Das Ergebnis ${first + second} ist größer`) }).click()
   await page.getByRole('button', { name: `Mila hat jetzt ${first + second} Muscheln.` }).click()
   await page.getByRole('button', { name: 'Weiter', exact: true }).click()
 })
@@ -926,7 +932,7 @@ test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', asy
     if (index === 2) await expect(resultRow).toHaveText(`?${String(answer).slice(1)}`)
   }
   await expect(resultRow).toHaveText(String(answer))
-  await expect(page.getByText(/Die Hunderterziffer \d stimmt/)).toBeVisible()
+  await expect(page.getByText(/Bei den Hundertern: \d − \d = \d\. Das stimmt\./)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('schriftliche-subtraktion-375x812.png'), fullPage: true })
   await page.setViewportSize({ width: 812, height: 375 })

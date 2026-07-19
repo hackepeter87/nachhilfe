@@ -208,11 +208,17 @@ function addition(seed: number, difficulty: Difficulty, focus?: string, phase?: 
       ...shared,
       typeId: 'addition-transfer-commutative', subskillId: bridge ? 'addition-bridge-10' : 'addition-within-10',
       prompt: `Welche Tauschaufgabe hat dasselbe Ergebnis wie ${first} + ${second}?`, answerMode: 'choice', correctAnswer: correct,
+      successFeedback: `Richtig: ${second} + ${first} ist die Tauschaufgabe.`,
+      explanation: `Die beiden Mengen tauschen ihre Plätze. ${first} + ${second} und ${second} + ${first} ergeben beide ${answer}.`,
+      hints: [
+        { level: 1, text: `Tausche nur die Reihenfolge von ${first} und ${second}. Das Pluszeichen bleibt.` },
+        { level: 2, text: `Die Tauschaufgabe beginnt mit ${second}.` }
+      ],
       options: textOptions(random, correct, [
         { value: `${second} − ${first} = ${Math.abs(second - first)}`, misconception: 'Tauschen mit Wechsel der Rechenart verwechselt', misconceptionId: 'addition-operation-reversal' },
         { value: `${first} + ${first} = ${first * 2}`, misconception: 'Ein Summand wurde doppelt verwendet', misconceptionId: 'addition-bridge-step' }
       ]),
-      representation: representation('addition', difficulty, 'ten-frame', 'Dieselben beiden Mengen in getauschter Reihenfolge', { first, second })
+      representation: representation('addition', difficulty, 'ten-frame', 'Dieselben beiden Mengen in getauschter Reihenfolge', { first: second, second: first })
     })
   }
   return withMetadata({
@@ -242,7 +248,9 @@ function subtraction(seed: number, difficulty: Difficulty, focus?: string, phase
     return withMetadata({
       ...shared,
       typeId: 'subtraction-activate-part-whole', subskillId: 'subtraction-part-whole',
-      prompt: `Welche Plusaufgabe zeigt, wie ${first} in ${answer} und ${second} zerlegt ist?`, answerMode: 'choice', correctAnswer: probe,
+      prompt: `${first} − ${second} = ${answer}. Welche Plusaufgabe gehört zur selben Aufgabenfamilie?`, answerMode: 'choice', correctAnswer: probe,
+      successFeedback: `Richtig: ${answer} + ${second} = ${first} prüft die Minusaufgabe.`,
+      explanation: `Bei ${first} − ${second} = ${answer} kennst du das Ganze und einen Teil. Mit ${answer} + ${second} = ${first} setzt du beide Teile wieder zum Ganzen zusammen.`,
       options: textOptions(random, probe, [
         { value: `${first} + ${second} = ${first + second}`, misconception: 'Die Gesamtmenge wird noch einmal addiert', misconceptionId: 'subtraction-number-order' },
         { value: `${second} − ${answer} = ${Math.abs(second - answer)}`, misconception: 'Teil und Ganzes werden vertauscht', misconceptionId: 'subtraction-number-order' }
@@ -1111,9 +1119,9 @@ function wordProblem(seed: number, difficulty: Difficulty, phase?: LearningPhase
     }
   const equationStep: ExerciseStep = {
     id: 'equation',
-    interaction: phase ? 'guided-equation' : 'select',
+    interaction: 'select',
     prompt: stepsContent.equationPrompt,
-    options: phase ? undefined : textOptions(random, equation, template.equationDistractors.map((text) => ({
+    options: textOptions(random, equation, template.equationDistractors.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Rechnung beschreibt ein anderes Mengenbild', misconceptionId: 'word-problem-keyword-operation'
     }))),
     correctAnswer: equation,
@@ -1130,9 +1138,9 @@ function wordProblem(seed: number, difficulty: Difficulty, phase?: LearningPhase
   }
   const secondEquationStep: ExerciseStep | undefined = template.secondOperation ? {
     id: 'second-equation',
-    interaction: phase ? 'guided-equation' : 'select',
+    interaction: 'select',
     prompt: renderCatalogText(stepsContent.secondEquationPrompt, values),
-    options: phase ? undefined : textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
+    options: textOptions(random, secondEquation, template.secondEquationDistractors!.map((text) => ({
       value: renderCatalogText(text, values), misconception: 'Zweite Veränderung in die falsche Richtung gerechnet'
     }))),
     correctAnswer: secondEquation,
@@ -1194,7 +1202,7 @@ function wordProblem(seed: number, difficulty: Difficulty, phase?: LearningPhase
       if (!step) throw new Error(`Katalogschritt ${definition.id} kann für ${template.id} nicht erzeugt werden.`)
       const catalogInteraction = definition.interaction === 'model-by-difficulty' ? modelInteraction : definition.interaction
       const expectedInteraction = definition.id === 'equation' || definition.id === 'second-equation'
-        ? phase ? 'guided-equation' : 'select'
+        ? 'select'
         : catalogInteraction === 'choice' ? 'select' : catalogInteraction === 'number' ? 'guided-number' : catalogInteraction
       const actualInteraction = step.interaction ?? 'select'
       if (actualInteraction !== expectedInteraction) throw new Error(`Interaktion für ${definition.id} weicht vom Katalog ab.`)
@@ -1436,7 +1444,9 @@ function writtenAdditionSteps(values: Record<string, number | string>, difficult
     successFeedback: renderCatalogText(successFeedback, values)
   })
   const steps = [
-    step('ones', content.onesPrompt, Number(values.onesResult), content.onesError, content.onesSuccess)
+    step('ones', content.onesPrompt, Number(values.onesResult),
+      `${values.firstOnes} + ${values.secondOnes}: Rechne zuerst nur die Einer.`,
+      `${values.firstOnes} + ${values.secondOnes} = ${Number(values.firstOnes) + Number(values.secondOnes)}. Die Einerziffer ${values.onesResult} stimmt.`)
   ]
   if (difficulty === 2) {
     steps.push(step('carry', content.carryPrompt, Number(values.carry), content.carryError, content.carrySuccess))
@@ -1487,6 +1497,8 @@ function writtenAddition(seed: number, difficulty: Difficulty, phase?: LearningP
     secondOnes = integer(random, 0, 9 - firstOnes)
   }
 
+  if (phase === 'activate') secondHundreds = 0
+
   const first = firstHundreds * 100 + firstTens * 10 + firstOnes
   const second = secondHundreds * 100 + secondTens * 10 + secondOnes
   const answer = first + second
@@ -1498,11 +1510,17 @@ function writtenAddition(seed: number, difficulty: Difficulty, phase?: LearningP
     tensResult: Math.floor(answer / 10) % 10,
     hundredsResult: Math.floor(answer / 100),
     carry: calculationLevel === 1 ? 0 : 1,
-    carryColumn
+    carryColumn,
+    firstHundreds, firstTens, firstOnes, secondHundreds, secondTens, secondOnes
   }
   const shared = {
     ...base('written-addition', seed, difficulty, values),
     ...contentFor('written-addition', values, difficulty),
+    explanation: phase === 'activate'
+      ? `${second} hat ${secondTens} Zehner und ${secondOnes} Einer. Deshalb bleibt die Hunderterspalte frei.`
+      : calculationLevel === 1
+        ? `Du hast jede Spalte von rechts nach links addiert. Es war kein Übertrag nötig. Das Ergebnis ist ${answer}.`
+        : `Du hast von rechts nach links gerechnet und den Übertrag genau in der nächsten Spalte mitgenommen. Das Ergebnis ist ${answer}.`,
     subskillId: calculationLevel === 1
       ? 'written-addition-no-carry'
       : carryColumn === 'tens'
@@ -1520,11 +1538,11 @@ function writtenAddition(seed: number, difficulty: Difficulty, phase?: LearningP
     return withMetadata({
       ...shared,
       typeId: 'written-addition-activate-alignment',
-      prompt: `Ordne ${second} stellengerecht unter ${first} ein. Welche Zahl gehört in die zweite Zeile?`,
+      prompt: `Trage ${second} stellengerecht unter ${first} ein.`,
       answerMode: 'guided-number',
       correctAnswer: String(second),
       steps: [{
-        id: 'second', interaction: 'place-value-input', prompt: 'Trage den zweiten Summanden stellengerecht ein.', correctAnswer: String(second),
+        id: 'second', interaction: 'place-value-input', prompt: 'Setze jede Ziffer in die passende H-, Z- oder E-Spalte.', correctAnswer: String(second),
         errorFeedback: 'Achte auf die Stellen: Einer unter Einer, Zehner unter Zehner und Hunderter unter Hunderter.',
         successFeedback: 'Die Stellen sind richtig ausgerichtet.'
       }],
@@ -1689,9 +1707,15 @@ function writtenSubtractionSteps(values: Record<string, number | string>, diffic
     steps.push(step('unbundle', content.unbundlePrompt, 1, content.unbundleError, content.unbundleSuccess))
   }
   steps.push(
-    step('ones', content.onesPrompt, Number(values.onesResult), content.onesError, content.onesSuccess),
-    step('tens', content.tensPrompt, Number(values.tensResult), content.tensError, content.tensSuccess),
-    step('hundreds', content.hundredsPrompt, Number(values.hundredsResult), content.hundredsError, content.hundredsSuccess)
+    step('ones', content.onesPrompt, Number(values.onesResult),
+      difficulty === 1 ? `Rechne die Einer: ${values.firstOnes} − ${values.secondOnes}.` : content.onesError,
+      `${values.firstOnes} − ${values.secondOnes} ergibt in der Einerspalte ${values.onesResult}. Das stimmt.`),
+    step('tens', content.tensPrompt, Number(values.tensResult),
+      difficulty === 1 ? `Rechne die Zehner: ${values.firstTens} − ${values.secondTens}.` : content.tensError,
+      `In der Zehnerspalte steht ${values.tensResult}. Das stimmt.`),
+    step('hundreds', content.hundredsPrompt, Number(values.hundredsResult),
+      difficulty === 1 ? `Rechne die Hunderter: ${values.firstHundreds} − ${values.secondHundreds}.` : content.hundredsError,
+      `Bei den Hundertern: ${values.firstHundreds} − ${values.secondHundreds} = ${values.hundredsResult}. Das stimmt.`)
   )
   if (difficulty === 3) {
     steps.push(step('check', content.checkPrompt, Number(values.first), content.checkError, content.checkSuccess))
@@ -1737,6 +1761,7 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     firstOnes = integer(random, 1, 9)
     secondOnes = integer(random, 0, firstOnes)
   }
+  if (phase === 'activate') secondHundreds = 0
 
   const first = firstHundreds * 100 + firstTens * 10 + firstOnes
   const second = secondHundreds * 100 + secondTens * 10 + secondOnes
@@ -1749,11 +1774,17 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     tensResult: Math.floor(answer / 10) % 10,
     hundredsResult: Math.floor(answer / 100),
     unbundle: calculationLevel === 1 ? 0 : 1,
-    unbundleFrom
+    unbundleFrom,
+    firstHundreds, firstTens, firstOnes, secondHundreds, secondTens, secondOnes
   }
   const shared = {
     ...base('written-subtraction', seed, difficulty, values),
     ...contentFor('written-subtraction', values, difficulty),
+    explanation: phase === 'activate'
+      ? `${second} hat ${secondTens} Zehner und ${secondOnes} Einer. Deshalb bleibt die Hunderterspalte frei.`
+      : calculationLevel === 1
+        ? `Du hast jede Spalte von rechts nach links subtrahiert. Es musste nichts entbündelt werden. Das Ergebnis ist ${answer}. Die Probe ${answer} + ${second} ergibt ${first}.`
+        : `Du hast von rechts nach links gerechnet und genau an der nötigen Stelle entbündelt. Das Ergebnis ist ${answer}. Die Probe ${answer} + ${second} ergibt ${first}.`,
     subskillId: calculationLevel === 1
       ? 'written-subtraction-no-unbundling'
       : unbundleFrom === 'tens'
@@ -1771,10 +1802,10 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     return withMetadata({
       ...shared,
       typeId: 'written-subtraction-activate-alignment',
-      prompt: `Ordne ${second} stellengerecht unter ${first} ein. Welche Zahl gehört in die zweite Zeile?`,
+      prompt: `Trage ${second} stellengerecht unter ${first} ein.`,
       answerMode: 'guided-number', correctAnswer: String(second),
       steps: [{
-        id: 'second', interaction: 'place-value-input', prompt: 'Trage den Subtrahenden stellengerecht ein.', correctAnswer: String(second),
+        id: 'second', interaction: 'place-value-input', prompt: 'Setze jede Ziffer in die passende H-, Z- oder E-Spalte.', correctAnswer: String(second),
         errorFeedback: 'Achte auf die Stellen: Einer unter Einer, Zehner unter Zehner und Hunderter unter Hunderter.',
         successFeedback: 'Die Stellen sind richtig ausgerichtet.'
       }],
@@ -2205,7 +2236,7 @@ function time(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exer
 
 export function formatBaseQuantity(value: number, quantity: 'mass' | 'capacity'): string {
   if (!Number.isInteger(value) || value < 0 || value > 1000) throw new RangeError('Die Grundmenge muss zwischen 0 und 1000 liegen.')
-  if (value === 1000) return quantity === 'mass' ? '1 kg' : '1 l'
+  if (value === 1000) return quantity === 'mass' ? '1 kg' : '1 Liter'
   return `${value} ${quantity === 'mass' ? 'g' : 'ml'}`
 }
 
@@ -2327,16 +2358,14 @@ function planeShapes(seed: number, difficulty: Difficulty, phase?: LearningPhase
   let representationValues: ExerciseRepresentation['values']
   let options: AnswerOption[]
   if (shapePhase === 'activate') {
-    const shapeType = pick(random, shapeTypes)
-    const corners = shapeType === 'triangle' ? 3 : 4
-    correctAnswer = String(corners)
-    taskPrompt = 'Beobachte die Außenform. Wie viele Ecken hat sie?'
-    typeId = 'shape-observe-corners'
+    correctAnswer = 'Beide Figuren haben vier Ecken.'
+    taskPrompt = 'Vergleiche Quadrat und Rechteck. Welche Aussage stimmt für beide?'
+    typeId = 'shape-compare-properties'
     subskillId = 'shape-features'
-    representationValues = { mode: 'identify', shapeType, answerLabel: content.shapeLabels[shapeType] }
-    options = numberOptions(random, corners, [
-      { value: corners - 1, misconception: 'Eine Ecke wird ausgelassen.', misconceptionId: 'shape-corner-count' },
-      { value: corners + 1, misconception: 'Eine Seite wird doppelt als Ecke gezählt.', misconceptionId: 'shape-corner-count' }
+    representationValues = { mode: 'compare', shapeType: 'square', secondShapeType: 'rectangle', answerLabel: correctAnswer }
+    options = textOptions(random, correctAnswer, [
+      { value: 'Bei beiden Figuren sind alle vier Seiten gleich lang.', misconception: 'Die Eigenschaften von Quadrat und Rechteck werden gleichgesetzt.', misconceptionId: 'shape-single-feature' },
+      { value: 'Beide Figuren haben drei Ecken.', misconception: 'Ecken werden nicht vollständig erfasst.', misconceptionId: 'shape-corner-count' }
     ])
   } else if (shapePhase === 'understand') {
     const shapeType = pick(random, shapeTypes)
@@ -2389,9 +2418,16 @@ function planeShapes(seed: number, difficulty: Difficulty, phase?: LearningPhase
     shapeModel: String(representationValues.shapeType),
     partCount: Number(representationValues.partCount ?? 0)
   }
+  const phaseFeedback = shapePhase === 'activate'
+    ? {
+        successFeedback: 'Richtig: Quadrat und Rechteck haben beide vier Ecken.',
+        explanation: 'Ein Quadrat hat vier gleich lange Seiten. Beim Rechteck sind nur die gegenüberliegenden Seiten gleich lang. Vier Ecken haben beide.'
+      }
+    : {}
   return withMetadata({
     ...base('plane-shapes', seed, difficulty, values),
     ...contentFor('plane-shapes', values, difficulty),
+    ...phaseFeedback,
     typeId,
     subskillId,
     answerMode: 'choice',
@@ -3227,14 +3263,16 @@ function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase
   }
   if (chancePhase === 'understand') {
     const outcomes = [...new Set(template.outcomes)]
-    const correctAnswer = outcomes.join(', ')
+    const correctAnswer = `Es kann ${outcomes.join(' oder ')} erscheinen.`
     return withMetadata({
       ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
-      prompt: 'Welche Liste enthält alle möglichen Ergebnisse dieses Versuchs?', typeId: 'chance-complete-outcome-space',
+      successFeedback: 'Richtig: Diese Vorhersage nennt alle möglichen Ergebnisse.',
+      explanation: `Bei einem Versuch erscheint genau eines dieser Ergebnisse: ${outcomes.join(', ')}. Kommt ein Ergebnis auf mehreren gleich großen Feldern vor, bleibt es trotzdem dieselbe mögliche Farbe oder Seite.`,
+      prompt: `Du führst den Versuch einmal aus. Welche Vorhersage stimmt?`, typeId: 'chance-complete-outcome-space',
       subskillId: 'chance-outcome-space', answerMode: 'choice', correctAnswer,
       options: textOptions(random, correctAnswer, [
-        { value: outcomes.slice(0, Math.max(1, outcomes.length - 1)).join(', '), misconception: 'Ein mögliches Ergebnis wird ausgelassen.', misconceptionId: 'chance-outcome-space' },
-        { value: [...outcomes, 'anderes Ergebnis'].join(', '), misconception: 'Ein unmögliches Ergebnis wird ergänzt.', misconceptionId: 'chance-outcome-space' }
+        { value: `Es kann nur ${outcomes[0]} erscheinen.`, misconception: 'Ein mögliches Ergebnis wird ausgelassen.', misconceptionId: 'chance-outcome-space' },
+        { value: `Es muss zuerst ${outcomes.at(-1)} erscheinen.`, misconception: 'Ein mögliches Ergebnis wird als sicher vorhergesagt.', misconceptionId: 'chance-single-result' }
       ]), representation: chanceRepresentation(template)
     })
   }

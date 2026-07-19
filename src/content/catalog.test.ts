@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.29.0')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.29.1')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -223,6 +223,13 @@ describe('versionierter Aufgabenkatalog', () => {
       'question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check'
     ])
     expect(JSON.stringify(catalog.wordProblemSteps)).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
+  })
+
+  it('verwendet in Remediation konkrete Handlungen statt interner Defizitsprache', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    for (const skill of catalog.skills) {
+      expect(skill.remediation.foundationStrategy).not.toMatch(/Grundlage von|neu aufbauen/i)
+    }
   })
 
   it('lehnt eine abweichende Sachaufgaben-Runtime-Sequenz ab', () => {

@@ -88,6 +88,17 @@ describe('MathRepresentation Zufall und Kombinationen', () => {
     expect(container).not.toHaveTextContent(/sicher|möglich|unmöglich/i)
   })
 
+  it('zeichnet eine Drehscheibe als zusammenhängendes Zufallsgerät statt als Kartenliste', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'chance-display', visibility: 'always', label: 'Drehscheibe',
+      values: { experimentType: 'spinner', title: 'Drehscheibe', outcomeCount: 4, outcome0: 'rot', outcome1: 'blau', outcome2: 'rot', outcome3: 'grün' },
+      valueRoles: { knownValues: ['experimentType', 'title', 'outcomeCount', 'outcome0', 'outcome1', 'outcome2', 'outcome3'], unknownValues: ['classification'], revealedValues: [] }
+    }} />)
+    expect(container.querySelector('.chance-spinner')).toBeVisible()
+    expect(container.querySelectorAll('.chance-legend span')).toHaveLength(3)
+    expect(container.querySelectorAll('.chance-outcomes span')).toHaveLength(0)
+  })
+
   it.each([
     [2, 2, 0, 4],
     [3, 2, 0, 6],
@@ -307,8 +318,7 @@ describe('MathRepresentation Größen', () => {
     }
     const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
     expect(screen.getByRole('img', { name: /digitale Uhrzeit bleibt unbekannt/ })).toBeVisible()
-    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
-    expect(container.querySelector('.quantity-result')).not.toHaveTextContent('08:30')
+    expect(container.querySelector('.quantity-result')).not.toBeInTheDocument()
 
     rerender(<RuntimeMathRepresentation representation={{
       ...representation,
@@ -375,6 +385,17 @@ describe('MathRepresentation Größen', () => {
 })
 
 describe('MathRepresentation ebene Geometrie', () => {
+  it('zeigt Quadrat und Rechteck als zwei vergleichbare Figuren ohne die Antwort einzublenden', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'shape-grid', visibility: 'always', label: 'Figuren vergleichen',
+      values: { mode: 'compare', shapeType: 'square', secondShapeType: 'rectangle', answerLabel: 'Beide haben vier Ecken.' },
+      valueRoles: { knownValues: ['mode', 'shapeType', 'secondShapeType'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('img', { name: /zwei Figuren zum Vergleichen/ })).toBeVisible()
+    expect(container.querySelectorAll('.shape-comparison .shape-outline')).toHaveLength(2)
+    expect(container).not.toHaveTextContent('Beide haben vier Ecken')
+  })
+
   it('zeigt eine zerlegte Figur ohne die gesuchte Antwort vorwegzunehmen', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{
       kind: 'shape-grid', visibility: 'always', label: 'Ebene Figur',
@@ -383,7 +404,7 @@ describe('MathRepresentation ebene Geometrie', () => {
     }} />)
     expect(screen.getByRole('img', { name: /4 sichtbaren Teilen.*Antwort bleibt unbekannt/ })).toBeVisible()
     expect(container.querySelector('.shape-outline--parts-4')).toBeVisible()
-    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+    expect(container.querySelector('.quantity-result')).not.toBeInTheDocument()
   })
 
   it('zeigt den vollständigen Musterstreifen mit offener Fortsetzung', () => {
@@ -409,7 +430,7 @@ describe('MathRepresentation ebene Geometrie', () => {
     const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
     expect(screen.getByRole('img', { name: new RegExp(description) })).toBeVisible()
     expect(container.querySelectorAll('.unit-cell--filled')).toHaveLength(6)
-    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+    expect(container.querySelector('.quantity-result')).not.toBeInTheDocument()
 
     rerender(<RuntimeMathRepresentation representation={{
       ...representation,
@@ -718,6 +739,6 @@ describe('MathRepresentation Daten und Diagramme', () => {
     expect(container.querySelector('.bar-chart-values')).not.toBeInTheDocument()
     expect(container.querySelector('.bar-chart')).toHaveTextContent('Apfel')
     expect(container.querySelector('.bar-chart')).not.toHaveTextContent('467')
-    expect(container.querySelector('.quantity-result')).toHaveTextContent('Ergebnis: ?')
+    expect(container.querySelector('.quantity-result')).not.toBeInTheDocument()
   })
 })

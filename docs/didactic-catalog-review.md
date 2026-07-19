@@ -1,6 +1,8 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.30.0, Katalog 0.29.0, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.30.1, Katalog 0.29.1, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+
+Die manuelle Erprobung von 0.30.0 hat gezeigt, dass die hier dokumentierte strukturelle Katalogabdeckung keine kindgerechte Verständlichkeit belegt. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) hat Vorrang, wo frühere Aussagen eine weitergehende didaktische Abnahme nahelegen.
 
 ## Feldmatrix
 

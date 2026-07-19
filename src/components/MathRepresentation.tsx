@@ -276,7 +276,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
         ? unbundleFrom === 'tens'
         : unbundleFrom === 'hundreds'
     const validBase = Number.isInteger(first) && first >= 100 && first <= 999 &&
-      Number.isInteger(second) && second >= 100 && second <= 999
+      Number.isInteger(second) && second >= 1 && second <= 999
     const validAddition = operation === '+' && first + second <= 999 && (carry === 0 || carry === 1) &&
       ['none', 'tens', 'hundreds'].includes(String(carryColumn)) && visibleCarryMatches
     const validSubtraction = operation === '−' && first > second && (unbundle === 0 || unbundle === 1) &&
@@ -289,6 +289,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const digits = (value: number) => [Math.floor(value / 100), Math.floor(value / 10) % 10, value % 10]
     const firstDigits = digits(first)
     const secondDigits = digits(second)
+    const firstVisibleSecondIndex = second >= 100 ? 0 : second >= 10 ? 1 : 2
     const secondVisible = isValueVisible('second')
     const answerDigits = digits(operation === '+' ? first + second : first - second)
     const revealedDigits = Array.isArray(values.revealedDigits) && values.revealedDigits.length === 3 &&
@@ -326,7 +327,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
           <span className="column-operation" />
           <div className="column-row">{firstDigits.map((digit, index) => <strong className={adjustedDigits[index] !== null ? 'column-cell--source-adjusted' : ''} key={index}>{digit}</strong>)}</div>
           <span className="column-operation">{operation}</span>
-          <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{secondVisible ? digit : '?'}</strong>)}</div>
+          <div className="column-row">{secondDigits.map((digit, index) => <strong key={index}>{index < firstVisibleSecondIndex ? '' : secondVisible ? digit : '?'}</strong>)}</div>
           <span className="column-operation" />
           <div className="column-row column-row--result">
             {revealedDigits.map((digit, index) => <strong className={activeColumn === ['hundreds', 'tens', 'ones'][index] ? 'column-cell--active' : ''} key={index}>{digit < 0 ? '?' : digit}</strong>)}
@@ -343,6 +344,27 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const valid = ['bag', 'coin', 'die', 'spinner'].includes(experimentType) && Number.isInteger(outcomeCount) && outcomeCount >= 2 && outcomeCount <= 8 && outcomes.every((outcome) => typeof outcome === 'string' && outcome.length > 0)
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Der Zufallsversuch enthält ungültige Ergebnisse.</div>
     const description = `${representation.label}. Mögliche gleich große Felder oder Ergebnisse: ${outcomes.join(', ')}.`
+    const outcomeColor = (outcome: string) => ({ rot: '#d9533f', blau: '#2876a8', grün: '#35845e', gelb: '#e3b83f' })[outcome.toLowerCase()] ?? '#78a88d'
+    const uniqueOutcomes = [...new Set(outcomes.map(String))]
+    if (experimentType === 'spinner') {
+      const sectorSize = 100 / outcomes.length
+      const sectors = outcomes.map((outcome, index) => `${outcomeColor(String(outcome))} ${index * sectorSize}% ${(index + 1) * sectorSize}%`).join(', ')
+      return (
+        <div className="math-visual chance-display chance-display--spinner" role="img" aria-label={description}>
+          <strong>{textValue(values.title)}</strong>
+          <div className="chance-spinner" aria-hidden="true"><i style={{ background: `conic-gradient(${sectors})` }} /><b>▼</b></div>
+          <div className="chance-legend" aria-hidden="true">{uniqueOutcomes.map((outcome) => <span key={outcome}><i style={{ background: outcomeColor(outcome) }} />{outcome}</span>)}</div>
+        </div>
+      )
+    }
+    if (experimentType === 'coin') {
+      return (
+        <div className="math-visual chance-display chance-display--coin" role="img" aria-label={description}>
+          <strong>{textValue(values.title)}</strong>
+          <div className="coin-faces" aria-hidden="true">{uniqueOutcomes.map((outcome) => <span key={outcome}><i>{outcome.startsWith('K') ? 'K' : 'Z'}</i>{outcome}</span>)}</div>
+        </div>
+      )
+    }
     return (
       <div className={`math-visual chance-display chance-display--${experimentType}`} role="img" aria-label={description}>
         <strong>{textValue(values.title)}</strong>
@@ -405,7 +427,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
           {mode === 'duration' && <span className="clock-arrow">→</span>}
           {mode === 'duration' && <section><ClockFace hour={endHour} minute={endMinute} /><b>Ende: {endLabel}</b></section>}
         </div>
-        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+        {answerVisible && <strong className="quantity-result">Ergebnis: {textValue(values.answerLabel)}</strong>}
       </div>
     )
   }
@@ -444,7 +466,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
       <div className={`math-visual quantity-measure quantity-measure--${quantityType}`} role="img" aria-label={description}>
         {content}
         <small>{textValue(values.equivalenceLabel)}</small>
-        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+        {answerVisible && <strong className="quantity-result">Ergebnis: {textValue(values.answerLabel)}</strong>}
       </div>
     )
   }
@@ -453,15 +475,19 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const mode = String(values.mode)
     const shapeType = String(values.shapeType)
     const partCount = Number(values.partCount ?? 1)
-    const valid = ['identify', 'decompose', 'compose'].includes(mode) && ['square', 'rectangle', 'triangle'].includes(shapeType) &&
-      typeof values.answerLabel === 'string' && (mode === 'identify' || [2, 4].includes(partCount))
+    const secondShapeType = String(values.secondShapeType ?? '')
+    const valid = ['identify', 'compare', 'decompose', 'compose'].includes(mode) && ['square', 'rectangle', 'triangle'].includes(shapeType) &&
+      (mode !== 'compare' || ['square', 'rectangle', 'triangle'].includes(secondShapeType)) &&
+      typeof values.answerLabel === 'string' && (mode === 'identify' || mode === 'compare' || [2, 4].includes(partCount))
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Figurendarstellung enthält ungültige Formdaten.</div>
     const answerVisible = isValueVisible('answerLabel')
-    const action = mode === 'identify' ? 'eine einzelne Außenform' : mode === 'decompose' ? `eine Außenform mit ${partCount} sichtbaren Teilen` : 'zwei Teile mit einer gemeinsamen Außenform'
+    const action = mode === 'identify' ? 'eine einzelne Außenform' : mode === 'compare' ? 'zwei Figuren zum Vergleichen' : mode === 'decompose' ? `eine Außenform mit ${partCount} sichtbaren Teilen` : 'zwei Teile mit einer gemeinsamen Außenform'
     return (
       <div className="math-visual shape-visual" role="img" aria-label={`${representation.label}. Gezeigt wird ${action}. ${answerVisible ? `Ergebnis ${values.answerLabel}.` : 'Die gesuchte Antwort bleibt unbekannt.'}`}>
-        <span className={`shape-outline shape-outline--${shapeType} shape-outline--${mode} shape-outline--parts-${partCount}`} aria-hidden="true" />
-        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+        {mode === 'compare'
+          ? <div className="shape-comparison" aria-hidden="true"><span className={`shape-outline shape-outline--${shapeType}`} /><span className={`shape-outline shape-outline--${secondShapeType}`} /></div>
+          : <span className={`shape-outline shape-outline--${shapeType} shape-outline--${mode} shape-outline--parts-${partCount}`} aria-hidden="true" />}
+        {answerVisible && <strong className="quantity-result">Ergebnis: {textValue(values.answerLabel)}</strong>}
       </div>
     )
   }
@@ -486,7 +512,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
     return (
       <div className="math-visual pattern-visual" role="img" aria-label={`${representation.label}. Sichtbare Folge: ${sequence.join(', ')}. ${answerDescription}`}>
         <div className="pattern-sequence" aria-hidden="true">{sequence.map((symbol, index) => <i className={symbolClass(symbol, index)} key={`${symbol}-${index}`} />)}{taskMode === 'continue' && <i className="pattern-symbol pattern-symbol--unknown">?</i>}</div>
-        <strong className="quantity-result">{taskMode === 'identify-error' ? answerVisible ? `Fehlerstelle: ${textValue(values.answerLabel)}` : 'Fehlerstelle: ?' : answerVisible ? `Fortsetzung: ${textValue(values.answerLabel)}` : 'Fortsetzung: ?'}</strong>
+        {answerVisible && <strong className="quantity-result">{taskMode === 'identify-error' ? `Fehlerstelle: ${textValue(values.answerLabel)}` : `Fortsetzung: ${textValue(values.answerLabel)}`}</strong>}
       </div>
     )
   }
@@ -520,7 +546,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
         <div className="unit-grid" aria-hidden="true" style={{ '--unit-columns': columns, '--unit-rows': rows } as CSSProperties}>
           {cells.map((cell, index) => <i className={`${cell ? 'unit-cell unit-cell--filled' : 'unit-cell'} ${edgeClasses(index)}`} key={index} />)}
         </div>
-        <strong className="quantity-result">{answerVisible ? `Ergebnis: ${textValue(values.answerLabel)}` : 'Ergebnis: ?'}</strong>
+        {answerVisible && <strong className="quantity-result">Ergebnis: {textValue(values.answerLabel)}</strong>}
       </div>
     )
   }
@@ -544,7 +570,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const rows = categories.map((category, index) => ({ category: String(category), value: dataValues[index]!, hidden: index === hiddenIndex && !missingVisible }))
     const hasAnswer = values.answerLabel !== undefined
     const answerVisible = hasAnswer && isValueVisible('answerLabel')
-    const result = hasAnswer ? <strong className="quantity-result">Ergebnis: {answerVisible ? textValue(values.answerLabel) : '?'}</strong> : null
+    const result = hasAnswer && answerVisible ? <strong className="quantity-result">Ergebnis: {textValue(values.answerLabel)}</strong> : null
 
     if (displayType === 'table') {
       return (

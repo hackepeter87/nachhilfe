@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.29.0",
+  "catalogVersion": "0.29.1",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-18",
+  "releasedAt": "2026-07-19",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -189,7 +189,7 @@
       "successFeedback": "Das Ergebnis der Plusaufgabe stimmt.",
       "remediation": {
         "strategy": "Zurück zu Summen bis 10 mit zwei sichtbaren Gruppen.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Plusaufgaben“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Lege beide Mengen sichtbar. Fülle mit der zweiten Menge zuerst bis 10 auf und nimm danach den Rest dazu.",
         "representation": "Punktefelder",
         "keepSubskill": true
       },
@@ -351,7 +351,7 @@
       "successFeedback": "Das Ergebnis der Minusaufgabe stimmt.",
       "remediation": {
         "strategy": "Abziehen in zwei sichtbaren Schritten bis zur 10.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Minusaufgaben“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Lege die Anfangsmenge sichtbar. Nimm zuerst so viel weg, dass du bei 10 ankommst, und danach den Rest.",
         "representation": "Punktefelder",
         "keepSubskill": true
       },
@@ -525,7 +525,7 @@
       "successFeedback": "Das Ergebnis der Malaufgabe stimmt.",
       "remediation": {
         "strategy": "Zurück zu einer bekannten Nachbarreihe mit Gruppenbild.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Einmaleins“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Lege wenige gleich große Gruppen. Zähle zuerst die Gruppen, dann die Punkte in jeder Gruppe.",
         "representation": "Gruppenbild",
         "keepSubskill": true
       },
@@ -861,7 +861,7 @@
       "successFeedback": "Du hast den richtigen Stellenwert erkannt.",
       "remediation": {
         "strategy": "Die Zahl wird mit Hundertern, Zehnern und Einern gelegt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Stellenwerte“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Baue die Zahl mit Hunderterflächen, Zehnerstangen und Einerpunkten. Ordne danach jede Ziffer ihrer Stelle zu.",
         "representation": "Stellenwerttafel",
         "keepSubskill": true
       },
@@ -1022,7 +1022,7 @@
       "successFeedback": "Du hast die passende Stellenwertzerlegung gewählt.",
       "remediation": {
         "strategy": "Jede Ziffer wird zuerst in die passende Stelle gelegt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Zahlen zerlegen“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Markiere Hunderter, Zehner und Einer getrennt. Schreibe zu jeder Stelle ihren Wert auf.",
         "representation": "Stellenwerttafel",
         "keepSubskill": true
       },
@@ -1183,7 +1183,7 @@
       "successFeedback": "Du hast die Zahl richtig zusammengesetzt.",
       "remediation": {
         "strategy": "Hunderter, Zehner und Einer werden in drei Spalten sortiert.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Zahlen bauen“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Lege Hunderter, Zehner und Einer in drei Felder. Lies die entstandene Zahl von links nach rechts.",
         "representation": "Stellenwerttafel",
         "keepSubskill": true
       },
@@ -1343,7 +1343,7 @@
       "successFeedback": "Du hast beide direkten Nachbarzehner gefunden.",
       "remediation": {
         "strategy": "Die Zahl wird auf einem Abschnitt zwischen zwei Zehnern markiert.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Nachbarzehner“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Setze die Zahl zwischen zwei markierte volle Zehner. Suche zuerst den Zehner darunter und dann den nächsten darüber.",
         "representation": "Zahlenstrahl",
         "keepSubskill": true
       },
@@ -1503,7 +1503,7 @@
       "successFeedback": "Du hast beide direkten Nachbarhunderter gefunden.",
       "remediation": {
         "strategy": "Die Zahl wird zwischen zwei Hundertern auf dem Zahlenstrahl markiert.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Nachbarhunderter“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Setze die Zahl zwischen zwei markierte volle Hunderter. Suche zuerst den Hunderter darunter und dann den nächsten darüber.",
         "representation": "Zahlenstrahl",
         "keepSubskill": true
       },
@@ -1684,7 +1684,7 @@
       "successFeedback": "Das Rundungsergebnis stimmt.",
       "remediation": {
         "strategy": "Zuerst werden nur die beiden Nachbarzehner bestimmt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Auf Zehner runden“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Markiere beide Nachbarzehner und vergleiche die beiden Abstände. Der kleinere Abstand entscheidet.",
         "representation": "Zahlenstrahl",
         "keepSubskill": true
       },
@@ -1865,7 +1865,7 @@
       "successFeedback": "Das Rundungsergebnis stimmt.",
       "remediation": {
         "strategy": "Zuerst werden nur die beiden Nachbarhunderter bestimmt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Auf Hunderter runden“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Markiere beide Nachbarhunderter und vergleiche die beiden Abstände. Der kleinere Abstand entscheidet.",
         "representation": "Zahlenstrahl",
         "keepSubskill": true
       },
@@ -2050,7 +2050,7 @@
       "successFeedback": "Du hast Geschichte, gesuchte Größe, Bild, Rechnung und Antwort passend verbunden.",
       "remediation": {
         "strategy": "Die Geschichte wird mit bekannten Größen und einer sichtbaren Unbekannten als Balken- oder Gruppenbild aufgebaut.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Sachaufgabe“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Ordne die bekannten Mengen im Bild. Das Fragezeichen zeigt, was du noch ausrechnen sollst.",
         "representation": "Balkenmodell",
         "keepSubskill": true
       },
@@ -2388,7 +2388,7 @@
       "successFeedback": "Das Ergebnis der Plusaufgabe bis 1000 stimmt.",
       "remediation": {
         "strategy": "Die Summanden werden nach Hundertern, Zehnern und Einern sortiert.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Addieren bis 1000“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Zerlege den zweiten Summanden in Hunderter, Zehner und Einer. Addiere einen Teil nach dem anderen am Rechenstrich.",
         "representation": "Stellenwerttafel",
         "keepSubskill": true
       },
@@ -2742,7 +2742,7 @@
       "successFeedback": "Das Ergebnis der Minusaufgabe bis 1000 stimmt.",
       "remediation": {
         "strategy": "Es wird nur eine Stelle verändert und im Material gezeigt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Subtrahieren bis 1000“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Zerlege die abzuziehende Zahl in Hunderter, Zehner und Einer. Ziehe einen Teil nach dem anderen am Rechenstrich ab.",
         "representation": "Stellenwerttafel",
         "keepSubskill": true
       },
@@ -3094,7 +3094,7 @@
       "successFeedback": "Der fehlende Abstand stimmt.",
       "remediation": {
         "strategy": "Der Weg wird in einen kleinen und einen vollen Zehnersprung geteilt.",
-        "foundationStrategy": "Baue zuerst die Grundlage von „Zur vollen Zahl ergänzen“ mit kleinen Zahlen und sichtbarem Material neu auf.",
+        "foundationStrategy": "Gehe am Rechenstrich zuerst bis zum nächsten vollen Zehner und danach, falls nötig, bis zum nächsten vollen Hunderter.",
         "representation": "Rechenstrich",
         "keepSubskill": true
       },
@@ -5350,9 +5350,9 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Ecken an einer sichtbaren Außenform beobachten und zählen.",
+          "goal": "Gemeinsame und unterschiedliche Eigenschaften von Quadrat und Rechteck vergleichen.",
           "exerciseTypes": [
-            "plane-shapes:shape-observe-corners"
+            "plane-shapes:shape-compare-properties"
           ],
           "releaseStatus": "active"
         },
@@ -6591,7 +6591,7 @@
         "id": "equation",
         "progressionId": "form-equation",
         "condition": "always",
-        "interaction": "equation-by-phase",
+        "interaction": "choice",
         "representation": "none"
       },
       {
@@ -6605,7 +6605,7 @@
         "id": "second-equation",
         "progressionId": "form-equation",
         "condition": "second-operation",
-        "interaction": "equation-by-phase",
+        "interaction": "choice",
         "representation": "none"
       },
       {
@@ -6632,20 +6632,20 @@
     ],
     "phaseSequences": {
       "activate": [
-        "question",
-        "relevant"
+        "model",
+        "calculate",
+        "check"
       ],
       "understand": [
-        "question",
-        "model"
-      ],
-      "guided-practice": [
-        "question",
-        "relevant",
         "model",
         "equation",
         "calculate",
-        "plausibility",
+        "check"
+      ],
+      "guided-practice": [
+        "model",
+        "equation",
+        "calculate",
         "check"
       ],
       "independent-practice": [
@@ -6658,10 +6658,8 @@
         "check"
       ],
       "automate": [
-        "question",
         "equation",
         "calculate",
-        "plausibility",
         "check"
       ],
       "transfer": [
@@ -6688,13 +6686,13 @@
     "relevantError": "Prüfe jede Handlung: Welche Mengen sind bekannt und welche Angabe verändert nichts?",
     "relevantSuccess": "Diese Angaben brauchst du für das Modell.",
     "modelPrompt": "Welches Bild passt zur Geschichte?",
-    "modelExplorePrompt": "Dieses Bild zeigt die Geschichte. Wo stehen bekannte Mengen und wo ist die gesuchte Menge mit ? markiert?",
+    "modelExplorePrompt": "Schau auf das Bild: Die bekannten Mengen sind eingetragen. Das ? zeigt, was du ausrechnen sollst.",
     "modelContinueLabel": "Weiter zur Rechnung",
     "modelError": "Achte darauf, welche Mengen bekannt sind und welcher Teil im Bild mit ? offenbleiben muss.",
-    "modelSuccess": "Das Bild ordnet die bekannten Mengen und lässt genau das Gesuchte offen.",
-    "equationPrompt": "Welche Rechnung passt zum Bild?",
-    "equationError": "Lies das Bild von den bekannten Mengen bis zum ?. Die Zeichen müssen genau diese Handlung beschreiben.",
-    "equationSuccess": "Diese Rechnung beschreibt das Bild.",
+    "modelSuccess": "Du siehst, was bekannt ist und was noch fehlt.",
+    "equationPrompt": "Welche Rechnung beschreibt die Geschichte?",
+    "equationError": "Prüfe: Kommt etwas dazu, wird etwas weggenommen oder wird gleichmäßig verteilt?",
+    "equationSuccess": "Diese Rechnung passt zur Handlung in der Geschichte.",
     "calculatePrompt": "Rechne selbst: {equation}",
     "calculateError": "Nutze die Rechnung aus dem vorherigen Schritt und rechne noch einmal.",
     "calculateSuccess": "Dein Ergebnis passt zur Rechnung.",
@@ -7813,14 +7811,14 @@
       ]
     },
     "capacity": {
-      "referencePrompt": "Welcher Rauminhalt passt ungefähr zu {item}?",
+      "referencePrompt": "Wie viel Flüssigkeit passt ungefähr in {item}?",
       "complementPrompt": "Im Gefäß sind {knownAmount}. Wie viel fehlt bis {targetAmount}?",
       "calculationPrompt": "Rechne die Flüssigkeitsmengen: {firstAmount} {operation} {secondAmount}.",
       "referenceExplanation": "Zu {item} passt als Bezugsgröße ungefähr {quantityAnswer}.",
       "complementExplanation": "Von {knownAmount} bis {targetAmount} fehlen {quantityAnswer}.",
       "calculationExplanation": "{firstAmount} {operation} {secondAmount} ergibt {quantityAnswer}.",
       "displayLabel": "Messgefäß für Milliliter und Liter",
-      "equivalenceLabel": "1 l = 1000 ml",
+      "equivalenceLabel": "1 Liter = 1000 Milliliter",
       "referenceEstimates": [
         {
           "id": "spoon",
@@ -7843,13 +7841,13 @@
           ]
         },
         {
-          "id": "bottle",
-          "label": "einer Wasserflasche",
-          "correct": "1 l",
+          "id": "juice-box",
+          "label": "ein kleines Trinkpäckchen",
+          "correct": "200 ml",
           "options": [
-            "100 ml",
-            "500 ml",
-            "1 l"
+            "20 ml",
+            "200 ml",
+            "2 Liter"
           ]
         }
       ]

@@ -1,5 +1,21 @@
 # Mathe-Reise
 
+## Kritische didaktische Korrektur 0.30.1
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Die manuellen iPhone-Befunde aus 0.30.0 werden als Release-Blocker und nicht als kosmetische Einzelprobleme behandelt.
+- Einfache Sachaufgaben verzichten auf künstliche Pflichtschritte. Das unbekanntenhaltige Modell bleibt bis zur Rechnung sichtbar, Gleichungen werden aus plausiblen Möglichkeiten gewählt und nicht mehr über eine erklärungsbedürftige Texteingabe erfasst.
+- Schriftliche Addition und Subtraktion lassen einen bewusst kürzeren zweiten Operanden über getrennte H/Z/E-Felder ausrichten. Rückmeldungen nennen die konkrete Spalte und nur tatsächlich verwendete Überträge oder Entbündelungen.
+- Tauschaufgaben tauschen die sichtbaren Mengen wirklich. Wahrscheinlichkeit verwendet eine echte Drehscheibe beziehungsweise Münzseiten und eine verständliche Vorhersage statt eines Listenquiz mit Fantasieausgang.
+- Die mehrdeutige Wasserflaschen-Schätzung wurde entfernt. Ebene Figuren beginnen mit einem Vergleich von Quadrat und Rechteck statt mit dem Zählen offensichtlicher Ecken.
+- Redundante Ergebniszeilen verschwinden, solange das Ergebnis unbekannt ist. Der mobile Sitzungsheader berücksichtigt den sicheren oberen Bildschirmbereich und bleibt beim Scrollen erreichbar.
+- Generische Remediation wie „Grundlage von ... neu aufbauen“ wurde aus allen Kompetenzen entfernt. Leichtere Folgeaufgaben nennen stattdessen eine konkrete mathematische Handlung.
+- Der kritische Audit trennt technische Konsistenz von kindgerechter Didaktik und kennzeichnet weitere Aufgabenfamilien offen als manuell prüfbedürftig.
+- App 0.30.1 verwendet Katalog 0.29.1 bei unverändertem Schema 19 und Status `ready-for-review`.
+
+Eine Lehrkraftfreigabe, Unterrichtserprobung und vollständige Abnahme der korrigierten Version auf einem echten iPhone sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 437 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.30.1-local` beziehungsweise `mathe-reise:local` (`sha256:99cefa23d747c09af0d6b01c6a31a5059718aba4735c00071cab38262071143e`) lief als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldete `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden erfolgreich mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen. Die Container-E2E lief auf `127.0.0.1:8091`. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Curriculare Konvergenz 0.30.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Alle 34 aktiven Kompetenzen laufen verbindlich über `activate`, `understand`, `guided-practice`, `independent-practice`, `automate` und `transfer`.

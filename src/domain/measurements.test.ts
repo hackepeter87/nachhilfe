@@ -20,7 +20,7 @@ describe('Zeit, Masse und Rauminhalt', () => {
     expect(() => formatClockTime(24, 0)).toThrow(RangeError)
     expect(() => formatClockTime(8, 60)).toThrow(RangeError)
     expect(formatBaseQuantity(1000, 'mass')).toBe('1 kg')
-    expect(formatBaseQuantity(1000, 'capacity')).toBe('1 l')
+    expect(formatBaseQuantity(1000, 'capacity')).toBe('1 Liter')
     expect(formatBaseQuantity(250, 'mass')).toBe('250 g')
     expect(formatBaseQuantity(250, 'capacity')).toBe('250 ml')
     expect(() => formatBaseQuantity(1001, 'mass')).toThrow(RangeError)

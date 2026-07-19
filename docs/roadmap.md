@@ -1,6 +1,6 @@
 # Fachliche Roadmap ab 0.21
 
-Stand: 18. Juli 2026. Seit Version 0.21 gilt der [didaktische Qualitätsstandard](didactic-quality-standard.md) verbindlich für jede neue und migrierte Kompetenz. Mathematische Korrektheit ist Voraussetzung; abgeschlossen ist eine Kompetenz erst, wenn die App den zugehörigen Denkprozess aufbaut, begleitet und in einen neuen Zusammenhang übertragen lässt.
+Stand: 19. Juli 2026. Seit Version 0.21 gilt der [didaktische Qualitätsstandard](didactic-quality-standard.md) verbindlich für jede neue und migrierte Kompetenz. Mathematische Korrektheit ist Voraussetzung; abgeschlossen ist eine Kompetenz erst, wenn die App den zugehörigen Denkprozess aufbaut, begleitet und in einen neuen Zusammenhang übertragen lässt.
 
 Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html): Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten werden mit Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen verbunden.
 
@@ -8,7 +8,7 @@ Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass
 
 Der Förderkern am Ende von Klasse 3 ist in Version 0.21 bereits breit abgedeckt. Die nächsten Releases erfinden diese Inhalte nicht neu, sondern bringen sie auf einen einheitlichen Qualitätsstand.
 
-**Umsetzungsstand 0.30.0:** Die Migrationen 0.22 bis 0.29 und die curriculare Konvergenz 0.30 sind abgeschlossen. Alle 34 aktiven Kompetenzen verwenden nun denselben Qualitätsstandard. Die folgende Releasefolge bleibt als nachvollziehbare Entwicklungs- und Abnahmehistorie erhalten.
+**Korrigierter Umsetzungsstand 0.30.1:** Die Migrationen 0.22 bis 0.29 und Version 0.30 haben einen gemeinsamen technischen Vertrag hergestellt. Die manuelle Erprobung hat jedoch gezeigt, dass daraus nicht auf gleichwertige Verständlichkeit oder Förderqualität geschlossen werden darf. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) ersetzt diese frühere pauschale Bewertung. Neue Kompetenzen bleiben zurückgestellt, bis die Kernabläufe aus Sachrechnen, Grundrechnen, schriftlichen Verfahren, Größen und den beanstandeten Auswahlaufgaben manuell abgenommen sind. Die folgende Releasefolge bleibt als Entwicklungs- und Abnahmehistorie erhalten.
 
 Bereits nach dem Standard 0.21 migriert sind:
 
@@ -19,7 +19,7 @@ Bereits nach dem Standard 0.21 migriert sind:
 - Kombinatorik
 - Muster
 
-Der [didaktische Audit 0.20.1](didactic-audit-0.20.1.md) bleibt die historische Befundgrundlage; die Umsetzung und verbleibenden externen Risiken sind im [Konvergenz-Audit 0.30.0](didactic-convergence-audit-0.30.0.md) zusammengeführt.
+Der [didaktische Audit 0.20.1](didactic-audit-0.20.1.md) bleibt die historische Befundgrundlage. Der [Konvergenz-Audit 0.30.0](didactic-convergence-audit-0.30.0.md) weist technische Konsistenz nach; seine didaktische Reichweite wird durch den [kritischen Audit 0.30.1](didactic-critical-audit-0.30.1.md) verbindlich begrenzt.
 
 Neue Klasse-4-Inhalte werden nicht allein deshalb vorgezogen, um die Zahl der Kompetenzen zu erhöhen. Schriftliche Multiplikation und Division, mehrere Überträge oder Entbündelungen, komplexe Umrechnungen, Millimeter, Kilometer, Körpernetze und Mehrfachfaltungen bleiben bis nach der Konvergenz des Klasse-3-Förderkerns zurückgestellt.
 

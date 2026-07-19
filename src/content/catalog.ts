@@ -872,9 +872,9 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     ['question', 'identify-unknown', 'always', 'choice', 'none'],
     ['relevant', 'identify-relevant', 'always', 'choice', 'none'],
     ['model', 'choose-model', 'always', 'model-by-difficulty', 'word-model'],
-    ['equation', 'form-equation', 'always', 'equation-by-phase', 'none'],
+    ['equation', 'form-equation', 'always', 'choice', 'none'],
     ['calculate', 'calculate', 'always', 'number', 'none'],
-    ['second-equation', 'form-equation', 'second-operation', 'equation-by-phase', 'none'],
+    ['second-equation', 'form-equation', 'second-operation', 'choice', 'none'],
     ['final-calculation', 'calculate', 'second-operation', 'number', 'none'],
     ['plausibility', 'check-result', 'always', 'choice', 'none'],
     ['check', 'answer-in-context', 'always', 'choice', 'none']
@@ -883,11 +883,11 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     !value.runtimeSequence.every((step, index) => isRecord(step) &&
       [step.id, step.progressionId, step.condition, step.interaction, step.representation].every((entry, fieldIndex) => entry === expectedRuntime[index]![fieldIndex]))) return false
   const expectedPhaseSequences: Record<LearningPhase, string[]> = {
-    activate: ['question', 'relevant'],
-    understand: ['question', 'model'],
-    'guided-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
+    activate: ['model', 'calculate', 'check'],
+    understand: ['model', 'equation', 'calculate', 'check'],
+    'guided-practice': ['model', 'equation', 'calculate', 'check'],
     'independent-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
-    automate: ['question', 'equation', 'calculate', 'plausibility', 'check'],
+    automate: ['equation', 'calculate', 'check'],
     transfer: ['question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check']
   }
   const phaseSequences = value.phaseSequences

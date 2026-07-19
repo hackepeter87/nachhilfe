@@ -30,6 +30,8 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 
 Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, schriftliche Multiplikation oder Division, verdeckte Würfel, freie Würfeldrehungen, Mehrfachfaltungen, Körpernetze, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN und Backup. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md); der seit 0.21 verbindliche Kompetenzvertrag im [didaktischen Qualitätsstandard](docs/didactic-quality-standard.md).
 
+Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erhebliche Verständlichkeitsmängel aufgedeckt. Der [kritische Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) dokumentiert diese Befunde, die behobenen gemeinsamen Ursachen und weiterhin nötige menschliche Prüfungen. Automatisierte Konsistenz gilt nicht mehr als Nachweis kindgerechter Didaktik.
+
 ## Voraussetzungen
 
 - Node.js 24 oder neuer
@@ -182,6 +184,8 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Release-Stand 0.30.0
+## Entwicklungsstand 0.30.1
 
-Version 0.30.0 schließt die curriculare Konvergenz ab, ohne eine neue Kompetenz einzuführen. Alle 34 aktiven Kompetenzen verwenden dieselbe sechsphasige Runtime, katalogisierte Typkennungen, mathematische Darstellungsrollen und kataloggebundene Remediation. Direkte Generator-, Wiederholungs- und Folgeaufrufe können den Lernphasenpfad nicht mehr umgehen. Katalog 0.29.0 bleibt bei Schema 19. Details stehen im [Konvergenz-Audit 0.30.0](docs/didactic-convergence-audit-0.30.0.md) und in den [Release Notes](RELEASE_NOTES.md). Eine externe Lehrkraftprüfung und ein echter iPhone-Test sind weiterhin nicht erfolgt.
+Version 0.30.1 korrigiert die in der manuellen Erprobung sichtbaren Probleme, ohne neue Kompetenzen einzuführen. Sachaufgaben werden in einfachen Lernphasen gekürzt, behalten ihr Modell bis zur Rechnung sichtbar und verlangen keine freie Gleichungssyntax mehr. Stellenwertausrichtung verwendet getrennte H/Z/E-Felder, Feedback bezieht sich auf den konkreten Rechenschritt, und die beanstandeten Aufgaben zu Tauschaufgaben, Wahrscheinlichkeit, Rauminhalt und ebenen Figuren wurden fachlich neu gefasst. Katalog 0.29.1 bleibt bei Schema 19. Details stehen im [kritischen Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) und in den [Release Notes](RELEASE_NOTES.md).
+
+Der Audit stuft weitere Familien ausdrücklich als manuell prüfbedürftig ein. Eine externe Lehrkraftprüfung, eine Unterrichtserprobung und eine vollständige Abnahme der korrigierten Version auf einem echten iPhone sind weiterhin nicht erfolgt.

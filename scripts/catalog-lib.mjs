@@ -617,9 +617,9 @@ export function validateCatalog(catalog) {
     ['question', 'identify-unknown', 'always', 'choice', 'none'],
     ['relevant', 'identify-relevant', 'always', 'choice', 'none'],
     ['model', 'choose-model', 'always', 'model-by-difficulty', 'word-model'],
-    ['equation', 'form-equation', 'always', 'equation-by-phase', 'none'],
+    ['equation', 'form-equation', 'always', 'choice', 'none'],
     ['calculate', 'calculate', 'always', 'number', 'none'],
-    ['second-equation', 'form-equation', 'second-operation', 'equation-by-phase', 'none'],
+    ['second-equation', 'form-equation', 'second-operation', 'choice', 'none'],
     ['final-calculation', 'calculate', 'second-operation', 'number', 'none'],
     ['plausibility', 'check-result', 'always', 'choice', 'none'],
     ['check', 'answer-in-context', 'always', 'choice', 'none']
@@ -630,11 +630,11 @@ export function validateCatalog(catalog) {
     fail('wordProblemSteps.runtimeSequence weicht vom vollständigen Modellierungsablauf ab')
   }
   const expectedPhaseSequences = {
-    activate: ['question', 'relevant'],
-    understand: ['question', 'model'],
-    'guided-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
+    activate: ['model', 'calculate', 'check'],
+    understand: ['model', 'equation', 'calculate', 'check'],
+    'guided-practice': ['model', 'equation', 'calculate', 'check'],
     'independent-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
-    automate: ['question', 'equation', 'calculate', 'plausibility', 'check'],
+    automate: ['equation', 'calculate', 'check'],
     transfer: ['question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check']
   }
   if (!isRecord(catalog.wordProblemSteps.phaseSequences) || !Object.entries(expectedPhaseSequences).every(([phase, sequence]) =>

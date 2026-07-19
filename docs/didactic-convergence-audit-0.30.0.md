@@ -1,5 +1,7 @@
 # Curriculare Konvergenz 0.30.0
 
+> **Nachtrag vom 19. Juli 2026:** Die hier dokumentierte strukturelle Konvergenz war keine ausreichende didaktische Abnahme. Manuelle iPhone-Tests zeigten unklare Lernhandlungen, widersprüchliches Feedback und ungeeignete Eingaben. Der kritische Folgeaudit steht in `docs/didactic-critical-audit-0.30.1.md`.
+
 Stand: App 0.30.0, Katalog 0.29.0, Schema 19, Status `ready-for-review`. Dieser Audit dokumentiert interne Konsistenz und automatisierte Abnahme. Er ist keine Lehrkraftfreigabe und keine Wirksamkeitsstudie.
 
 ## Ziel und Umfang

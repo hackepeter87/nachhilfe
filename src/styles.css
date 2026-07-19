@@ -455,14 +455,21 @@ p {
 }
 
 .session-page {
-  padding-top: max(16px, env(safe-area-inset-top));
+  padding-top: 0;
 }
 
 .session-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-right: calc(-1 * max(20px, env(safe-area-inset-right)));
+  margin-left: calc(-1 * max(20px, env(safe-area-inset-left)));
+  padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 10px max(20px, env(safe-area-inset-left));
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
 }
 
 .brand-button {
@@ -507,6 +514,10 @@ p {
 .exercise-heading h2 {
   margin-bottom: 24px;
   font-size: 1.45rem;
+}
+
+.exercise-heading h2:focus {
+  outline: none;
 }
 
 .math-visual {
@@ -754,8 +765,15 @@ p {
 .chance-outcomes span { display: grid; place-items: center; min-width: 48px; min-height: 48px; padding: 6px 9px; border: 2px solid #78a88d; border-radius: 8px; background: #fff; font-size: .72rem; font-weight: 800; }
 .chance-outcomes i { color: #2876a8; font-size: 1rem; font-style: normal; }
 .chance-display--bag .chance-outcomes { padding: 14px; border: 3px solid #947348; border-radius: 8px 8px 28px 28px; background: #fff9eb; }
-.chance-display--coin .chance-outcomes span { border-radius: 50%; }
-.chance-display--spinner .chance-outcomes span { border-color: #2876a8; border-radius: 18px 5px 18px 5px; }
+.chance-spinner { position: relative; width: 142px; margin: 4px auto 0; padding-top: 12px; }
+.chance-spinner > i { display: block; width: 142px; height: 142px; border: 4px solid #315d45; border-radius: 50%; box-shadow: inset 0 0 0 3px #fff; }
+.chance-spinner > b { position: absolute; top: 0; left: 50%; z-index: 1; color: #183f32; font-size: 1.6rem; line-height: 1; transform: translateX(-50%); }
+.chance-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; }
+.chance-legend span { display: inline-flex; align-items: center; gap: 5px; font-size: .76rem; font-weight: 800; }
+.chance-legend i { width: 12px; height: 12px; border: 1px solid #315d45; border-radius: 50%; }
+.coin-faces { display: flex; justify-content: center; gap: 18px; }
+.coin-faces span { display: grid; justify-items: center; gap: 5px; font-size: .78rem; font-weight: 800; }
+.coin-faces i { display: grid; width: 72px; height: 72px; place-items: center; border: 4px solid #9a7a2c; border-radius: 50%; color: #5f4a18; background: #f0cf65; box-shadow: inset 0 0 0 4px #f8e7a7; font-size: 1.25rem; font-style: normal; }
 .chance-display > p { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; font-size: .8rem; }
 .chance-display > p span { color: #557060; }
 .combination-groups { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
@@ -790,7 +808,9 @@ p {
 .quantity-result { color: #244d38; }
 .quantity-measure small { color: #557060; font-weight: 800; }
 .reference-measure { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr); align-items: center; gap: 10px; width: min(100%, 300px); }
-.reference-measure span, .reference-measure strong { padding: 12px 8px; border: 2px solid #78a88d; border-radius: 6px; background: #fff; font-weight: 850; }
+.reference-measure span, .reference-measure strong { padding: 12px 8px; border: 2px solid #78a88d; border-radius: 6px; background: #fff; font-weight: 850; overflow-wrap: normal; }
+.reference-measure span { text-wrap: balance; }
+.reference-measure strong { white-space: nowrap; }
 .reference-measure i { height: 4px; background: #315d45; }
 .measure-complement { display: grid; gap: 6px; width: min(100%, 310px); }
 .measure-track { position: relative; height: 44px; overflow: hidden; border: 2px solid #315d45; border-radius: 5px; background: #fff; }
@@ -806,6 +826,9 @@ p {
 .shape-outline--parts-4::before { position: absolute; inset: 50% 0 auto; height: 3px; content: ''; background: var(--green-dark); }
 .shape-outline--compose::after { inset: -4px auto auto -4px; width: calc(100% + 8px); height: 4px; transform: rotate(37deg); transform-origin: left center; }
 .shape-outline--square.shape-outline--compose::after { transform: rotate(45deg); }
+.shape-comparison { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; }
+.shape-comparison .shape-outline { width: min(36vw, 128px); height: min(27vw, 96px); }
+.shape-comparison .shape-outline--square { width: min(29vw, 104px); height: min(29vw, 104px); }
 .pattern-sequence { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 100%; }
 .pattern-symbol { display: grid; flex: 0 0 42px; width: 42px; height: 42px; place-items: center; border: 3px solid var(--green-dark); background: #9fd1b5; }
 .pattern-symbol--kreis { border-radius: 50%; }
@@ -928,6 +951,14 @@ p {
   font-size: 1.5rem;
   font-weight: 800;
 }
+
+.place-value-answer { display: grid; gap: 14px; }
+.place-value-answer fieldset { margin: 0; padding: 0; border: 0; }
+.place-value-answer legend { margin-bottom: 10px; font-weight: 800; }
+.place-value-inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.place-value-inputs label { display: grid; gap: 5px; text-align: center; }
+.place-value-inputs label > span { color: var(--muted); font-size: .78rem; font-weight: 850; }
+.place-value-inputs input { min-width: 0; height: 60px; padding: 6px; text-align: center; font-size: 1.5rem; font-weight: 850; }
 
 .answer-options {
   display: grid;

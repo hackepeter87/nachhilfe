@@ -276,7 +276,7 @@ describe('ExerciseCard', () => {
     expect(screen.getByRole('img', { name: /Zerlegt bis 10/ })).toBeVisible()
   })
 
-  it('zeigt einen modellbezogenen Sachaufgabentipp nur beim sichtbaren Modellschritt', async () => {
+  it('zeigt beim sichtbaren Sachaufgabenmodell konkrete Hilfen ohne technischen Status', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('word-problem', 42, 1)
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
@@ -284,7 +284,7 @@ describe('ExerciseCard', () => {
     await user.click(screen.getByRole('button', { name: 'Ich brauche einen Tipp' }))
     expect(screen.getByText(exercise.hints[0].text)).toBeVisible()
     expect(screen.queryByText(exercise.hints[1].text)).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Tipp geöffnet' })).toBeDisabled()
+    expect(screen.queryByText('Tipp geöffnet')).not.toBeInTheDocument()
   })
 
   it('zeigt mathematische Teilsprünge erst mit der Zahlenstrahl-Hilfe', async () => {
@@ -417,12 +417,15 @@ describe('ExerciseCard', () => {
     const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
     const rows = container.querySelectorAll('.column-equation .column-row')
 
-    expect(rows[1]).toHaveTextContent('???')
+    expect(rows[1]).toHaveTextContent('??')
     expect(container.querySelector('.column-row--result')).toHaveTextContent('???')
     expect(screen.queryByText(exercise.correctAnswer)).not.toBeInTheDocument()
 
-    await user.type(screen.getByLabelText('Dein Ergebnis'), exercise.correctAnswer)
-    await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    const digits = exercise.correctAnswer.padStart(3, '0')
+    if (digits[0] !== '0') await user.type(screen.getByLabelText('Hunderter'), digits[0]!)
+    await user.type(screen.getByLabelText('Zehner'), digits[1]!)
+    await user.type(screen.getByLabelText('Einer'), digits[2]!)
+    await user.click(screen.getByRole('button', { name: 'Stellen prüfen' }))
     expect(rows[1]).toHaveTextContent(exercise.correctAnswer)
   })
 
@@ -488,16 +491,17 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
   })
 
-  it('lässt das Kind die Rechnung einer geführten Sachaufgabe selbst eintragen', async () => {
+  it('lässt das Kind eine passende Rechnung wählen und behält das Modell sichtbar', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('word-problem', 42, 1, undefined, 'guided-practice')
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
 
     for (const step of exercise.steps ?? []) {
       if (step.id === 'equation') {
-        expect(screen.getByLabelText('Deine Rechnung')).toHaveValue('')
-        await user.type(screen.getByLabelText('Deine Rechnung'), step.correctAnswer)
-        await user.click(screen.getByRole('button', { name: 'Rechnung prüfen' }))
+        expect(screen.getByRole('img', { name: /unbekannt|offen/i })).toBeVisible()
+        const correct = step.options?.find((option) => option.value === step.correctAnswer)
+        if (!correct) throw new Error('Passende Rechnung fehlt')
+        await user.click(screen.getByRole('button', { name: correct.label }))
         expect(screen.getByText(/Rechne selbst/)).toBeVisible()
         break
       }
@@ -515,14 +519,11 @@ describe('ExerciseCard', () => {
     const exercise = generateExercise('word-problem', 42, 1)
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
 
-    for (const stepId of ['question', 'relevant']) {
-      const step = exercise.steps?.find((candidate) => candidate.id === stepId)
-      const option = step?.options?.find((candidate) => candidate.value === step.correctAnswer)
-      if (!step || !option) throw new Error(`Richtige Option für ${stepId} fehlt`)
-      await user.click(screen.getByRole('button', { name: option.label }))
-    }
+    const modelStep = exercise.steps?.find((step) => step.id === 'model')
+    if (!modelStep || modelStep.interaction !== 'continue') throw new Error('Geführtes Modell fehlt')
+    await user.click(screen.getByRole('button', { name: modelStep.continueLabel ?? 'Weiter' }))
 
-    const feedback = screen.getByText(exercise.steps?.find((step) => step.id === 'relevant')?.successFeedback ?? '')
+    const feedback = screen.getByText(modelStep.successFeedback)
     expect(feedback).toHaveClass('feedback--step-success')
     expect(feedback).not.toHaveClass('feedback--try')
   })

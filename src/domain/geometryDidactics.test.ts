@@ -10,7 +10,7 @@ const PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'i
 
 const EXPECTED_TYPES = {
   symmetry: ['symmetry-identify-side-change', 'symmetry-understand-equal-distance', 'symmetry-mirror-guided', 'symmetry-mirror-independent', 'symmetry-mirror-fluent', 'symmetry-analyze-wrong-axis'],
-  'plane-shapes': ['shape-observe-corners', 'shape-connect-features', 'shape-identify-guided', 'shape-decompose-independent', 'shape-identify-fluent', 'shape-compose-transfer'],
+  'plane-shapes': ['shape-compare-properties', 'shape-connect-features', 'shape-identify-guided', 'shape-decompose-independent', 'shape-identify-fluent', 'shape-compose-transfer'],
   patterns: ['pattern-activate-find-block', 'pattern-understand-restart', 'pattern-guided-continue', 'pattern-independent-continue', 'pattern-automate-next-pair', 'pattern-transfer-identify-error'],
   area: ['area-identify-unit', 'area-understand-covering', 'area-count-guided', 'area-count-independent', 'area-count-fluent', 'area-analyze-boundary-error'],
   perimeter: ['perimeter-identify-unit-edge', 'perimeter-understand-boundary', 'perimeter-trace-guided', 'perimeter-trace-independent', 'perimeter-trace-fluent', 'perimeter-analyze-area-error'],

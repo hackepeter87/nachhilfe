@@ -124,6 +124,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
 
   const continueStep = () => {
     if (!currentStep) return
+    setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: currentStep.correctAnswer }))
     setMessage(currentStep.successFeedback)
     setMessageKind('success')
     if (stepIndex === (exercise.steps?.length ?? 1) - 1) setAnswerState('correct')
@@ -137,6 +138,12 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const submitPairing = () => {
     if (!currentStep || pairingSelections.length === 0) return
     checkStepAnswer([...pairingSelections].sort().join('|'))
+  }
+
+  const updatePlaceValueDigit = (index: number, value: string) => {
+    const digits = answer.padStart(3, ' ').slice(-3).split('')
+    digits[index] = value.replace(/[^0-9]/g, '').slice(-1) || ' '
+    setAnswer(digits.join('').trimStart())
   }
 
   const displayedRepresentation = exercise.representation?.kind === 'column-calculation'
@@ -200,6 +207,11 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       }
     : progressivelyRevealedRepresentation
 
+  const modelStepIndex = exercise.steps?.findIndex((step) => step.id === 'model') ?? -1
+  const persistentWordModel = exercise.answerMode === 'guided-word' && modelStepIndex >= 0 && stepIndex > modelStepIndex
+    ? presentationRepresentation
+    : undefined
+
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
     return (
@@ -241,7 +253,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
             {exercise.steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
           </div>
           <h3>{stepIndex + 1}. {currentStep.prompt}</h3>
-          {currentStep.representation && <MathRepresentation representation={currentStep.representation} />}
+          {(currentStep.representation ?? persistentWordModel) && <MathRepresentation representation={(currentStep.representation ?? persistentWordModel)!} />}
           {['select', 'mark', 'match', 'order', 'complete-model', 'identify-error', 'choose-strategy'].includes(currentInteraction) && renderOptions()}
           {currentInteraction === 'build-pairing' && (
             <div className="pairing-builder">
@@ -263,13 +275,36 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
             </div>
           )}
           {currentInteraction === 'continue' && <button className="primary-button" type="button" onClick={continueStep}>{currentStep.continueLabel ?? 'Weiter'}</button>}
-          {['guided-number', 'place-value-input'].includes(currentInteraction) && (
+          {currentInteraction === 'guided-number' && (
             <form className="number-answer" onSubmit={submitNumber}>
               <label htmlFor="guided-number-answer">Dein Ergebnis</label>
               <div className="number-row">
                 <input id="guided-number-answer" inputMode="numeric" pattern="[0-9]*" autoComplete="off" value={answer} onChange={(event) => setAnswer(event.target.value.replace(/[^0-9]/g, '').slice(0, 4))} />
                 <button className="icon-button icon-button--primary" type="submit" aria-label="Ergebnis prüfen" title="Ergebnis prüfen"><Send aria-hidden="true" /></button>
               </div>
+            </form>
+          )}
+          {currentInteraction === 'place-value-input' && (
+            <form className="place-value-answer" onSubmit={submitNumber}>
+              <fieldset>
+                <legend>Trage die Ziffern an der richtigen Stelle ein</legend>
+                <div className="place-value-inputs">
+                  {['Hunderter', 'Zehner', 'Einer'].map((label, index) => (
+                    <label key={label}>
+                      <span>{label[0]}</span>
+                      <input
+                        aria-label={label}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        autoComplete="off"
+                        value={answer.padStart(3, ' ').slice(-3)[index]?.trim() ?? ''}
+                        onChange={(event) => updatePlaceValueDigit(index, event.target.value)}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <button className="primary-button" type="submit" disabled={!answer.trim()}>Stellen prüfen</button>
             </form>
           )}
           {currentInteraction === 'guided-equation' && (
@@ -325,7 +360,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
               : hintsShown < visibleHintLimit
                 ? 'Noch ein Tipp'
                 : visibleHintLimit === 1
-                  ? 'Tipp geöffnet'
+                  ? 'Tipp'
                   : 'Beide Tipps geöffnet'}
           </button>
           {hintsShown > 0 && (
