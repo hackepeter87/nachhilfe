@@ -3311,7 +3311,7 @@ function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase
   })
 }
 
-function combinationRepresentation(template: CombinationTemplate): ExerciseRepresentation {
+function combinationRepresentation(template: CombinationTemplate, missingPair?: string): ExerciseRepresentation {
   const values: ExerciseRepresentation['values'] = {
     title: template.title,
     firstLabel: template.firstLabel,
@@ -3326,9 +3326,14 @@ function combinationRepresentation(template: CombinationTemplate): ExerciseRepre
     values.excludedFirst = template.excludedPair[0]
     values.excludedSecond = template.excludedPair[1]
   }
+  if (missingPair) values.missingPair = missingPair
   return {
     kind: 'combination-display', visibility: 'always', label: template.title, values,
-    valueRoles: { knownValues: Object.keys(values), unknownValues: ['combinationCount'], revealedValues: [] }
+    valueRoles: {
+      knownValues: Object.keys(values).filter((key) => key !== 'missingPair'),
+      unknownValues: missingPair ? ['missingPair', 'combinationCount'] : ['combinationCount'],
+      revealedValues: []
+    }
   }
 }
 
@@ -3342,7 +3347,6 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
   const allowedPairs = template.firstOptions.flatMap((first) => template.secondOptions
     .filter((second) => !template.excludedPair || template.excludedPair[0] !== first || template.excludedPair[1] !== second)
     .map((second) => ({ value: `${first} + ${second}`, label: `${first} mit ${second}` })))
-  const pairingAnswer = allowedPairs.map((option) => option.value).sort().join('|')
   if (phase === 'activate') {
     const correct = allowedPairs[0]!
     return withMetadata({
@@ -3356,11 +3360,22 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
       representation: combinationRepresentation(template)
     })
   }
-  const buildStep: ExerciseStep = {
-    id: 'pairings', prompt: 'Baue alle erlaubten Paarungen. Halte eine Wahl links fest und gehe rechts der Reihe nach durch.',
-    interaction: 'build-pairing', options: allowedPairs, expectedSelections: allowedPairs.map((option) => option.value), correctAnswer: pairingAnswer,
-    errorFeedback: 'Es fehlt noch eine erlaubte Paarung. Gehe links und rechts der Reihe nach durch.',
-    successFeedback: 'Alle erlaubten Paarungen sind vollständig und ohne Doppelung erfasst.'
+  const missingPair = pick(random, allowedPairs)
+  const visiblePair = allowedPairs.find((option) => option.value !== missingPair.value)!
+  const sameFirstGroup = `${template.firstOptions[0]} + ${template.firstOptions[1]}`
+  const sameSecondGroup = `${template.secondOptions[0]} + ${template.secondOptions[1]}`
+  const completeGridStep: ExerciseStep = {
+    id: 'missingPair',
+    prompt: 'Eine Paarung fehlt im Plan. Welche gehört in das Feld mit dem Fragezeichen?',
+    interaction: 'select',
+    options: textOptions(random, missingPair.value, [
+      { value: visiblePair.value, misconception: 'Eine bereits eingetragene Paarung wird doppelt gewählt.', misconceptionId: 'combinations-duplicate' },
+      { value: sameFirstGroup, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' },
+      { value: sameSecondGroup, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' }
+    ]).map((option) => ({ ...option, label: option.value.replace(' + ', ' mit ') })),
+    correctAnswer: missingPair.value,
+    errorFeedback: 'Lies zuerst die Zeile und dann die Spalte am Fragezeichen. Eine Paarung braucht genau eine Wahl aus jeder Gruppe.',
+    successFeedback: 'Jetzt ist die fehlende Paarung im Plan ergänzt.'
   }
   const countStep: ExerciseStep = {
     id: 'count', prompt: 'Wie viele verschiedene Paarungen hast du gebaut?', interaction: 'select',
@@ -3373,11 +3388,11 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
   return withMetadata({
     ...base('combinatorics', seed, difficulty, generatedValues), ...generatedContent,
     prompt: template.question || getTaskCatalog().chanceContent.combinationCountPrompt,
-    typeId: phase === 'understand' ? 'combinations-understand-build' : difficulty === 1 ? 'combinations-2x2' : difficulty === 2 ? 'combinations-3x2' : 'combinations-with-exclusion',
+    typeId: phase === 'understand' ? 'combinations-understand-complete' : difficulty === 1 ? 'combinations-2x2' : difficulty === 2 ? 'combinations-3x2' : 'combinations-with-exclusion',
     subskillId: difficulty === 3 ? 'combinations-one-exclusion' : 'combinations-systematic',
     answerMode: 'guided-choice', correctAnswer: String(answer),
-    steps: phase === 'understand' ? [buildStep] : [buildStep, countStep],
-    representation: combinationRepresentation(template)
+    steps: phase === 'understand' ? [completeGridStep] : [completeGridStep, countStep],
+    representation: combinationRepresentation(template, missingPair.value)
   })
 }
 

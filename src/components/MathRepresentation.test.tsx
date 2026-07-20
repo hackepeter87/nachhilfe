@@ -476,9 +476,21 @@ describe('MathRepresentation mathematische Rollen', () => {
       values: { start: 560, end: 570, marker: 565, step: 10 },
       valueRoles: { knownValues: ['marker', 'step'], unknownValues: ['start', 'end'], revealedValues: [] }
     }} />)
-    expect(container.querySelector('.number-line-labels')).toHaveTextContent('?565?')
+    expect(container.querySelector('.number-line-labels')).toHaveTextContent('??')
+    expect(container.querySelector('.number-line-marker-label')).toHaveTextContent('565')
     expect(container.querySelector('.number-line-labels')).not.toHaveTextContent('560')
     expect(container.querySelector('.number-line-labels')).not.toHaveTextContent('570')
+  })
+
+  it('positioniert die Beschriftung einer Zahl am mathematisch korrekten Ort des Zahlenstrahls', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: 'Nachbarhunderter',
+      values: { start: 0, end: 1000, marker: 801, tickStep: 100, lower: 800, upper: 900 },
+      valueRoles: { knownValues: ['start', 'end', 'marker', 'tickStep', 'lower', 'upper'], unknownValues: [], revealedValues: [] }
+    }} />)
+    const label = container.querySelector<HTMLElement>('.number-line-marker-label')
+    expect(label).toHaveTextContent('801')
+    expect(label?.style.left).toBe('80.10000000000001%')
   })
 
   it('maskiert gesuchte Geld- und Längenwerte auch für Screenreader', () => {

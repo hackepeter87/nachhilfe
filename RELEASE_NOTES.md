@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## iPhone-Regressionskorrektur 0.30.2
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Drei weitere Befunde aus der realen iPhone-Nutzung werden als gemeinsame Korrektur von Katalog, Generator und Runtime behandelt.
+- Kombinatorik listet nicht mehr alle richtigen Paarungen als auswählbare Antworten auf. Eine beschriftete Zeilen-/Spaltentabelle enthält genau eine offene Paarung; das Kind ergänzt sie aus den beiden Merkmalen und zählt anschließend den vollständigen Ergebnisraum.
+- Die künstliche Boots-/Anlegergeschichte wurde durch das Gestalten einer Trinkflasche aus Farbe und Aufkleber ersetzt.
+- Zahlenbeschriftungen am Zahlenstrahl sind direkt an die berechnete Markerposition gebunden. `801` steht auf einer Skala von `0` bis `1000` bei `80,1 %` statt unabhängig vom Marker in der Mitte.
+- Sachaufgaben erhalten in der Runtime zwingend einen eigenen numerischen Rechenschritt, falls ein älterer unvollständiger Schrittplan keinen solchen Ergebnisschritt enthält. Die Erklärung mit der Lösung erscheint erst danach.
+- App 0.30.2 verwendet Katalog 0.29.2 bei unverändertem Schema 19 und Status `ready-for-review`.
+
+Die Korrekturen wurden noch nicht erneut auf einem echten iPhone abgenommen. Eine Lehrkraftfreigabe oder Unterrichtserprobung wird nicht behauptet.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 439 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.30.2-local` beziehungsweise `mathe-reise:local` (`sha256:dda15dea2f3e1ad6aafe1a79780f9938dfdf2e70d4bb1c2b68d7ef4b5295d8b1`) lief als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldete `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen. Die Container-E2E lief auf `127.0.0.1:8092`. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Kritische didaktische Korrektur 0.30.1
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Die manuellen iPhone-Befunde aus 0.30.0 werden als Release-Blocker und nicht als kosmetische Einzelprobleme behandelt.

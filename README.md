@@ -143,7 +143,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.30.1
+podman pull ghcr.io/hackepeter87/nachhilfe:0.30.2
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -184,8 +184,8 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.30.1
+## Entwicklungsstand 0.30.2
 
-Version 0.30.1 korrigiert die in der manuellen Erprobung sichtbaren Probleme, ohne neue Kompetenzen einzuführen. Sachaufgaben werden in einfachen Lernphasen gekürzt, behalten ihr Modell bis zur Rechnung sichtbar und verlangen keine freie Gleichungssyntax mehr. Stellenwertausrichtung verwendet getrennte H/Z/E-Felder, Feedback bezieht sich auf den konkreten Rechenschritt, und die beanstandeten Aufgaben zu Tauschaufgaben, Wahrscheinlichkeit, Rauminhalt und ebenen Figuren wurden fachlich neu gefasst. Katalog 0.29.1 bleibt bei Schema 19. Details stehen im [kritischen Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) und in den [Release Notes](RELEASE_NOTES.md).
+Version 0.30.2 korrigiert drei weitere Befunde aus der manuellen iPhone-Erprobung, ohne neue Kompetenzen einzuführen. Kombinatorik ergänzt nun eine fehlende Paarung in einer beschrifteten Tabelle und zählt anschließend den Ergebnisraum; die künstliche Boots-/Anlegergeschichte entfällt. Zahlenbeschriftungen stehen direkt an ihrer mathematischen Position auf dem Zahlenstrahl. Eine Runtime-Schutzregel verhindert außerdem, dass ältere unvollständige Sachaufgabenpläne ein Ergebnis zeigen, bevor das Kind selbst gerechnet hat. Katalog 0.29.2 bleibt bei Schema 19. Details stehen in den [Release Notes](RELEASE_NOTES.md).
 
-Der Audit stuft weitere Familien ausdrücklich als manuell prüfbedürftig ein. Eine externe Lehrkraftprüfung, eine Unterrichtserprobung und eine vollständige Abnahme der korrigierten Version auf einem echten iPhone sind weiterhin nicht erfolgt.
+Der Audit stuft weitere Familien ausdrücklich als manuell prüfbedürftig ein. Die genannten Fehler wurden auf einem echten iPhone entdeckt; die korrigierte Version 0.30.2 wurde dort noch nicht erneut vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

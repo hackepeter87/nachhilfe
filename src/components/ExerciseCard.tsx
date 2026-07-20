@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { Check, HelpCircle, Lightbulb, Send } from 'lucide-react'
 import { analyzeWrongAnswer, isAnswerCorrect, isStepAnswerCorrect } from '../domain'
-import type { AttemptResult, Exercise } from '../domain'
+import type { AttemptResult, Exercise, ExerciseStep } from '../domain'
 import { GridPicture } from './GridPicture'
 import { MathRepresentation } from './MathRepresentation'
 
@@ -12,6 +12,27 @@ interface ExerciseCardProps {
 
 type AnswerState = 'answering' | 'correct' | 'scaffold'
 type MessageKind = 'error' | 'success'
+
+function safeExerciseSteps(exercise: Exercise): ExerciseStep[] | undefined {
+  const steps = exercise.steps
+  const result = Number(exercise.variant.values.result)
+  if (exercise.answerMode !== 'guided-word' || !steps || !Number.isFinite(result) ||
+    steps.some((step) => step.interaction === 'guided-number' && step.correctAnswer === String(result))) return steps
+
+  const calculation: ExerciseStep = {
+    id: 'calculate',
+    curriculumStage: 'calculate',
+    prompt: 'Rechne jetzt selbst. Wie lautet das Ergebnis?',
+    interaction: 'guided-number',
+    correctAnswer: String(result),
+    errorFeedback: 'Nutze die bekannten Zahlen aus der Geschichte und rechne noch einmal.',
+    successFeedback: 'Deine Rechnung stimmt.'
+  }
+  const checkIndex = steps.findIndex((step) => step.id === 'check')
+  return checkIndex < 0
+    ? [...steps, calculation]
+    : [...steps.slice(0, checkIndex), calculation, ...steps.slice(checkIndex)]
+}
 
 export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   return <ExerciseCardState key={exercise.id} exercise={exercise} onComplete={onComplete} />
@@ -31,13 +52,14 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const [completedStepAnswers, setCompletedStepAnswers] = useState<Record<string, string>>({})
   const [detectedMisconceptions, setDetectedMisconceptions] = useState<string[]>([])
   const [pairingSelections, setPairingSelections] = useState<string[]>([])
+  const steps = safeExerciseSteps(exercise)
 
   useLayoutEffect(() => {
     panelRef.current?.scrollTo?.({ top: 0, left: 0 })
     headingRef.current?.focus({ preventScroll: true })
   }, [])
 
-  const currentStep = exercise.steps?.[stepIndex]
+  const currentStep = steps?.[stepIndex]
   const currentInteraction = currentStep?.interaction ?? 'select'
   const visibleHintLimit = exercise.answerMode === 'guided-word' && currentStep?.id !== 'model' ? 1 : 2
 
@@ -92,7 +114,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: value }))
     setMessage(currentStep.successFeedback)
     setMessageKind('success')
-    if (stepIndex === (exercise.steps?.length ?? 1) - 1) {
+    if (stepIndex === (steps?.length ?? 1) - 1) {
       setAnswerState('correct')
     } else {
       setStepIndex((current) => current + 1)
@@ -127,7 +149,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: currentStep.correctAnswer }))
     setMessage(currentStep.successFeedback)
     setMessageKind('success')
-    if (stepIndex === (exercise.steps?.length ?? 1) - 1) setAnswerState('correct')
+    if (stepIndex === (steps?.length ?? 1) - 1) setAnswerState('correct')
     else setStepIndex((current) => current + 1)
   }
 
@@ -207,7 +229,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       }
     : progressivelyRevealedRepresentation
 
-  const modelStepIndex = exercise.steps?.findIndex((step) => step.id === 'model') ?? -1
+  const modelStepIndex = steps?.findIndex((step) => step.id === 'model') ?? -1
   const persistentWordModel = exercise.answerMode === 'guided-word' && modelStepIndex >= 0 && stepIndex > modelStepIndex
     ? presentationRepresentation
     : undefined
@@ -249,8 +271,8 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
 
       {(exercise.answerMode === 'guided-word' || exercise.answerMode === 'guided-choice' || exercise.answerMode === 'guided-number') && currentStep && answerState === 'answering' && (
         <div className="guided-step" data-curriculum-stage={currentStep.curriculumStage}>
-          <div className="step-dots" aria-label={`Schritt ${stepIndex + 1} von ${exercise.steps?.length}`}>
-            {exercise.steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
+          <div className="step-dots" aria-label={`Schritt ${stepIndex + 1} von ${steps?.length}`}>
+            {steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
           </div>
           <h3>{stepIndex + 1}. {currentStep.prompt}</h3>
           {(currentStep.representation ?? persistentWordModel) && <MathRepresentation representation={(currentStep.representation ?? persistentWordModel)!} />}

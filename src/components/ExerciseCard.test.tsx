@@ -23,16 +23,20 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ detectedMisconceptions: ['addition-operation-reversal'] }))
   })
 
-  it('baut Kombinationspaare aktiv auf, bevor die Anzahl abgefragt wird', async () => {
+  it('ergänzt eine fehlende Kombinationspaarung, bevor die Anzahl abgefragt wird', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('combinatorics', 37, 1, undefined, 'guided-practice')
-    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
     const pairing = exercise.steps?.[0]
     if (!pairing?.options) throw new Error('Paarungsschritt fehlt')
 
-    for (const option of pairing.options) await user.click(screen.getByRole('button', { name: option.label }))
-    expect(screen.getByText(`${pairing.options.length} Paarungen ausgewählt`)).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Paarungen prüfen' }))
+    expect(pairing.interaction).toBe('select')
+    expect(pairing.options).toHaveLength(3)
+    expect(container.querySelector('.combination-cell--missing')).toHaveTextContent('?')
+    const correct = pairing.options.find((option) => option.value === pairing.correctAnswer)
+    if (!correct) throw new Error('Fehlende Paarung hat keine Antwortoption')
+    await user.click(screen.getByRole('button', { name: correct.label }))
+    expect(container.querySelector('.combination-cell--missing')).not.toBeInTheDocument()
     expect(screen.getByText(/Wie viele verschiedene Paarungen/)).toBeVisible()
   })
 
@@ -512,6 +516,26 @@ describe('ExerciseCard', () => {
         await user.click(screen.getByRole('button', { name: correct.label }))
       }
     }
+  })
+
+  it('ergänzt bei einem alten unvollständigen Sachaufgabenplan zwingend einen Rechenschritt', async () => {
+    const user = userEvent.setup()
+    const generated = generateExercise('word-problem', 42, 1, undefined, 'guided-practice')
+    const model = generated.steps?.find((step) => step.id === 'model')
+    if (!model) throw new Error('Modellschritt fehlt')
+    const legacyExercise = { ...generated, steps: [model] }
+    render(<ExerciseCard exercise={legacyExercise} onComplete={vi.fn()} />)
+
+    if (model.interaction === 'continue') await user.click(screen.getByRole('button', { name: model.continueLabel ?? 'Weiter' }))
+    else {
+      const correct = model.options?.find((option) => option.value === model.correctAnswer)
+      if (!correct) throw new Error('Richtiges Modell fehlt')
+      await user.click(screen.getByRole('button', { name: correct.label }))
+    }
+
+    expect(screen.getByRole('heading', { name: /Rechne jetzt selbst/ })).toBeVisible()
+    expect(screen.getByLabelText('Dein Ergebnis')).toHaveValue('')
+    expect(screen.queryByText(generated.explanation)).not.toBeInTheDocument()
   })
 
   it('zeigt positives Zwischenfeedback bei Sachaufgaben grün', async () => {

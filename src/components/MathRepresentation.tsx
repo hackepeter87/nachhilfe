@@ -385,20 +385,29 @@ export function MathRepresentation({ representation }: { representation: Exercis
       [...firstOptions, ...secondOptions].every((option) => typeof option === 'string' && option.length > 0)
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Die Kombinationsdarstellung ist unvollständig.</div>
     const excluded = values.excludedFirst && values.excludedSecond ? `${values.excludedFirst} mit ${values.excludedSecond}` : ''
-    const description = `${representation.label}. ${values.firstLabel}: ${firstOptions.join(', ')}. ${values.secondLabel}: ${secondOptions.join(', ')}.${excluded ? ` Nicht erlaubt: ${excluded}.` : ''} Die Anzahl bleibt unbekannt.`
+    const missingPair = typeof values.missingPair === 'string' ? values.missingPair : ''
+    const [missingFirst, missingSecond] = missingPair.split(' + ')
+    const missingPairVisible = isValueVisible('missingPair')
+    const description = `${representation.label}. ${values.firstLabel}: ${firstOptions.join(', ')}. ${values.secondLabel}: ${secondOptions.join(', ')}.${excluded ? ` Nicht erlaubt: ${excluded}.` : ''}${missingPair ? ` Eine Paarung ist ${missingPairVisible ? 'ergänzt' : 'noch offen'}.` : ''} Die Anzahl bleibt unbekannt.`
     return (
       <div className="math-visual combination-display" role="img" aria-label={description}>
         <strong>{textValue(values.title)}</strong>
-        <div className="combination-groups" aria-hidden="true">
-          <section><b>{textValue(values.firstLabel)}</b>{firstOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
-          <span className="combination-sign">mit</span>
-          <section><b>{textValue(values.secondLabel)}</b>{secondOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
-        </div>
-        <div className="combination-grid" aria-hidden="true" style={{ '--combination-columns': secondCount } as CSSProperties}>
-          {firstOptions.flatMap((first) => secondOptions.map((second) => {
-            const blocked = first === values.excludedFirst && second === values.excludedSecond
-            return <span className={blocked ? 'combination-cell combination-cell--blocked' : 'combination-cell'} key={`${first}-${second}`}>{blocked ? '×' : ''}</span>
-          }))}
+        <div className="combination-table" aria-hidden="true" style={{ '--combination-columns': secondCount } as CSSProperties}>
+          <span className="combination-corner">{textValue(values.firstLabel)} / {textValue(values.secondLabel)}</span>
+          {secondOptions.map((option) => <b className="combination-heading" key={String(option)}>{String(option)}</b>)}
+          {firstOptions.flatMap((first) => [
+            <b className="combination-heading combination-heading--row" key={`${first}-heading`}>{String(first)}</b>,
+            ...secondOptions.map((second) => {
+              const blocked = first === values.excludedFirst && second === values.excludedSecond
+              const missing = first === missingFirst && second === missingSecond
+              const className = blocked
+                ? 'combination-cell combination-cell--blocked'
+                : missing && !missingPairVisible
+                  ? 'combination-cell combination-cell--missing'
+                  : 'combination-cell combination-cell--filled'
+              return <span className={className} key={`${first}-${second}`}>{blocked ? '×' : missing && !missingPairVisible ? '?' : '✓'}</span>
+            })
+          ])}
         </div>
         {excluded && <small>{textValue(values.excludedLabel)}: {excluded}</small>}
       </div>
@@ -664,6 +673,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
             </span>
           ))}
           <span className="number-line-marker" style={{ left: `${position}%` }} />
+          {marker !== scaleStart && marker !== scaleEnd && (
+            <strong className="number-line-marker-label" style={{ left: `${position}%` }}>{markerVisible ? marker : '?'}</strong>
+          )}
           {jumps.map((jump, index) => {
             const from = positionFor(jump.from)
             const to = positionFor(jump.to)
@@ -683,7 +695,6 @@ export function MathRepresentation({ representation }: { representation: Exercis
         </div>
         <div className="number-line-labels">
           <span>{scaleStartVisible ? scaleStart : '?'}</span>
-          {marker !== scaleStart && marker !== scaleEnd && <strong>{markerVisible ? marker : '?'}</strong>}
           <span>{scaleEndVisible ? scaleEnd : '?'}</span>
         </div>
       </div>

@@ -72,13 +72,14 @@ describe('didaktisch migrierte Lernhandlungen', () => {
     expect([15, 45]).toContain(generated[3]?.representation?.values.minute)
   })
 
-  it('lässt Kombinationsmöglichkeiten zuerst vollständig bauen und erst danach zählen', () => {
+  it('lässt eine fehlende Kombinationsmöglichkeit zuerst ergänzen und erst danach zählen', () => {
     for (const difficulty of [1, 2, 3] as const) {
       const exercise = generateExercise('combinatorics', 92, difficulty, undefined, 'guided-practice')
       const pairing = exercise.steps?.[0]
-      expect(pairing?.interaction).toBe('build-pairing')
-      expect(pairing?.options).toHaveLength(Number(exercise.correctAnswer))
-      expect([...pairing?.expectedSelections ?? []].sort().join('|')).toBe(pairing?.correctAnswer)
+      expect(pairing?.id).toBe('missingPair')
+      expect(pairing?.interaction).toBe('select')
+      expect(pairing?.options).toHaveLength(3)
+      expect(pairing?.options?.filter((option) => option.value === pairing.correctAnswer)).toHaveLength(1)
       expect(exercise.steps?.[1]?.id).toBe('count')
     }
   })

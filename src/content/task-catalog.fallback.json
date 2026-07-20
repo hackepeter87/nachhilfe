@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.29.1",
+  "catalogVersion": "0.29.2",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-19",
+  "releasedAt": "2026-07-20",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -4634,8 +4634,8 @@
         "kleines Einmaleins als mögliche Kontrollstrategie"
       ],
       "representations": [
-        "Zwei geordnete Auswahlreihen",
-        "Aktiv mit konkreten Paarungen gefülltes Kombinationstableau",
+        "Beschriftete Zeilen und Spalten für die beiden Auswahlgruppen",
+        "Kombinationstableau mit genau einer aktiv zu ergänzenden Paarung",
         "Sichtbar ausgeschlossene Paarung"
       ],
       "difficultyLevels": [
@@ -4682,10 +4682,10 @@
           "learningPhase": "transfer"
         }
       ],
-      "workedExample": "Zwei T-Shirts und zwei Hosen ergeben vier Kombinationen: Jedes T-Shirt passt einmal zu jeder Hose.",
+      "workedExample": "Im Plan stehen T-Shirts in den Zeilen und Hosen in den Spalten. Jedes Feld steht für genau eine Paarung. Ein Fragezeichen markiert eine Paarung, die noch ergänzt werden muss.",
       "successFeedback": "Du hast den kleinen Ergebnisraum vollständig erfasst.",
       "remediation": {
-        "strategy": "Halte eine Möglichkeit links fest und gehe rechts der Reihe nach durch. Wechsle erst danach links weiter.",
+        "strategy": "Lies am fehlenden Feld zuerst die Zeile und dann die Spalte. Zähle anschließend alle erlaubten Felder genau einmal.",
         "foundationStrategy": "Beginne erneut mit genau zwei Möglichkeiten in jeder Gruppe und ohne Einschränkung.",
         "representation": "Zwei Auswahlreihen mit leerem 2-mal-2-Tableau",
         "keepSubskill": true
@@ -4703,25 +4703,25 @@
         },
         {
           "id": "understand",
-          "goal": "Eine Paarung als je eine Wahl aus beiden Gruppen verstehen.",
+          "goal": "Eine fehlende Paarung aus Zeile und Spalte bestimmen.",
           "exerciseTypes": [
-            "combinatorics:build-pairing"
+            "combinatorics:complete-missing-pair"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "guided-practice",
-          "goal": "Vier Möglichkeiten geordnet zählen.",
+          "goal": "Eine fehlende Paarung ergänzen und vier Möglichkeiten geordnet zählen.",
           "exerciseTypes": [
-            "combinatorics:build-and-count-2x2"
+            "combinatorics:complete-and-count-2x2"
           ],
           "releaseStatus": "active"
         },
         {
           "id": "independent-practice",
-          "goal": "Sechs Möglichkeiten ohne Doppelzählung bestimmen.",
+          "goal": "Eine fehlende Paarung ergänzen und sechs Möglichkeiten ohne Doppelzählung bestimmen.",
           "exerciseTypes": [
-            "combinatorics:build-and-count-3x2"
+            "combinatorics:complete-and-count-3x2"
           ],
           "releaseStatus": "active"
         },
@@ -4729,7 +4729,7 @@
           "id": "automate",
           "goal": "Kleine Ergebnisräume systematisch erfassen.",
           "exerciseTypes": [
-            "combinatorics:build-and-count"
+            "combinatorics:complete-and-count"
           ],
           "releaseStatus": "active"
         },
@@ -4737,7 +4737,7 @@
           "id": "transfer",
           "goal": "Eine sichtbare Einschränkung korrekt berücksichtigen.",
           "exerciseTypes": [
-            "combinatorics:build-with-exclusion"
+            "combinatorics:complete-with-exclusion"
           ],
           "releaseStatus": "active"
         }
@@ -8300,21 +8300,21 @@
         "question": "Wie viele Eis-Kombinationen sind möglich?"
       },
       {
-        "id": "routes-2x3",
+        "id": "bottle-design-2x3",
         "difficulty": 2,
-        "title": "Weg zur Insel",
-        "firstLabel": "Boot",
+        "title": "Trinkflasche gestalten",
+        "firstLabel": "Flaschenfarbe",
         "firstOptions": [
           "rot",
           "blau"
         ],
-        "secondLabel": "Anleger",
+        "secondLabel": "Aufkleber",
         "secondOptions": [
-          "Nord",
-          "Mitte",
-          "Süd"
+          "Stern",
+          "Welle",
+          "Sonne"
         ],
-        "question": "Wie viele verschiedene Wege sind möglich?"
+        "question": "Wie viele verschiedene Trinkflaschen kannst du gestalten?"
       },
       {
         "id": "craft-3x3-excluded",

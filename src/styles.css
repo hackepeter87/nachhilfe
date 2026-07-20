@@ -699,6 +699,13 @@ p {
 .number-line-track::before { left: 0; }
 .number-line-track::after { left: 100%; }
 .number-line-marker { background: #df6b3d; height: 24px; }
+.number-line-marker-label {
+  position: absolute;
+  bottom: 12px;
+  color: #b94c24;
+  font-size: .78rem;
+  transform: translateX(-50%);
+}
 .number-line-tick { position: absolute; top: 50%; width: 2px; height: 12px; background: #6f8a79; transform: translate(-50%, -50%); }
 .number-line-tick small { position: absolute; top: 15px; left: 50%; color: #19577d; font-size: .64rem; font-weight: 850; transform: translateX(-50%); }
 .number-line-jump {
@@ -728,7 +735,6 @@ p {
   transform: rotate(-135deg);
 }
 .number-line-labels { display: flex; justify-content: space-between; align-items: center; }
-.number-line-labels strong { color: #b94c24; }
 .number-line-visual p { margin: 10px 0 0; font-weight: 700; text-align: center; }
 
 .data-display { display: grid; gap: 12px; overflow: hidden; background: #f8fbf9; }
@@ -781,8 +787,13 @@ p {
 .combination-groups section b { color: #557060; font-size: .72rem; }
 .combination-groups section span { overflow-wrap: anywhere; padding: 6px; border: 1px solid #78a88d; border-radius: 4px; background: #fff; font-size: .76rem; font-weight: 800; }
 .combination-sign { color: #2876a8; font-size: 1.2rem; font-weight: 900; }
-.combination-grid { --combination-columns: 2; display: grid; grid-template-columns: repeat(var(--combination-columns), minmax(26px, 42px)); justify-content: center; gap: 4px; }
-.combination-cell { aspect-ratio: 1; border: 2px dashed #8eb3a2; background: #fff; }
+.combination-table { --combination-columns: 2; display: grid; grid-template-columns: minmax(72px, 1fr) repeat(var(--combination-columns), minmax(48px, 1fr)); gap: 4px; width: 100%; }
+.combination-corner, .combination-heading { display: grid; place-items: center; min-width: 0; padding: 5px 3px; color: #557060; font-size: .66rem; line-height: 1.1; overflow-wrap: anywhere; }
+.combination-corner { text-align: left; }
+.combination-heading--row { justify-items: start; color: #244d38; font-size: .72rem; }
+.combination-cell { display: grid; min-height: 38px; place-items: center; border: 2px solid #8eb3a2; background: #fff; color: #23664e; font-weight: 900; }
+.combination-cell--filled { background: #e8f3ed; }
+.combination-cell--missing { border-style: dashed; color: #19577d; background: #eef7fb; font-size: 1.1rem; }
 .combination-cell--blocked { display: grid; place-items: center; border-style: solid; border-color: #bd7658; color: #9a4e28; background: #fff0e9; font-weight: 900; }
 .combination-display small { color: #7c3f22; font-weight: 800; }
 .pairing-builder { display: grid; gap: 12px; }

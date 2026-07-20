@@ -84,6 +84,15 @@ async function finishAdditionWarmups(page: Page) {
     const complement = prompt.match(/Welche Zahl ergänzt (\d+) bis 10\?/)
     if (complement) {
       await page.getByRole('button', { name: String(10 - Number(complement[1])), exact: true }).click()
+    } else if (/Welche Aussage beschreibt das Gruppenbild/.test(prompt)) {
+      const description = await page.locator('.groups-visual').getAttribute('aria-label')
+      const groups = description?.match(/(\d+) Gruppen mit je (\d+) Punkten/)
+      if (!groups) throw new Error(`Gruppenbild ist nicht zugänglich beschrieben: ${description}`)
+      await page.getByRole('button', { name: `${groups[1]} Gruppen mit je ${groups[2]} Punkten`, exact: true }).click()
+    } else if (/werden auf \d+ Gruppen verteilt/.test(prompt)) {
+      await page.getByRole('button', { name: 'die Punkte in jeder Gruppe', exact: true }).click()
+    } else if (/werden immer zu \d+ Punkten zusammengelegt/.test(prompt)) {
+      await page.getByRole('button', { name: 'die Anzahl der Gruppen', exact: true }).click()
     } else {
       const [first, second] = prompt.match(/\d+/g)?.map(Number) ?? []
       const input = page.getByLabel('Deine Antwort')
@@ -165,9 +174,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.29.1',
+    catalogVersion: '0.29.2',
     schemaVersion: 19,
-    appVersion: '0.30.1'
+    appVersion: '0.30.2'
   })
 
   await page.reload()
@@ -237,6 +246,30 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
   })
 
   await onboard(page, 'Zufall')
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('mathe-reise')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('progress', 'readwrite')
+      for (const skillId of ['probability', 'combinatorics']) transaction.objectStore('progress').put({
+        skillId, attempts: 2, correctAnswers: 1, hintsUsed: 0,
+        lastPracticedAt: '2026-07-20T08:00:00.000Z', difficulty: 1,
+        learningPhase: 'guided-practice', mastery: 35, recentErrors: 0,
+        correctStreak: 1, lastVariantKey: null, status: 'learning', subskills: {}
+      })
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+    database.close()
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map((registration) => registration.unregister()))
+    const cacheNames = await caches.keys()
+    await Promise.all(cacheNames.map((name) => caches.delete(name)))
+  })
+  await page.reload()
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishAdditionWarmups(page)
 
@@ -268,15 +301,21 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
       seen.add('combinatorics')
       await expect(combinations).toHaveAttribute('aria-label', /Die Anzahl bleibt unbekannt/)
       expect(await combinations.locator('.combination-cell').count()).toBeGreaterThanOrEqual(4)
+      await expect(combinations.locator('.combination-cell--missing')).toHaveText('?')
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath('kombinatorik-375x812.png'), fullPage: true })
-      const groups = combinations.locator('.combination-groups section')
-      const firstOptions = await groups.nth(0).locator('span').allTextContents()
-      const secondOptions = await groups.nth(1).locator('span').allTextContents()
-      const answerButtons = page.locator('.answer-option')
-      const labels = await answerButtons.allTextContents()
-      const validPair = labels.find((label) => firstOptions.some((first) => label.includes(first)) && secondOptions.some((second) => label.includes(second)))
-      if (!validPair) throw new Error('Gültige Paarung ist nicht auswählbar.')
-      await page.getByRole('button', { name: validPair, exact: true }).click()
+      const missingPair = await combinations.locator('.combination-table').evaluate((table) => {
+        const columns = [...table.querySelectorAll('.combination-heading:not(.combination-heading--row)')].map((node) => node.textContent?.trim() ?? '')
+        const rows = [...table.querySelectorAll('.combination-heading--row')].map((node) => node.textContent?.trim() ?? '')
+        const cells = [...table.querySelectorAll('.combination-cell')]
+        const missingIndex = cells.findIndex((cell) => cell.classList.contains('combination-cell--missing'))
+        if (missingIndex < 0 || columns.length === 0) return ''
+        return `${rows[Math.floor(missingIndex / columns.length)]} mit ${columns[missingIndex % columns.length]}`
+      })
+      if (!missingPair) throw new Error('Die offene Paarung ist nicht aus Zeile und Spalte lesbar.')
+      await page.getByRole('button', { name: missingPair, exact: true }).click()
+      await expect(combinations.locator('.combination-cell--missing')).toHaveCount(0)
+      const combinationCount = await combinations.locator('.combination-cell:not(.combination-cell--blocked)').count()
+      await page.getByRole('button', { name: String(combinationCount), exact: true }).click()
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 1) {
