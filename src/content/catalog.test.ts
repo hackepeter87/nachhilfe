@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.30.0')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.30.1')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -167,7 +167,7 @@ describe('versionierter Aufgabenkatalog', () => {
       ['symmetry:symmetry-mirror-guided'],
       ['symmetry:symmetry-mirror-independent'],
       ['symmetry:symmetry-mirror-fluent'],
-      ['symmetry:symmetry-analyze-wrong-axis']
+      ['symmetry:symmetry-mirror-transfer']
     ])
     expect(catalog.symmetry.progression.map((phase) => phase.phase)).toEqual([1, 2, 3, 4, 5])
     expect(catalog.symmetry.entryRationale).toMatch(/Gerade Raster.*eindeutig.*Sonderfall/i)

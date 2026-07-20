@@ -8,7 +8,7 @@ const PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'i
 
 const DATA_PHASE_TYPES = {
   'read-tables': [
-    'table-identify-category', 'table-connect-row', 'table-read-guided',
+    'table-identify-category', 'table-connect-row', 'table-combine-guided',
     'tally-compare-independent', 'table-find-maximum', 'table-complete-transfer'
   ],
   'read-charts': [
@@ -91,6 +91,17 @@ describe('Daten und Diagramme', () => {
       expect(exercise.representation?.valueRoles.unknownValues).toContain('answerLabel')
       expect(exercise.representation?.valueRoles.knownValues).not.toContain('answerLabel')
       expect(exercise.representation?.values.answerLabel).toBe(exercise.correctAnswer)
+    }
+  })
+
+  it('verlangt im geführten Tabellenlesen eine Rechenhandlung statt Abschreiben', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('read-tables', seed, 2, undefined, 'guided-practice')
+      expect(exercise.typeId).toBe('table-combine-guided')
+      expect(Number(exercise.correctAnswer)).toBe(Number(exercise.variant.values.firstValue) + Number(exercise.variant.values.secondValue))
+      expect(exercise.prompt).toContain(String(exercise.variant.values.category))
+      expect(exercise.prompt).toContain(String(exercise.variant.values.secondCategory))
+      expect(exercise.successFeedback).not.toMatch(/Strichliste|Fünferblock/)
     }
   })
 })

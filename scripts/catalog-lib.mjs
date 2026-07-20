@@ -19,7 +19,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change', 'toTen', 'rest',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
   'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
-  'category', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
+  'category', 'secondCategory', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
   'knownAmount', 'targetAmount', 'quantityAnswer', 'firstAmount', 'secondAmount'
 ])
 
@@ -563,7 +563,7 @@ export function validateCatalog(catalog) {
     ['symmetry:symmetry-mirror-guided'],
     ['symmetry:symmetry-mirror-independent'],
     ['symmetry:symmetry-mirror-fluent'],
-    ['symmetry:symmetry-analyze-wrong-axis']
+    ['symmetry:symmetry-mirror-transfer']
   ]
   if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) {
     fail('Symmetrie-Lernphasen passen nicht zur produktiven Progression')

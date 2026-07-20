@@ -30,7 +30,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 
 Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, schriftliche Multiplikation oder Division, verdeckte Würfel, freie Würfeldrehungen, Mehrfachfaltungen, Körpernetze, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN und Backup. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md); der seit 0.21 verbindliche Kompetenzvertrag im [didaktischen Qualitätsstandard](docs/didactic-quality-standard.md).
 
-Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erhebliche Verständlichkeitsmängel aufgedeckt. Der [kritische Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) dokumentiert diese Befunde. Version 0.31.0 ergänzt deshalb einen [reproduzierbaren didaktischen Prüfstand](docs/didactic-review-workbench.md) und beginnt die systematische Stabilisierung, ohne neue Kompetenzen einzuführen. Automatisierte Konsistenz gilt nicht als Nachweis kindgerechter Didaktik.
+Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erhebliche Verständlichkeitsmängel aufgedeckt. Der [kritische Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) dokumentiert diese Befunde. Version 0.31.0 ergänzt deshalb einen [reproduzierbaren didaktischen Prüfstand](docs/didactic-review-workbench.md). Die [iPhone-Regressionskorrektur 0.31.1](docs/didactic-hotfix-0.31.1.md) beseitigt einen mehrdeutigen Symmetrie-Transfer, eine reine Abschreibaufgabe und eine instabile Strichlistendarstellung. Automatisierte Konsistenz gilt nicht als Nachweis kindgerechter Didaktik.
 
 ## Voraussetzungen
 
@@ -145,7 +145,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.31.0
+podman pull ghcr.io/hackepeter87/nachhilfe:0.31.1
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -186,8 +186,8 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.31.0
+## Entwicklungsstand 0.31.1
 
-Version 0.31.0 führt keine neue Kompetenz ein. Der Entwicklungsprüfstand macht alle 34 aktiven Kompetenzen nach Lernphase, Schwierigkeit und Seed reproduzierbar. Ein Produktionsbuild-Gate verhindert seine Auslieferung in den Kinderbereich. Einfache Sachaufgaben überspringen passive Modellbestätigungen, halten das offene Mengenbild bis zur eigenen Rechnung sichtbar und zeigen das Ergebnis weiterhin erst danach. Nachbarzahlvarianten sind auch an der Grenze 1000 robust. Katalog 0.30.0 bleibt bei Schema 19. Details stehen im [Stabilisierungsbericht](docs/didactic-stabilization-0.31.0.md) und in den [Release Notes](RELEASE_NOTES.md).
+Version 0.31.1 führt keine neue Kompetenz ein. Der Symmetrie-Transfer fragt nur noch nach der Spiegelung an der sichtbar markierten Achse und akzeptiert genau dieses Spiegelbild. Geführtes Tabellenlesen verbindet zwei benannte Tabellenwerte, statt eine bereits gedruckte Zahl abschreiben zu lassen. Strichlisten bündeln fünf Striche in einer stabilen, auf dem iPhone lesbaren Gruppe; Rückmeldungen beziehen sich nur auf die tatsächlich sichtbare Darstellung. App 0.31.1 verwendet Katalog 0.30.1 bei unverändertem Schema 19. Details stehen im [Korrekturbericht](docs/didactic-hotfix-0.31.1.md) und in den [Release Notes](RELEASE_NOTES.md).
 
-Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Zahlen und Modellieren folgen in 0.32, Größen, Daten und Raum in 0.33. Die vorhandenen echten iPhone-Screenshots gelten als Teilprüfung; 0.31.0 wurde dort nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
+Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Zahlen und Modellieren folgen in 0.32, Größen, Daten und Raum in 0.33. Die vorhandenen echten iPhone-Screenshots belegen die Ausgangsfehler; die korrigierte Version 0.31.1 wurde dort noch nicht erneut abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

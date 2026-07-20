@@ -9,7 +9,7 @@ import { getTaskCatalog } from '../content/catalog'
 const PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
 
 const EXPECTED_TYPES = {
-  symmetry: ['symmetry-identify-side-change', 'symmetry-understand-equal-distance', 'symmetry-mirror-guided', 'symmetry-mirror-independent', 'symmetry-mirror-fluent', 'symmetry-analyze-wrong-axis'],
+  symmetry: ['symmetry-identify-side-change', 'symmetry-understand-equal-distance', 'symmetry-mirror-guided', 'symmetry-mirror-independent', 'symmetry-mirror-fluent', 'symmetry-mirror-transfer'],
   'plane-shapes': ['shape-compare-properties', 'shape-connect-features', 'shape-identify-guided', 'shape-decompose-independent', 'shape-identify-fluent', 'shape-compose-transfer'],
   patterns: ['pattern-activate-find-block', 'pattern-understand-restart', 'pattern-guided-continue', 'pattern-independent-continue', 'pattern-automate-next-pair', 'pattern-transfer-identify-error'],
   area: ['area-identify-unit', 'area-understand-covering', 'area-count-guided', 'area-count-independent', 'area-count-fluent', 'area-analyze-boundary-error'],
@@ -57,7 +57,7 @@ describe('Didaktische Geometrie-Migration 0.29', () => {
         const relevantSize = exercise.symmetry?.axis === 'vertical' ? exercise.sourceGrid?.[0]?.length : exercise.sourceGrid?.length
         expect(relevantSize! % 2).toBe(0)
         expect(exercise.symmetry?.axisPosition).toBe('between-cells')
-        expect(exercise.correctAnswer).toBe(phase === 'transfer' ? 'wrong-axis' : 'mirror')
+        expect(exercise.correctAnswer).toBe('mirror')
       }
     }
   })

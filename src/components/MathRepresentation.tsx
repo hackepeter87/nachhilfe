@@ -596,11 +596,20 @@ export function MathRepresentation({ representation }: { representation: Exercis
     }
 
     if (displayType === 'tally') {
+      const tallyGroups = (value: number) => Array.from({ length: Math.ceil(value / 5) }, (_, groupIndex) => {
+        const count = Math.min(5, value - groupIndex * 5)
+        return (
+          <span className="tally-group" key={groupIndex}>
+            {Array.from({ length: Math.min(4, count) }, (_, index) => <i className="tally-mark" key={index} />)}
+            {count === 5 && <i className="tally-mark tally-mark--fifth" />}
+          </span>
+        )
+      })
       return (
         <div className="math-visual data-display" role="img" aria-label={description}>
           <strong className="data-display-title">{textValue(values.title)}</strong>
           <div className="tally-list" aria-hidden="true">{rows.map((row) => (
-            <div className="tally-row" key={row.category}><span>{row.category}</span><span className="tally-marks">{Array.from({ length: row.value }, (_, index) => <i className={(index + 1) % 5 === 0 ? 'tally-mark tally-mark--fifth' : 'tally-mark'} key={index} />)}</span></div>
+            <div className="tally-row" key={row.category}><span>{row.category}</span><span className="tally-marks">{tallyGroups(row.value)}</span></div>
           ))}</div>
           {result}
         </div>

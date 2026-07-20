@@ -119,6 +119,20 @@ describe('ExerciseCard', () => {
     expect(screen.getAllByRole('img', { name: /Spiegelachse zwischen Feldern/ })).toHaveLength(4)
   })
 
+  it('wertet im Symmetrie-Transfer das Spiegelbild an der sichtbaren Achse als richtig', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('symmetry', 42, 3, undefined, 'transfer')
+    const correctOption = exercise.options?.find((option) => option.value === 'mirror')
+    if (!correctOption) throw new Error('Korrektes Spiegelbild fehlt')
+
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    expect(exercise.correctAnswer).toBe('mirror')
+    expect(exercise.prompt).toMatch(/grünen Achse/)
+    expect(exercise.prompt).not.toMatch(/Fehler|falschen Achse/)
+    await user.click(screen.getByRole('button', { name: new RegExp(correctOption.label) }))
+    expect(screen.getByText(exercise.successFeedback)).toBeVisible()
+  })
+
   it('zeigt Hilfen und konkretes Fehlerfeedback', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('addition', 42)

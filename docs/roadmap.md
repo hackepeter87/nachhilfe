@@ -8,7 +8,7 @@ Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass
 
 Der Förderkern am Ende von Klasse 3 ist in Version 0.21 bereits breit abgedeckt. Die nächsten Releases erfinden diese Inhalte nicht neu, sondern bringen sie auf einen einheitlichen Qualitätsstand.
 
-**Korrigierter Umsetzungsstand 0.31.0:** Die Migrationen 0.22 bis 0.30 haben einen gemeinsamen technischen Vertrag hergestellt. Die manuelle Erprobung hat jedoch gezeigt, dass daraus nicht auf gleichwertige Verständlichkeit oder Förderqualität geschlossen werden darf. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) ersetzt diese frühere pauschale Bewertung. Version 0.31.0 ergänzt einen [reproduzierbaren didaktischen Prüfstand](didactic-review-workbench.md) und korrigiert erste gemeinsame Ursachen. Neue Kompetenzen und der unabhängige Katalogkanal bleiben zurückgestellt, bis die bestehenden Familien manuell abgenommen sind.
+**Korrigierter Umsetzungsstand 0.31.1:** Die Migrationen 0.22 bis 0.30 haben einen gemeinsamen technischen Vertrag hergestellt. Die manuelle Erprobung hat jedoch gezeigt, dass daraus nicht auf gleichwertige Verständlichkeit oder Förderqualität geschlossen werden darf. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) ersetzt diese frühere pauschale Bewertung. Version 0.31.0 ergänzt einen [reproduzierbaren didaktischen Prüfstand](didactic-review-workbench.md); 0.31.1 korrigiert weitere konkrete iPhone-Befunde bei Symmetrie, Tabellen und Strichlisten. Neue Kompetenzen und der unabhängige Katalogkanal bleiben zurückgestellt, bis die bestehenden Familien manuell abgenommen sind.
 
 ## Verständlichkeit vor neuen Inhalten: 0.31 bis 0.34
 

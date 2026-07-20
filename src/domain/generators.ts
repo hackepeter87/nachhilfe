@@ -1294,17 +1294,17 @@ function symmetry(seed: number, difficulty: Difficulty, focus?: string, phase?: 
     distractorSimilarity: template.distractorSimilarity
   }
   const options = shuffle(random, [
-    { value: 'mirror', label: symmetryContent.optionLabels[0], grid: correct, misconception: phase === 'transfer' ? 'Das korrekte Spiegelbild wird statt des gesuchten Achsenfehlers gewählt.' : undefined, misconceptionId: phase === 'transfer' ? 'symmetry-error-analysis' : undefined },
+    { value: 'mirror', label: symmetryContent.optionLabels[0], grid: correct },
     { value: 'shift', label: symmetryContent.optionLabels[1], grid: shift, misconception: 'Spiegelung mit Verschiebung verwechselt.', misconceptionId: 'symmetry-shift' },
-    { value: 'wrong-axis', label: symmetryContent.optionLabels[2], grid: wrongAxis, misconception: phase === 'transfer' ? undefined : 'An der falschen Achse gespiegelt.', misconceptionId: phase === 'transfer' ? undefined : 'symmetry-wrong-axis' }
+    { value: 'wrong-axis', label: symmetryContent.optionLabels[2], grid: wrongAxis, misconception: 'An der falschen Achse gespiegelt.', misconceptionId: 'symmetry-wrong-axis' }
   ])
   const guidance = symmetryContent.guidance[template.axisPosition]
-  const typeId = phase === 'activate' ? 'symmetry-identify-side-change' : phase === 'understand' ? 'symmetry-understand-equal-distance' : phase === 'guided-practice' ? 'symmetry-mirror-guided' : phase === 'independent-practice' ? 'symmetry-mirror-independent' : phase === 'automate' ? 'symmetry-mirror-fluent' : phase === 'transfer' ? 'symmetry-analyze-wrong-axis' : 'grid-symmetry'
+  const typeId = phase === 'activate' ? 'symmetry-identify-side-change' : phase === 'understand' ? 'symmetry-understand-equal-distance' : phase === 'guided-practice' ? 'symmetry-mirror-guided' : phase === 'independent-practice' ? 'symmetry-mirror-independent' : phase === 'automate' ? 'symmetry-mirror-fluent' : phase === 'transfer' ? 'symmetry-mirror-transfer' : 'grid-symmetry'
   const prompt = phase === 'activate' ? 'Welches Bild liegt auf der anderen Seite der grünen Achse statt nur verschoben zu sein?'
     : phase === 'understand' ? 'Welches Bild hält für jedes Feld Seite und gleichen Abstand zur grünen Achse ein?'
-      : phase === 'transfer' ? 'Welches Bild zeigt den typischen Fehler, dass an der falschen Achse gespiegelt wurde?'
+      : phase === 'transfer' ? `Welches Bild spiegelt die Figur richtig an der ${horizontal ? 'waagerechten' : 'senkrechten'} grünen Achse?`
         : renderCatalogText(getSkillContent('symmetry').prompt, values)
-  const correctAnswer = phase === 'transfer' ? 'wrong-axis' : 'mirror'
+  const correctAnswer = 'mirror'
   return withMetadata({
     ...base('symmetry', seed, difficulty, values),
     ...contentFor('symmetry', values, difficulty),
@@ -1324,9 +1324,9 @@ function symmetry(seed: number, difficulty: Difficulty, focus?: string, phase?: 
       { level: 1, text: guidance.hint1 },
       { level: 2, text: guidance.hint2 }
     ],
-    successFeedback: phase === 'transfer' ? 'Du hast erkannt, welche Achse beim fehlerhaften Spiegelbild vertauscht wurde.' : guidance.successFeedback,
+    successFeedback: guidance.successFeedback,
     errorFeedback: guidance.errorFeedback,
-    explanation: phase === 'transfer' ? `Das gesuchte Fehlerbild wurde an der anderen Achsenrichtung gespiegelt. ${guidance.explanation}` : guidance.explanation,
+    explanation: guidance.explanation,
     options
   })
 }
@@ -3044,17 +3044,34 @@ function readTables(seed: number, difficulty: Difficulty, phase?: LearningPhase)
   }
 
   if (dataPhase === 'guided-practice') {
-    const answer = dataValues[targetIndex]!
+    const secondIndex = (targetIndex + 1) % 3
+    const answer = dataValues[targetIndex]! + dataValues[secondIndex]!
+    const combineMisconception = getSkillContent('read-tables').misconceptionFeedback?.find((entry) => entry.id === 'data-combine-values')
+    if (!combineMisconception) throw new Error('Katalogeintrag data-combine-values fehlt.')
+    const values = {
+      ...generatedValues,
+      firstValue: dataValues[targetIndex]!,
+      secondCategory: template.categories[secondIndex]!,
+      secondValue: dataValues[secondIndex]!,
+      answer
+    }
     return withMetadata({
-      ...base('read-tables', seed, difficulty, generatedValues),
-      ...generatedContent,
-      prompt: renderCatalogText(content.prompts.tableRead, generatedValues),
-      typeId: 'table-read-guided',
-      subskillId: 'table-read-value',
+      ...base('read-tables', seed, difficulty, values),
+      ...contentFor('read-tables', values, difficulty),
+      prompt: renderCatalogText(content.prompts.tableCombine, values),
+      typeId: 'table-combine-guided',
+      subskillId: 'table-combine-values',
       answerMode: 'choice',
       correctAnswer: String(answer),
-      options: numberOptions(random, answer, createDataDistractors(answer, dataValues).map((value) => ({ value, misconception: content.distractorFeedback.wrongRow }))),
-      representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`)
+      options: numberOptions(random, answer, createDataDistractors(answer, [dataValues[targetIndex]!, dataValues[secondIndex]!]).map((value) => ({
+        value,
+        misconception: combineMisconception.misconception,
+        misconceptionId: 'data-combine-values'
+      }))),
+      representation: dataDisplayRepresentation('table', template, dataValues, `${content.displayLabels.table}: ${template.title}`, -1, 0, 0, String(answer)),
+      successFeedback: `Du hast beide Zeilen gelesen: ${dataValues[targetIndex]} + ${dataValues[secondIndex]} = ${answer}.`,
+      errorFeedback: `Lies die Zeilen „${template.categories[targetIndex]}“ und „${template.categories[secondIndex]}“. Addiere dann die beiden Werte.`,
+      explanation: `${dataValues[targetIndex]} ${template.unitLabel} und ${dataValues[secondIndex]} ${template.unitLabel} sind zusammen ${answer} ${template.unitLabel}.`
     })
   }
 

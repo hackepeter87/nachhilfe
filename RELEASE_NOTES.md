@@ -1,5 +1,17 @@
 # Mathe-Reise
 
+## iPhone-Regressionskorrektur 0.31.1
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Drei Befunde aus der realen iPhone-Nutzung werden gemeinsam in Katalog, Generator, Runtime und Rendering korrigiert.
+- Der Symmetrie-Transfer verlangt keinen unsichtbaren Wechsel auf eine zweite Achse mehr. Er fragt eindeutig nach der Spiegelung an der sichtbaren grünen Achse; dieses Spiegelbild ist auch die interne Zielantwort.
+- Geführtes Tabellenlesen verlangt das Zusammenführen zweier benannter Tabellenwerte. Das bloße Abschreiben eines sichtbaren Einzelwerts entfällt, und Feedback spricht nicht mehr über eine Strichliste, wenn ausschließlich eine Tabelle sichtbar ist.
+- Strichlisten werden in eigenständigen Fünfergruppen gerendert. Der schräge fünfte Strich liegt innerhalb der Gruppe und verschiebt auf kleinen Bildschirmen keine nachfolgenden Striche mehr.
+- App 0.31.1 verwendet Katalog 0.30.1 bei unverändertem Schema 19 und Status `ready-for-review`.
+
+Die Ausgangsfehler wurden auf einem echten iPhone dokumentiert. Eine erneute vollständige Geräteabnahme der korrigierten Version und eine Lehrkraftprüfung sind noch nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 451 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das explizit für AMD64 gebaute Image `mathe-reise:0.31.1-local` beziehungsweise `mathe-reise:local` (`sha256:966fe915a8b7977a0b03257829d9d865098db4b74684da6ee032b10af549c669`) lief als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldete `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; Docker Compose validierte die Deployment-Datei. Die Container-E2E lief auf `127.0.0.1:8094`. WebKit bleibt eine Mobile-Safari-Näherung; die korrigierte Version wurde nicht auf dem echten iPhone erneut geprüft.
+
 ## Reproduzierbarer didaktischer Prüfstand 0.31.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Ein ausschließlich in der Vite-Entwicklungsumgebung verfügbarer Prüfstand stellt alle 34 aktiven Kompetenzen über Lernphase, Schwierigkeit, Seed und Remediationspfad reproduzierbar bereit.

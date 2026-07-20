@@ -907,9 +907,10 @@ p {
 .tally-list, .pictogram { display: grid; gap: 8px; }
 .tally-row, .pictogram-row { display: grid; grid-template-columns: minmax(74px, .8fr) minmax(0, 1.4fr); align-items: center; gap: 8px; }
 .tally-row > span:first-child, .pictogram-row > span:first-child { overflow-wrap: anywhere; font-size: .78rem; font-weight: 800; }
-.tally-marks { display: flex; flex-wrap: wrap; gap: 4px; min-height: 24px; padding: 4px; border-bottom: 1px solid #aec6b8; }
+.tally-marks { display: flex; flex-wrap: wrap; gap: 8px; min-height: 30px; padding: 4px; border-bottom: 1px solid #aec6b8; }
+.tally-group { position: relative; display: inline-flex; gap: 5px; width: 31px; height: 24px; align-items: flex-start; }
 .tally-mark { width: 3px; height: 22px; background: #285f4e; transform: rotate(0); }
-.tally-mark--fifth { margin-left: -18px; width: 24px; height: 3px; transform: rotate(-48deg) translate(-2px, 8px); transform-origin: center; }
+.tally-mark--fifth { position: absolute; left: 2px; top: 10px; width: 29px; height: 3px; transform: rotate(-42deg); transform-origin: center; }
 .pictogram-row > span:last-child { display: flex; flex-wrap: wrap; gap: 5px; }
 .pictogram-row i { width: 13px; height: 13px; border: 2px solid #2876a8; border-radius: 50%; background: #d8edf6; }
 .data-display small { color: #557060; font-weight: 750; text-align: center; }

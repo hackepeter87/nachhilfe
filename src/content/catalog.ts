@@ -458,7 +458,7 @@ export interface DataAndChartsContent {
   totalLabel: string
   missingLabel: string
   displayLabels: Record<'table' | 'tally' | 'pictogram' | 'bar', string>
-  prompts: Record<'tableRead' | 'tallyCompare' | 'tableMissing' | 'pictogramRead' | 'barCompare' | 'representationMatch', string>
+  prompts: Record<'tableRead' | 'tableCombine' | 'tallyCompare' | 'tableMissing' | 'pictogramRead' | 'barCompare' | 'representationMatch', string>
   distractorFeedback: Record<'wrongRow' | 'wrongDifference' | 'wrongCompletion' | 'wrongPictogram' | 'wrongBarDifference' | 'swappedCategories' | 'changedValue', string>
   templates: DataSetTemplate[]
 }
@@ -525,7 +525,7 @@ const KNOWN_PLACEHOLDERS = new Set([
   'intermediate', 'secondOperation', 'quantityExplanation', 'amount', 'price', 'paid', 'change', 'toTen', 'rest',
   'length', 'firstLength', 'secondLength', 'answerLength', 'modelHint', 'equation', 'secondEquation',
   'onesResult', 'tensResult', 'hundredsResult', 'carry', 'viewLabel', 'turnLabel', 'foldLabel',
-  'category', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
+  'category', 'secondCategory', 'larger', 'smaller', 'unitLabel', 'item', 'startTime', 'endTime', 'time', 'duration',
   'knownAmount', 'targetAmount', 'quantityAnswer', 'firstAmount', 'secondAmount'
 ])
 
@@ -690,7 +690,7 @@ function isDataAndChartsContent(value: unknown): value is DataAndChartsContent {
   if (!['table', 'tally', 'pictogram', 'bar'].every((key) => isNonEmptyString(displayLabels[key]))) return false
   if (!isRecord(value.prompts)) return false
   const prompts = value.prompts
-  if (!['tableRead', 'tallyCompare', 'tableMissing', 'pictogramRead', 'barCompare', 'representationMatch'].every((key) => isNonEmptyString(prompts[key]))) return false
+  if (!['tableRead', 'tableCombine', 'tallyCompare', 'tableMissing', 'pictogramRead', 'barCompare', 'representationMatch'].every((key) => isNonEmptyString(prompts[key]))) return false
   if (!isRecord(value.distractorFeedback)) return false
   const distractorFeedback = value.distractorFeedback
   if (!['wrongRow', 'wrongDifference', 'wrongCompletion', 'wrongPictogram', 'wrongBarDifference', 'swappedCategories', 'changedValue'].every((key) => isNonEmptyString(distractorFeedback[key]))) return false
@@ -927,7 +927,7 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
     ['symmetry:symmetry-mirror-guided'],
     ['symmetry:symmetry-mirror-independent'],
     ['symmetry:symmetry-mirror-fluent'],
-    ['symmetry:symmetry-analyze-wrong-axis']
+    ['symmetry:symmetry-mirror-transfer']
   ]
   if (!symmetrySkill || JSON.stringify(symmetrySkill.learningPhases.map((phase) => phase.exerciseTypes)) !== JSON.stringify(expectedSymmetryExerciseTypes)) return false
   if (!Array.isArray(value.preparedTopics) || value.preparedTopics.length !== 1 || !value.preparedTopics.every((topic) =>

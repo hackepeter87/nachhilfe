@@ -741,6 +741,21 @@ describe('MathRepresentation Daten und Diagramme', () => {
     expect(container.querySelector(displayType === 'tally' ? '.tally-list' : displayType === 'pictogram' ? '.pictogram' : '.bar-chart')).toBeInTheDocument()
   })
 
+  it('bündelt eine Strichliste in stabile Fünfergruppen', () => {
+    const values = { ...base, displayType: 'tally', dataValues: [8, 5, 4], hiddenIndex: -1 }
+    const { container } = render(<MathRepresentation representation={{
+      kind: 'data-display', visibility: 'always', label: 'Strichliste Obstwahl', values,
+      valueRoles: { knownValues: Object.keys(values), unknownValues: [], revealedValues: [] }
+    }} />)
+    const rows = container.querySelectorAll('.tally-row')
+    expect(rows[0]?.querySelectorAll('.tally-group')).toHaveLength(2)
+    expect(rows[0]?.querySelectorAll('.tally-mark')).toHaveLength(8)
+    expect(rows[0]?.querySelectorAll('.tally-mark--fifth')).toHaveLength(1)
+    expect(rows[1]?.querySelectorAll('.tally-group')).toHaveLength(1)
+    expect(rows[1]?.querySelectorAll('.tally-mark--fifth')).toHaveLength(1)
+    expect(rows[2]?.querySelectorAll('.tally-mark--fifth')).toHaveLength(0)
+  })
+
   it('zeigt Säulen an einer Skala ohne aufgedruckte Werte und maskiert das Ergebnis', () => {
     const values = { ...base, displayType: 'bar', dataValues: [4, 6, 7], hiddenIndex: -1, scaleMax: 8, answerLabel: '3' }
     const { container } = render(<MathRepresentation representation={{
