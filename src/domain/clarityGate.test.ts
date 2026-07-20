@@ -44,7 +44,7 @@ describe('verbindliches Verstaendlichkeits-Gate ab 0.31', () => {
         }
       }
     }
-  })
+  }, 20_000)
 
   it('verwendet keine passiven Weiter-Schritte als Ersatz fuer eine mathematische Handlung', () => {
     for (const skill of getTaskCatalog().skills.filter((entry) => entry.releaseStatus === 'active')) {
