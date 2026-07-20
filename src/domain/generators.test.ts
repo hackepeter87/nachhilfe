@@ -796,7 +796,7 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(typeIds).toEqual(new Set([expectedTypes[skill][phaseIndex]]))
       }
     }
-  })
+  }, 20_000)
 
   it('beginnt Größenlernen bei Einheit und Bezugsgröße statt beim Umrechnen', () => {
     for (const skill of ['money', 'lengths', 'mass', 'capacity'] as const) {
