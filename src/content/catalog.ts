@@ -883,9 +883,9 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     !value.runtimeSequence.every((step, index) => isRecord(step) &&
       [step.id, step.progressionId, step.condition, step.interaction, step.representation].every((entry, fieldIndex) => entry === expectedRuntime[index]![fieldIndex]))) return false
   const expectedPhaseSequences: Record<LearningPhase, string[]> = {
-    activate: ['model', 'calculate', 'check'],
-    understand: ['model', 'equation', 'calculate', 'check'],
-    'guided-practice': ['model', 'equation', 'calculate', 'check'],
+    activate: ['calculate', 'check'],
+    understand: ['equation', 'calculate', 'check'],
+    'guided-practice': ['equation', 'calculate', 'check'],
     'independent-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
     automate: ['equation', 'calculate', 'check'],
     transfer: ['question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check']
@@ -895,7 +895,7 @@ function isWordProblemSteps(value: unknown): value is WordProblemSteps {
     const actual = phaseSequences[phase]
     return Array.isArray(actual) && actual.length === sequence.length && actual.every((id, index) => id === sequence[index])
   })) return false
-  return isRecord(value.modelInteractionByDifficulty) && value.modelInteractionByDifficulty['1'] === 'continue' &&
+  return isRecord(value.modelInteractionByDifficulty) && value.modelInteractionByDifficulty['1'] === 'choice' &&
     value.modelInteractionByDifficulty['2'] === 'choice' && value.modelInteractionByDifficulty['3'] === 'choice'
 }
 

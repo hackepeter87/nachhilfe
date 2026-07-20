@@ -41,7 +41,7 @@ Das erste erfolgreiche Publish legt das Paket in GitHub Container Registry an. F
 Ein öffentliches Paket kann ohne Anmeldung geladen werden:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.30.2
+podman pull ghcr.io/hackepeter87/nachhilfe:0.31.0
 ```
 
 Solange das Paket privat ist, erfolgt die Anmeldung mit einem technisch geeigneten GitHub-Token mit `read:packages`. Tokens gehören weder in die Compose-Datei noch in das Repository:
@@ -140,7 +140,7 @@ Nach einem Release lädt der neue Service Worker Ressourcen im Hintergrund. Eine
 3. Die installierte App einmal online öffnen und auf **Offline bereit** warten.
 4. Erst danach den Offline-Neustart prüfen.
 
-Ein echter iPhone-Test bleibt eine manuelle Release-Abnahme, solange er nicht auf einem Gerät durchgeführt wurde.
+Reale iPhone-Befunde liegen vor. Die vollständige manuelle Release-Abnahme mit dokumentiertem Gerät, iOS-Version, Installation, Offline-Neustart, Persistenz und Update bleibt dennoch offen.
 
 ## Read-only-Prüfung ohne Compose
 

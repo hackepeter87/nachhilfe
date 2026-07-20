@@ -30,7 +30,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 
 Nicht Bestandteil dieses Stands sind mehrere gleichzeitige Stellenübergänge, schriftliche Multiplikation oder Division, verdeckte Würfel, freie Würfeldrehungen, Mehrfachfaltungen, Körpernetze, Millimeter/Kilometer, komplexe Kaufsituationen, Elternbereich, PIN und Backup. Dafür existieren keine sichtbaren Attrappen. Die fachliche Releasefolge steht in der [Roadmap](docs/roadmap.md); der seit 0.21 verbindliche Kompetenzvertrag im [didaktischen Qualitätsstandard](docs/didactic-quality-standard.md).
 
-Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erhebliche Verständlichkeitsmängel aufgedeckt. Der [kritische Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) dokumentiert diese Befunde, die behobenen gemeinsamen Ursachen und weiterhin nötige menschliche Prüfungen. Automatisierte Konsistenz gilt nicht mehr als Nachweis kindgerechter Didaktik.
+Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erhebliche Verständlichkeitsmängel aufgedeckt. Der [kritische Audit 0.30.1](docs/didactic-critical-audit-0.30.1.md) dokumentiert diese Befunde. Version 0.31.0 ergänzt deshalb einen [reproduzierbaren didaktischen Prüfstand](docs/didactic-review-workbench.md) und beginnt die systematische Stabilisierung, ohne neue Kompetenzen einzuführen. Automatisierte Konsistenz gilt nicht als Nachweis kindgerechter Didaktik.
 
 ## Voraussetzungen
 
@@ -49,6 +49,8 @@ npm run dev
 ```
 
 Vite zeigt die lokale URL beim Start an, standardmäßig `http://localhost:5173`.
+
+Für interne Aufgabenreviews steht ausschließlich im Entwicklungsmodus `http://localhost:5173/?review=1` bereit. Kompetenz, Lernphase, Schwierigkeit und Seed sind dort reproduzierbar wählbar; verwendet werden die produktiven Generatoren und dieselbe Aufgabenkomponente. Der Ablauf und seine Grenzen stehen in der [Prüfstand-Dokumentation](docs/didactic-review-workbench.md).
 
 ## Qualitätsprüfungen
 
@@ -143,7 +145,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.30.2
+podman pull ghcr.io/hackepeter87/nachhilfe:0.31.0
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -174,7 +176,7 @@ Diese Regeln sollten bei einem anderen statischen Host oder vorgeschalteten CDN 
 5. Die App schließen, Flugmodus einschalten und sie über das Home-Bildschirm-Symbol erneut öffnen.
 6. Eine vollständige Runde abschließen, die App schließen und erneut öffnen. Begrüßung, Rundenzahl und Lernstand müssen erhalten bleiben.
 
-Die Offline- und Mobilabläufe wurden automatisiert mit Playwright geprüft. Ein Test auf einem echten iPhone 13 mini wurde nicht durchgeführt und bleibt eine manuelle Release-Abnahme.
+Die Offline- und Mobilabläufe wurden automatisiert mit Playwright geprüft. Aus der manuellen Nutzung auf einem echten iPhone liegen Screenshots und konkrete Befunde vor. Die vollständige Gerätecheckliste mit dokumentiertem Modell, iOS-Version, Installation, Offline-Neustart, Persistenz und Update ist noch nicht abgeschlossen.
 
 **Offline bereit** wird erst angezeigt, wenn `verifyOfflineReadiness()` einen aktivierten Service Worker, schreib- und lesbare IndexedDB, die zentralen Ressourcen im Cache, eine lokal erzeugte und geprüfte Beispielaufgabe sowie eine Schreib-/Leseprobe im Lernstands-Store bestätigt. Eine fehlgeschlagene Teilprüfung lässt die Anzeige auf **Offline wird vorbereitet**; es werden keine Diagnosedaten übertragen oder dauerhaft gespeichert.
 
@@ -184,8 +186,8 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.30.2
+## Entwicklungsstand 0.31.0
 
-Version 0.30.2 korrigiert drei weitere Befunde aus der manuellen iPhone-Erprobung, ohne neue Kompetenzen einzuführen. Kombinatorik ergänzt nun eine fehlende Paarung in einer beschrifteten Tabelle und zählt anschließend den Ergebnisraum; die künstliche Boots-/Anlegergeschichte entfällt. Zahlenbeschriftungen stehen direkt an ihrer mathematischen Position auf dem Zahlenstrahl. Eine Runtime-Schutzregel verhindert außerdem, dass ältere unvollständige Sachaufgabenpläne ein Ergebnis zeigen, bevor das Kind selbst gerechnet hat. Katalog 0.29.2 bleibt bei Schema 19. Details stehen in den [Release Notes](RELEASE_NOTES.md).
+Version 0.31.0 führt keine neue Kompetenz ein. Der Entwicklungsprüfstand macht alle 34 aktiven Kompetenzen nach Lernphase, Schwierigkeit und Seed reproduzierbar. Ein Produktionsbuild-Gate verhindert seine Auslieferung in den Kinderbereich. Einfache Sachaufgaben überspringen passive Modellbestätigungen, halten das offene Mengenbild bis zur eigenen Rechnung sichtbar und zeigen das Ergebnis weiterhin erst danach. Nachbarzahlvarianten sind auch an der Grenze 1000 robust. Katalog 0.30.0 bleibt bei Schema 19. Details stehen im [Stabilisierungsbericht](docs/didactic-stabilization-0.31.0.md) und in den [Release Notes](RELEASE_NOTES.md).
 
-Der Audit stuft weitere Familien ausdrücklich als manuell prüfbedürftig ein. Die genannten Fehler wurden auf einem echten iPhone entdeckt; die korrigierte Version 0.30.2 wurde dort noch nicht erneut vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
+Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Zahlen und Modellieren folgen in 0.32, Größen, Daten und Raum in 0.33. Die vorhandenen echten iPhone-Screenshots gelten als Teilprüfung; 0.31.0 wurde dort nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

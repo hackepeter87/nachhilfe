@@ -69,7 +69,7 @@ describe('curriculare Gesamtintegration', () => {
         }
         if (skill.id === 'word-problem') {
           const modelStep = exercise.steps?.find((step) => step.id === 'model')
-          expect(modelStep?.representation || modelStep?.options?.every((option) => option.representation), `${skill.id}/Stufe ${level.level}`).toBeTruthy()
+          expect(exercise.representation || modelStep?.representation || modelStep?.options?.every((option) => option.representation), `${skill.id}/Stufe ${level.level}`).toBeTruthy()
           continue
         }
         if (level.representation === 'none' && !exercise.representation) continue

@@ -174,9 +174,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.29.2',
+    catalogVersion: '0.30.0',
     schemaVersion: 19,
-    appVersion: '0.30.2'
+    appVersion: '0.31.0'
   })
 
   await page.reload()
@@ -786,7 +786,7 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishAdditionWarmups(page)
 
-  await expect(page.getByText(/1\. Schau auf das Bild/)).toBeVisible()
+  await expect(page.getByRole('heading', { name: /1\. Welche Rechnung beschreibt die Geschichte/ })).toBeVisible()
   await expect(page.getByText(/Mengenbeziehung|Welche Rechenart/i)).toHaveCount(0)
   const model = page.getByRole('img', { name: /neue Gesamtmenge unbekannt/i })
   await expect(model).toBeVisible()
@@ -803,13 +803,13 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   await expect(page.locator('.feedback--try')).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.locator('.session-page').screenshot({ path: testInfo.outputPath('sachaufgabe-modell-375x812.png'), fullPage: true })
-  await page.getByRole('button', { name: 'Weiter zur Rechnung' }).click()
-  await expect(page.locator('.feedback--step-success')).toBeVisible()
   const story = await page.locator('.exercise-heading h2').textContent()
   const [first, second] = story?.match(/\d+/g)?.map(Number) ?? []
   if (first === undefined || second === undefined) throw new Error('Rechnung ist nicht lesbar')
   await expect(model).toBeVisible()
   await page.getByRole('button', { name: `${first} + ${second} = ?`, exact: true }).click()
+  await expect(page.locator('.feedback--step-success')).toBeVisible()
+  await expect(model).toBeVisible()
   await page.getByLabel('Dein Ergebnis').fill(String(first + second))
   await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
   await page.getByRole('button', { name: `Mila hat jetzt ${first + second} Muscheln.` }).click()

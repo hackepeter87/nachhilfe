@@ -230,9 +230,10 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     : progressivelyRevealedRepresentation
 
   const modelStepIndex = steps?.findIndex((step) => step.id === 'model') ?? -1
-  const persistentWordModel = exercise.answerMode === 'guided-word' && modelStepIndex >= 0 && stepIndex > modelStepIndex
-    ? presentationRepresentation
-    : undefined
+  const persistentWordModel = exercise.answerMode === 'guided-word' && presentationRepresentation && (
+    (modelStepIndex >= 0 && stepIndex > modelStepIndex) ||
+    (modelStepIndex < 0 && ['equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check'].includes(currentStep?.id ?? ''))
+  ) ? presentationRepresentation : undefined
 
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []

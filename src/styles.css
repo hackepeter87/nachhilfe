@@ -41,7 +41,9 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -53,6 +55,164 @@ button:focus-visible,
 input:focus-visible {
   outline: 3px solid var(--yellow);
   outline-offset: 3px;
+}
+
+.review-workbench {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.review-header h1 {
+  margin-bottom: 8px;
+}
+
+.review-header p {
+  max-width: 680px;
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.review-header > svg {
+  width: 42px;
+  height: 42px;
+  color: var(--green);
+}
+
+.review-controls {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(130px, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.review-controls label,
+.review-finding-fields label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.review-controls select,
+.review-controls input,
+.review-finding-fields select,
+.review-finding-fields textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--white);
+}
+
+.review-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  background: var(--green-soft);
+}
+
+.review-metadata strong,
+.review-metadata code {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.review-metadata > span,
+.review-metadata > details {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.review-exercise {
+  width: min(100%, 560px);
+  min-width: 0;
+  margin: 0 auto 28px;
+}
+
+.review-checklist {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border-top: 2px solid var(--line);
+}
+
+.review-checklist > label {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.review-checklist input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+
+.review-finding-fields {
+  display: grid;
+  grid-template-columns: 160px 1fr 1fr;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.review-finding-fields textarea,
+.review-report {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.review-report {
+  width: 100%;
+  min-height: 260px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (max-width: 900px) {
+  .review-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-finding-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .review-workbench {
+    padding: 16px;
+  }
+
+  .review-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 h1,

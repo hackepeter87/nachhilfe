@@ -771,7 +771,8 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
       options: numberOptions(random, full, [
         { value: number, misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' },
         { value: Math.max(0, full - 1), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' },
-        { value: Math.min(1000, full + unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' }
+        { value: Math.min(1000, full + unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' },
+        { value: Math.max(0, full - unit), misconception: unit === 10 ? 'Ein weiter entfernter Zehner wird gewählt.' : 'Ein weiter entfernter Hunderter wird gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' }
       ]), representation: numberLine
     })
   }
@@ -784,7 +785,8 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
     const upperOptions = numberOptions(random, upper, [
       { value: lower, misconception: unit === 10 ? 'Nur der kleinere Zehner wird betrachtet.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-one-sided' : 'neighbor-hundreds-wrong-interval' },
       { value: Math.min(1000, upper + unit), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Nicht direkt benachbarte Hunderter werden gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' },
-      { value: Math.ceil(number / (unit / 10)) * (unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' }
+      { value: Math.ceil(number / (unit / 10)) * (unit / 10), misconception: unit === 10 ? 'Nicht direkt benachbarte Zehner werden gewählt.' : 'Zehner statt Hunderter werden betrachtet.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-used-tens' },
+      { value: Math.max(0, upper - 2 * unit), misconception: unit === 10 ? 'Ein weiter entfernter Zehner wird gewählt.' : 'Ein weiter entfernter Hunderter wird gewählt.', misconceptionId: unit === 10 ? 'neighbor-tens-wrong-interval' : 'neighbor-hundreds-wrong-interval' }
     ])
     const steps: ExerciseStep[] = [
       { id: 'lower', prompt: `Welcher ${unit === 10 ? 'Zehner' : 'Hunderter'} liegt direkt unter ${number}?`, interaction: 'mark', options: lowerOptions, correctAnswer: String(lower), errorFeedback: shared.errorFeedback, successFeedback: `Der untere Nachbar ist ${lower}.` },
@@ -814,7 +816,7 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
     representation: numberLine,
     options: textOptions(random, answer, [
       { value: `${Math.max(0, lower - unit)} und ${lower}`, misconception: 'Intervall zu weit links' },
-      { value: `${upper} und ${Math.min(1000, upper + unit)}`, misconception: 'Intervall zu weit rechts' },
+      { value: upper + unit <= 1000 ? `${upper} und ${upper + unit}` : `${lower} und ${upper - unit / 10}`, misconception: upper + unit <= 1000 ? 'Intervall zu weit rechts' : 'Zehner statt Hunderter als Grenze verwendet' },
       { value: `${Math.max(0, lower - unit)} und ${upper}`, misconception: 'Nur eine Nachbarzahl passend' }
     ])
   })
@@ -1094,9 +1096,7 @@ function wordProblem(seed: number, difficulty: Difficulty, phase?: LearningPhase
     successFeedback: renderCatalogText(stepsContent.relevantSuccess, values)
   }
   const model = wordModelRepresentation(template.modelType, values, 'Passendes Mengenbild mit offener gesuchter Größe', template.modelType)
-  const modelInteraction = phase === 'understand' || phase === 'guided-practice'
-    ? 'continue'
-    : stepsContent.modelInteractionByDifficulty[String(modellingLevel) as '1' | '2' | '3']
+  const modelInteraction = stepsContent.modelInteractionByDifficulty[String(modellingLevel) as '1' | '2' | '3']
   const modelStep: ExerciseStep = modelInteraction === 'continue'
     ? {
       id: 'model',

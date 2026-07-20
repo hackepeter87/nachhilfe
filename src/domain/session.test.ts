@@ -19,9 +19,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.29.2',
+      catalogVersion: '0.30.0',
       schemaVersion: 19,
-      appVersion: '0.30.2'
+      appVersion: '0.31.0'
     })
   })
 
@@ -54,7 +54,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.29.2')
+      expect(runningSession.catalogVersion).toBe('0.30.0')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {

@@ -1,6 +1,6 @@
 # Validierung und Konsolidierung 0.6
 
-Stand: App 0.30.0, Katalog 0.29.0, Schema 19. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
+Stand: App 0.31.0, Katalog 0.30.0, Schema 19. Dieses Dokument trennt automatisierte und interne Prüfungen von noch ausstehenden externen Abnahmen.
 
 ## Intern prüfbar
 
@@ -24,7 +24,7 @@ Die konkreten ausgeführten Befehle und Ergebnisse stehen in den Release Notes. 
 
 Nachweis und Arbeitsstand werden in GitHub Issue #58 geführt. Der Katalogstatus bleibt bis dahin `ready-for-review`; eine Lehrkraftfreigabe wird nicht behauptet.
 
-## Offener echter iPhone-Test
+## Begonnene, noch unvollständige iPhone-Abnahme
 
 - [ ] Gerät und iOS-Version dokumentieren
 - [ ] Installation aus Safari prüfen
@@ -34,4 +34,4 @@ Nachweis und Arbeitsstand werden in GitHub Issue #58 geführt. Der Katalogstatus
 - [ ] lokale Persistenz nach erneutem Start prüfen
 - [ ] Service-Worker-Update nach einer Runde prüfen
 
-Nachweis und Arbeitsstand werden in GitHub Issue #59 geführt. Playwright bei 375 x 812 und 812 x 375 sowie die WebKit-Näherung für Mobile Safari sind Browserprüfungen, aber kein echter Gerätetest.
+Aus der manuellen Nutzung auf einem echten iPhone liegen Screenshots und reproduzierbare Befunde vor. Gerät, iOS-Version und die vollständige Checkliste sind noch nicht dokumentiert. Nachweis und Arbeitsstand werden in GitHub Issue #59 geführt. Playwright bei 375 x 812 und 812 x 375 sowie die WebKit-Näherung für Mobile Safari bleiben zusätzliche Browserprüfungen und ersetzen die fehlenden Geräteprüfschritte nicht.

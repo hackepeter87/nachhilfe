@@ -33,4 +33,4 @@ Jede Runde enthält bei verfügbarem Katalog alle vier Fokusbereiche, jede Aufga
 ## 16. Grenzen der aktuellen Umsetzung
 Die Lernstandsheuristik ist kein Diagnosemodell. Schriftliche Multiplikation und Division, mehrere Überträge oder Entbündelungen, komplexe Größen, Körpernetze und unabhängige Remote-Katalogupdates bleiben nachgelagert.
 ## 17. Punkte für die Gesamtprüfung
-Eine Lehrkraft soll das zusammenhängende Curriculum, Sprache, Progression und Remediation bewerten. Installation, Touch-Bedienung, Offline-Neustart und Updateverhalten müssen zusätzlich auf einem echten iPhone geprüft werden. Beides ist noch nicht erfolgt.
+Eine Lehrkraft soll das zusammenhängende Curriculum, Sprache, Progression und Remediation bewerten. Installation, Touch-Bedienung, Offline-Neustart und Updateverhalten müssen zusätzlich auf einem echten iPhone vollständig geprüft werden. Reale iPhone-Befunde liegen vor; die vollständige Gerätecheckliste und die Lehrkraftprüfung sind noch nicht erfolgt.

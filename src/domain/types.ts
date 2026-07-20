@@ -233,6 +233,14 @@ export interface SessionPlan extends SessionReleaseMetadata {
   exercises: Exercise[]
 }
 
+export interface ReviewScenario {
+  skillId: SkillId
+  phase: LearningPhase
+  difficulty: Difficulty
+  seed: number
+  errorPath?: 'remediation'
+}
+
 export type SelfAssessment = 'material' | 'hint' | 'thinking'
 
 export interface CompletedSession extends SessionReleaseMetadata {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.29.2",
+  "catalogVersion": "0.30.0",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-20",
   "status": "ready-for-review",
@@ -2005,7 +2005,7 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Gesuchte Größe und wichtige Angaben klären, sichtbares unbekanntenhaltiges Mengenbild untersuchen, passende Rechnung wählen, selbst rechnen und das Ergebnis prüfen",
+          "description": "Eine kurze Geschichte mit sichtbarem unbekanntenhaltigem Mengenbild in eine passende Rechnung übersetzen, selbst rechnen und das Ergebnis im Antwortsatz prüfen",
           "numberRange": "Ergebnisse bis 20",
           "representation": "always",
           "requirements": {
@@ -6632,18 +6632,15 @@
     ],
     "phaseSequences": {
       "activate": [
-        "model",
         "calculate",
         "check"
       ],
       "understand": [
-        "model",
         "equation",
         "calculate",
         "check"
       ],
       "guided-practice": [
-        "model",
         "equation",
         "calculate",
         "check"
@@ -6675,7 +6672,7 @@
       ]
     },
     "modelInteractionByDifficulty": {
-      "1": "continue",
+      "1": "choice",
       "2": "choice",
       "3": "choice"
     },

@@ -8,7 +8,18 @@ Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass
 
 Der Förderkern am Ende von Klasse 3 ist in Version 0.21 bereits breit abgedeckt. Die nächsten Releases erfinden diese Inhalte nicht neu, sondern bringen sie auf einen einheitlichen Qualitätsstand.
 
-**Korrigierter Umsetzungsstand 0.30.2:** Die Migrationen 0.22 bis 0.29 und Version 0.30 haben einen gemeinsamen technischen Vertrag hergestellt. Die manuelle Erprobung hat jedoch gezeigt, dass daraus nicht auf gleichwertige Verständlichkeit oder Förderqualität geschlossen werden darf. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) ersetzt diese frühere pauschale Bewertung; 0.30.2 korrigiert zusätzlich die danach gefundenen Befunde bei Kombinatorik, Zahlenstrahl und Sachaufgabenfluss. Neue Kompetenzen bleiben zurückgestellt, bis die Kernabläufe aus Sachrechnen, Grundrechnen, schriftlichen Verfahren, Größen und den beanstandeten Auswahlaufgaben manuell abgenommen sind. Die folgende Releasefolge bleibt als Entwicklungs- und Abnahmehistorie erhalten.
+**Korrigierter Umsetzungsstand 0.31.0:** Die Migrationen 0.22 bis 0.30 haben einen gemeinsamen technischen Vertrag hergestellt. Die manuelle Erprobung hat jedoch gezeigt, dass daraus nicht auf gleichwertige Verständlichkeit oder Förderqualität geschlossen werden darf. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) ersetzt diese frühere pauschale Bewertung. Version 0.31.0 ergänzt einen [reproduzierbaren didaktischen Prüfstand](didactic-review-workbench.md) und korrigiert erste gemeinsame Ursachen. Neue Kompetenzen und der unabhängige Katalogkanal bleiben zurückgestellt, bis die bestehenden Familien manuell abgenommen sind.
+
+## Verständlichkeit vor neuen Inhalten: 0.31 bis 0.34
+
+| Version | Ziel | Abnahmestand |
+| --- | --- | --- |
+| **0.31** | Entwicklungsprüfstand mit echter Runtime, reproduzierbaren Szenarien, Befundvorlage und Produktionsausschluss | implementiert; interne Browser-Stichprobe, keine vollständige menschliche Variantenabnahme |
+| **0.32** | Addition, Subtraktion, Multiplikation, Division, Zahlverständnis, Rechnen bis 1000, schriftliche Verfahren und Sachaufgaben familienweise prüfen und korrigieren | offen |
+| **0.33** | Größen, Daten, Wahrscheinlichkeit, Kombinatorik und Raum/Form familienweise prüfen und korrigieren | offen |
+| **0.34** | vollständige reale iPhone-Checkliste, PWA-/Offline-/Updateabnahme und Releasekandidat | offen; vorhandene Screenshots sind nur eine Teilprüfung |
+
+Technische Tests bleiben in jeder Version Release-Gates, gelten aber nicht als didaktische Abnahme. Issue #58 zur externen Lehrkraftprüfung bleibt eine getrennte Gesamtbewertung und blockiert Korrekturreleases nicht.
 
 Bereits nach dem Standard 0.21 migriert sind:
 

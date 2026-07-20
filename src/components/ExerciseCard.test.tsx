@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { generateExercise } from '../domain'
+import { generateExercise, type ExerciseStep } from '../domain'
 import { ExerciseCard } from './ExerciseCard'
 
 describe('ExerciseCard', () => {
@@ -521,17 +521,15 @@ describe('ExerciseCard', () => {
   it('ergänzt bei einem alten unvollständigen Sachaufgabenplan zwingend einen Rechenschritt', async () => {
     const user = userEvent.setup()
     const generated = generateExercise('word-problem', 42, 1, undefined, 'guided-practice')
-    const model = generated.steps?.find((step) => step.id === 'model')
-    if (!model) throw new Error('Modellschritt fehlt')
+    if (!generated.representation) throw new Error('Sachaufgabenmodell fehlt')
+    const model = {
+      id: 'model', interaction: 'continue', prompt: 'Betrachte das offene Modell.', continueLabel: 'Weiter',
+      representation: generated.representation, correctAnswer: 'continue', errorFeedback: 'Pruefe das Modell.', successFeedback: 'Das Modell ist geordnet.'
+    } satisfies ExerciseStep
     const legacyExercise = { ...generated, steps: [model] }
     render(<ExerciseCard exercise={legacyExercise} onComplete={vi.fn()} />)
 
-    if (model.interaction === 'continue') await user.click(screen.getByRole('button', { name: model.continueLabel ?? 'Weiter' }))
-    else {
-      const correct = model.options?.find((option) => option.value === model.correctAnswer)
-      if (!correct) throw new Error('Richtiges Modell fehlt')
-      await user.click(screen.getByRole('button', { name: correct.label }))
-    }
+    await user.click(screen.getByRole('button', { name: model.continueLabel }))
 
     expect(screen.getByRole('heading', { name: /Rechne jetzt selbst/ })).toBeVisible()
     expect(screen.getByLabelText('Dein Ergebnis')).toHaveValue('')
@@ -540,14 +538,15 @@ describe('ExerciseCard', () => {
 
   it('zeigt positives Zwischenfeedback bei Sachaufgaben grün', async () => {
     const user = userEvent.setup()
-    const exercise = generateExercise('word-problem', 42, 1)
+    const exercise = generateExercise('word-problem', 42, 1, undefined, 'guided-practice')
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
 
-    const modelStep = exercise.steps?.find((step) => step.id === 'model')
-    if (!modelStep || modelStep.interaction !== 'continue') throw new Error('Geführtes Modell fehlt')
-    await user.click(screen.getByRole('button', { name: modelStep.continueLabel ?? 'Weiter' }))
+    const equationStep = exercise.steps?.find((step) => step.id === 'equation')
+    const correct = equationStep?.options?.find((option) => option.value === equationStep.correctAnswer)
+    if (!equationStep || !correct) throw new Error('Geführte Rechnungswahl fehlt')
+    await user.click(screen.getByRole('button', { name: correct.label }))
 
-    const feedback = screen.getByText(modelStep.successFeedback)
+    const feedback = screen.getByText(equationStep.successFeedback)
     expect(feedback).toHaveClass('feedback--step-success')
     expect(feedback).not.toHaveClass('feedback--try')
   })

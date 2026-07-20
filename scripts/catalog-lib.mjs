@@ -630,9 +630,9 @@ export function validateCatalog(catalog) {
     fail('wordProblemSteps.runtimeSequence weicht vom vollständigen Modellierungsablauf ab')
   }
   const expectedPhaseSequences = {
-    activate: ['model', 'calculate', 'check'],
-    understand: ['model', 'equation', 'calculate', 'check'],
-    'guided-practice': ['model', 'equation', 'calculate', 'check'],
+    activate: ['calculate', 'check'],
+    understand: ['equation', 'calculate', 'check'],
+    'guided-practice': ['equation', 'calculate', 'check'],
     'independent-practice': ['question', 'relevant', 'model', 'equation', 'calculate', 'plausibility', 'check'],
     automate: ['equation', 'calculate', 'check'],
     transfer: ['question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check']
@@ -643,7 +643,7 @@ export function validateCatalog(catalog) {
     fail('wordProblemSteps.phaseSequences ist ungültig')
   }
   const modelInteractions = catalog.wordProblemSteps.modelInteractionByDifficulty
-  if (!isRecord(modelInteractions) || modelInteractions['1'] !== 'continue' || modelInteractions['2'] !== 'choice' || modelInteractions['3'] !== 'choice') {
+  if (!isRecord(modelInteractions) || modelInteractions['1'] !== 'choice' || modelInteractions['2'] !== 'choice' || modelInteractions['3'] !== 'choice') {
     fail('wordProblemSteps.modelInteractionByDifficulty ist ungültig')
   }
   validateSymmetry(catalog.symmetry)

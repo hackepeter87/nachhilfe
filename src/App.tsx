@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, Check, CircleHelp, Compass, Download, Info, RefreshCw, ShieldCheck, Sparkles, Wifi, WifiOff } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import {
@@ -21,6 +21,8 @@ import { getActiveCatalogMetadata, type CatalogMetadata } from './content/catalo
 import { APP_VERSION } from './version'
 
 type Screen = 'loading' | 'onboarding' | 'home' | 'session' | 'summary' | 'error'
+
+const ReviewWorkbench = import.meta.env.DEV ? lazy(() => import('./review/ReviewWorkbench')) : null
 
 function isStandalone(): boolean {
   const iosNavigator = navigator as Navigator & { standalone?: boolean }
@@ -186,7 +188,7 @@ function Summary({ results, onFinish }: { results: AttemptResult[]; onFinish: (a
   )
 }
 
-export default function App() {
+function LearningApp() {
   const [screen, setScreen] = useState<Screen>('loading')
   const [profile, setProfileState] = useState<Profile | null>(null)
   const [settings, setSettingsState] = useState<AppSettings>({ key: 'app-settings', installHelpDismissed: false, schemaVersion: 1 })
@@ -357,4 +359,12 @@ export default function App() {
       {currentExercise && <ExerciseCard key={currentExercise.id} exercise={currentExercise} onComplete={completeExercise} />}
     </main>
   )
+}
+
+export default function App() {
+  const reviewRequested = import.meta.env.DEV && new URLSearchParams(window.location.search).get('review') === '1'
+  if (reviewRequested && ReviewWorkbench) {
+    return <Suspense fallback={<main className="page loading-page"><p>Prüfstand wird geladen ...</p></main>}><ReviewWorkbench /></Suspense>
+  }
+  return <LearningApp />
 }

@@ -41,8 +41,7 @@ describe('deterministische Aufgabengeneratoren', () => {
           expect(exercise.options?.every((option) => option.grid)).toBe(true)
         } else if (skill.id === 'word-problem') {
           const modelStep = exercise.steps?.find((step) => step.id === 'model')
-          expect(modelStep).toBeDefined()
-          expect(modelStep?.representation || modelStep?.options?.every((option) => option.representation)).toBeTruthy()
+          expect(exercise.representation || modelStep?.representation || modelStep?.options?.every((option) => option.representation)).toBeTruthy()
         } else if (expected === 'none') {
           if (exercise.representation) expect(exercise.representation.visibility).toBe('scaffold')
         } else {
@@ -276,15 +275,13 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(calculationStep?.options).toBeUndefined()
         expect(exercise.steps?.map((step) => step.prompt).join(' ')).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
         const modelStep = exercise.steps?.find((step) => step.id === 'model')
-        expect(modelStep).toBeDefined()
-        if (!modelStep) throw new Error('Modellschritt fehlt')
-        if (modelStep.interaction === 'continue') {
-          expect(modelStep.interaction).toBe('continue')
-          expect(modelStep.representation).toBeDefined()
-          expect(modelStep.representation?.values.unknownQuantity).toBeTruthy()
-          expect(modelStep.representation?.values).not.toHaveProperty('result')
-          expect(modelStep.representation?.values).not.toHaveProperty('intermediate')
+        if (!modelStep) {
+          expect(exercise.representation).toBeDefined()
+          expect(exercise.representation?.values.unknownQuantity).toBeTruthy()
+          expect(exercise.representation?.values).not.toHaveProperty('result')
+          expect(exercise.representation?.values).not.toHaveProperty('intermediate')
         } else {
+          expect(modelStep.interaction).not.toBe('continue')
           expect(modelStep.options).toHaveLength(3)
           expect(new Set(modelStep.options?.map((option) => option.value)).size).toBe(3)
           expect(modelStep.options?.filter((option) => option.value === modelStep.correctAnswer)).toHaveLength(1)
@@ -515,11 +512,12 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(hard.representation?.visibility).toBe('scaffold')
   })
 
-  it('steigert bei Sachaufgaben die selbstständige Modellwahl', () => {
+  it('zeigt bei Sachaufgaben zuerst ein offenes Modell und verlangt die Modellwahl erst selbstständig', () => {
     const easy = generateExercise('word-problem', 315, 1)
     const medium = generateExercise('word-problem', 315, 2)
     const hard = generateExercise('word-problem', 315, 3)
-    expect(easy.steps?.find((step) => step.id === 'model')).toMatchObject({ interaction: 'continue', representation: expect.any(Object) })
+    expect(easy.steps?.find((step) => step.id === 'model')).toBeUndefined()
+    expect(easy.representation?.values.unknownQuantity).toBeTruthy()
     expect(medium.steps?.find((step) => step.id === 'model')?.options).toHaveLength(3)
     expect(hard.steps?.find((step) => step.id === 'relevant')).toBeDefined()
   })

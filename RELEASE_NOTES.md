@@ -1,5 +1,19 @@
 # Mathe-Reise
 
+## Reproduzierbarer didaktischer Prüfstand 0.31.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Ein ausschließlich in der Vite-Entwicklungsumgebung verfügbarer Prüfstand stellt alle 34 aktiven Kompetenzen über Lernphase, Schwierigkeit, Seed und Remediationspfad reproduzierbar bereit.
+- Der Prüfstand verwendet den produktiven Katalog, die produktiven Generatoren und dieselbe `ExerciseCard` wie eine Mathe-Runde. Die technische Lösung bleibt standardmäßig verborgen; Hilfe, Fehler, Feedback und Remediation können kontrolliert durchlaufen werden.
+- Eine verbindliche Prüfliste und eine Markdown-Befundvorlage erfassen Arbeitsauftrag, Lernhandlung, Darstellung, Antwortform, Hilfe, Feedback, Remediation, mobiles Layout und Klasse-3-Niveau.
+- Der Produktionsbuild scheitert, falls Kennzeichen des Prüfstands in `dist` enthalten sind. Im Kinderbereich entsteht keine zweite Navigation oder Aufgabenruntime.
+- Einfache Sachaufgaben enthalten keinen passiven Modellbestätigungsschritt mehr. Das unbekanntenhaltige Modell bleibt bis zur eigenen Rechnung sichtbar; Ergebnis und Antwortsatz erscheinen weiterhin erst danach.
+- Nachbarzahlaufgaben erzeugen auch an der oberen Zahlenraumgrenze eindeutige plausible Optionen.
+- Katalog 0.30.0 und App 0.31.0 bleiben bei Schema 19 und Status `ready-for-review`.
+
+Der Prüfstand wurde intern bei `375 × 812` für alle 34 Kompetenzen in einer geführten und einer Transferkonfiguration ohne horizontalen Seitenüberlauf durchlaufen. Das ist keine vollständige Variantenprüfung und keine echte iPhone-Abnahme. Zahlen/Modellieren, Größen/Daten/Raum, die vollständige Gerätecheckliste und die externe Lehrkraftprüfung bleiben offen.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 448 Unit-/Komponententests, Produktionsbuild und 19 Playwright-Szenarien gegen Vite Preview sowie erneut 19 Szenarien gegen den gehärteten Read-only-Container. Das mit Docker Desktop explizit für AMD64 gebaute Image `mathe-reise:0.31.0-local` beziehungsweise `mathe-reise:local` (`sha256:d2e97e9e6db1928f2ad6763393b854d625e80b5dc1700b3debfd9339d0a38b96`) lief als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldete `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; Docker Compose validierte die Deployment-Datei. Die Container-E2E lief auf `127.0.0.1:8093`. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## iPhone-Regressionskorrektur 0.30.2
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Drei weitere Befunde aus der realen iPhone-Nutzung werden als gemeinsame Korrektur von Katalog, Generator und Runtime behandelt.

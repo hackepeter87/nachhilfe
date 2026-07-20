@@ -1,7 +1,7 @@
 {
   "name": "mathe-reise",
   "private": true,
-  "version": "0.30.2",
+  "version": "0.31.0",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -14,7 +14,8 @@
     "curriculum:check": "node scripts/curriculum-matrix.mjs check",
     "prebuild": "npm run catalog:check",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run review:check-production",
+    "review:check-production": "node scripts/review-build-check.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",

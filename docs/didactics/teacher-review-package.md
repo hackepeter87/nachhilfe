@@ -2,7 +2,7 @@
 
 ## Lauffähige Version
 
-Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit docker run --rm -p 8080:8080 mathe-reise:0.30.2. Das öffentliche OCI-Image ist ghcr.io/hackepeter87/nachhilfe:0.30.2, sobald der Release-Workflow für `v0.30.2` erfolgreich gelaufen ist. Dieses Paket bereitet die Gesamtprüfung vor; eine tatsächliche Prüfung ist noch nicht dokumentiert.
+Nach Deployment ist die URL des konkreten Testsystems hier einzutragen. Lokal startet die App mit npm run dev; der AMD64-Container mit `docker run --rm -p 8080:8080 mathe-reise:0.31.0`. Das öffentliche OCI-Image ist `ghcr.io/hackepeter87/nachhilfe:0.31.0`, sobald der Release-Workflow für `v0.31.0` erfolgreich gelaufen ist. Dieses Paket bereitet die Gesamtprüfung vor; eine tatsächliche Prüfung ist noch nicht dokumentiert.
 
 ## Förderziel
 
@@ -36,4 +36,4 @@ Stufe 1 nutzt kleinere Zahlen und sichtbare Darstellung. Stufe 2 reduziert die D
 
 ## Bekannte Grenzen
 
-Es liegt keine dokumentierte Lehrkraftfreigabe vor. Ein echter iPhone-Test ist noch offen. Freie Rechenwege oder Freitextbegründungen werden nicht diagnostisch ausgewertet. Millimeter/Kilometer, komplexe Kaufsituationen, freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze sind nicht sichtbar. Das adaptive Modell ist eine getestete Produktheuristik, kein wissenschaftlich validiertes Diagnosemodell.
+Es liegt keine dokumentierte Lehrkraftfreigabe vor. Reale iPhone-Befunde liegen vor, die vollständige Gerätecheckliste ist jedoch noch offen. Freie Rechenwege oder Freitextbegründungen werden nicht diagnostisch ausgewertet. Millimeter/Kilometer, komplexe Kaufsituationen, freie Rotation, Kippen, Mehrfachfaltungen und Körpernetze sind nicht sichtbar. Das adaptive Modell ist eine getestete Produktheuristik, kein wissenschaftlich validiertes Diagnosemodell.
