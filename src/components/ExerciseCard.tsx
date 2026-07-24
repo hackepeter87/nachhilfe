@@ -291,7 +291,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
         <h2 id="exercise-title" ref={headingRef} tabIndex={-1}>{exercise.prompt}</h2>
       </div>
 
-      {exercise.answerMode !== 'guided-word' && presentationRepresentation && (
+      {exercise.answerMode !== 'guided-word' && presentationRepresentation && !currentStep?.representation && (
         presentationRepresentation.visibility === 'always' ||
         (presentationRepresentation.visibility === 'hint' && hintsShown > 0) ||
         checks > 0 ||

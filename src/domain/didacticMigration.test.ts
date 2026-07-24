@@ -57,7 +57,7 @@ describe('didaktisch migrierte Lernhandlungen', () => {
   it.each(['neighbor-tens', 'neighbor-hundreds'] as const)('%s bestimmt zuerst die untere und danach die obere Grenze', (skillId) => {
     const exercise = generateExercise(skillId, 422, 1, undefined, 'understand')
     expect(exercise.steps?.map((step) => step.id)).toEqual(['lower', 'upper'])
-    expect(exercise.representation?.valueRoles.unknownValues).toEqual(['lower', 'upper'])
+    expect(exercise.representation?.valueRoles.unknownValues).toEqual(['start', 'end', 'lower', 'upper'])
     expect(exercise.representation?.values.tickStep).toBe(skillId === 'neighbor-tens' ? 10 : 100)
   })
 

@@ -86,6 +86,53 @@ describe('MathRepresentation lokaler Zahlenstrahl', () => {
     expect(container.querySelector('.number-line-marker')).toHaveStyle({ left: '1%' })
     expect(container.querySelector('.number-line-marker-label')).toHaveStyle({ left: '1%', transform: 'translateX(0)' })
   })
+
+  it('beschriftet die Nachbarzehner von 449 nach dem Aufdecken genau einmal', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: 'Nachbarzehner',
+      values: { start: 440, end: 450, marker: 449, lower: 440, upper: 450, step: 10, tickStep: 10 },
+      valueRoles: { knownValues: ['marker', 'step', 'tickStep'], unknownValues: ['start', 'end', 'lower', 'upper'], revealedValues: ['lower', 'upper'] }
+    }} />)
+    expect(container.querySelector('.number-line-marker')).toHaveStyle({ left: '90%' })
+    expect(container.querySelectorAll('.number-line-tick small')).toHaveLength(0)
+    expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual(['440', '450'])
+  })
+})
+
+describe('MathRepresentation Zehnerfelder', () => {
+  it('stellt Aufgabenfamilien bis 20 ohne ungültige oder abgeschnittene Mengen dar', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'ten-frame', visibility: 'always', label: '20 zerlegt in 8 und 12',
+      values: { first: 8, second: 12 },
+      valueRoles: { knownValues: ['first', 'second'], unknownValues: [], revealedValues: [] }
+    }} />)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(container.querySelectorAll('.ten-frame')).toHaveLength(3)
+    expect(container.querySelectorAll('.ten-frame-dot--filled')).toHaveLength(20)
+  })
+})
+
+describe('MathRepresentation Bezugsgrößen', () => {
+  it('zeigt für einen Teelöffel ein konkretes Objekt ohne unpassende Liter-Umrechnung', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'capacity-vessel', visibility: 'always', label: 'Bezugsgröße',
+      values: { mode: 'reference', quantityType: 'capacity', referenceId: 'spoon', itemLabel: 'einem Teelöffel', equivalenceLabel: '1 Liter = 1000 Milliliter', answerLabel: '5 ml' },
+      valueRoles: { knownValues: ['mode', 'quantityType', 'referenceId', 'itemLabel', 'equivalenceLabel'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(container.querySelector('.reference-object--spoon')).toBeVisible()
+    expect(container).toHaveTextContent('einem Teelöffel')
+    expect(container).not.toHaveTextContent('1 Liter = 1000 Milliliter')
+    expect(container).not.toHaveTextContent('5 ml')
+  })
+
+  it('lehnt eine nicht gerenderte Bezugsgröße sichtbar ab', () => {
+    render(<RuntimeMathRepresentation representation={{
+      kind: 'capacity-vessel', visibility: 'always', label: 'Bezugsgröße',
+      values: { mode: 'reference', quantityType: 'capacity', referenceId: 'unknown', itemLabel: 'einem Gegenstand', equivalenceLabel: '1 Liter = 1000 Milliliter', answerLabel: '5 ml' },
+      valueRoles: { knownValues: ['mode', 'quantityType', 'referenceId', 'itemLabel', 'equivalenceLabel'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Messwerte')
+  })
 })
 
 describe('MathRepresentation Zufall und Kombinationen', () => {
@@ -428,6 +475,27 @@ describe('MathRepresentation ebene Geometrie', () => {
     expect(screen.getByRole('img', { name: /Kreis, Quadrat, Kreis, Quadrat, Kreis.*Fortsetzung bleibt unbekannt/ })).toBeVisible()
     expect(container.querySelectorAll('.pattern-sequence .pattern-symbol')).toHaveLength(6)
     expect(container).not.toHaveTextContent('Fortsetzung: Quadrat')
+  })
+
+  it('zeigt den wiederkehrenden Musterblock in genau einer Reihe ohne falsches Fragezeichen', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'pattern-strip', visibility: 'always', label: 'Musterblock',
+      values: { sequenceCount: 4, blockLength: 2, taskMode: 'identify-block', symbol0: 'Quadrat', symbol1: 'Kreis', symbol2: 'Quadrat', symbol3: 'Kreis', answerLabel: 'Quadrat – Kreis' },
+      valueRoles: { knownValues: ['sequenceCount', 'blockLength', 'taskMode', 'symbol0', 'symbol1', 'symbol2', 'symbol3'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect(container.querySelector('.pattern-sequence')).toHaveStyle({ '--pattern-count': '4' })
+    expect(container.querySelectorAll('.pattern-symbol')).toHaveLength(4)
+    expect(container.querySelector('.pattern-symbol--unknown')).not.toBeInTheDocument()
+  })
+
+  it('zeigt Zahlenfolgen als Zahlen statt als leere Symbole', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'pattern-strip', visibility: 'always', label: 'Zahlenfolge',
+      values: { sequenceCount: 4, blockLength: 1, taskMode: 'number-sequence', symbol0: '120', symbol1: '130', symbol2: '140', symbol3: '150', answerLabel: '160' },
+      valueRoles: { knownValues: ['sequenceCount', 'blockLength', 'taskMode', 'symbol0', 'symbol1', 'symbol2', 'symbol3'], unknownValues: ['answerLabel'], revealedValues: [] }
+    }} />)
+    expect([...container.querySelectorAll('.pattern-symbol--number')].map((node) => node.textContent)).toEqual(['120', '130', '140', '150'])
+    expect(container.querySelector('.pattern-symbol--unknown')).toHaveTextContent('?')
   })
 
   it.each([

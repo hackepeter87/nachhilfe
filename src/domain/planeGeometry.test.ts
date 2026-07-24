@@ -11,6 +11,16 @@ function assertChoice(exercise: Exercise) {
 }
 
 describe('Ebene Figuren, Muster, Fläche und Umfang', () => {
+  it('fragt beim Einstieg nach dem wiederkehrenden Block und zeigt genau zwei vollständige Blöcke', () => {
+    for (let seed = 1; seed <= 100; seed += 1) {
+      const exercise = generateExercise('patterns', seed, 1, undefined, 'activate')
+      const values = exercise.representation!.values
+      expect(exercise.prompt).toBe('Welche Figuren wiederholen sich immer wieder?')
+      expect(values.taskMode).toBe('identify-block')
+      expect(Number(values.sequenceCount)).toBe(Number(values.blockLength) * 2)
+    }
+  })
+
   it('berechnet Fläche und Umfang reiner Rasterfiguren exakt', () => {
     const rectangle = [1, 1, 1, 1, 1, 1]
     expect(validateGridCells(2, 3, rectangle)).toBe(true)

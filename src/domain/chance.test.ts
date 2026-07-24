@@ -13,7 +13,7 @@ import type { LearningPhase } from './types'
 
 const PHASES: LearningPhase[] = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer']
 const PROBABILITY_TYPES = [
-  'chance-identify-outcome', 'chance-complete-outcome-space', 'chance-classify-guided',
+  'chance-classify-foundation', 'chance-complete-outcome-space', 'chance-classify-guided',
   'chance-classify-independent', 'chance-classify-fluent', 'chance-predict-and-evaluate'
 ] as const
 
@@ -34,6 +34,17 @@ describe('Wahrscheinlichkeit und Kombinatorik', () => {
     expect(classifyEvent(['rot', 'blau'], ['grün'])).toBe('impossible')
     expect(compareEventFrequency(['rot', 'rot', 'blau'], ['rot'], ['blau'])).toBe('first')
     expect(compareEventFrequency(['Kopf', 'Zahl'], ['Kopf'], ['Zahl'])).toBe('equal')
+  })
+
+  it('beginnt mit einer konkreten Handlung und kindgerechten Einschätzung statt einem Ergebnisraum-Quiz', () => {
+    const exercise = generateExercise('probability', 1, 1, undefined, 'activate')
+    expect(exercise.prompt).toMatch(/Du (ziehst|wirfst|würfelst|drehst)/)
+    expect(exercise.prompt).not.toMatch(/Ergebnisraum/i)
+    expect(exercise.options?.map((option) => option.label).sort()).toEqual(['möglich', 'sicher', 'unmöglich'].sort())
+    expect(exercise.correctAnswer).toBe(classifyEvent(
+      getTaskCatalog().chanceContent.probabilityTemplates.find((template) => template.id === exercise.variant.values.templateId)!.outcomes,
+      getTaskCatalog().chanceContent.probabilityTemplates.find((template) => template.id === exercise.variant.values.templateId)!.eventA
+    ))
   })
 
   it('validiert alle katalogisierten Vorlagen und lehnt inkonsistente Vorlagen ab', () => {

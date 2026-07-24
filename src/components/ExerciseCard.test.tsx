@@ -48,8 +48,10 @@ describe('ExerciseCard', () => {
     if (!lower || !upper) throw new Error('Nachbarschritte fehlen')
 
     expect(container.querySelectorAll('.number-line-tick small')).toHaveLength(0)
+    expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual(['?', '?'])
     await user.click(screen.getByRole('button', { name: lower.correctAnswer }))
-    expect([...container.querySelectorAll('.number-line-tick small')].map((node) => node.textContent)).toEqual([lower.correctAnswer])
+    expect(container.querySelectorAll('.number-line-tick small')).toHaveLength(0)
+    expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual([lower.correctAnswer, '?'])
     expect(screen.getByRole('heading', { name: new RegExp(upper.prompt.replace(/[?]/g, '\\?')) })).toBeVisible()
   })
 
@@ -204,6 +206,21 @@ describe('ExerciseCard', () => {
     await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, subskillId: 'division-grouping-by-5' }))
+  })
+
+  it('wechselt bei der zweiten Geteiltaufgabe auch die sichtbare Verteilhandlung', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('division', 125, 3, 'division-grouping-by-5', 'transfer')
+    const [probe, inverse] = exercise.steps ?? []
+    if (!probe || !inverse?.representation) throw new Error('Divisions-Transferhandlungen fehlen')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    expect(container.querySelectorAll('.math-visual')).toHaveLength(1)
+    await user.click(screen.getByRole('button', { name: probe.correctAnswer }))
+    expect(screen.getByRole('heading', { name: new RegExp(inverse.prompt.replace(/[?]/g, '\\?')) })).toBeVisible()
+    expect(container.querySelectorAll('.math-visual')).toHaveLength(1)
+    expect(container.querySelector(inverse.representation.kind === 'sharing-model' ? '.division-model--sharing' : '.division-model--grouping')).toBeVisible()
+    expect(screen.getByRole('img', { name: /Punkte werden vollständig/ })).toBeVisible()
   })
 
   it('reagiert bei Multiplikation auf das Addieren der Faktoren mit passender Hilfe', async () => {

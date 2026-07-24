@@ -1,6 +1,6 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.31.0",
+  "catalogVersion": "0.31.1",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-07-24",
   "status": "ready-for-review",
@@ -4402,11 +4402,11 @@
         "Gleich häufige Ereignisse werden wegen ihrer Lage als verschieden eingeschätzt."
       ],
       "hints": [
-        "Zähle alle sichtbaren möglichen Ergebnisse und prüfe, ob das gesuchte Ergebnis darunter ist.",
-        "Sicher heißt: Es passt immer. Unmöglich heißt: Es passt nie. Dazwischen ist es möglich."
+        "Schau auf alle sichtbaren Möglichkeiten. Kann das genannte Ergebnis immer, manchmal oder nie eintreten?",
+        "Sicher heißt: Es passiert immer. Unmöglich heißt: Es kann nie passieren. Dazwischen ist es möglich."
       ],
       "prompt": "Untersuche den Zufallsversuch und entscheide passend.",
-      "errorFeedback": "Prüfe jedes mögliche Ergebnis einzeln. Passt die Aussage immer, manchmal oder nie?",
+      "errorFeedback": "Schau auf alle sichtbaren Möglichkeiten: Passiert das Genannte immer, manchmal oder nie?",
       "explanation": "Ein Ereignis ist sicher, wenn alle möglichen Ergebnisse passen, möglich, wenn mindestens eines passt, und unmöglich, wenn keines passt.",
       "difficultyBounds": {
         "minLevel": 1,
@@ -4478,7 +4478,7 @@
         }
       ],
       "workedExample": "Im Beutel liegen nur rote Steine. Rot zu ziehen ist sicher, blau zu ziehen ist unmöglich. Bei roten und blauen Steinen ist rot möglich, aber nicht sicher.",
-      "successFeedback": "Du hast alle möglichen Ergebnisse passend berücksichtigt.",
+      "successFeedback": "Du hast den sichtbaren Versuch passend eingeschätzt.",
       "remediation": {
         "strategy": "Streiche gedanklich jedes Ergebnis, das nicht zur Aussage passt, und vergleiche die verbleibende Anzahl.",
         "foundationStrategy": "Kehre zu einem Beutel mit deutlich sichtbaren Gegenständen zurück und prüfe immer, manchmal oder nie.",
@@ -4490,9 +4490,9 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Ein tatsächlich mögliches Ergebnis im sichtbaren Ergebnisraum erkennen.",
+          "goal": "An einem sichtbaren Zufallsversuch sicher, möglich und unmöglich unterscheiden.",
           "exerciseTypes": [
-            "probability:chance-identify-outcome"
+            "probability:chance-classify-foundation"
           ],
           "releaseStatus": "active"
         },
@@ -4547,7 +4547,7 @@
         {
           "id": "chance-outcome-space",
           "misconception": "Ein mögliches Ergebnis außerhalb des sichtbaren Ergebnisraums wird angenommen.",
-          "feedback": "Zähle nur Ergebnisse, die im sichtbaren Ergebnisraum wirklich vorkommen, und lasse keines davon aus."
+          "feedback": "Schau nur auf die sichtbaren Möglichkeiten und lasse keine davon aus."
         },
         {
           "id": "chance-possible-sure",
@@ -5468,12 +5468,12 @@
         }
       ],
       "hints": [
-        "Suche zuerst den kleinsten Block, der sich wiederholt.",
-        "Sprich den Musterblock leise von vorne und setze genau an derselben Stelle fort."
+        "Schau, welche Figuren in derselben Reihenfolge noch einmal vorkommen.",
+        "Sprich die wiederkehrenden Figuren leise von vorne und setze genau an derselben Stelle fort."
       ],
       "prompt": "{taskPrompt}",
-      "errorFeedback": "Suche den vollständigen Musterblock, nicht nur das letzte Zeichen.",
-      "explanation": "Ein Muster wird fortgesetzt, indem derselbe kleinste Block in derselben Reihenfolge wiederholt wird.",
+      "errorFeedback": "Suche die Figuren, die in derselben Reihenfolge noch einmal beginnen. Schau nicht nur auf die letzte Figur.",
+      "explanation": "Bei einem Muster wiederholen sich dieselben Figuren immer in derselben Reihenfolge.",
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
@@ -5557,7 +5557,7 @@
       "learningPhases": [
         {
           "id": "activate",
-          "goal": "Den kleinsten wiederholten Musterblock finden.",
+          "goal": "Die wiederkehrende Figurenfolge erkennen.",
           "exerciseTypes": [
             "patterns:pattern-activate-find-block"
           ],
@@ -7824,7 +7824,7 @@
       ]
     },
     "capacity": {
-      "referencePrompt": "Wie viel Flüssigkeit passt ungefähr in {item}?",
+      "referencePrompt": "Welche Flüssigkeitsmenge passt ungefähr zu {item}?",
       "complementPrompt": "Im Gefäß sind {knownAmount}. Wie viel fehlt bis {targetAmount}?",
       "calculationPrompt": "Rechne die Flüssigkeitsmengen: {firstAmount} {operation} {secondAmount}.",
       "referenceExplanation": "Zu {item} passt als Bezugsgröße ungefähr {quantityAnswer}.",
@@ -7855,7 +7855,7 @@
         },
         {
           "id": "juice-box",
-          "label": "ein kleines Trinkpäckchen",
+          "label": "einem kleinen Trinkpäckchen",
           "correct": "200 ml",
           "options": [
             "20 ml",

@@ -477,6 +477,16 @@ function division(seed: number, difficulty: Difficulty, focus?: string, phase?: 
   if (phase === 'transfer') {
     const probe = `${divisor} · ${quotient} = ${dividend}`
     const inverse = `${dividend} : ${quotient} = ${divisor}`
+    const inverseRepresentation = representation(
+      'division',
+      difficulty,
+      grouping ? 'sharing-model' : 'grouping-model',
+      grouping ? getSkillContent('division').representations[1]! : getSkillContent('division').representations[0]!,
+      grouping
+        ? { total: dividend, groupCount: quotient, groupSize: divisor }
+        : { total: dividend, groupSize: quotient, groupCount: divisor },
+      [grouping ? 'groupSize' : 'groupCount']
+    )
     return withMetadata({
       ...shared,
       typeId: `division-transfer-fact-family-${situation}`, subskillId,
@@ -488,14 +498,26 @@ function division(seed: number, difficulty: Difficulty, focus?: string, phase?: 
             { value: `${divisor} + ${quotient} = ${divisor + quotient}`, misconception: 'Divisor und Ergebnis werden addiert.', misconceptionId: 'division-operation-choice' },
             { value: `${quotient} · ${quotient} = ${quotient * quotient}`, misconception: 'Gruppenanzahl und Gruppengröße werden verwechselt.', misconceptionId: 'division-group-roles' },
             { value: `${divisor} · ${quotient === 2 ? 3 : quotient - 1} = ${divisor * (quotient === 2 ? 3 : quotient - 1)}`, misconception: 'Eine Gruppe wird ausgelassen oder zu viel verwendet.', misconceptionId: 'division-incomplete-partition' }
-          ]), correctAnswer: probe, errorFeedback: 'Multipliziere Gruppenanzahl und Gruppengröße. So muss wieder die Gesamtmenge entstehen.', successFeedback: 'Die Malprobe ergibt wieder die Gesamtmenge.'
+          ]), correctAnswer: probe, errorFeedback: 'Multipliziere Gruppenanzahl und Gruppengröße. So muss wieder die Gesamtmenge entstehen.', successFeedback: 'Die Malprobe ergibt wieder die Gesamtmenge.',
+          representation: { ...divisionRepresentation, visibility: 'always' }
         },
         {
-          id: 'inverse', prompt: 'Welche zweite Geteiltaufgabe gehört zu denselben drei Zahlen?', interaction: 'choose-strategy',
+          id: 'inverse',
+          prompt: grouping
+            ? `Jetzt verteilst du ${dividend} Punkte auf ${quotient} Gruppen. Welche Rechnung zeigt die Punkte in jeder Gruppe?`
+            : `Jetzt legst du immer ${quotient} Punkte zu einer Gruppe. Welche Rechnung zeigt die Anzahl der Gruppen?`,
+          interaction: 'choose-strategy',
           options: textOptions(random, inverse, [
             { value: `${quotient} : ${divisor} = ${Math.floor(quotient / divisor)}`, misconception: 'Die Gesamtmenge steht nicht am Anfang der Geteiltaufgabe.', misconceptionId: 'division-known-total' },
             { value: `${dividend} : ${dividend} = 1`, misconception: 'Die Gesamtmenge wird durch sich selbst geteilt.', misconceptionId: 'division-operation-choice' }
-          ]), correctAnswer: inverse, errorFeedback: 'Beginne wieder mit der Gesamtmenge und teile diesmal durch das andere bekannte Ergebnis.', successFeedback: 'Beide Geteiltaufgaben gehören zur selben Aufgabenfamilie.'
+          ]), correctAnswer: inverse,
+          errorFeedback: grouping
+            ? `Beginne mit ${dividend} und teile durch die ${quotient} bekannten Gruppen.`
+            : `Beginne mit ${dividend} und teile durch die bekannte Gruppengröße ${quotient}.`,
+          successFeedback: grouping
+            ? `${dividend} : ${quotient} = ${divisor}. In jeder Gruppe liegen ${divisor} Punkte.`
+            : `${dividend} : ${quotient} = ${divisor}. Es entstehen ${divisor} Gruppen.`,
+          representation: { ...inverseRepresentation, visibility: 'always' }
         }
       ],
       representation: { ...divisionRepresentation, visibility: 'hint' }
@@ -857,7 +879,7 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
   const referenceEnd = upper
   const numberLine = representation(skillId, difficulty, 'number-line', 'Zahlenstrahl mit bekannten Referenzmarken', {
     start: referenceStart, end: referenceEnd, marker: number, step: unit, tickStep: unit, lower, upper
-  }, ['lower', 'upper'])
+  }, ['start', 'end', 'lower', 'upper'])
   if (phase === 'activate') {
     const full = random() < 0.5 ? lower : upper
     return withMetadata({
@@ -2411,7 +2433,7 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
     quantityExplanation = `${estimate.correct} ist eine passende Bezugsgröße. Deshalb passt die Einheit ${correctAnswer}.`
     strategy = `Entscheide zuerst, ob ${estimate.label} eher mit der kleinen oder der großen Einheit beschrieben wird.`
     subskillId = `${skillId}-unit-choice`
-    representationValues = { mode: 'reference', quantityType: skillId, itemLabel: estimate.label, equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    representationValues = { mode: 'reference', quantityType: skillId, referenceId: estimate.id, itemLabel: estimate.label, equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
     options = textOptions(random, correctAnswer, [
       { value: correctAnswer === smallUnit ? largeUnit : smallUnit, misconception: 'Kleine und große Einheit werden vertauscht.', misconceptionId: `${skillId}-unit-confusion` },
       { value: skillId === 'mass' ? 'ml' : 'g', misconception: 'Die Einheit gehört zu einer anderen Größenart.', misconceptionId: `${skillId}-quantity-confusion` }
@@ -2432,9 +2454,9 @@ function measurementQuantity(skillId: 'mass' | 'capacity', seed: number, difficu
     correctAnswer = estimate.correct
     taskPrompt = renderCatalogText(content.referencePrompt, { item: estimate.label })
     quantityExplanation = renderCatalogText(content.referenceExplanation, { item: estimate.label, quantityAnswer: correctAnswer })
-    strategy = `Vergleiche ${estimate.label} mit einer bekannten Bezugsgröße. ${content.equivalenceLabel}.`
+    strategy = `Stell dir ${estimate.label} im Alltag vor. Passt dazu eine kleine oder eine große Menge?`
     subskillId = `${skillId}-reference-estimate`
-    representationValues = { mode: 'reference', quantityType: skillId, itemLabel: estimate.label, equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
+    representationValues = { mode: 'reference', quantityType: skillId, referenceId: estimate.id, itemLabel: estimate.label, equivalenceLabel: content.equivalenceLabel, answerLabel: correctAnswer }
     options = shuffle(random, estimate.options.map((value) => ({
       value,
       label: value,
@@ -2605,7 +2627,7 @@ function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): 
       blockLength: 1,
       answerLabel: String(answer),
       highlightBlocks: 0,
-      taskMode: 'continue',
+      taskMode: 'number-sequence',
       ...Object.fromEntries(sequence.map((value, index) => [`symbol${index}`, String(value)]))
     }, ['answerLabel'])
     return withMetadata({
@@ -2646,25 +2668,26 @@ function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): 
   }
   const options = textOptions(random, correctAnswer, symbols.filter((symbol) => symbol !== correctAnswer).map((symbol) => ({ value: symbol, misconception: 'Musterblock an der falschen Stelle fortgesetzt' })))
   const shared = { ...base('patterns', seed, difficulty, values), ...contentFor('patterns', values, difficulty) }
-  const strip = (shown: string[], answerLabel = correctAnswer) => representation('patterns', difficulty, 'pattern-strip', content.displayLabels.pattern, {
+  const strip = (shown: string[], answerLabel = correctAnswer, taskMode = 'continue') => representation('patterns', difficulty, 'pattern-strip', content.displayLabels.pattern, {
     sequenceCount: shown.length,
     blockLength: block.length,
     answerLabel,
     highlightBlocks: phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1 : 0,
-    taskMode: 'continue',
+    taskMode,
     ...Object.fromEntries(shown.map((symbol, index) => [`symbol${index}`, symbol]))
   }, ['answerLabel'])
   if (phase === 'activate') {
     const correctBlock = block.join(' – ')
+    const repeatedBlock = Array.from({ length: block.length * 2 }, (_, index) => block[index % block.length]!)
     return withMetadata({
       ...shared,
       typeId: 'pattern-activate-find-block', subskillId: difficulty === 1 ? 'pattern-ab' : 'pattern-abc',
-      prompt: 'Welcher kleinste Block wiederholt sich?', answerMode: 'choice', correctAnswer: correctBlock,
+      prompt: 'Welche Figuren wiederholen sich immer wieder?', answerMode: 'choice', correctAnswer: correctBlock,
       options: textOptions(random, correctBlock, [
         { value: block[block.length - 1]!, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
         { value: [...block].reverse().join(' – '), misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' },
         { value: sequence.slice(0, block.length + 1).join(' – '), misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' }
-      ]), representation: strip(sequence)
+      ]), representation: strip(repeatedBlock, correctBlock, 'identify-block')
     })
   }
   if (phase === 'understand') {
@@ -3433,6 +3456,13 @@ function chanceRepresentation(template: ProbabilityTemplate): ExerciseRepresenta
   }
 }
 
+function chanceAction(template: ProbabilityTemplate): string {
+  if (template.experimentType === 'bag') return 'Du ziehst ohne hinzusehen genau einen Stein.'
+  if (template.experimentType === 'coin') return 'Du wirfst die Münze einmal.'
+  if (template.experimentType === 'die') return 'Du würfelst einmal.'
+  return 'Du drehst die Scheibe einmal.'
+}
+
 function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().chanceContent
@@ -3443,14 +3473,17 @@ function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase
   const generatedValues = { templateId: template.id, experimentType: template.experimentType, outcomeCount: template.outcomes.length }
   const generatedContent = contentFor('probability', generatedValues, difficulty)
   if (chancePhase === 'activate') {
-    const outcomes = [...new Set(template.outcomes)]
-    const correctAnswer = outcomes[0]!
-    const absent = ['gelb', 'grün', 'schwarz', 'weiß'].filter((value) => !outcomes.includes(value)).slice(0, 2)
+    const correctAnswer = classifyEvent(template.outcomes, template.eventA)
+    const options = shuffle(random, Object.entries(content.classificationLabels).map(([value, label]) => ({
+      value,
+      label,
+      misconception: value === correctAnswer ? undefined : 'Sicher, möglich und unmöglich werden verwechselt.',
+      misconceptionId: value === correctAnswer ? undefined : 'chance-possible-sure'
+    })))
     return withMetadata({
       ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
-      prompt: 'Welches Ergebnis ist im sichtbaren Ergebnisraum enthalten?', typeId: 'chance-identify-outcome',
-      subskillId: 'chance-outcome-space', answerMode: 'choice', correctAnswer,
-      options: textOptions(random, correctAnswer, absent.map((value) => ({ value, misconception: 'Ein nicht vorhandenes Ergebnis wird angenommen.', misconceptionId: 'chance-outcome-space' }))),
+      prompt: `${chanceAction(template)} ${template.question}`, typeId: 'chance-classify-foundation',
+      subskillId: 'chance-classify-visible', answerMode: 'choice', correctAnswer, options,
       representation: chanceRepresentation(template)
     })
   }
@@ -3461,7 +3494,7 @@ function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase
       ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
       successFeedback: 'Richtig: Diese Vorhersage nennt alle möglichen Ergebnisse.',
       explanation: `Bei einem Versuch erscheint genau eines dieser Ergebnisse: ${outcomes.join(', ')}. Kommt ein Ergebnis auf mehreren gleich großen Feldern vor, bleibt es trotzdem dieselbe mögliche Farbe oder Seite.`,
-      prompt: `Du führst den Versuch einmal aus. Welche Vorhersage stimmt?`, typeId: 'chance-complete-outcome-space',
+      prompt: `${chanceAction(template)} Welche Vorhersage stimmt?`, typeId: 'chance-complete-outcome-space',
       subskillId: 'chance-outcome-space', answerMode: 'choice', correctAnswer,
       options: textOptions(random, correctAnswer, [
         { value: `Es kann nur ${outcomes[0]} erscheinen.`, misconception: 'Ein mögliches Ergebnis wird ausgelassen.', misconceptionId: 'chance-outcome-space' },
@@ -3495,7 +3528,7 @@ function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase
   }
   return withMetadata({
     ...base('probability', seed, difficulty, generatedValues), ...generatedContent,
-    prompt: template.question,
+    prompt: `${chanceAction(template)} ${template.question}`,
     typeId: chancePhase === 'guided-practice' ? 'chance-classify-guided' : chancePhase === 'independent-practice' ? 'chance-classify-independent' : 'chance-classify-fluent',
     subskillId: chancePhase === 'guided-practice' ? 'chance-classify-visible' : 'chance-classify-experiment',
     answerMode: 'choice', correctAnswer,

@@ -66,6 +66,7 @@ describe('Zeit, Masse und Rauminhalt', () => {
         expect(exercise.representation?.valueRoles.unknownValues).toEqual(['answerLabel'])
         if (difficulty === 1) {
           expect(values.mode).toBe('reference')
+          expect(typeof values.referenceId).toBe('string')
           expect(exercise.options?.map((option) => option.label)).toContain(exercise.correctAnswer)
         } else if (difficulty === 2) {
           const known = Number(values.knownAmountBase)

@@ -1,5 +1,17 @@
 # Mathe-Reise
 
+## Darstellungs- und Verständlichkeitskorrekturen 0.32.2
+
+- Aufgabenfamilien bis 20 verwenden nun mehrere Zehnerfelder statt einer sichtbaren Fehlermeldung; keine Menge wird abgeschnitten.
+- Der zweite Divisionsschritt wechselt zwischen Gruppieren und Verteilen und zeigt damit genau die Handlung der verlangten Umkehraufgabe.
+- Nachbarzehner und Nachbarhunderter bleiben vor der Bearbeitung unbekannt und erscheinen nach dem Aufdecken nur einmal an der geometrisch richtigen Stelle.
+- Zufallsaufgaben beginnen mit einer konkreten Handlung und den kindgerechten Entscheidungen `sicher`, `möglich` und `unmöglich`; der Begriff Ergebnisraum verschwindet aus diesem Einstieg.
+- Muster fragen nach den wiederkehrenden Figuren, zeigen zwei vollständige Blöcke in einer Reihe und rendern Zahlenfolgen tatsächlich als Zahlen.
+- Bezugsgrößen für Masse und Rauminhalt zeigen ein konkretes Alltagsobjekt. Die unpassende Einheitenumrechnung wird in diesem Schritt nicht mehr eingeblendet.
+- App 0.32.2 verwendet Katalog 0.31.1 und unverändert Schema 19; es kommt keine neue Kompetenz hinzu.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 485 Unit-/Komponententests, Produktionsbuild und 20 Playwright-Szenarien gegen Vite Preview sowie erneut 20 Szenarien gegen den gehärteten Read-only-Container. Das mit Docker Desktop für AMD64 gebaute Image `mathe-reise:0.32.2-local` beziehungsweise `mathe-reise:local` (`sha256:dca7a372954953421c6e7c3bb93d1eea6c044f0778f5dc625501e360876d4968`) lief als UID `101:101`, ohne Capabilities, mit `/tmp` als einzigem tmpfs und meldete `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen. Ein erneuter vollständiger Test dieser Korrektur auf einem echten iPhone und eine externe Lehrkraftprüfung sind noch nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
+
 ## Erreichbarkeit der Lehrkraft-Übungsformen 0.32.1
 
 - Behebt den Befund, dass die in 0.32.0 implementierten Lehrkraft-Übungsformen in normalen Runden über lange Zeit gar nicht erscheinen konnten.

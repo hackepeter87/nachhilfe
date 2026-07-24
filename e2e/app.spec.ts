@@ -186,9 +186,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.31.0',
+    catalogVersion: '0.31.1',
     schemaVersion: 19,
-    appVersion: '0.32.1'
+    appVersion: '0.32.2'
   })
 
   await page.reload()
@@ -356,7 +356,7 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
 
   const referenceAnswers = new Map([
     ['einem Apfel', '200 g'], ['einer Packung Butter', '250 g'], ['einer Packung Mehl', '1 kg'],
-    ['einem Teelöffel', '5 ml'], ['einem Trinkglas', '250 ml'], ['ein kleines Trinkpäckchen', '200 ml']
+    ['einem Teelöffel', '5 ml'], ['einem Trinkglas', '250 ml'], ['einem kleinen Trinkpäckchen', '200 ml']
   ])
   const seen = new Set<string>()
   for (let focus = 0; focus < 3; focus += 1) {
@@ -1093,9 +1093,9 @@ test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung 
         transaction.objectStore('sessions').put({
           id: `rotation-fixture-${index}`,
           catalogId: 'nrw-klasse3-foerderkern',
-          catalogVersion: '0.31.0',
+          catalogVersion: '0.31.1',
           schemaVersion: 19,
-          appVersion: '0.32.1',
+          appVersion: '0.32.2',
           startedAt: `2026-07-${String(index + 1).padStart(2, '0')}T08:00:00.000Z`,
           completedAt: `2026-07-${String(index + 1).padStart(2, '0')}T08:05:00.000Z`,
           results: [],

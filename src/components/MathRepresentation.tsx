@@ -104,19 +104,28 @@ export function MathRepresentation({ representation }: { representation: Exercis
   if (representation.kind === 'ten-frame') {
     const first = Number(values.first)
     const second = Number(values.second)
-    const valid = Number.isInteger(first) && Number.isInteger(second) && first >= 0 && second >= 0 && first <= 10 && second <= 10
+    const valid = Number.isInteger(first) && Number.isInteger(second) && first >= 0 && second >= 0 && first <= 20 && second <= 20
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Das Punktefeld enthält ungültige Mengen.</div>
     const secondVisible = isValueVisible('second')
     return (
       <div className="math-visual ten-frame-visual" role="img" aria-label={`${representation.label}. Erste Menge ${first}, zweite Menge ${secondVisible ? second : 'unbekannt'}.`}>
-        {[{ label: 'erste Menge', count: first }, { label: 'zweite Menge', count: second }].map((frame) => (
-          <section key={frame.label}>
-            <span>{frame.label}</span>
-            <div className="ten-frame" aria-hidden="true">
-              {Array.from({ length: 10 }, (_, index) => <i className={frame.label === 'zweite Menge' && !secondVisible ? 'ten-frame-dot ten-frame-dot--unknown' : index < frame.count ? 'ten-frame-dot ten-frame-dot--filled' : 'ten-frame-dot'} key={index} />)}
-            </div>
-          </section>
-        ))}
+        {[{ label: 'erste Menge', count: first, visible: true }, { label: 'zweite Menge', count: second, visible: secondVisible }].map((quantity) => {
+          const chunks = quantity.visible
+            ? Array.from({ length: Math.max(1, Math.ceil(quantity.count / 10)) }, (_, index) => Math.min(10, Math.max(0, quantity.count - index * 10)))
+            : [0]
+          return (
+            <section key={quantity.label}>
+              <span>{quantity.label}</span>
+              <div className="ten-frame-stack" aria-hidden="true">
+                {chunks.map((count, frameIndex) => (
+                  <div className="ten-frame" key={frameIndex}>
+                    {Array.from({ length: 10 }, (_, index) => <i className={!quantity.visible ? 'ten-frame-dot ten-frame-dot--unknown' : index < count ? 'ten-frame-dot ten-frame-dot--filled' : 'ten-frame-dot'} key={index} />)}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )
+        })}
       </div>
     )
   }
@@ -449,9 +458,10 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const firstAmount = Number(values.firstAmountBase)
     const secondAmount = Number(values.secondAmountBase)
     const operation = String(values.operation)
+    const validReferenceIds = quantityType === 'mass' ? ['apple', 'butter', 'flour'] : ['spoon', 'glass', 'juice-box']
     const validBase = (value: number) => Number.isInteger(value) && value >= 0 && value <= 1000
     const valid = typeof values.answerLabel === 'string' && typeof values.equivalenceLabel === 'string' && (
-      (mode === 'reference' && typeof values.itemLabel === 'string') ||
+      (mode === 'reference' && typeof values.itemLabel === 'string' && validReferenceIds.includes(String(values.referenceId))) ||
       (mode === 'complement' && validBase(knownAmount) && targetAmount === 1000 && knownAmount < targetAmount) ||
       (mode === 'calculation' && validBase(firstAmount) && validBase(secondAmount) && ['+', '−'].includes(operation))
     )
@@ -462,7 +472,11 @@ export function MathRepresentation({ representation }: { representation: Exercis
         : `${measureLabel(firstAmount, quantityType)} ${operation} ${measureLabel(secondAmount, quantityType)}`
     const description = `${representation.label}. Bekannt: ${knownDescription}. ${answerVisible ? `Ergebnis ${values.answerLabel}.` : 'Das Ergebnis bleibt unbekannt.'}`
     const content = mode === 'reference' ? (
-      <div className="reference-measure" aria-hidden="true"><span>{textValue(values.itemLabel)}</span><i /><strong>?</strong></div>
+      <div className="reference-measure" aria-hidden="true">
+        <i className={`reference-object reference-object--${String(values.referenceId)}`} />
+        <span>{textValue(values.itemLabel)}</span>
+        <strong>?</strong>
+      </div>
     ) : mode === 'complement' ? (
       <div className="measure-complement" aria-hidden="true">
         <div className="measure-track"><i style={{ '--measure-fill': `${knownAmount / targetAmount * 100}%` } as CSSProperties} /></div>
@@ -474,7 +488,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
     return (
       <div className={`math-visual quantity-measure quantity-measure--${quantityType}`} role="img" aria-label={description}>
         {content}
-        <small>{textValue(values.equivalenceLabel)}</small>
+        {mode !== 'reference' && <small>{textValue(values.equivalenceLabel)}</small>}
         {answerVisible && <strong className="quantity-result">Ergebnis: {textValue(values.answerLabel)}</strong>}
       </div>
     )
@@ -503,25 +517,33 @@ export function MathRepresentation({ representation }: { representation: Exercis
 
   if (representation.kind === 'pattern-strip') {
     const sequenceCount = Number(values.sequenceCount)
-    const sequence = Number.isInteger(sequenceCount) && sequenceCount >= 5 && sequenceCount <= 8
+    const sequence = Number.isInteger(sequenceCount) && sequenceCount >= 4 && sequenceCount <= 8
       ? Array.from({ length: sequenceCount }, (_, index) => String(values[`symbol${index}`]))
       : []
     const blockLength = Number(values.blockLength)
     const allowed = ['Kreis', 'Quadrat', 'Dreieck', 'Stern']
-    const valid = sequence.length === sequenceCount && sequence.every((symbol) => allowed.includes(symbol)) &&
-      Number.isInteger(blockLength) && blockLength >= 2 && blockLength <= 3 && typeof values.answerLabel === 'string'
+    const taskMode = ['identify-error', 'identify-block', 'number-sequence'].includes(String(values.taskMode)) ? String(values.taskMode) : 'continue'
+    const numberSequence = taskMode === 'number-sequence'
+    const valid = sequence.length === sequenceCount &&
+      (numberSequence ? sequence.every((symbol) => /^\d+$/.test(symbol)) && blockLength === 1 : sequence.every((symbol) => allowed.includes(symbol)) && blockLength >= 2 && blockLength <= 3) &&
+      Number.isInteger(blockLength) && typeof values.answerLabel === 'string'
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Der Musterstreifen enthält ungültige Symbole.</div>
     const answerVisible = isValueVisible('answerLabel')
     const highlightBlocks = Number(values.highlightBlocks) === 1
-    const taskMode = values.taskMode === 'identify-error' ? 'identify-error' : 'continue'
-    const symbolClass = (symbol: string, index: number) => `pattern-symbol pattern-symbol--${symbol.toLowerCase()}${highlightBlocks && index % blockLength === 0 ? ' pattern-symbol--block-start' : ''}${highlightBlocks && index % blockLength === blockLength - 1 ? ' pattern-symbol--block-end' : ''}`
+    const showUnknown = taskMode === 'continue' || taskMode === 'number-sequence'
+    const symbolClass = (symbol: string, index: number) => `pattern-symbol ${numberSequence ? 'pattern-symbol--number' : `pattern-symbol--${symbol.toLowerCase()}`}${highlightBlocks && index % blockLength === 0 ? ' pattern-symbol--block-start' : ''}${highlightBlocks && index % blockLength === blockLength - 1 ? ' pattern-symbol--block-end' : ''}`
     const answerDescription = taskMode === 'identify-error'
       ? answerVisible ? `Fehlerstelle ${values.answerLabel}.` : 'Die Fehlerstelle bleibt unbekannt.'
-      : answerVisible ? `Fortsetzung ${values.answerLabel}.` : 'Die Fortsetzung bleibt unbekannt.'
+      : taskMode === 'identify-block'
+        ? answerVisible ? `Wiederholung ${values.answerLabel}.` : 'Die Wiederholung bleibt unbekannt.'
+        : answerVisible ? `Fortsetzung ${values.answerLabel}.` : 'Die Fortsetzung bleibt unbekannt.'
     return (
       <div className="math-visual pattern-visual" role="img" aria-label={`${representation.label}. Sichtbare Folge: ${sequence.join(', ')}. ${answerDescription}`}>
-        <div className="pattern-sequence" aria-hidden="true">{sequence.map((symbol, index) => <i className={symbolClass(symbol, index)} key={`${symbol}-${index}`} />)}{taskMode === 'continue' && <i className="pattern-symbol pattern-symbol--unknown">?</i>}</div>
-        {answerVisible && <strong className="quantity-result">{taskMode === 'identify-error' ? `Fehlerstelle: ${textValue(values.answerLabel)}` : `Fortsetzung: ${textValue(values.answerLabel)}`}</strong>}
+        <div className="pattern-sequence" aria-hidden="true" style={{ '--pattern-count': sequence.length + (showUnknown ? 1 : 0) } as CSSProperties}>
+          {sequence.map((symbol, index) => <i className={symbolClass(symbol, index)} key={`${symbol}-${index}`}>{numberSequence ? symbol : ''}</i>)}
+          {showUnknown && <i className="pattern-symbol pattern-symbol--unknown">?</i>}
+        </div>
+        {answerVisible && <strong className="quantity-result">{taskMode === 'identify-error' ? `Fehlerstelle: ${textValue(values.answerLabel)}` : taskMode === 'identify-block' ? `Es wiederholt sich: ${textValue(values.answerLabel)}` : `Fortsetzung: ${textValue(values.answerLabel)}`}</strong>}
       </div>
     )
   }
@@ -670,15 +692,21 @@ export function MathRepresentation({ representation }: { representation: Exercis
       : []
     const lower = Number(values.lower)
     const upper = Number(values.upper)
-    const scaleStartVisible = scaleStart === start ? startVisible : scaleStart === end ? endVisible : jumpsVisible
-    const scaleEndVisible = scaleEnd === start ? startVisible : scaleEnd === end ? endVisible : jumpsVisible
+    const scaleStartVisible = (scaleStart === start && startVisible) ||
+      (scaleStart === lower && isValueVisible('lower')) ||
+      (scaleStart === upper && isValueVisible('upper')) ||
+      (scaleStart !== start && scaleStart !== end && jumpsVisible)
+    const scaleEndVisible = (scaleEnd === end && endVisible) ||
+      (scaleEnd === lower && isValueVisible('lower')) ||
+      (scaleEnd === upper && isValueVisible('upper')) ||
+      (scaleEnd !== start && scaleEnd !== end && jumpsVisible)
     const description = `${representation.label}. Anfang ${startVisible ? start : 'unbekannt'}, Ende ${endVisible ? end : 'unbekannt'}, Markierung ${markerVisible ? marker : 'unbekannt'}.`
     return (
       <div className="math-visual number-line-visual" role="img" aria-label={description}>
         <div className="number-line-track">
           {ticks.map((tick) => (
             <span className="number-line-tick" key={tick} style={{ left: `${positionFor(tick)}%` }}>
-              {((tick === lower && isValueVisible('lower')) || (tick === upper && isValueVisible('upper'))) && <small>{tick}</small>}
+              {tick !== scaleStart && tick !== scaleEnd && ((tick === lower && isValueVisible('lower')) || (tick === upper && isValueVisible('upper'))) && <small>{tick}</small>}
             </span>
           ))}
           <span className="number-line-marker" style={{ left: `${position}%` }} />

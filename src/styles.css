@@ -758,6 +758,7 @@ p {
 
 .ten-frame-visual { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .ten-frame-visual section { display: grid; gap: 5px; min-width: 0; color: #557060; font-size: .72rem; font-weight: 800; text-align: center; }
+.ten-frame-stack { display: grid; gap: 5px; align-content: start; }
 .ten-frame { display: grid; grid-template-columns: repeat(5, minmax(12px, 1fr)); grid-template-rows: repeat(2, 28px); gap: 3px; padding: 5px; border: 2px solid #315d45; background: #fff; }
 .ten-frame-dot { display: grid; place-items: center; border: 1px solid #cfdbd4; background: #fff; }
 .ten-frame-dot--filled::after { width: 13px; height: 13px; border-radius: 50%; background: #c84f2c; content: ''; }
@@ -988,11 +989,20 @@ p {
 .clock-arrow { color: #2876a8; font-size: 1.25rem; font-weight: 900; }
 .quantity-result { color: #244d38; }
 .quantity-measure small { color: #557060; font-weight: 800; }
-.reference-measure { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr); align-items: center; gap: 10px; width: min(100%, 300px); }
-.reference-measure span, .reference-measure strong { padding: 12px 8px; border: 2px solid #78a88d; border-radius: 6px; background: #fff; font-weight: 850; overflow-wrap: normal; }
-.reference-measure span { text-wrap: balance; }
-.reference-measure strong { white-space: nowrap; }
-.reference-measure i { height: 4px; background: #315d45; }
+.reference-measure { display: grid; grid-template-columns: 76px minmax(0, 1fr) 48px; align-items: center; gap: 10px; width: min(100%, 300px); }
+.reference-measure span { color: #244d38; font-weight: 850; line-height: 1.25; text-align: left; text-wrap: balance; }
+.reference-measure strong { display: grid; min-height: 52px; place-items: center; border: 2px solid #78a88d; border-radius: 6px; background: #fff; font-size: 1.2rem; white-space: nowrap; }
+.reference-object { position: relative; display: block; width: 72px; height: 64px; background: transparent; }
+.reference-object::before, .reference-object::after { position: absolute; content: ''; }
+.reference-object--spoon::before { top: 17px; left: 2px; width: 27px; height: 31px; border: 3px solid #315d45; border-radius: 50%; background: #d7edf6; }
+.reference-object--spoon::after { top: 29px; left: 28px; width: 43px; height: 7px; border: 3px solid #315d45; border-left: 0; border-radius: 0 7px 7px 0; background: #fff; }
+.reference-object--glass::before { inset: 5px 14px 4px; border: 3px solid #315d45; border-top-width: 5px; border-radius: 3px 3px 12px 12px; background: linear-gradient(to top, #8fcce5 0 56%, transparent 56%); clip-path: polygon(4% 0, 96% 0, 84% 100%, 16% 100%); }
+.reference-object--juice-box::before { inset: 4px 17px 3px; border: 3px solid #315d45; border-radius: 3px; background: #dcefe5; }
+.reference-object--juice-box::after { top: 0; right: 13px; width: 24px; height: 3px; background: #315d45; transform: rotate(-65deg); transform-origin: right center; }
+.reference-object--apple::before { inset: 11px 12px 3px; border: 3px solid #315d45; border-radius: 48% 48% 42% 42%; background: #dcefe5; }
+.reference-object--apple::after { top: 3px; left: 38px; width: 5px; height: 16px; border-radius: 4px; background: #315d45; transform: rotate(18deg); }
+.reference-object--butter::before { inset: 17px 5px 10px; border: 3px solid #315d45; border-radius: 5px; background: #fff2b8; transform: skewX(-10deg); }
+.reference-object--flour::before { inset: 4px 14px 2px; border: 3px solid #315d45; border-radius: 10px 10px 4px 4px; background: #f5faf7; clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%); }
 .measure-complement { display: grid; gap: 6px; width: min(100%, 310px); }
 .measure-track { position: relative; height: 44px; overflow: hidden; border: 2px solid #315d45; border-radius: 5px; background: #fff; }
 .measure-track i { display: block; width: var(--measure-fill); height: 100%; background: #9fcdb8; }
@@ -1010,13 +1020,14 @@ p {
 .shape-comparison { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; }
 .shape-comparison .shape-outline { width: min(36vw, 128px); height: min(27vw, 96px); }
 .shape-comparison .shape-outline--square { width: min(29vw, 104px); height: min(29vw, 104px); }
-.pattern-sequence { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 100%; }
-.pattern-symbol { display: grid; flex: 0 0 42px; width: 42px; height: 42px; place-items: center; border: 3px solid var(--green-dark); background: #9fd1b5; }
+.pattern-sequence { display: grid; grid-template-columns: repeat(var(--pattern-count), minmax(0, 42px)); justify-content: center; gap: 5px; width: 100%; max-width: 100%; }
+.pattern-symbol { display: grid; width: 100%; min-width: 0; max-width: 42px; aspect-ratio: 1; place-items: center; border: 3px solid var(--green-dark); background: #9fd1b5; font-style: normal; }
 .pattern-symbol--kreis { border-radius: 50%; }
-.pattern-symbol--dreieck { width: 0; height: 0; flex-basis: 42px; border: 0; border-right: 21px solid transparent; border-bottom: 40px solid #e7a960; border-left: 21px solid transparent; background: transparent; }
+.pattern-symbol--dreieck { border: 0; background: #e7a960; clip-path: polygon(50% 2%, 98% 98%, 2% 98%); }
 .pattern-symbol--stern { border: 0; color: #b06a00; font-size: 2.5rem; background: transparent; }
 .pattern-symbol--stern::before { content: '★'; }
 .pattern-symbol--unknown { color: var(--green-dark); font-weight: 900; background: #fff; }
+.pattern-symbol--number { border-width: 2px; background: #fff; color: #244d38; font-size: .72rem; font-weight: 850; }
 .pattern-symbol--block-start { border-left-width: 5px; border-left-color: #2876a8; }
 .pattern-symbol--block-end { border-right-width: 5px; border-right-color: #2876a8; }
 .unit-grid { display: grid; width: min(250px, 78vw); aspect-ratio: var(--unit-columns) / var(--unit-rows); grid-template-columns: repeat(var(--unit-columns), 1fr); grid-template-rows: repeat(var(--unit-rows), 1fr); }
