@@ -34,6 +34,18 @@ function safeExerciseSteps(exercise: Exercise): ExerciseStep[] | undefined {
     : [...steps.slice(0, checkIndex), calculation, ...steps.slice(checkIndex)]
 }
 
+function placeValueErrorFeedback(step: ExerciseStep, value: string): string {
+  const labels = ['Hunderterstelle', 'Zehnerstelle', 'Einerstelle']
+  const expected = step.correctAnswer.padStart(3, ' ').slice(-3)
+  const submitted = value.padEnd(3, ' ').slice(0, 3)
+  const mismatches = labels.filter((_, index) => submitted[index] !== expected[index])
+
+  if (mismatches.length === 0) return step.errorFeedback
+  if (mismatches.length === 1) return `Prüfe die ${mismatches[0]} noch einmal.`
+  if (mismatches.length === 2) return `Prüfe die ${mismatches[0]} und die ${mismatches[1]} noch einmal.`
+  return 'Prüfe Hunderter, Zehner und Einer noch einmal.'
+}
+
 export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
   return <ExerciseCardState key={exercise.id} exercise={exercise} onComplete={onComplete} />
 }
@@ -52,6 +64,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const [completedStepAnswers, setCompletedStepAnswers] = useState<Record<string, string>>({})
   const [detectedMisconceptions, setDetectedMisconceptions] = useState<string[]>([])
   const [pairingSelections, setPairingSelections] = useState<string[]>([])
+  const [orderSelections, setOrderSelections] = useState<string[]>([])
   const steps = safeExerciseSteps(exercise)
 
   useLayoutEffect(() => {
@@ -76,6 +89,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setMessageKind('error')
     setAnswer('')
     setPairingSelections([])
+    setOrderSelections([])
     setHintsShown((current) => Math.max(current, 1))
     if (nextChecks >= 2) setAnswerState('scaffold')
   }
@@ -106,6 +120,10 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const checkStepAnswer = (value: string) => {
     if (!currentStep) return
     if (!isStepAnswerCorrect(currentStep, value)) {
+      if (currentInteraction === 'place-value-input') {
+        registerWrongAnswer(placeValueErrorFeedback(currentStep, value), 'place-value-column-confusion')
+        return
+      }
       const routed = optionFeedback(value, currentStep.errorFeedback)
       registerWrongAnswer(routed.feedback, routed.misconceptionId)
       return
@@ -120,6 +138,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       setStepIndex((current) => current + 1)
       setAnswer('')
       setPairingSelections([])
+      setOrderSelections([])
     }
   }
 
@@ -162,10 +181,21 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     checkStepAnswer([...pairingSelections].sort().join('|'))
   }
 
+  const toggleOrder = (value: string) => {
+    setOrderSelections((current) => current.includes(value)
+      ? current.filter((entry) => entry !== value)
+      : [...current, value])
+  }
+
+  const submitOrder = () => {
+    if (!currentStep || orderSelections.length !== (currentStep.options?.length ?? 0)) return
+    checkStepAnswer(orderSelections.join('|'))
+  }
+
   const updatePlaceValueDigit = (index: number, value: string) => {
-    const digits = answer.padStart(3, ' ').slice(-3).split('')
+    const digits = answer.padEnd(3, ' ').slice(0, 3).split('')
     digits[index] = value.replace(/[^0-9]/g, '').slice(-1) || ' '
-    setAnswer(digits.join('').trimStart())
+    setAnswer(digits.join(''))
   }
 
   const displayedRepresentation = exercise.representation?.kind === 'column-calculation'
@@ -277,7 +307,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
           </div>
           <h3>{stepIndex + 1}. {currentStep.prompt}</h3>
           {(currentStep.representation ?? persistentWordModel) && <MathRepresentation representation={(currentStep.representation ?? persistentWordModel)!} />}
-          {['select', 'mark', 'match', 'order', 'complete-model', 'identify-error', 'choose-strategy'].includes(currentInteraction) && renderOptions()}
+          {['select', 'mark', 'match', 'complete-model', 'identify-error', 'choose-strategy'].includes(currentInteraction) && renderOptions()}
           {currentInteraction === 'build-pairing' && (
             <div className="pairing-builder">
               <div className="pairing-options" aria-label="Mögliche Paarungen">
@@ -295,6 +325,37 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
               </div>
               <p>{pairingSelections.length} Paarungen ausgewählt</p>
               <button className="primary-button" type="button" disabled={pairingSelections.length === 0} onClick={submitPairing}>Paarungen prüfen</button>
+            </div>
+          )}
+          {currentInteraction === 'order' && (
+            <div className="order-builder">
+              <div className="order-result" aria-live="polite">
+                {orderSelections.length === 0
+                  ? <span className="order-placeholder">Noch keine Zahl gewählt</span>
+                  : orderSelections.map((value, index) => <span key={value}><small>{index + 1}</small>{value}</span>)}
+              </div>
+              <div className="order-options" aria-label="Zahlen zum Ordnen">
+                {(currentStep.options ?? []).map((option) => (
+                  <button
+                    aria-pressed={orderSelections.includes(option.value)}
+                    className="order-option"
+                    data-answer-state="idle"
+                    key={option.id ?? option.value}
+                    type="button"
+                    onClick={() => toggleOrder(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="primary-button"
+                type="button"
+                disabled={orderSelections.length !== (currentStep.options?.length ?? 0)}
+                onClick={submitOrder}
+              >
+                Reihenfolge prüfen
+              </button>
             </div>
           )}
           {currentInteraction === 'continue' && <button className="primary-button" type="button" onClick={continueStep}>{currentStep.continueLabel ?? 'Weiter'}</button>}
@@ -320,7 +381,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
                         inputMode="numeric"
                         pattern="[0-9]*"
                         autoComplete="off"
-                        value={answer.padStart(3, ' ').slice(-3)[index]?.trim() ?? ''}
+                        value={answer.padEnd(3, ' ').slice(0, 3)[index]?.trim() ?? ''}
                         onChange={(event) => updatePlaceValueDigit(index, event.target.value)}
                       />
                     </label>

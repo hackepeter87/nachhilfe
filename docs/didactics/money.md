@@ -17,7 +17,7 @@ Geldbeträge bestehen aus gleichwertigen Darstellungen; 100 Cent entsprechen 1 E
 ## 7. Methodischer Zugang
 Reale Münzwerte erkennen, Beträge legen, Preise verbinden, zum gegebenen Betrag ergänzen.
 ## 8. Geeignete Darstellungen
-Geprüfte Münz-/Scheinbilder, Preisschild und Balkenmodell.
+Geprüfte Münzbilder sowie bei Rückgeld sichtbarer Preis und Zahlbetrag. Die zum Lösen erforderliche Darstellung ist in jeder Lernphase sofort sichtbar; nur der gesuchte Gesamt- oder Rückgeldbetrag bleibt maskiert.
 ## 9. Lernprogression
 Erkennen, gleichwertig legen, vergleichen, addieren, Wechselgeld bestimmen.
 ## 10. Aufgabentypen
@@ -31,7 +31,7 @@ Zwei verschiedene Bezahlmöglichkeiten oder Plausibilität eines Preises beurtei
 ## 14. Wiederholung
 Einheiten- und Wechselgeldfehler getrennt wiederholen.
 ## 15. Erfolgskriterien
-Münzsumme und dargestellter Betrag stimmen exakt überein; Lösung und Optionen bleiben im Zahlenraum bis 1000 Cent; Optionen sind eindeutig formatiert; Wechselgeld ist positiv und wird als Differenz geprüft.
+Münzsumme und dargestellter Betrag stimmen exakt überein; keine Geldwertaufgabe wird ohne Münzen beziehungsweise Preis und Zahlbetrag ausgeliefert; Lösung und Optionen bleiben im Zahlenraum bis 1000 Cent; Optionen sind eindeutig formatiert; Wechselgeld ist positiv und wird als Differenz geprüft.
 ## 16. Grenzen der aktuellen Umsetzung
 Produktiv sind Zählen, Euro-/Cent-Beziehung und einfaches Wechselgeld. Scheine, mehrere Einkäufe, freie Bezahlmöglichkeiten, Dezimalrechnung als eigenes Verfahren und reale Kaufentscheidungen sind bewusst nicht enthalten.
 ## 17. Punkte für die Gesamtprüfung

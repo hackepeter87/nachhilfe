@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createRoundingExercise, formatEuro, formatLength, generateExercise, isAnswerCorrect, roundToUnit } from './generators'
+import { createRoundingExercise, formatEuro, formatLength, generateExercise, germanNumberWord, isAnswerCorrect, roundToUnit } from './generators'
 import { getTaskCatalog, renderCatalogText } from '../content/catalog'
 import type { SkillId } from './types'
 import { everyOccupiedCellHasMirrorPartner, reflectGrid, sourceStaysOnOneAxisSide } from './symmetry'
@@ -26,9 +26,17 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
     first.steps?.forEach((step) => {
       if (step.interaction === 'build-pairing') expect([...step.expectedSelections ?? []].sort().join('|')).toBe(step.correctAnswer)
+      else if (step.interaction === 'order') expect(step.expectedSelections?.join('|')).toBe(step.correctAnswer)
       else if (step.options) expect(step.options.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
-      else expect(['guided-number', 'guided-equation', 'continue', 'build-pairing']).toContain(step.interaction)
+      else expect(['guided-number', 'guided-equation', 'place-value-input', 'continue', 'build-pairing']).toContain(step.interaction)
     })
+  })
+
+  it.each([
+    [0, 'null'], [1, 'eins'], [17, 'siebzehn'], [21, 'einundzwanzig'], [100, 'einhundert'],
+    [101, 'einhunderteins'], [238, 'zweihundertachtunddreißig'], [999, 'neunhundertneunundneunzig'], [1000, 'eintausend']
+  ])('schreibt %i als eindeutiges deutsches Zahlwort', (number, word) => {
+    expect(germanNumberWord(number)).toBe(word)
   })
 
   it('setzt die katalogisierte Sichtbarkeit verpflichtender Darstellungen um', () => {
@@ -221,6 +229,22 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
+  it('liefert Geldaufgaben niemals ohne die zum Lösen nötige Darstellung aus', () => {
+    const phases = ['activate', 'understand', 'guided-practice', 'independent-practice', 'automate', 'transfer'] as const
+    for (const phase of phases) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const difficulty = phase === 'transfer' ? 3 : phase === 'activate' || phase === 'guided-practice' ? 1 : 2
+        const exercise = generateExercise('money', seed, difficulty, undefined, phase)
+        expect(exercise.representation).toMatchObject({
+          kind: 'money',
+          visibility: 'always',
+          valueRoles: { unknownValues: phase === 'transfer' ? ['changeCents'] : ['displayedCents'] }
+        })
+        expect(exercise.representation?.values.coins).toEqual(expect.arrayContaining([expect.any(Number)]))
+      }
+    }
+  })
+
   it('fragt Nullstellen als Ziffer und Stellenwert tatsächlich ab', () => {
     for (const difficulty of [2, 3] as const) {
       for (let seed = 1; seed <= 1_000; seed += 1) {
@@ -304,8 +328,11 @@ describe('deterministische Aufgabengeneratoren', () => {
 
   it('führt Stellenwert und Runden auf höheren Stufen über überprüfbare Strategischritte', () => {
     const placeValue = generateExercise('place-value', 77, 3, undefined, 'guided-practice')
-    expect(placeValue.answerMode).toBe('guided-choice')
-    expect(placeValue.steps?.map((step) => step.id)).toEqual(['identify-digit', 'identify-value'])
+    expect(placeValue.answerMode).toBe('guided-number')
+    expect(placeValue.steps?.map((step) => step.id)).toEqual(['place-value-table'])
+    expect(placeValue.steps?.[0]?.interaction).toBe('place-value-input')
+    expect(placeValue.representation?.kind).toBe('place-value-material')
+    expect(placeValue.representation?.visibility).toBe('always')
     expect(placeValue.learningPhase).toBe('guided-practice')
 
     const easyRounding = generateExercise('round-tens', 77, 1, undefined, 'activate')
@@ -315,6 +342,83 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(mediumRounding.steps?.map((step) => step.id)).toEqual(['neighbors', 'compare-distances', 'round-result'])
     expect(independentRounding.steps).toBeUndefined()
     expect(independentRounding.answerMode).toBe('number')
+  })
+
+  it('verbindet Stellenwertmaterial, H-Z-E-Tafel, Zahlwort und Größenordnung über 1.000 Seeds', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const guided = generateExercise('place-value', seed, 1, undefined, 'guided-practice')
+      const hundreds = Number(guided.representation?.values.hundreds)
+      const tens = Number(guided.representation?.values.tens)
+      const ones = Number(guided.representation?.values.ones)
+      expect(Number(guided.correctAnswer)).toBe(hundreds * 100 + tens * 10 + ones)
+      expect(guided.steps?.[0]).toMatchObject({ interaction: 'place-value-input', correctAnswer: guided.correctAnswer })
+
+      const word = generateExercise('compose', seed, 2, undefined, 'transfer')
+      expect(word.prompt).toContain(germanNumberWord(Number(word.correctAnswer)))
+
+      const order = generateExercise('place-value', seed, 3, undefined, 'transfer')
+      const step = order.steps?.find((candidate) => candidate.id === 'order-numbers')
+      const expected = step?.expectedSelections?.map(Number) ?? []
+      expect(step?.interaction).toBe('order')
+      expect(expected).toHaveLength(4)
+      expect(new Set(expected).size).toBe(4)
+      const descending = order.prompt.includes('größten')
+      expect(expected).toEqual([...expected].sort((first, second) => descending ? second - first : first - second))
+      expect(step?.correctAnswer).toBe(step?.expectedSelections?.join('|'))
+    }
+  })
+
+  it('vergleicht Zahlen je Stufe an der ersten unterschiedlichen Stelle', () => {
+    for (const difficulty of [1, 2, 3] as const) {
+      const directions = new Set<string>()
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise('place-value', seed, difficulty, undefined, 'transfer')
+        const first = Number(exercise.variant.values.comparisonFirst)
+        const second = Number(exercise.variant.values.comparisonSecond)
+        const expected = first < second ? '<' : '>'
+        const expectedPlace = Math.floor(first / 100) !== Math.floor(second / 100)
+          ? 'Hunderter'
+          : Math.floor(first / 10) !== Math.floor(second / 10)
+            ? 'Zehner'
+            : 'Einer'
+        const compareStep = exercise.steps?.find((step) => step.id === 'compare-numbers')
+        directions.add(expected)
+        expect(compareStep?.correctAnswer).toBe(expected)
+        expect(exercise.variant.values.comparisonPlace).toBe(expectedPlace)
+        expect(compareStep?.options?.map((option) => option.value).sort()).toEqual(['<', '=', '>'])
+      }
+      expect(directions).toEqual(new Set(['<', '>']))
+    }
+  })
+
+  it('verknüpft Vorgänger, Nachfolger und direkte Nachbargrenzen über 1.000 Seeds', () => {
+    for (const skill of ['neighbor-tens', 'neighbor-hundreds'] as const) {
+      const unit = skill === 'neighbor-tens' ? 10 : 100
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise(skill, seed, 1, undefined, 'guided-practice')
+        const number = Number(exercise.variant.values.number)
+        const lower = Number(exercise.variant.values.lower)
+        const upper = Number(exercise.variant.values.upper)
+        expect(exercise.steps?.map((step) => step.id)).toEqual(['predecessor', 'successor', 'lower', 'upper'])
+        expect(exercise.steps?.map((step) => Number(step.correctAnswer))).toEqual([number - 1, number + 1, lower, upper])
+        expect(lower).toBe(Math.floor(number / unit) * unit)
+        expect(upper).toBe(lower + unit)
+        expect(exercise.representation?.values).toMatchObject({ start: lower, end: upper, marker: number })
+      }
+    }
+  })
+
+  it('setzt Zahlenfolgen mit einer konstanten Schrittweite fort', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('patterns', seed, 3, undefined, 'transfer')
+      const step = Number(exercise.variant.values.step)
+      const sequence = String(exercise.variant.values.patternKey).split('|').map(Number)
+      expect(sequence).toHaveLength(4)
+      for (let index = 1; index < sequence.length; index += 1) expect(sequence[index]! - sequence[index - 1]!).toBe(step)
+      expect(Number(exercise.correctAnswer)).toBe(sequence[sequence.length - 1]! + step)
+      expect(exercise.options).toHaveLength(3)
+      expect(new Set(exercise.options?.map((option) => option.value)).size).toBe(3)
+    }
   })
 
   it('erzeugt schriftliche Additionen mit genau der vorgesehenen Zahl von Überträgen', () => {
@@ -694,9 +798,10 @@ describe('deterministische Aufgabengeneratoren', () => {
           const bridge = Number(exercise.variant.values.bridge)
           const answer = Number(exercise.correctAnswer)
           expect(exercise.answerMode).toBe('guided-choice')
-          expect(exercise.steps?.map((step) => step.id)).toEqual(['bridge', 'result'])
-          expect(exercise.steps?.[0]?.correctAnswer).toBe(String(bridge))
-          expect(exercise.steps?.[1]?.correctAnswer).toBe(String(answer))
+          expect(exercise.steps?.map((step) => step.id)).toEqual(['split', 'bridge', 'result'])
+          expect(exercise.steps?.[0]?.correctAnswer).toBe(`${exercise.variant.values.firstStep} und ${exercise.variant.values.rest}`)
+          expect(exercise.steps?.[1]?.correctAnswer).toBe(String(bridge))
+          expect(exercise.steps?.[2]?.correctAnswer).toBe(String(answer))
           expect(bridge).not.toBe(first)
           expect(bridge).not.toBe(answer)
           exercise.steps?.forEach((step) => {
@@ -705,6 +810,27 @@ describe('deterministische Aufgabengeneratoren', () => {
             expect(step.options?.filter((option) => option.value === step.correctAnswer)).toHaveLength(1)
           })
         }
+      }
+    }
+  })
+
+  it('baut den Zehnerübergang in der Förderphase mit kleinen Zahlen und vollständiger Zerlegung auf', () => {
+    for (const skill of ['addition-1000', 'subtraction-1000'] as const) {
+      for (let seed = 1; seed <= 1_000; seed += 1) {
+        const exercise = generateExercise(skill, seed, 2, undefined, 'guided-practice')
+        const first = Number(exercise.variant.values.first)
+        const second = Number(exercise.variant.values.second)
+        const bridge = Number(exercise.variant.values.bridge)
+        const firstStep = Number(exercise.variant.values.firstStep)
+        const rest = Number(exercise.variant.values.rest)
+        expect(first).toBeGreaterThanOrEqual(10)
+        expect(first).toBeLessThan(100)
+        expect(second).toBeGreaterThan(0)
+        expect(firstStep + rest).toBe(second)
+        expect(bridge % 10).toBe(0)
+        expect(skill === 'addition-1000' ? first + firstStep : first - firstStep).toBe(bridge)
+        expect(exercise.steps?.map((step) => step.id)).toEqual(['split', 'bridge', 'result'])
+        expect(exercise.representation).toMatchObject({ kind: 'number-line', visibility: 'always' })
       }
     }
   })

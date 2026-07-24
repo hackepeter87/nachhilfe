@@ -309,9 +309,9 @@ describe('ExerciseCard', () => {
     const user = userEvent.setup()
     const exercise = generateExercise('addition-1000', 42, 2)
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
-    expect(screen.queryByRole('img', { name: 'Rechenstrich mit Zwischenziel' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Rechenstrich mit vollem Zwischenziel/ })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /tipp/i }))
-    const representation = screen.getByRole('img', { name: /Rechenstrich mit Zwischenziel/ })
+    const representation = screen.getByRole('img', { name: /Rechenstrich mit vollem Zwischenziel/ })
     expect(representation).toBeVisible()
     const jumps = exercise.representation?.values.jumps
     expect(Array.isArray(jumps)).toBe(true)
@@ -336,7 +336,7 @@ describe('ExerciseCard', () => {
     const onComplete = vi.fn()
     const exercise = generateExercise('subtraction-1000', 42, 3, undefined, 'guided-practice')
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
-    expect(exercise.steps?.map((step) => step.id)).toEqual(['bridge', 'result'])
+    expect(exercise.steps?.map((step) => step.id)).toEqual(['split', 'bridge', 'result'])
     for (const step of exercise.steps ?? []) {
       const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
       if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
@@ -608,5 +608,85 @@ describe('ExerciseCard', () => {
     await user.click(screen.getByRole('button', { name: option.label }))
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, skillId: skill }))
+  })
+
+  it('zeigt die Münzen einer Geldwertaufgabe ohne geöffneten Tipp und maskiert nur die Summe', () => {
+    const exercise = generateExercise('money', 77, 2, undefined, 'independent-practice')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    expect(screen.getByRole('img', { name: /Gesamtbetrag unbekannt/ })).toBeVisible()
+    expect(container.querySelectorAll('.coin').length).toBeGreaterThan(0)
+    expect(container.querySelector('.money-total')).toHaveTextContent('Gesamt: ?')
+    expect(screen.getByRole('button', { name: /Ich brauche einen Tipp/i })).toBeEnabled()
+  })
+
+  it('zeigt bei Rückgeld Preis und Zahlbetrag, aber nicht das gesuchte Rückgeld', () => {
+    const exercise = generateExercise('money', 77, 3, undefined, 'transfer')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    expect(container.querySelector('.money-context')).toBeVisible()
+    expect(container.querySelectorAll('.money-context strong')).toHaveLength(2)
+    expect(container).toHaveTextContent('Rückgeld: ?')
+    expect(container).not.toHaveTextContent(String(exercise.correctAnswer))
+  })
+
+  it('überträgt sichtbares Stellenwertmaterial in die H-Z-E-Tafel', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('place-value', 77, 1, undefined, 'guided-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    expect(screen.getByRole('img', { name: /Stellenwertmaterial/ })).toBeVisible()
+    const digits = exercise.correctAnswer.padStart(3, '0').split('')
+    await user.type(screen.getByLabelText('Hunderter'), digits[0]!)
+    await user.type(screen.getByLabelText('Zehner'), digits[1]!)
+    await user.type(screen.getByLabelText('Einer'), digits[2]!)
+    await user.click(screen.getByRole('button', { name: 'Stellen prüfen' }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
+
+  it('benennt bei der H-Z-E-Eingabe genau die falsch besetzte Stelle', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('place-value', 77, 1, undefined, 'guided-practice')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    const digits = exercise.correctAnswer.padStart(3, '0').split('')
+    await user.type(screen.getByLabelText('Hunderter'), digits[0]!)
+    await user.type(screen.getByLabelText('Zehner'), digits[1] === '9' ? '8' : String(Number(digits[1]) + 1))
+    await user.type(screen.getByLabelText('Einer'), digits[2]!)
+    await user.click(screen.getByRole('button', { name: 'Stellen prüfen' }))
+
+    expect(screen.getByText('Prüfe die Zehnerstelle noch einmal.')).toBeVisible()
+  })
+
+  it('ordnet vier Zahlen ohne Vorauswahl in der geforderten Reihenfolge', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('place-value', 77, 3, undefined, 'transfer')
+    const compareStep = exercise.steps?.find((candidate) => candidate.id === 'compare-numbers')
+    const step = exercise.steps?.find((candidate) => candidate.id === 'order-numbers')
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    await user.click(screen.getByRole('button', { name: compareStep?.correctAnswer }))
+    expect(screen.getByText('Noch keine Zahl gewählt')).toBeVisible()
+    for (const option of step?.options ?? []) expect(screen.getByRole('button', { name: option.label })).toHaveAttribute('aria-pressed', 'false')
+    for (const value of step?.expectedSelections ?? []) await user.click(screen.getByRole('button', { name: value }))
+    await user.click(screen.getByRole('button', { name: 'Reihenfolge prüfen' }))
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
+  })
+
+  it('vergleicht zwei Zahlen neutral mit kleiner- oder größer-Zeichen', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('place-value', 77, 3, undefined, 'transfer')
+    const step = exercise.steps?.find((candidate) => candidate.id === 'compare-numbers')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    for (const symbol of ['<', '=', '>']) {
+      expect(screen.getByRole('button', { name: symbol })).toHaveAttribute('data-answer-state', 'idle')
+    }
+    await user.click(screen.getByRole('button', { name: step?.correctAnswer }))
+    expect(screen.getByText('Noch keine Zahl gewählt')).toBeVisible()
   })
 })

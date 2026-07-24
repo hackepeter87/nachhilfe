@@ -7,21 +7,21 @@ Kinder sollen ebene Formen anhand ihrer Eigenschaften erfassen, Regelmäßigkeit
 ## 2. Lehrplanbereich
 Raum und Form sowie Größen und Messen; Problemlösen, Argumentieren, Kommunizieren und Darstellen.
 ## 3. Konkretes Lernziel
-Das Kind erkennt, zerlegt und verbindet einfache Figuren, setzt regelmäßige Muster fort, bestimmt Flächen über Einheitsquadrate und Umfang als Länge des äußeren Randwegs.
+Das Kind erkennt, zerlegt und verbindet einfache Figuren, setzt regelmäßige Symbolmuster und Zahlenfolgen mit konstanter Schrittweite fort, bestimmt Flächen über Einheitsquadrate und Umfang als Länge des äußeren Randwegs.
 ## 4. Voraussetzungen
 Ecken und Seiten unterscheiden, Reihenfolgen lesen, sicher bis 30 zählen und einfache Figuren ohne Lücke zusammensetzen.
 ## 5. Typische Fehlvorstellungen
 Lage wird mit Form verwechselt; Teilungslinien gelten als Außenkanten; beim Muster wird nur das letzte Symbol kopiert; Fläche und Umfang werden verwechselt; leere Rasterfelder oder innere Kanten werden mitgezählt.
 ## 6. Fachliche Kernidee
-Eine ebene Figur wird durch ihren Außenrand bestimmt. Ein Muster wiederholt einen kleinsten geordneten Block. Fläche beschreibt eine lückenlose Bedeckung, Umfang den vollständigen geschlossenen Außenrand.
+Eine ebene Figur wird durch ihren Außenrand bestimmt. Ein Symbolmuster wiederholt einen kleinsten geordneten Block; eine Zahlenfolge verändert sich bei jedem Schritt um denselben Betrag. Fläche beschreibt eine lückenlose Bedeckung, Umfang den vollständigen geschlossenen Außenrand.
 ## 7. Methodischer Zugang
-Grundformen stehen vor Zerlegung und Zusammensetzung. Bei Mustern wird zunächst der kleinste Wiederholungsblock erkannt, danach die Folge fortgesetzt und im Transfer eine fehlerhafte Stelle gefunden. Fläche beginnt mit kleinen Rechtecken und geht zu unregelmäßigen Figuren über. Umfang folgt erst bei tragfähiger Figurenkenntnis und wird Kante für Kante verfolgt.
+Grundformen stehen vor Zerlegung und Zusammensetzung. Bei Symbolmustern wird zunächst der kleinste Wiederholungsblock erkannt und danach die Folge fortgesetzt. Im Transfer wird diese Regelerkennung auf Zahlenfolgen mit konstanter positiver oder negativer Schrittweite übertragen. Fläche beginnt mit kleinen Rechtecken und geht zu unregelmäßigen Figuren über. Umfang folgt erst bei tragfähiger Figurenkenntnis und wird Kante für Kante verfolgt.
 ## 8. Geeignete Darstellungen
 Große Außenformen mit sichtbaren Teilungslinien, stabile Musterstreifen, gleich große Einheitsquadrate und ein kontrastreich markierter Außenrand. Numerische Ergebnisse bleiben bis zur richtigen Antwort unbekannt.
 ## 9. Lernprogression
-`plane-shapes`: Grundform, sichtbare Zerlegung, Zusammensetzung. `patterns`: kleinsten Block markieren, erste Wiederholung erkennen, AB/ABC beziehungsweise längere Blöcke fortsetzen, im Transfer eine Regelverletzung markieren. `area`: kleines Rechteck, strukturiertes Rechteck, unregelmäßige zusammenhängende Figur. `perimeter`: kurzer Rechteckrand, längerer Rechteckrand, unregelmäßiger Randweg.
+`plane-shapes`: Grundform, sichtbare Zerlegung, Zusammensetzung. `patterns`: kleinsten Block markieren, erste Wiederholung erkennen, AB/ABC beziehungsweise längere Blöcke fortsetzen, im Transfer eine konstante Zahlenfolge fortführen. `area`: kleines Rechteck, strukturiertes Rechteck, unregelmäßige zusammenhängende Figur. `perimeter`: kurzer Rechteckrand, längerer Rechteckrand, unregelmäßiger Randweg.
 ## 10. Aufgabentypen
-Produktiv sind `shape-identify`, `shape-decompose`, `shape-compose`, `pattern-ab`, `pattern-abc`, `pattern-repeated-element`, `area-rectangle-unit-squares`, `area-irregular-unit-squares`, `perimeter-rectangle-path` und `perimeter-irregular-path`.
+Produktiv sind `shape-identify`, `shape-decompose`, `shape-compose`, `pattern-ab`, `pattern-abc`, `pattern-repeated-element`, `pattern-transfer-number-sequence`, `area-rectangle-unit-squares`, `area-irregular-unit-squares`, `perimeter-rectangle-path` und `perimeter-irregular-path`.
 ## 11. Hilfestufen
 Die erste Hilfe lenkt auf Außenrand, Musterblock, gefüllte Felder oder Außenkanten. Die zweite nennt ein systematisches Vorgehen, ohne Formname, Folgesymbol oder Zahlenwert vorzugeben.
 ## 12. Remediation

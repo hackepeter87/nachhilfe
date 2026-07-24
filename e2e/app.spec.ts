@@ -35,6 +35,18 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
       await page.getByRole('button', { name: 'Paarungen prüfen' }).click()
       continue
     }
+    const orderOptions = page.locator('.order-option[aria-pressed="false"]')
+    if (await orderOptions.first().isVisible().catch(() => false)) {
+      while (await orderOptions.count() > 0) await orderOptions.first().click()
+      await page.getByRole('button', { name: 'Reihenfolge prüfen' }).click()
+      continue
+    }
+    const placeValueInputs = page.locator('.place-value-inputs input')
+    if (await placeValueInputs.first().isVisible().catch(() => false)) {
+      for (let index = 0; index < await placeValueInputs.count(); index += 1) await placeValueInputs.nth(index).fill('9')
+      await page.getByRole('button', { name: 'Stellen prüfen' }).click()
+      continue
+    }
     const guidedNumberInput = page.getByLabel('Dein Ergebnis')
     if (await guidedNumberInput.isVisible().catch(() => false)) {
       await guidedNumberInput.fill('9999')
@@ -174,9 +186,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.30.1',
+    catalogVersion: '0.31.0',
     schemaVersion: 19,
-    appVersion: '0.31.1'
+    appVersion: '0.32.0'
   })
 
   await page.reload()
@@ -1032,4 +1044,71 @@ test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', asyn
   }
   expect(moneySeen).toBe(true)
   expect(lengthSeen).toBe(true)
+})
+
+test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung mobil vollständig', async ({ browser }, testInfo) => {
+  const scenarios = [
+    { id: 'place-value-guided', skillId: 'place-value', phase: 'guided-practice', difficulty: 1, expected: '.place-material-stack', interaction: '.place-value-inputs' },
+    { id: 'place-value-transfer', skillId: 'place-value', phase: 'transfer', difficulty: 3, expected: '.answer-options', interaction: '.answer-option' },
+    { id: 'neighbor-hundreds', skillId: 'neighbor-hundreds', phase: 'guided-practice', difficulty: 1, expected: '.number-line-visual', interaction: '#guided-number-answer' },
+    { id: 'addition-1000', skillId: 'addition-1000', phase: 'guided-practice', difficulty: 1, expected: '.number-line-visual', interaction: '.answer-option' }
+  ] as const
+
+  for (const scenario of scenarios) {
+    const context = await browser.newContext({ viewport: { width: 375, height: 812 }, serviceWorkers: 'block' })
+    const page = await context.newPage()
+    await page.route('**/content/task-catalog.json', async (route) => {
+      const response = await route.fetch()
+      const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
+      catalog.skills.forEach((skill) => {
+        if (!['addition', scenario.skillId].includes(skill.id)) skill.releaseStatus = 'disabled'
+      })
+      await route.fulfill({ response, json: catalog })
+    })
+
+    await onboard(page, 'Zahlen')
+    await page.evaluate(async ({ skillId, phase, difficulty }) => {
+      const database = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('mathe-reise')
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = () => reject(request.error)
+      })
+      const transaction = database.transaction('progress', 'readwrite')
+      transaction.objectStore('progress').put({
+        skillId,
+        attempts: 3,
+        correctAnswers: 2,
+        hintsUsed: 1,
+        lastPracticedAt: '2026-07-24T08:00:00.000Z',
+        difficulty,
+        learningPhase: phase,
+        mastery: 35,
+        recentErrors: 0,
+        correctStreak: 1,
+        lastVariantKey: null,
+        status: 'practicing',
+        subskills: {}
+      })
+      await new Promise<void>((resolve, reject) => {
+        transaction.oncomplete = () => resolve()
+        transaction.onerror = () => reject(transaction.error)
+      })
+      database.close()
+    }, scenario)
+    await page.reload()
+    await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
+    await finishAdditionWarmups(page)
+
+    await expect(page.locator(scenario.expected)).toBeVisible()
+    await expect(page.locator(scenario.interaction).first()).toBeVisible()
+    if (scenario.id === 'place-value-transfer') await expect(page.getByRole('heading', { level: 3 })).toContainText('Welches Zeichen')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    await page.locator('.session-page').screenshot({ path: testInfo.outputPath(`${scenario.id}-375x812.png`), fullPage: true })
+
+    await page.setViewportSize({ width: 812, height: 375 })
+    await expect(page.locator(scenario.expected)).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    await page.locator('.session-page').screenshot({ path: testInfo.outputPath(`${scenario.id}-812x375.png`), fullPage: true })
+    await context.close()
+  }
 })

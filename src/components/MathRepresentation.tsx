@@ -683,7 +683,15 @@ export function MathRepresentation({ representation }: { representation: Exercis
           ))}
           <span className="number-line-marker" style={{ left: `${position}%` }} />
           {marker !== scaleStart && marker !== scaleEnd && (
-            <strong className="number-line-marker-label" style={{ left: `${position}%` }}>{markerVisible ? marker : '?'}</strong>
+            <strong
+              className="number-line-marker-label"
+              style={{
+                left: `${position}%`,
+                transform: position < 8 ? 'translateX(0)' : position > 92 ? 'translateX(-100%)' : 'translateX(-50%)'
+              }}
+            >
+              {markerVisible ? marker : '?'}
+            </strong>
           )}
           {jumps.map((jump, index) => {
             const from = positionFor(jump.from)

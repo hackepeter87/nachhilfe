@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.30.1",
+  "catalogVersion": "0.31.0",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-20",
+  "releasedAt": "2026-07-24",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -816,7 +816,7 @@
       "difficultyLevels": [
         {
           "level": 1,
-          "description": "Dreistellige Zahl ohne Null; gefragte Stelle in der Tafel markiert",
+          "description": "Dreistellige Zahl ohne Null; sichtbares Stellenwertmaterial wird in die H-Z-E-Tafel übertragen",
           "numberRange": "100 bis 999",
           "representation": "always",
           "requirements": {
@@ -886,9 +886,9 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Sichtbares Stellenwertmaterial stellengerecht in eine H-Z-E-Tafel übertragen.",
           "exerciseTypes": [
-            "place-value:guided-table"
+            "place-value:guided-material-table"
           ],
           "releaseStatus": "active"
         },
@@ -910,9 +910,10 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Zwei dreistellige Zahlen an der ersten unterschiedlichen Stelle vergleichen und mehrere Zahlen der Größe nach ordnen.",
           "exerciseTypes": [
-            "place-value:transfer-hundred-change"
+            "place-value:transfer-compare",
+            "place-value:transfer-order"
           ],
           "releaseStatus": "active"
         }
@@ -1232,9 +1233,9 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Kompetenz begründen oder in einer neuen Darstellung beziehungsweise Situation nutzen.",
+          "goal": "Ein gesprochenes beziehungsweise geschriebenes Zahlwort stellengerecht als Zahl notieren.",
           "exerciseTypes": [
-            "compose:transfer-decompose"
+            "compose:transfer-number-word"
           ],
           "releaseStatus": "ready-for-review"
         }
@@ -1290,6 +1291,7 @@
         }
       ],
       "prerequisites": [
+        "Vorgänger und Nachfolger einer Zahl bestimmen",
         "Zehnerzahlen kennen"
       ],
       "representations": [
@@ -1368,9 +1370,9 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Vorgänger, Nachfolger und beide direkten Nachbarzehner als unterschiedliche Zahlbeziehungen bestimmen.",
           "exerciseTypes": [
-            "neighbor-tens:guided-boundaries"
+            "neighbor-tens:guided-number-relations"
           ],
           "releaseStatus": "active"
         },
@@ -1450,6 +1452,7 @@
         }
       ],
       "prerequisites": [
+        "Vorgänger und Nachfolger einer Zahl bestimmen",
         "Hunderterzahlen kennen"
       ],
       "representations": [
@@ -1528,9 +1531,9 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Die Kompetenz mit sichtbarer Darstellung und gestuften Hinweisen anwenden.",
+          "goal": "Vorgänger, Nachfolger und beide direkten Nachbarhunderter als unterschiedliche Zahlbeziehungen bestimmen.",
           "exerciseTypes": [
-            "neighbor-hundreds:guided-boundaries"
+            "neighbor-hundreds:guided-number-relations"
           ],
           "releaseStatus": "active"
         },
@@ -2413,7 +2416,7 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Einen Stellenübergang mit geprüftem Zwischenziel und Restschritt ausführen.",
+          "goal": "Den zweiten Summanden passend zerlegen, zuerst den nächsten vollen Zehner erreichen und danach den Rest addieren.",
           "exerciseTypes": [
             "addition-1000:guided-bridge"
           ],
@@ -2767,7 +2770,7 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Einen Stellenübergang mit geprüftem Zwischenziel und Restschritt ausführen.",
+          "goal": "Den Subtrahenden passend zerlegen, zuerst zum vorherigen vollen Zehner zurückgehen und danach den Rest subtrahieren.",
           "exerciseTypes": [
             "subtraction-1000:guided-bridge"
           ],
@@ -3214,9 +3217,9 @@
         },
         {
           "level": 2,
-          "description": "Gemischte Euro- und Centbeträge aus Münzen lesen; Darstellung auf Hilfe",
+          "description": "Gemischte Euro- und Centbeträge aus vollständig sichtbaren Münzen lesen",
           "numberRange": "1,20 bis 9,80 Euro",
-          "representation": "hint",
+          "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
             "requiresRepresentationChoice": false,
@@ -3228,9 +3231,9 @@
         },
         {
           "level": 3,
-          "description": "Rückgeld von einem Zahlbetrag von 10 Euro selbstständig ergänzen",
+          "description": "Rückgeld von einem sichtbaren Preis und Zahlbetrag von 10 Euro selbstständig ergänzen",
           "numberRange": "Preise von 2,50 bis 9,00 Euro",
-          "representation": "none",
+          "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
             "requiresRepresentationChoice": false,
@@ -3278,7 +3281,7 @@
         },
         {
           "id": "independent-practice",
-          "goal": "Gemischte Beträge mit abrufbarer Münzdarstellung lesen.",
+          "goal": "Gemischte Beträge aus einer vollständig sichtbaren Münzdarstellung lesen.",
           "exerciseTypes": [
             "money:count-mixed"
           ],
@@ -5278,7 +5281,7 @@
         "minLevel": 1,
         "maxLevel": 3,
         "minValue": 0,
-        "maxValue": 4
+        "maxValue": 1000
       },
       "processCompetencies": [
         {
@@ -5433,13 +5436,14 @@
     },
     {
       "id": "patterns",
-      "label": "Muster und Regeln",
-      "curriculumArea": "Raum und Form",
-      "supportGoal": "Regelmäßige Folgen erfassen, fortsetzen und die zugrunde liegende Wiederholung sprachlich beschreiben.",
+      "label": "Muster, Regeln und Zahlenfolgen",
+      "curriculumArea": "Zahlen und Operationen; Raum und Form",
+      "supportGoal": "Regelmäßige Muster und Zahlenfolgen erfassen, mit derselben Regel fortsetzen und die Regel sprachlich beschreiben.",
       "misconceptions": [
         "Nur das letzte Zeichen wird wiederholt.",
         "Die Reihenfolge innerhalb des Musterblocks wird vertauscht.",
-        "Ein wachsender Block wird als einfaches Wechselmuster gelesen."
+        "Ein wachsender Block wird als einfaches Wechselmuster gelesen.",
+        "Bei einer Zahlenfolge wird die Schrittweite nach einem Schritt verändert."
       ],
       "misconceptionFeedback": [
         {
@@ -5456,6 +5460,11 @@
           "id": "patterns-growing-confusion",
           "misconception": "Ein wachsender Block wird als einfaches Wechselmuster gelesen.",
           "feedback": "Prüfe, ob der Block wirklich gleich bleibt oder von Runde zu Runde wächst."
+        },
+        {
+          "id": "patterns-number-step",
+          "misconception": "Bei einer Zahlenfolge wird die Schrittweite nach einem Schritt verändert.",
+          "feedback": "Vergleiche je zwei Nachbarzahlen. Der Abstand muss bei jedem Schritt gleich bleiben."
         }
       ],
       "hints": [
@@ -5488,7 +5497,8 @@
       "representations": [
         "Markierter kleinster Wiederholungsblock",
         "AB- und ABC-Musterstreifen",
-        "Fehlersuche in einem wiederkehrenden AAB- oder ABB-Block"
+        "AAB- oder ABB-Musterstreifen",
+        "Zahlenfolge mit konstanter Schrittweite"
       ],
       "difficultyLevels": [
         {
@@ -5521,8 +5531,8 @@
         },
         {
           "level": 3,
-          "description": "Einen wiederkehrenden Block mit doppeltem Element erfassen",
-          "numberRange": "Block AAB oder ABB",
+          "description": "Eine Zahlenfolge mit konstanter Schrittweite fortsetzen",
+          "numberRange": "0 bis 1000; Schritte +10, +50, +100 oder −30",
           "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
@@ -5534,15 +5544,15 @@
           "learningPhase": "transfer"
         }
       ],
-      "workedExample": "Kreis, Quadrat, Kreis, Quadrat wird mit Kreis fortgesetzt, weil der Block Kreis-Quadrat wiederkehrt.",
-      "successFeedback": "Du hast den wiederkehrenden Musterblock erkannt.",
+      "workedExample": "150, 250, 350 wird mit 450 fortgesetzt, weil jeder Schritt +100 beträgt.",
+      "successFeedback": "Du hast die gleichbleibende Regel der Folge erkannt.",
       "remediation": {
         "strategy": "Trenne die Folge sichtbar in gleich lange Blöcke.",
         "foundationStrategy": "Beginne mit einem klaren Wechsel aus zwei Symbolen.",
         "representation": "Musterstreifen mit farblich getrennten Blöcken",
         "keepSubskill": true
       },
-      "transferPrompt": "Beschreibe den kleinsten Block, der sich wiederholt.",
+      "transferPrompt": "Bestimme die konstante Schrittweite einer Zahlenfolge und setze sie fort.",
       "releaseStatus": "active",
       "learningPhases": [
         {
@@ -5587,15 +5597,15 @@
         },
         {
           "id": "transfer",
-          "goal": "Eine fehlerhafte Stelle in einem Musterblock identifizieren.",
+          "goal": "Eine Zahlenfolge mit gleichbleibender positiver oder negativer Schrittweite fortsetzen.",
           "exerciseTypes": [
-            "patterns:pattern-transfer-identify-error"
+            "patterns:pattern-transfer-number-sequence"
           ],
           "releaseStatus": "active"
         }
       ],
       "successCriteria": [
-        "Der kleinste Block ist eindeutig.",
+        "Der kleinste Block beziehungsweise die konstante Schrittweite ist eindeutig.",
         "Die Fortsetzung hat genau eine richtige Lösung.",
         "Schwierigkeit entsteht durch die Regel, nicht durch unnötige Länge."
       ]

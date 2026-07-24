@@ -512,6 +512,28 @@ function division(seed: number, difficulty: Difficulty, focus?: string, phase?: 
   })
 }
 
+export function germanNumberWord(number: number): string {
+  if (!Number.isInteger(number) || number < 0 || number > 1000) {
+    throw new RangeError('Zahlwörter werden nur für ganze Zahlen von 0 bis 1000 erzeugt.')
+  }
+  const small = [
+    'null', 'eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun',
+    'zehn', 'elf', 'zwölf', 'dreizehn', 'vierzehn', 'fünfzehn', 'sechzehn', 'siebzehn', 'achtzehn', 'neunzehn'
+  ]
+  const unitPrefix = ['', 'ein', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun']
+  const tensWords = ['', '', 'zwanzig', 'dreißig', 'vierzig', 'fünfzig', 'sechzig', 'siebzig', 'achtzig', 'neunzig']
+  if (number < 20) return small[number]!
+  if (number === 1000) return 'eintausend'
+  if (number < 100) {
+    const tens = Math.floor(number / 10)
+    const ones = number % 10
+    return ones === 0 ? tensWords[tens]! : `${unitPrefix[ones]}und${tensWords[tens]}`
+  }
+  const hundreds = Math.floor(number / 100)
+  const rest = number % 100
+  return `${unitPrefix[hundreds]}hundert${rest === 0 ? '' : germanNumberWord(rest)}`
+}
+
 function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const hundreds = integer(random, 1, 9)
@@ -602,20 +624,80 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
       ])
     })
   }
-  if (phase === 'transfer') {
-    const grows = hundreds < 9
-    const target = grows ? number + 100 : number - 100
-    const correct = String(target)
+  if (phase === 'guided-practice') {
     return withMetadata({
       ...shared,
-      typeId: 'place-value-transfer-hundred-change', prompt: `${grows ? 'Erhöhe' : 'Verringere'} nur die Hunderterstelle von ${number} um 1. Welche Zahl entsteht?`,
-      answerMode: 'choice', correctAnswer: correct,
-      options: numberOptions(random, target, [
-        { value: grows ? number + 10 : number - 10, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' },
-        { value: grows ? number + 1 : number - 1, misconception: 'Ziffer und Stellenwert werden gleichgesetzt.', misconceptionId: 'place-value-digit-as-value' },
-        { value: number, misconception: 'Die Stellenwertänderung wurde nicht ausgeführt', misconceptionId: 'place-value-digit-as-value' }
-      ]),
-      representation: representation('place-value', difficulty, 'place-value', 'Stellenwerttafel', { hundreds, tens, ones, highlight: 'hundreds' })
+      typeId: 'place-value-guided-material-table',
+      prompt: 'Übertrage das Material in die H-Z-E-Tafel.',
+      answerMode: 'guided-number',
+      correctAnswer: String(number),
+      steps: [{
+        id: 'place-value-table',
+        interaction: 'place-value-input',
+        prompt: 'Trage ein, wie viele Hunderter, Zehner und Einer du siehst.',
+        correctAnswer: String(number),
+        errorFeedback: 'Zähle jede Materialart einzeln: Flächen bei H, Stangen bei Z und Punkte bei E.',
+        successFeedback: `Die H-Z-E-Tafel zeigt ${number}.`
+      }],
+      representation: { ...material, visibility: 'always' }
+    })
+  }
+  if (phase === 'transfer') {
+    const candidates = [
+      number,
+      hundreds * 100 + ones * 10 + tens,
+      tens * 100 + hundreds * 10 + ones,
+      number + 10,
+      number - 10,
+      number + 100,
+      number - 100,
+      number + 1,
+      number - 1
+    ].filter((value, index, all) => value >= 100 && value <= 999 && all.indexOf(value) === index).slice(0, 4)
+    if (candidates.length !== 4) throw new Error('Zu wenige unterschiedliche Zahlen zum Ordnen.')
+    const descending = random() < 0.5
+    const ordered = [...candidates].sort((first, second) => descending ? second - first : first - second)
+    const correct = ordered.join('|')
+    const comparison = shuffle(random, candidates.slice(0, 2))
+    const comparisonFirst = comparison[0]!
+    const comparisonSecond = comparison[1]!
+    const comparisonAnswer = comparisonFirst < comparisonSecond ? '<' : '>'
+    const comparisonPlace = Math.floor(comparisonFirst / 100) !== Math.floor(comparisonSecond / 100)
+      ? 'Hunderter'
+      : Math.floor(comparisonFirst / 10) !== Math.floor(comparisonSecond / 10)
+        ? 'Zehner'
+        : 'Einer'
+    return withMetadata({
+      ...shared,
+      variant: {
+        ...shared.variant,
+        values: { ...shared.variant.values, comparisonFirst, comparisonSecond, comparisonPlace }
+      },
+      typeId: 'place-value-transfer-order',
+      prompt: `Vergleiche und ordne die Zahlen. Beginne danach mit der ${descending ? 'größten' : 'kleinsten'} Zahl.`,
+      answerMode: 'guided-choice',
+      correctAnswer: correct,
+      steps: [{
+        id: 'compare-numbers',
+        interaction: 'select',
+        prompt: `Welches Zeichen passt zwischen ${comparisonFirst} und ${comparisonSecond}?`,
+        options: textOptions(random, comparisonAnswer, [
+          { value: comparisonAnswer === '<' ? '>' : '<', misconception: `${comparisonPlace} wurden in der falschen Richtung verglichen.`, misconceptionId: 'place-value-column-confusion' },
+          { value: '=', misconception: `Die Zahlen unterscheiden sich bei den ${comparisonPlace}n.`, misconceptionId: 'place-value-digit-as-value' }
+        ]),
+        correctAnswer: comparisonAnswer,
+        errorFeedback: `Prüfe zuerst die ${comparisonPlace}stelle.`,
+        successFeedback: `${comparisonFirst} ${comparisonAnswer} ${comparisonSecond}. Die ${comparisonPlace} entscheiden den Vergleich.`
+      }, {
+        id: 'order-numbers',
+        interaction: 'order',
+        prompt: `Tippe die Zahlen von ${descending ? 'groß nach klein' : 'klein nach groß'} an.`,
+        options: shuffle(random, candidates).map((value) => ({ value: String(value), label: String(value) })),
+        expectedSelections: ordered.map(String),
+        correctAnswer: correct,
+        errorFeedback: 'Vergleiche zuerst die Hunderter, dann die Zehner und zuletzt die Einer.',
+        successFeedback: 'Die Zahlen sind richtig geordnet.'
+      }]
     })
   }
   return withMetadata({
@@ -733,6 +815,18 @@ function compose(seed: number, difficulty: Difficulty, phase?: LearningPhase): E
       ]), representation: material
     })
   }
+  if (phase === 'transfer') {
+    const numberWord = germanNumberWord(answer)
+    return withMetadata({
+      ...shared,
+      typeId: 'compose-transfer-number-word',
+      prompt: `Schreibe das Zahlwort „${numberWord}“ als Zahl.`,
+      answerMode: 'number',
+      correctAnswer: String(answer),
+      successFeedback: `Das Zahlwort „${numberWord}“ gehört zur Zahl ${answer}.`,
+      errorFeedback: 'Höre auf Hunderter, Zehner und Einer und setze die Ziffern an die passenden Stellen.'
+    })
+  }
   return withMetadata({
     ...shared,
     typeId: 'compose-number',
@@ -755,10 +849,12 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
   const upper = lower + unit
   const answer = `${lower} und ${upper}`
   const skillId: SkillId = unit === 10 ? 'neighbor-tens' : 'neighbor-hundreds'
-  const values = { number, lower, upper }
+  const predecessor = number - 1
+  const successor = number + 1
+  const values = { number, lower, upper, predecessor, successor }
   const shared = { ...base(skillId, seed, difficulty, values), ...contentFor(skillId, values, difficulty) }
-  const referenceStart = unit === 10 ? Math.floor(number / 100) * 100 : 0
-  const referenceEnd = unit === 10 ? Math.min(1000, referenceStart + 100) : 1000
+  const referenceStart = lower
+  const referenceEnd = upper
   const numberLine = representation(skillId, difficulty, 'number-line', 'Zahlenstrahl mit bekannten Referenzmarken', {
     start: referenceStart, end: referenceEnd, marker: number, step: unit, tickStep: unit, lower, upper
   }, ['lower', 'upper'])
@@ -793,6 +889,35 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
       { id: 'upper', prompt: `Welcher ${unit === 10 ? 'Zehner' : 'Hunderter'} folgt direkt danach?`, interaction: 'mark', options: upperOptions, correctAnswer: String(upper), errorFeedback: shared.errorFeedback, successFeedback: `Der obere Nachbar ist ${upper}.` }
     ]
     return withMetadata({ ...shared, typeId: `${skillId}-guided-boundaries`, answerMode: 'guided-choice', correctAnswer: answer, steps, representation: numberLine })
+  }
+  if (phase === 'guided-practice') {
+    const unitLabel = unit === 10 ? 'Nachbarzehner' : 'Nachbarhunderter'
+    const steps: ExerciseStep[] = [
+      {
+        id: 'predecessor', interaction: 'guided-number', prompt: `Welche Zahl steht direkt vor ${number}?`,
+        correctAnswer: String(predecessor), errorFeedback: `Gehe von ${number} genau einen Schritt zurück.`, successFeedback: `Der Vorgänger ist ${predecessor}.`
+      },
+      {
+        id: 'successor', interaction: 'guided-number', prompt: `Welche Zahl steht direkt nach ${number}?`,
+        correctAnswer: String(successor), errorFeedback: `Gehe von ${number} genau einen Schritt weiter.`, successFeedback: `Der Nachfolger ist ${successor}.`
+      },
+      {
+        id: 'lower', interaction: 'guided-number', prompt: `Welcher untere ${unitLabel} gehört zu ${number}?`,
+        correctAnswer: String(lower), errorFeedback: `Suche den vollen ${unit === 10 ? 'Zehner' : 'Hunderter'} direkt unter ${number}.`, successFeedback: `Der untere ${unitLabel} ist ${lower}.`
+      },
+      {
+        id: 'upper', interaction: 'guided-number', prompt: `Welcher obere ${unitLabel} folgt direkt?`,
+        correctAnswer: String(upper), errorFeedback: `Vom unteren ${unitLabel} geht es genau ${unit} weiter.`, successFeedback: `Der obere ${unitLabel} ist ${upper}.`
+      }
+    ]
+    return withMetadata({
+      ...shared,
+      typeId: `${skillId}-guided-number-relations`,
+      answerMode: 'guided-number',
+      correctAnswer: [predecessor, successor, lower, upper].join('|'),
+      steps,
+      representation: { ...numberLine, visibility: 'always' }
+    })
   }
   if (phase === 'transfer') {
     const lowerDistance = number - lower
@@ -1233,7 +1358,23 @@ function arithmetic1000Steps(
   skill: 'addition' | 'subtraction'
 ): ExerciseStep[] {
   const content = getTaskCatalog().strategySteps.arithmetic1000
+  const firstStep = Number(values.firstStep)
+  const rest = Number(values.rest)
+  const second = Number(values.second)
+  const split = `${firstStep} und ${rest}`
   return [{
+    id: 'split',
+    interaction: 'select',
+    prompt: `Wie zerlegst du ${second}, damit du zuerst ${bridge} erreichst?`,
+    options: textOptions(random, split, [
+      { value: `${Math.max(0, firstStep - 1)} und ${rest + 1}`, misconception: 'Der erste Teil endet nicht genau auf der vollen Zahl.', misconceptionId: `${skill}-1000-bridge-direction` },
+      { value: `${rest} und ${firstStep}`, misconception: 'Die Teile passen, aber das volle Zwischenziel wird nicht zuerst erreicht.', misconceptionId: `${skill}-1000-bridge-direction` },
+      { value: `${firstStep} und ${Math.max(0, rest - 1)}`, misconception: 'Ein Teil der zweiten Zahl geht beim Zerlegen verloren.', misconceptionId: `${skill}-1000-rest-step` }
+    ]),
+    correctAnswer: split,
+    errorFeedback: `Beide Teile müssen zusammen ${second} ergeben. Der erste Teil führt genau bis ${bridge}.`,
+    successFeedback: `${second} ist passend in ${firstStep} und ${rest} zerlegt.`
+  }, {
     id: 'bridge',
     prompt: renderCatalogText(content.bridgePrompt, values),
     options: numberOptions(random, bridge, [
@@ -1333,6 +1474,7 @@ function symmetry(seed: number, difficulty: Difficulty, focus?: string, phase?: 
 
 function addition1000(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+  const foundationBridge = phase === 'understand' || phase === 'guided-practice'
   const calculationLevel: Difficulty = phase === 'activate' ? 1
     : phase === 'understand' || phase === 'guided-practice' ? 2
       : phase === 'automate' || phase === 'transfer' ? 3
@@ -1356,7 +1498,7 @@ function addition1000(seed: number, difficulty: Difficulty, phase?: LearningPhas
   } else if (calculationLevel === 2) {
     const ones = integer(random, 6, 9)
     second = integer(random, 11 - ones, 9)
-    first = integer(random, 2, 8) * 100 + integer(random, 1, 8) * 10 + ones
+    first = (foundationBridge ? 0 : integer(random, 2, 8) * 100) + integer(random, 1, 8) * 10 + ones
     strategy = `Ergänze zuerst ${10 - ones} bis zum nächsten Zehner und addiere dann den Rest.`
   } else {
     const tens = integer(random, 6, 9)
@@ -1372,7 +1514,7 @@ function addition1000(seed: number, difficulty: Difficulty, phase?: LearningPhas
   const bridgeUnit = calculationLevel === 3 ? 100 : 10
   const values = { first, second, answer, bridge, firstStep, rest, strategy }
   const shared = { ...base('addition-1000', seed, difficulty, values), ...contentFor('addition-1000', values, difficulty) }
-  const line = representation('addition-1000', difficulty, 'number-line', 'Rechenstrich mit Zwischenziel', { start: first, end: answer, marker: bridge, jumps }, ['end', 'marker', 'jumps'])
+  const line = representation('addition-1000', difficulty, 'number-line', 'Rechenstrich mit vollem Zwischenziel', { start: first, end: answer, marker: bridge, jumps }, ['end', 'jumps'])
   if (phase === 'activate') {
     const changedPlace = second % 100 === 0 ? 'Hunderter' : 'Zehner'
     return withMetadata({
@@ -1423,7 +1565,7 @@ function addition1000(seed: number, difficulty: Difficulty, phase?: LearningPhas
           hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10,
           changeHundreds: Math.floor(second / 100), changeTens: Math.floor(second / 10) % 10, changeOnes: second % 10, operation: '+'
         })
-      : line
+      : phase === 'guided-practice' ? { ...line, visibility: 'always' } : line
   })
 }
 
@@ -1590,6 +1732,7 @@ function writtenAddition(seed: number, difficulty: Difficulty, phase?: LearningP
 
 function subtraction1000(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+  const foundationBridge = phase === 'understand' || phase === 'guided-practice'
   const calculationLevel: Difficulty = phase === 'activate' ? 1
     : phase === 'understand' || phase === 'guided-practice' ? 3
       : phase === 'automate' || phase === 'transfer' ? 3
@@ -1611,7 +1754,14 @@ function subtraction1000(seed: number, difficulty: Difficulty, phase?: LearningP
     bridge = first - second
     strategy = `Verändere nur die Zehner: ${tens} Zehner minus ${second / 10} Zehner.`
   } else {
-    if (random() < 0.5) {
+    if (foundationBridge) {
+      const tens = integer(random, 1, 9)
+      const ones = integer(random, 1, 8)
+      first = tens * 10 + ones
+      second = integer(random, ones + 1, Math.min(9, ones + 5))
+      bridge = tens * 10
+      strategy = `Gehe zuerst ${ones} bis ${bridge} zurück und ziehe dann den Rest ab.`
+    } else if (random() < 0.5) {
       const ones = integer(random, 1, 8)
       first = integer(random, 3, 9) * 100 + integer(random, 1, 8) * 10 + ones
       second = integer(random, ones + 1, Math.min(9, ones + 5))
@@ -1632,7 +1782,7 @@ function subtraction1000(seed: number, difficulty: Difficulty, phase?: LearningP
   const jumps = calculationLevel === 1 ? numberLineJumps([first, answer]) : numberLineJumps(bridge === answer ? [first, answer] : [first, bridge, answer])
   const values = { first, second, answer, bridge, firstStep, rest, strategy }
   const shared = { ...base('subtraction-1000', seed, difficulty, values), ...contentFor('subtraction-1000', values, difficulty) }
-  const line = representation('subtraction-1000', difficulty, 'number-line', 'Rechenstrich mit Zwischenziel', { start: first, end: answer, marker: bridge, jumps }, ['end', 'marker', 'jumps'])
+  const line = representation('subtraction-1000', difficulty, 'number-line', 'Rechenstrich mit vollem Zwischenziel', { start: first, end: answer, marker: bridge, jumps }, ['end', 'jumps'])
   if (phase === 'activate') {
     return withMetadata({
       ...shared, typeId: 'subtraction-1000-activate-direction', subskillId: 'subtraction-1000-hundreds',
@@ -1682,7 +1832,7 @@ function subtraction1000(seed: number, difficulty: Difficulty, phase?: LearningP
           hundreds: Math.floor(first / 100), tens: Math.floor(first / 10) % 10, ones: first % 10,
           changeHundreds: Math.floor(second / 100), changeTens: Math.floor(second / 10) % 10, changeOnes: second % 10, operation: '−'
         })
-      : line
+      : phase === 'guided-practice' ? { ...line, visibility: 'always' } : line
   })
 }
 
@@ -2014,6 +2164,15 @@ function money(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exe
     { value: amountCents + 100, misconception: 'Einen Euro zu viel berücksichtigt', misconceptionId: 'money-unit-confusion' },
     { value: priceCents, misconception: 'Preis und Rückgeld verwechselt', misconceptionId: 'money-direction-confusion' }
   ]).map((option) => ({ ...option, label: formatEuro(Number(option.value)) }))
+  const moneyRepresentation = representation('money', moneyPhase === 'activate' || moneyPhase === 'guided-practice' ? 1 : moneyPhase === 'transfer' ? 3 : 2, 'money', content.coinsLabel, {
+    coins,
+    displayedCents: paidCents || amountCents,
+    changeCents: amountCents,
+    priceCents,
+    paidCents,
+    priceLabel: content.priceLabel,
+    paidLabel: content.paidLabel
+  }, moneyPhase === 'transfer' ? ['changeCents'] : ['displayedCents'])
   return withMetadata({
     ...base('money', seed, difficulty, values),
     ...contentFor('money', values, difficulty),
@@ -2022,15 +2181,7 @@ function money(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exe
     answerMode: 'choice',
     correctAnswer: String(amountCents),
     options,
-    representation: representation('money', moneyPhase === 'activate' || moneyPhase === 'guided-practice' ? 1 : moneyPhase === 'transfer' ? 3 : 2, 'money', content.coinsLabel, {
-      coins,
-      displayedCents: paidCents || amountCents,
-      changeCents: amountCents,
-      priceCents,
-      paidCents,
-      priceLabel: content.priceLabel,
-      paidLabel: content.paidLabel
-    }, moneyPhase === 'transfer' ? ['changeCents'] : ['displayedCents'])
+    representation: { ...moneyRepresentation, visibility: 'always' }
   })
 }
 
@@ -2440,6 +2591,47 @@ function planeShapes(seed: number, difficulty: Difficulty, phase?: LearningPhase
 function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const content = getTaskCatalog().planeGeometry
+  if (phase === 'transfer' || (!phase && difficulty === 3)) {
+    const step = pick(random, [10, 50, 100, -30])
+    const visibleLength = 4
+    const minimumStart = step < 0 ? Math.abs(step) * visibleLength : 10
+    const maximumStart = step > 0 ? 1000 - step * visibleLength : 1000
+    const start = integer(random, Math.ceil(minimumStart / 10), Math.floor(maximumStart / 10)) * 10
+    const sequence = Array.from({ length: visibleLength }, (_, index) => start + step * index)
+    const answer = start + step * visibleLength
+    const values = { taskPrompt: 'Welche Zahl setzt die Reihe fort?', answer, step, patternKey: sequence.join('|') }
+    const strip = representation('patterns', difficulty, 'pattern-strip', 'Zahlenfolge mit gleich großen Schritten', {
+      sequenceCount: sequence.length,
+      blockLength: 1,
+      answerLabel: String(answer),
+      highlightBlocks: 0,
+      taskMode: 'continue',
+      ...Object.fromEntries(sequence.map((value, index) => [`symbol${index}`, String(value)]))
+    }, ['answerLabel'])
+    return withMetadata({
+      ...base('patterns', seed, difficulty, values),
+      ...contentFor('patterns', values, difficulty),
+      typeId: 'pattern-transfer-number-sequence',
+      subskillId: 'pattern-constant-number-step',
+      prompt: 'Welche Zahl setzt die Reihe mit gleich großen Schritten fort?',
+      answerMode: 'choice',
+      correctAnswer: String(answer),
+      options: numberOptions(random, answer, [
+        { value: answer - step, misconception: 'Das letzte sichtbare Folgenglied wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
+        { value: answer + step, misconception: 'Ein Schritt wird übersprungen.', misconceptionId: 'patterns-number-step' },
+        { value: answer - 2 * step, misconception: 'Ein früheres Folgenglied wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
+        { value: answer + 10, misconception: 'Die Schrittweite wird durch 10 ersetzt.', misconceptionId: 'patterns-number-step' },
+        { value: answer - 10, misconception: 'Die Schrittweite wird durch 10 ersetzt.', misconceptionId: 'patterns-number-step' },
+        { value: answer + 50, misconception: 'Die Schrittweite wird durch 50 ersetzt.', misconceptionId: 'patterns-number-step' },
+        { value: answer - 50, misconception: 'Die Schrittweite wird durch 50 ersetzt.', misconceptionId: 'patterns-number-step' },
+        { value: answer + 100, misconception: 'Die Schrittweite wird durch 100 ersetzt.', misconceptionId: 'patterns-number-step' },
+        { value: answer - 100, misconception: 'Die Schrittweite wird durch 100 ersetzt.', misconceptionId: 'patterns-number-step' }
+      ]),
+      representation: { ...strip, visibility: 'always' },
+      successFeedback: `Jeder Schritt verändert die Zahl um ${step > 0 ? `+${step}` : step}. ${answer} setzt die Reihe fort.`,
+      errorFeedback: 'Vergleiche zwei Nachbarzahlen der Reihe. Derselbe Schritt gilt jedes Mal.'
+    })
+  }
   const symbols = shuffle(random, [...content.patternSymbols])
   const block = difficulty === 1 ? symbols.slice(0, 2) : difficulty === 2 ? symbols.slice(0, 3) : [symbols[0]!, symbols[0]!, symbols[1]!]
   const visibleLength = difficulty === 1 ? 5 : 7
@@ -2459,7 +2651,7 @@ function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): 
     blockLength: block.length,
     answerLabel,
     highlightBlocks: phase === 'activate' || phase === 'understand' || phase === 'guided-practice' ? 1 : 0,
-    taskMode: phase === 'transfer' ? 'identify-error' : 'continue',
+    taskMode: 'continue',
     ...Object.fromEntries(shown.map((symbol, index) => [`symbol${index}`, symbol]))
   }, ['answerLabel'])
   if (phase === 'activate') {
@@ -2486,22 +2678,6 @@ function patterns(seed: number, difficulty: Difficulty, phase?: LearningPhase): 
         { value: block.length + 2, misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' },
         { value: 1, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' }
       ]), representation: strip(sequence)
-    })
-  }
-  if (phase === 'transfer') {
-    const errorIndex = Math.min(sequence.length - 2, block.length + 1)
-    const corrupted = [...sequence]
-    corrupted[errorIndex] = symbols.find((symbol) => symbol !== sequence[errorIndex])!
-    const correctPosition = String(errorIndex + 1)
-    return withMetadata({
-      ...shared,
-      typeId: 'pattern-transfer-identify-error', subskillId: 'pattern-complex-block',
-      prompt: 'An welcher Stelle ist der Musterfehler?', answerMode: 'choice', correctAnswer: correctPosition,
-      options: numberOptions(random, errorIndex + 1, [
-        { value: Math.max(1, errorIndex), misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' },
-        { value: errorIndex + 2, misconception: 'Nur das letzte Zeichen wird wiederholt.', misconceptionId: 'patterns-repeat-last' },
-        { value: block.length, misconception: 'Die Reihenfolge innerhalb des Musterblocks wird vertauscht.', misconceptionId: 'patterns-block-order' }
-      ]), representation: strip(corrupted, correctPosition)
     })
   }
   if (phase === 'automate') {
@@ -3478,6 +3654,7 @@ export function isStepAnswerCorrect(step: ExerciseStep, answer: string): boolean
     const normalize = (value: string) => value.replaceAll('*', '·').replaceAll('/', ':').replaceAll('-', '−').replace(/\s+/g, '')
     return normalize(answer) === normalize(step.correctAnswer)
   }
+  if (step.interaction === 'place-value-input') return answer.replace(/\s+/g, '') === step.correctAnswer
   return answer === step.correctAnswer
 }
 

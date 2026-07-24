@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Didaktische Stabilisierung 0.32.0
+
+- Es kommt keine neue mathematische Kompetenz hinzu. Belegte iPhone-Befunde und von einer Lehrkraft bereitgestellte Übungsformen werden in tragfähige digitale Lernhandlungen für Geld, Stellenwert, Zahlbeziehungen und Zehnerübergang überführt.
+- Geldaufgaben zeigen in jeder Lernphase die zur Lösung nötigen Münzen beziehungsweise Preis und Zahlbetrag. Der unbekannte Gesamtbetrag oder das Wechselgeld bleibt maskiert.
+- Stellenwertmaterial führt in eine feste H-Z-E-Tafel, Zahlzerlegung und Zahlwort. Transferaufgaben vergleichen zunächst ein Zahlenpaar mit `<` oder `>` und lassen danach vier verschiedene Zahlen tatsächlich ordnen.
+- Nachbaraufgaben verbinden Vorgänger, Nachfolger, Nachbarzehner und Nachbarhunderter. Lokale Zahlenstrahlen positionieren Werte proportional zwischen ihren echten Grenzen.
+- Zahlenfolgen werden mit konstanter Schrittweite fortgesetzt. Addition und Subtraktion mit Zehnerübergang zerlegen den zweiten Operanden zuerst bis zum vollen Zehner und dann in den Rest.
+- App 0.32.0 verwendet Katalog 0.31.0 bei unverändertem Schema 19 und Status `ready-for-review`.
+
+Die Arbeitsblätter dienen als fachliche Referenz, werden aber nicht in die Anwendung übernommen. Eine vollständige Lehrkraftabnahme, Unterrichtserprobung und erneute Prüfung dieser Version auf dem echten iPhone sind nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 473 Unit-/Komponententests, Produktionsbuild und 20 Playwright-Szenarien gegen Vite Preview sowie erneut 20 Szenarien gegen den gehärteten Read-only-Container. Das mit Docker Desktop explizit für AMD64 gebaute Image `mathe-reise:0.32.0-local` beziehungsweise `mathe-reise:local` (`sha256:737c51fb4ebb8566d0360348d224ee2c920cbf3b27b9d9ac92da7c6c1ed11cb9`) lief als UID 101 mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldete `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen; Docker Compose validierte die Deployment-Datei. Die Container-E2E lief auf `127.0.0.1:8095`. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung; die korrigierte Version wurde nicht auf dem echten iPhone erneut geprüft.
+
 ## iPhone-Regressionskorrektur 0.31.1
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Drei Befunde aus der realen iPhone-Nutzung werden gemeinsam in Katalog, Generator, Runtime und Rendering korrigiert.

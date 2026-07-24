@@ -153,7 +153,10 @@ describe('didaktisch migrierte Lernhandlungen', () => {
         expect(exercises[0]?.representation?.values.operation).toBe(skillId === 'addition-1000' ? '+' : '−')
         expect(Number(exercises[0]?.representation?.values.changeHundreds) * 100 + Number(exercises[0]?.representation?.values.changeTens) * 10 + Number(exercises[0]?.representation?.values.changeOnes)).toBe(Number(exercises[0]?.variant.values.second))
       }
-      expect(exercises[1]?.representation?.valueRoles.unknownValues).toEqual(expect.arrayContaining(['end', 'marker', 'jumps']))
+      expect(exercises[1]?.representation?.valueRoles.unknownValues).toEqual(expect.arrayContaining(
+        skillId === 'complement-1000' ? ['end', 'marker', 'jumps'] : ['end', 'jumps']
+      ))
+      if (skillId !== 'complement-1000') expect(exercises[1]?.representation?.valueRoles.knownValues).toContain('marker')
       expect(exercises[2]?.steps?.length).toBeGreaterThanOrEqual(2)
       expect(exercises[3]?.answerMode).toBe('number')
       expect(exercises[4]?.answerMode).toBe('number')
@@ -178,7 +181,10 @@ describe('didaktisch migrierte Lernhandlungen', () => {
           const optionGroups = [exercise.options ?? [], ...exercise.steps?.map((step) => step.options ?? []) ?? []]
           optionGroups.forEach((options) => expect(new Set(options.map((option) => option.value)).size, `${skillId}/${phase}/${seed}`).toBe(options.length))
           if (exercise.representation?.kind === 'number-line') {
-            expect(exercise.representation.valueRoles.unknownValues).toEqual(expect.arrayContaining(['end', 'marker', 'jumps']))
+            expect(exercise.representation.valueRoles.unknownValues).toEqual(expect.arrayContaining(
+              skillId === 'complement-1000' ? ['end', 'marker', 'jumps'] : ['end', 'jumps']
+            ))
+            if (skillId !== 'complement-1000') expect(exercise.representation.valueRoles.knownValues).toContain('marker')
             expect(exercise.representation.valueRoles.revealedValues).toEqual([])
           }
         }
@@ -226,10 +232,10 @@ describe('didaktisch migrierte Lernhandlungen', () => {
     }
   })
 
-  it('nutzt Mustertransfer als Fehlersuche und verrät die Fehlerstelle nicht', () => {
+  it('nutzt Mustertransfer als konstante Zahlenfolge und verrät das nächste Glied nicht', () => {
     const transfer = generateExercise('patterns', 83, 3, undefined, 'transfer')
-    expect(transfer.typeId).toBe('pattern-transfer-identify-error')
-    expect(transfer.prompt).toContain('Musterfehler')
+    expect(transfer.typeId).toBe('pattern-transfer-number-sequence')
+    expect(transfer.prompt).toContain('gleich großen Schritten')
     expect(transfer.representation?.valueRoles.unknownValues).toContain('answerLabel')
     expect(transfer.representation?.valueRoles.revealedValues).toEqual([])
   })

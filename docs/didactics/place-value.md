@@ -13,24 +13,24 @@ Ziffer wird als Wert angegeben; Stellen werden vertauscht; Null wird ausgelassen
 ## 6. Fachliche Kernidee
 Der Wert einer Ziffer entsteht aus Ziffer und Position im dezimalen Stellenwertsystem.
 ## 7. Methodischer Zugang
-Gebündeltes Material zunächst einer Zahl zuordnen, danach Material, Ziffer, Stelle und Wert miteinander verbinden. Erst anschließend wird der Stellenwert ohne vollständige Materialhilfe bestimmt oder die Wirkung einer veränderten Stelle untersucht.
+Gebündeltes Material zunächst einer Zahl zuordnen, danach das Material aktiv in eine H-Z-E-Tafel übertragen und Material, Ziffer, Stelle und Wert miteinander verbinden. Erst anschließend wird der Stellenwert ohne vollständige Materialhilfe bestimmt, ein Zahlwort gelesen, ein Zahlenpaar mit `<` oder `>` verglichen oder mehrere Zahlen über Hunderter, Zehner und Einer geordnet.
 ## 8. Geeignete Darstellungen
 Hunderterflächen, Zehnerstangen, Einerpunkte und Stellenwerttafel.
 ## 9. Lernprogression
-Materialgruppe erkennen; Ziffer, Stelle und Wert verbinden; Stellenwert mit sichtbarer Tafel bestimmen; Null als Platzhalter berücksichtigen; selbstständig lösen; im Transfer die Änderung der Hunderterstelle untersuchen.
+Materialgruppe erkennen; Ziffer, Stelle und Wert verbinden; sichtbares Material in die H-Z-E-Tafel übertragen; Null als Platzhalter berücksichtigen; Zahlwörter in Ziffernschreibweise übertragen; zwei Zahlen an der ersten unterschiedlichen Stelle vergleichen; mehrere Zahlen zuerst nach Hundertern, dann nach Zehnern und Einern ordnen.
 ## 10. Aufgabentypen
-Material und Zahl zuordnen, Ziffer beziehungsweise Stellenwert auswählen und im Transfer die Auswirkung einer Stellenänderung bestimmen.
+Material und Zahl zuordnen, Material in H-Z-E eintragen, Ziffer beziehungsweise Stellenwert auswählen, Zahlwörter schreiben, Zahlen mit `<` oder `>` vergleichen und Zahlen der Größe nach ordnen.
 ## 11. Hilfestufen
 Gesuchte Spalte hervorheben; Ziffer und Einheit getrennt benennen; Materialdarstellung zeigen.
 ## 12. Remediation
 Zahl mit Material neu aufbauen und danach dieselbe Stelle in einer verwandten Zahl prüfen.
 ## 13. Transfer
-Zahl anders darstellen oder erklären, wie sich ihr Wert beim Verschieben einer Ziffer ändert.
+Eine Zahl aus einem Zahlwort notieren oder mehrere Zahlen durch Stellenvergleich ordnen.
 ## 14. Wiederholung
 Nullstellen und andere fehlerhafte Varianten erscheinen erneut, aber nicht unmittelbar identisch.
 ## 15. Erfolgskriterien
 Ziffer und Stellenwert in mehreren Varianten korrekt unterscheiden.
 ## 16. Grenzen der aktuellen Umsetzung
-Freies Erklären und aktives Verschieben von Material sind nicht implementiert.
+Freies Erklären und aktives Verschieben einzelner Materialteile sind nicht implementiert.
 ## 17. Punkte für die Gesamtprüfung
 Verständlichkeit der Begriffe Ziffer, Stelle und Wert auf dem kleinen Bildschirm prüfen.

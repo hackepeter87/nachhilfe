@@ -76,6 +76,18 @@ describe('MathRepresentation Gruppenbild', () => {
   })
 })
 
+describe('MathRepresentation lokaler Zahlenstrahl', () => {
+  it('positioniert 801 direkt hinter 800 statt in der Mitte eines globalen Strahls', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: 'Nachbarhunderter',
+      values: { start: 800, end: 900, marker: 801, lower: 800, upper: 900, step: 100, tickStep: 100 },
+      valueRoles: { knownValues: ['start', 'end', 'marker', 'step', 'tickStep'], unknownValues: ['lower', 'upper'], revealedValues: [] }
+    }} />)
+    expect(container.querySelector('.number-line-marker')).toHaveStyle({ left: '1%' })
+    expect(container.querySelector('.number-line-marker-label')).toHaveStyle({ left: '1%', transform: 'translateX(0)' })
+  })
+})
+
 describe('MathRepresentation Zufall und Kombinationen', () => {
   it('zeigt nur bekannte Versuchsergebnisse und keine vorweggenommene Klassifikation', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{

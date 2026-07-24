@@ -45,6 +45,9 @@ describe('curriculare Gesamtintegration', () => {
             if (step.interaction === 'build-pairing') {
               if (!step.expectedSelections || step.expectedSelections.length !== step.options?.length ||
                 [...step.expectedSelections].sort().join('|') !== step.correctAnswer) throw new Error(`${context}/${step.id}: Paarungen unvollständig`)
+            } else if (step.interaction === 'order') {
+              if (!step.expectedSelections || step.expectedSelections.length !== step.options?.length ||
+                step.expectedSelections.join('|') !== step.correctAnswer) throw new Error(`${context}/${step.id}: Reihenfolge unvollständig`)
             } else if (step.options && step.options.filter((option) => option.value === step.correctAnswer).length !== 1) {
               throw new Error(`${context}/${step.id}: keine eindeutige Schrittlösung`)
             }

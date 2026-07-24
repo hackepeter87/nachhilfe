@@ -13,15 +13,15 @@ Stellen werden vermischt; Übergang wird ausgelassen; Rückwärtssprung hat fals
 ## 6. Fachliche Kernidee
 Zahlen können stellenweise oder schrittweise verändert werden; passende Zwischenziele vereinfachen die Rechnung.
 ## 7. Methodischer Zugang
-Hunderter/Zehner/Einer sortieren, zum nächsten vollen Wert ergänzen und Restschritt ausführen.
+Den zweiten Summanden beziehungsweise Subtrahenden so zerlegen, dass der erste Teil genau zum nächsten beziehungsweise vorherigen vollen Zehner führt. Danach wird nur der verbleibende Rest gerechnet. Die geführte Einführung verwendet zunächst zweistellige Zahlen; die Strategie wird anschließend in den Zahlenraum bis 1000 übertragen.
 ## 8. Geeignete Darstellungen
 Stellenwertmaterial und Rechenstrich mit mathematisch lückenlosen Sprüngen.
 ## 9. Lernprogression
 Die Aktivierung klärt Stellenwert, Rechenrichtung beziehungsweise volle Zielzahl. Beim Verstehen wird der zweite Summand, der Subtrahend oder der Abstand passend zum vollen Zwischenziel zerlegt. Danach folgen geführte Teilschritte, selbstständige Rechnung, Abruf ohne Zeitdruck und Transfer über Strategiewahl oder Umkehraufgabe. Zahlenbereiche allein definieren keine Lernphase.
 ## 10. Aufgabentypen
-Addition, Subtraktion und Ergänzen zum nächsten Zehner/Hunderter bleiben getrennte Generatoren, verwenden aber denselben phasenspezifischen Vertrag. Übergangsaufgaben prüfen zuerst die volle Zwischenzahl und danach das Ergebnis. Im Transfer wird ein Rechenweg beziehungsweise eine passende Umkehraufgabe aktiv ausgewählt.
+Addition, Subtraktion und Ergänzen zum nächsten Zehner/Hunderter bleiben getrennte Generatoren, verwenden aber denselben phasenspezifischen Vertrag. Übergangsaufgaben prüfen zuerst die vollständige Zerlegung, dann die volle Zwischenzahl und erst danach das Ergebnis. Im Transfer wird ein Rechenweg beziehungsweise eine passende Umkehraufgabe aktiv ausgewählt.
 ## 11. Hilfestufen
-Veränderte Stelle markieren; Zwischenziel nennen; Sprünge sichtbar machen.
+Die benötigte Ergänzung zum vollen Zehner bestimmen; zweiten Summanden oder Subtrahenden vollständig zerlegen; Zwischenziel nennen; beide Sprünge sichtbar machen.
 ## 12. Remediation
 Nur eine Stelle mit Material verändern und danach den zweiten Schritt ergänzen.
 ## 13. Transfer

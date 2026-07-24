@@ -840,7 +840,7 @@ p {
 .number-line-track {
   position: relative;
   height: 4px;
-  margin: 18px 10px 10px;
+  margin: 42px 10px 10px;
   background: #315d45;
 }
 
@@ -870,7 +870,7 @@ p {
 .number-line-tick small { position: absolute; top: 15px; left: 50%; color: #19577d; font-size: .64rem; font-weight: 850; transform: translateX(-50%); }
 .number-line-jump {
   position: absolute;
-  bottom: 7px;
+  bottom: 32px;
   min-width: 24px;
   border-top: 2px solid #2876a8;
   color: #19577d;
@@ -962,6 +962,15 @@ p {
 .pairing-option { min-height: 48px; padding: 9px; border: 2px solid #78a88d; border-radius: 5px; color: var(--ink); background: #fff; font: inherit; font-weight: 800; }
 .pairing-option[aria-pressed="true"] { border-color: #23664e; background: #dcefe5; box-shadow: inset 0 0 0 1px #23664e; }
 .pairing-builder > p { margin: 0; color: #557060; font-size: .8rem; font-weight: 800; text-align: center; }
+
+.order-builder { display: grid; gap: 12px; }
+.order-result { display: flex; min-height: 52px; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; padding: 8px; border: 2px dashed #8eb3a2; background: #f5faf7; color: #557060; font-weight: 800; }
+.order-result > span { display: inline-flex; min-width: 54px; align-items: center; justify-content: center; gap: 5px; padding: 7px; border: 1px solid #8eb3a2; background: #fff; color: var(--ink); }
+.order-result > .order-placeholder { border: 0; background: transparent; color: #557060; }
+.order-result small { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; background: #dcefe5; color: #23664e; font-size: .65rem; }
+.order-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.order-option { min-height: 50px; padding: 9px; border: 2px solid #78a88d; border-radius: 5px; color: var(--ink); background: #fff; font: inherit; font-weight: 850; }
+.order-option[aria-pressed="true"] { border-color: #23664e; background: #dcefe5; opacity: .65; }
 
 .clock-visual, .quantity-measure { display: grid; justify-items: center; gap: 12px; text-align: center; }
 .clock-single, .clock-pair { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
