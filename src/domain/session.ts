@@ -20,6 +20,27 @@ export const FOCUS_DOMAINS = {
 
 export type FocusDomain = keyof typeof FOCUS_DOMAINS
 
+export const CLASSROOM_PRACTICE_ROTATION = [
+  { skillId: 'place-value', phase: 'guided-practice', typeId: 'guided-material-table' },
+  { skillId: 'place-value', phase: 'transfer', typeId: 'transfer-compare' },
+  { skillId: 'compose', phase: 'transfer', typeId: 'transfer-number-word' },
+  { skillId: 'neighbor-tens', phase: 'guided-practice', typeId: 'guided-number-relations' },
+  { skillId: 'neighbor-hundreds', phase: 'guided-practice', typeId: 'guided-number-relations' },
+  { skillId: 'patterns', phase: 'transfer', typeId: 'pattern-transfer-number-sequence' },
+  { skillId: 'addition-1000', phase: 'guided-practice', typeId: 'guided-bridge' },
+  { skillId: 'subtraction-1000', phase: 'guided-practice', typeId: 'guided-bridge' }
+] as const satisfies readonly { skillId: SkillId; phase: LearningPhase; typeId: string }[]
+
+export interface SessionPlanningOptions {
+  completedSessionCount?: number
+  releaseMetadata?: SessionReleaseMetadata
+}
+
+interface PlannedSkill {
+  skillId: SkillId
+  phase?: LearningPhase
+}
+
 const FOCUS_SKILLS: SkillId[] = Object.values(FOCUS_DOMAINS).flat()
 
 function weightedIndex(weights: number[], random: () => number): number {
@@ -94,6 +115,27 @@ function weightedSkills(progress: ProgressMap, seed: number, count: number): Ski
     selected.push(candidates[index] as SkillId)
   }
   return selected
+}
+
+function focusDomainFor(skillId: SkillId): FocusDomain | undefined {
+  return (Object.keys(FOCUS_DOMAINS) as FocusDomain[])
+    .find((domain) => (FOCUS_DOMAINS[domain] as readonly SkillId[]).includes(skillId))
+}
+
+function focusSkillsWithClassroomPractice(progress: ProgressMap, seed: number, count: number, completedSessionCount?: number): PlannedSkill[] {
+  const focus: PlannedSkill[] = weightedSkills(progress, seed, count).map((skillId) => ({ skillId }))
+  if (completedSessionCount === undefined) return focus
+  const practice = CLASSROOM_PRACTICE_ROTATION[completedSessionCount % CLASSROOM_PRACTICE_ROTATION.length]
+  if (!practice || !isSkillEligible(practice.skillId, progress)) return focus
+
+  const domain = focusDomainFor(practice.skillId)
+  const replacementIndex = domain
+    ? focus.findIndex(({ skillId }) => (FOCUS_DOMAINS[domain] as readonly SkillId[]).includes(skillId))
+    : -1
+  if (replacementIndex < 0) return focus
+
+  focus[replacementIndex] = { skillId: practice.skillId, phase: practice.phase }
+  return focus
 }
 
 function warmupSkills(progress: ProgressMap, seed: number): SkillId[] {
@@ -174,6 +216,17 @@ function settingsForProgress(progress: SkillProgress | undefined): { difficulty:
   return { difficulty, phase }
 }
 
+function settingsForPhase(phase: LearningPhase): { difficulty: Difficulty; phase: LearningPhase } {
+  return {
+    difficulty: phase === 'independent-practice'
+      ? 2
+      : phase === 'automate' || phase === 'transfer'
+        ? 3
+        : 1,
+    phase
+  }
+}
+
 function settingsForSkill(skillId: SkillId, progress: ProgressMap): { difficulty: Difficulty; phase: LearningPhase } {
   const settings = settingsForProgress(progress[skillId])
   if ((skillId === 'mass' || skillId === 'capacity') && !hasReachedPhase(progress['complement-1000'], 'independent-practice')) {
@@ -215,14 +268,19 @@ export function currentSessionReleaseMetadata(): SessionReleaseMetadata {
 export function createSessionPlan(
   progress: ProgressMap,
   seed = dailySeed() + Date.now() % 10_000,
-  releaseMetadata = currentSessionReleaseMetadata()
+  options: SessionPlanningOptions = {}
 ): SessionPlan {
+  const releaseMetadata = options.releaseMetadata ?? currentSessionReleaseMetadata()
   const warmups = warmupSkills(progress, seed + 17)
-  const focus = weightedSkills(progress, seed + 31, 4)
-  const skills = [...warmups, ...focus, ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled)]
-  const exercises = skills.map((skillId, index) => {
+  const focus = focusSkillsWithClassroomPractice(progress, seed + 31, 4, options.completedSessionCount)
+  const skills: PlannedSkill[] = [
+    ...warmups.map((skillId) => ({ skillId })),
+    ...focus,
+    ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled).map((skillId) => ({ skillId }))
+  ]
+  const exercises = skills.map(({ skillId, phase: plannedPhase }, index) => {
     const skillProgress = progress[skillId]
-    const { difficulty, phase } = settingsForSkill(skillId, progress)
+    const { difficulty, phase } = plannedPhase ? settingsForPhase(plannedPhase) : settingsForSkill(skillId, progress)
     const exerciseSeed = seed + (index + 1) * 113
     const focus = selectSubskill(skillId, progress, exerciseSeed + 41, difficulty)
     return applyLearningPhase(uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus, phase), phase)

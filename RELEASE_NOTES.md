@@ -1,5 +1,17 @@
 # Mathe-Reise
 
+## Erreichbarkeit der Lehrkraft-Übungsformen 0.32.1
+
+- Behebt den Befund, dass die in 0.32.0 implementierten Lehrkraft-Übungsformen in normalen Runden über lange Zeit gar nicht erscheinen konnten.
+- Jede Runde reserviert nun einen Fokusplatz für eine persistente Acht-Runden-Rotation aus Stellenwertmaterial, Zahlenvergleich und -ordnung, Zahlwort, Nachbarzehnern, Nachbarhundertern, Zahlenfolgen sowie Zehnerübergang bei Addition und Subtraktion.
+- Die Zahl abgeschlossener Sitzungen steuert die Rotation. Reload, Browserneustart und vorhandene Lernstände ändern oder löschen den gespeicherten Fortschritt nicht.
+- Die übrigen Aufgaben bleiben adaptiv. Es kommt keine neue Kompetenz und kein separater Kindermodus hinzu.
+- App 0.32.1 verwendet unverändert Katalog 0.31.0 und Schema 19.
+
+Eine erneute vollständige Abnahme auf dem echten iPhone und eine externe Lehrkraftprüfung sind noch nicht erfolgt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 476 Unit-/Komponententests, Produktionsbuild und 20 Playwright-Szenarien gegen Vite Preview sowie erneut 20 Szenarien gegen den gehärteten Read-only-Container. Das mit Docker Desktop explizit für AMD64 gebaute Image `mathe-reise:0.32.1-local` beziehungsweise `mathe-reise:local` (`sha256:e7e866e15d126bf2653ede969357ad7e6db42eab937768860864d30113b7e286`) lief als UID `101:101` mit ausschließlich `/tmp` als tmpfs, ohne Capabilities und meldete `healthy`. Einstieg, Manifest, Service Worker, Katalog und Healthcheck wurden erfolgreich abgerufen. Die Container-E2E lief auf `127.0.0.1:8096`. Podman war nicht installiert. WebKit bleibt eine Mobile-Safari-Näherung.
+
 ## Didaktische Stabilisierung 0.32.0
 
 - Es kommt keine neue mathematische Kompetenz hinzu. Belegte iPhone-Befunde und von einer Lehrkraft bereitgestellte Übungsformen werden in tragfähige digitale Lernhandlungen für Geld, Stellenwert, Zahlbeziehungen und Zehnerübergang überführt.

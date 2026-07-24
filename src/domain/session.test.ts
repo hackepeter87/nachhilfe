@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createRemediationExercise, createRepetitionExercise, createSessionPlan, FOCUS_DOMAINS, isSkillEligible } from './session'
+import { CLASSROOM_PRACTICE_ROTATION, createRemediationExercise, createRepetitionExercise, createSessionPlan, FOCUS_DOMAINS, isSkillEligible } from './session'
 import { createSkillProgress } from './progress'
 import { defaultLearningPhaseForDifficulty, generateExercise } from './generators'
 import { FALLBACK_TASK_CATALOG, getTaskCatalog, setTaskCatalog } from '../content/catalog'
@@ -21,8 +21,50 @@ describe('Sitzungsplanung', () => {
       catalogId: 'nrw-klasse3-foerderkern',
       catalogVersion: '0.31.0',
       schemaVersion: 19,
-      appVersion: '0.32.0'
+      appVersion: '0.32.1'
     })
+  })
+
+  it('macht in jeder normalen Runde eine Lehrkraft-Übungsform erreichbar', () => {
+    const seenTypes = new Set<string>()
+    CLASSROOM_PRACTICE_ROTATION.forEach((expected, completedSessionCount) => {
+      const session = createSessionPlan({}, 12_500 + completedSessionCount, { completedSessionCount })
+      const practice = session.exercises.find((exercise) => exercise.typeId === expected.typeId)
+      expect(practice, `Runde ${completedSessionCount + 1}: ${expected.typeId}`).toMatchObject({
+        skillId: expected.skillId,
+        learningPhase: expected.phase,
+        typeId: expected.typeId
+      })
+      seenTypes.add(practice!.typeId)
+    })
+    expect(seenTypes).toEqual(new Set(CLASSROOM_PRACTICE_ROTATION.map(({ typeId }) => typeId)))
+  })
+
+  it('behält die Lehrkraft-Rotation auch bei bestehenden abweichenden Lernphasen bei', () => {
+    const existingProgress = Object.fromEntries(CLASSROOM_PRACTICE_ROTATION.map(({ skillId }) => [
+      skillId,
+      {
+        ...createSkillProgress(skillId),
+        attempts: 12,
+        difficulty: 2 as const,
+        learningPhase: 'independent-practice' as const,
+        mastery: 72,
+        status: 'practicing' as const
+      }
+    ]))
+
+    for (let completedSessionCount = 0; completedSessionCount < CLASSROOM_PRACTICE_ROTATION.length; completedSessionCount += 1) {
+      const expected = CLASSROOM_PRACTICE_ROTATION[completedSessionCount]!
+      const session = createSessionPlan(existingProgress, 13_500 + completedSessionCount, { completedSessionCount })
+      expect(session.exercises.some((exercise) => exercise.typeId === expected.typeId)).toBe(true)
+    }
+  })
+
+  it('setzt die Lehrkraft-Rotation nach einem vollständigen Zyklus deterministisch fort', () => {
+    const first = createSessionPlan({}, 14_500, { completedSessionCount: 0 })
+    const repeated = createSessionPlan({}, 14_500, { completedSessionCount: CLASSROOM_PRACTICE_ROTATION.length })
+    expect(first.exercises.map(({ skillId, typeId, variant }) => ({ skillId, typeId, variant: variant.key })))
+      .toEqual(repeated.exercises.map(({ skillId, typeId, variant }) => ({ skillId, typeId, variant: variant.key })))
   })
 
   it('hält auch sicheren Symmetrietransfer auf geraden Rastern zwischen Feldern', () => {

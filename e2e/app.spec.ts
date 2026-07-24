@@ -188,7 +188,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
     catalogId: 'nrw-klasse3-foerderkern',
     catalogVersion: '0.31.0',
     schemaVersion: 19,
-    appVersion: '0.32.0'
+    appVersion: '0.32.1'
   })
 
   await page.reload()
@@ -1048,10 +1048,10 @@ test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', asyn
 
 test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung mobil vollständig', async ({ browser }, testInfo) => {
   const scenarios = [
-    { id: 'place-value-guided', skillId: 'place-value', phase: 'guided-practice', difficulty: 1, expected: '.place-material-stack', interaction: '.place-value-inputs' },
-    { id: 'place-value-transfer', skillId: 'place-value', phase: 'transfer', difficulty: 3, expected: '.answer-options', interaction: '.answer-option' },
-    { id: 'neighbor-hundreds', skillId: 'neighbor-hundreds', phase: 'guided-practice', difficulty: 1, expected: '.number-line-visual', interaction: '#guided-number-answer' },
-    { id: 'addition-1000', skillId: 'addition-1000', phase: 'guided-practice', difficulty: 1, expected: '.number-line-visual', interaction: '.answer-option' }
+    { id: 'place-value-guided', skillId: 'place-value', phase: 'guided-practice', difficulty: 1, completedSessionCount: 0, expected: '.place-material-stack', interaction: '.place-value-inputs' },
+    { id: 'place-value-transfer', skillId: 'place-value', phase: 'transfer', difficulty: 3, completedSessionCount: 1, expected: '.answer-options', interaction: '.answer-option' },
+    { id: 'neighbor-hundreds', skillId: 'neighbor-hundreds', phase: 'guided-practice', difficulty: 1, completedSessionCount: 4, expected: '.number-line-visual', interaction: '#guided-number-answer' },
+    { id: 'addition-1000', skillId: 'addition-1000', phase: 'guided-practice', difficulty: 1, completedSessionCount: 6, expected: '.number-line-visual', interaction: '.answer-option' }
   ] as const
 
   for (const scenario of scenarios) {
@@ -1067,13 +1067,13 @@ test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung 
     })
 
     await onboard(page, 'Zahlen')
-    await page.evaluate(async ({ skillId, phase, difficulty }) => {
+    await page.evaluate(async ({ skillId, phase, difficulty, completedSessionCount }) => {
       const database = await new Promise<IDBDatabase>((resolve, reject) => {
         const request = indexedDB.open('mathe-reise')
         request.onsuccess = () => resolve(request.result)
         request.onerror = () => reject(request.error)
       })
-      const transaction = database.transaction('progress', 'readwrite')
+      const transaction = database.transaction(['progress', 'sessions'], 'readwrite')
       transaction.objectStore('progress').put({
         skillId,
         attempts: 3,
@@ -1089,6 +1089,19 @@ test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung 
         status: 'practicing',
         subskills: {}
       })
+      for (let index = 0; index < completedSessionCount; index += 1) {
+        transaction.objectStore('sessions').put({
+          id: `rotation-fixture-${index}`,
+          catalogId: 'nrw-klasse3-foerderkern',
+          catalogVersion: '0.31.0',
+          schemaVersion: 19,
+          appVersion: '0.32.1',
+          startedAt: `2026-07-${String(index + 1).padStart(2, '0')}T08:00:00.000Z`,
+          completedAt: `2026-07-${String(index + 1).padStart(2, '0')}T08:05:00.000Z`,
+          results: [],
+          selfAssessment: 'thinking'
+        })
+      }
       await new Promise<void>((resolve, reject) => {
         transaction.oncomplete = () => resolve()
         transaction.onerror = () => reject(transaction.error)

@@ -273,7 +273,7 @@ function LearningApp() {
   }
 
   const startRound = () => {
-    setSession(createSessionPlan(progress))
+    setSession(createSessionPlan(progress, undefined, { completedSessionCount: sessions.length }))
     setResults([])
     setExerciseIndex(0)
     setRepeatCount(0)
