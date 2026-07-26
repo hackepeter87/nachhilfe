@@ -33,7 +33,8 @@ describe('curriculare Konvergenz 0.30', () => {
 
   it('prüft alle aktiven Kompetenzen in sechs Lernphasen über je 1.000 Seeds', () => {
     const activeSkills = getTaskCatalog().skills.filter((entry) => entry.releaseStatus === 'active')
-    expect(activeSkills).toHaveLength(34)
+    expect(activeSkills).toHaveLength(33)
+    expect(activeSkills.map((skill) => skill.id)).not.toContain('probability')
     let generated = 0
     for (const skill of activeSkills) {
       expect(skill.learningPhases.map((phase) => phase.id)).toEqual(PHASES)
@@ -65,6 +66,6 @@ describe('curriculare Konvergenz 0.30', () => {
       }
       expect(seenTypes.size, `${skill.id}: keine sechs unterschiedlichen Runtime-Typen`).toBe(6)
     }
-    expect(generated).toBe(34 * 6 * 1_000)
+    expect(generated).toBe(activeSkills.length * 6 * 1_000)
   }, 120_000)
 })

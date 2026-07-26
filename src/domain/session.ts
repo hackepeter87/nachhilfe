@@ -14,7 +14,7 @@ export const FOCUS_DOMAINS = {
     'written-subtraction', 'complement-1000'
   ],
   quantities: ['money', 'lengths', 'time', 'mass', 'capacity'],
-  data: ['read-tables', 'read-charts', 'probability', 'combinatorics'],
+  data: ['read-tables', 'read-charts', 'combinatorics'],
   geometry: ['body-views', 'cube-rotation', 'folding', 'plane-shapes', 'patterns', 'area', 'perimeter']
 } as const satisfies Record<string, readonly SkillId[]>
 

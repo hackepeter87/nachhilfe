@@ -1,5 +1,18 @@
 # Mathe-Reise
 
+## Zufallsaufgaben deaktiviert 0.32.3
+
+- Der Kompetenzbereich `probability` ist im zentralen Katalog auf `disabled` gesetzt.
+- Die produktive Sitzungsplanung enthält `probability` nicht mehr im Daten-Fokuspool.
+- Auch vorhandene niedrige Lernwerte, frühere Fehler oder gespeicherte Probability-Fortschritte können keine neue Zufallsaufgabe auswählen.
+- Kombinatorik, Tabellen und Diagramme bleiben unabhängig davon produktiv verfügbar.
+- Generator und historische Kataloginhalte bleiben vorerst für eine mögliche vollständige fachliche Neuentwicklung erhalten, sind aber weder im Kinderbereich noch im Entwicklungs-Prüfstand auswählbar.
+- App 0.32.3 verwendet Katalog 0.31.2 und unverändert Schema 19; es kommt keine neue Kompetenz hinzu.
+
+Die Deaktivierung beruht auf einem erneuten manuellen Praxisbefund. Sie ist keine Aussage darüber, dass Wahrscheinlichkeit kein Unterrichtsinhalt ist, sondern darüber, dass die aktuelle digitale Aufgabenfamilie keinen ausreichenden Förderwert besitzt.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 486 Unit-/Komponententests, Produktionsbuild und 20 Playwright-Szenarien gegen Vite Preview sowie erneut 20 Szenarien gegen den gehärteten Read-only-Container. Das für AMD64 gebaute lokale Image `mathe-reise:0.32.3-local` beziehungsweise `mathe-reise:local` lief als UID 101, ohne Capabilities, mit `/tmp` als einzigem `tmpfs` und meldete `healthy`. Einstieg, Manifest, Service Worker und Katalog wurden erfolgreich abgerufen. Ein erneuter vollständiger Test dieser Korrektur auf dem echten Gerät und eine externe Lehrkraftprüfung sind noch nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
+
 ## Darstellungs- und Verständlichkeitskorrekturen 0.32.2
 
 - Aufgabenfamilien bis 20 verwenden nun mehrere Zehnerfelder statt einer sichtbaren Fehlermeldung; keine Menge wird abgeschnitten.

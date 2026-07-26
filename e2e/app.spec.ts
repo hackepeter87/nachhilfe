@@ -186,9 +186,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.31.1',
+    catalogVersion: '0.31.2',
     schemaVersion: 19,
-    appVersion: '0.32.2'
+    appVersion: '0.32.3'
   })
 
   await page.reload()
@@ -247,17 +247,17 @@ test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral'
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
-test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
+test('Kombinatorik bleibt mobil lesbar und deaktivierte Zufallsaufgaben erscheinen nicht', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
     const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
     catalog.skills.forEach((skill) => {
-      if (!['addition', 'probability', 'combinatorics'].includes(skill.id)) skill.releaseStatus = 'disabled'
+      if (!['addition', 'combinatorics'].includes(skill.id)) skill.releaseStatus = 'disabled'
     })
     await route.fulfill({ response, json: catalog })
   })
 
-  await onboard(page, 'Zufall')
+  await onboard(page, 'Kombinationen')
   await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open('mathe-reise')
@@ -285,59 +285,30 @@ test('Wahrscheinlichkeit und Kombinationen bleiben mobil lesbar und ergebnisoffe
   await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishAdditionWarmups(page)
 
-  const seen = new Set<string>()
-  for (let focus = 0; focus < 2; focus += 1) {
-    const chance = page.locator('.chance-display')
-    const combinations = page.locator('.combination-display')
-    await expect(chance.or(combinations).first()).toBeVisible()
-    await expect(page.locator('.answer-option[data-answer-state="idle"]')).toHaveCount(3)
-    if (await chance.isVisible().catch(() => false)) {
-      seen.add('probability')
-      await expect(chance).toHaveAttribute('aria-label', /Mögliche gleich große Felder oder Ergebnisse/)
-      const outcomes = (await chance.locator('.chance-outcomes span, .chance-legend span, .coin-faces span').allTextContents()).map((outcome) => outcome.replace(/^[□○●KZ]\s*/, '').trim())
-      expect(outcomes.length).toBeGreaterThanOrEqual(2)
-      const prompt = await page.locator('.exercise-heading h2').textContent()
-      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('wahrscheinlichkeit-375x812.png'), fullPage: true })
-      if (prompt?.includes('im sichtbaren Ergebnisraum enthalten')) {
-        await page.getByRole('button', { name: outcomes[0]!, exact: true }).click()
-      } else if (prompt?.includes('Vorhersage')) {
-        await page.getByRole('button', { name: `Es kann ${[...new Set(outcomes)].join(' oder ')} erscheinen.`, exact: true }).click()
-      } else {
-        const event = ['rot', 'blau', 'grün', 'gelb'].find((color) => prompt?.toLowerCase().includes(color))
-        if (!event) throw new Error('Das Ereignis der Zufallsaufgabe ist nicht lesbar.')
-        const matches = outcomes.filter((outcome) => outcome.toLowerCase().includes(event)).length
-        const answer = matches === 0 ? 'unmöglich' : matches === outcomes.length ? 'sicher' : 'möglich'
-        await page.getByRole('button', { name: answer, exact: true }).click()
-      }
-    } else {
-      seen.add('combinatorics')
-      await expect(combinations).toHaveAttribute('aria-label', /Die Anzahl bleibt unbekannt/)
-      expect(await combinations.locator('.combination-cell').count()).toBeGreaterThanOrEqual(4)
-      await expect(combinations.locator('.combination-cell--missing')).toHaveText('?')
-      await page.locator('.session-page').screenshot({ path: testInfo.outputPath('kombinatorik-375x812.png'), fullPage: true })
-      const missingPair = await combinations.locator('.combination-table').evaluate((table) => {
-        const columns = [...table.querySelectorAll('.combination-heading:not(.combination-heading--row)')].map((node) => node.textContent?.trim() ?? '')
-        const rows = [...table.querySelectorAll('.combination-heading--row')].map((node) => node.textContent?.trim() ?? '')
-        const cells = [...table.querySelectorAll('.combination-cell')]
-        const missingIndex = cells.findIndex((cell) => cell.classList.contains('combination-cell--missing'))
-        if (missingIndex < 0 || columns.length === 0) return ''
-        return `${rows[Math.floor(missingIndex / columns.length)]} mit ${columns[missingIndex % columns.length]}`
-      })
-      if (!missingPair) throw new Error('Die offene Paarung ist nicht aus Zeile und Spalte lesbar.')
-      await page.getByRole('button', { name: missingPair, exact: true }).click()
-      await expect(combinations.locator('.combination-cell--missing')).toHaveCount(0)
-      const combinationCount = await combinations.locator('.combination-cell:not(.combination-cell--blocked)').count()
-      await page.getByRole('button', { name: String(combinationCount), exact: true }).click()
-    }
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    if (focus === 1) {
-      await page.setViewportSize({ width: 812, height: 375 })
-      await expect(page.locator('.exercise-panel')).toBeVisible()
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    }
-    await page.getByRole('button', { name: 'Weiter', exact: true }).click()
-  }
-  expect(seen).toEqual(new Set(['probability', 'combinatorics']))
+  const combinations = page.locator('.combination-display')
+  await expect(page.locator('.chance-display')).toHaveCount(0)
+  await expect(combinations).toBeVisible()
+  await expect(combinations).toHaveAttribute('aria-label', /Die Anzahl bleibt unbekannt/)
+  expect(await combinations.locator('.combination-cell').count()).toBeGreaterThanOrEqual(4)
+  await expect(combinations.locator('.combination-cell--missing')).toHaveText('?')
+  await page.locator('.session-page').screenshot({ path: testInfo.outputPath('kombinatorik-375x812.png'), fullPage: true })
+  const missingPair = await combinations.locator('.combination-table').evaluate((table) => {
+    const columns = [...table.querySelectorAll('.combination-heading:not(.combination-heading--row)')].map((node) => node.textContent?.trim() ?? '')
+    const rows = [...table.querySelectorAll('.combination-heading--row')].map((node) => node.textContent?.trim() ?? '')
+    const cells = [...table.querySelectorAll('.combination-cell')]
+    const missingIndex = cells.findIndex((cell) => cell.classList.contains('combination-cell--missing'))
+    if (missingIndex < 0 || columns.length === 0) return ''
+    return `${rows[Math.floor(missingIndex / columns.length)]} mit ${columns[missingIndex % columns.length]}`
+  })
+  if (!missingPair) throw new Error('Die offene Paarung ist nicht aus Zeile und Spalte lesbar.')
+  await page.getByRole('button', { name: missingPair, exact: true }).click()
+  await expect(combinations.locator('.combination-cell--missing')).toHaveCount(0)
+  const combinationCount = await combinations.locator('.combination-cell:not(.combination-cell--blocked)').count()
+  await page.getByRole('button', { name: String(combinationCount), exact: true }).click()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.setViewportSize({ width: 812, height: 375 })
+  await expect(page.locator('.exercise-panel')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
 test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
@@ -1093,9 +1064,9 @@ test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung 
         transaction.objectStore('sessions').put({
           id: `rotation-fixture-${index}`,
           catalogId: 'nrw-klasse3-foerderkern',
-          catalogVersion: '0.31.1',
+          catalogVersion: '0.31.2',
           schemaVersion: 19,
-          appVersion: '0.32.2',
+          appVersion: '0.32.3',
           startedAt: `2026-07-${String(index + 1).padStart(2, '0')}T08:00:00.000Z`,
           completedAt: `2026-07-${String(index + 1).padStart(2, '0')}T08:05:00.000Z`,
           results: [],

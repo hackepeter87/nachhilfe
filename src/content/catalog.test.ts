@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.1')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.2')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -92,7 +92,7 @@ describe('versionierter Aufgabenkatalog', () => {
       expect(skill.learningPhases).toHaveLength(6)
       expect(skill.successCriteria.length).toBeGreaterThan(0)
       expect(skill.transferPrompt.length).toBeGreaterThan(0)
-      expect(skill.releaseStatus).toBe('active')
+      expect(skill.releaseStatus).toBe(skill.id === 'probability' ? 'disabled' : 'active')
     })
   })
 
@@ -246,9 +246,10 @@ describe('versionierter Aufgabenkatalog', () => {
     expect(withMehr.some((template) => template.relationship === 'compare' && template.operation === '−')).toBe(true)
   })
 
-  it('hält alle Laufzeitkompetenzen aktiv und vorbereitete Themen unsichtbar', () => {
+  it('hält produktive Kompetenzen aktiv und deaktivierte Inhalte unsichtbar', () => {
     const catalog = readPublicCatalog() as TaskCatalog
-    expect(catalog.skills.every((skill) => skill.releaseStatus === 'active')).toBe(true)
+    expect(catalog.skills.filter((skill) => skill.id !== 'probability').every((skill) => skill.releaseStatus === 'active')).toBe(true)
+    expect(catalog.skills.find((skill) => skill.id === 'probability')?.releaseStatus).toBe('disabled')
     expect(catalog.skills.every((skill) => skill.learningPhases.some((phase) => phase.releaseStatus === 'active'))).toBe(true)
     expect(catalog.preparedTopics.map((topic) => topic.id)).toEqual(['spatial-reasoning'])
     expect(catalog.skills.filter((skill) => ['money', 'lengths'].includes(skill.id)).every((skill) => skill.releaseStatus === 'active')).toBe(true)

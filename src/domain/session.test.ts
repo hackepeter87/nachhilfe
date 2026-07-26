@@ -19,9 +19,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.31.1',
+      catalogVersion: '0.31.2',
       schemaVersion: 19,
-      appVersion: '0.32.2'
+      appVersion: '0.32.3'
     })
   })
 
@@ -96,7 +96,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.31.1')
+      expect(runningSession.catalogVersion).toBe('0.31.2')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -118,6 +118,23 @@ describe('Sitzungsplanung', () => {
       }
     } finally {
       setTaskCatalog(originalCatalog)
+    }
+  })
+
+  it('plant keine Zufallsaufgabe mehr ein, auch nicht bei vorhandenem Förderbedarf', () => {
+    const probabilityProgress = {
+      ...createSkillProgress('probability'),
+      attempts: 12,
+      correctAnswers: 1,
+      recentErrors: 5,
+      mastery: 4,
+      learningPhase: 'guided-practice' as const
+    }
+    expect(getTaskCatalog().skills.find((skill) => skill.id === 'addition')?.releaseStatus).toBe('active')
+    expect(getTaskCatalog().skills.find((skill) => skill.id === 'probability')?.releaseStatus).toBe('disabled')
+    expect(FOCUS_DOMAINS.data).not.toContain('probability')
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      expect(createSessionPlan({ probability: probabilityProgress }, seed).exercises.map((exercise) => exercise.skillId)).not.toContain('probability')
     }
   })
 

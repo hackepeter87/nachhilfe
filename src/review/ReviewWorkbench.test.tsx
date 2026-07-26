@@ -9,7 +9,8 @@ describe('ReviewWorkbench', () => {
     const { container } = render(<ReviewWorkbench />)
 
     expect(screen.getByRole('heading', { name: 'Didaktischer Prüfstand' })).toBeVisible()
-    expect(screen.getByLabelText('Kompetenz').querySelectorAll('option')).toHaveLength(34)
+    expect(screen.getByLabelText('Kompetenz').querySelectorAll('option')).toHaveLength(33)
+    expect(screen.getByLabelText('Kompetenz').querySelector('option[value="probability"]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-review-scenario="addition:activate:1:1:base"]')).toBeInTheDocument()
     const solutionDetails = screen.getByText('Technische Lösung anzeigen').closest('details')
     expect(solutionDetails).not.toBeNull()
