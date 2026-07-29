@@ -29,4 +29,17 @@ Der Regressionstest erzeugt 1.000 Sitzungspläne mit stark negativem Probability
 
 Das mit Docker Desktop explizit für `linux/amd64` gebaute Image `mathe-reise:0.32.3-local` beziehungsweise `mathe-reise:local` lief als UID 101 mit schreibgeschütztem Root-Dateisystem, ohne Capabilities und ausschließlich `/tmp` als `tmpfs`. Healthcheck, Einstieg, Manifest, Service Worker und Katalog wurden erfolgreich abgerufen. Das veröffentlichte GHCR-Image wird ausschließlich vom GitHub-Workflow aus dem Release-Tag gebaut.
 
+## Veröffentlichung
+
+- Git-Tag: [`v0.32.3`](https://github.com/hackepeter87/nachhilfe/tree/v0.32.3)
+- GitHub Release: [`Mathe-Reise 0.32.3`](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.3)
+- GitHub-CI: [erfolgreicher Lauf 30200737991](https://github.com/hackepeter87/nachhilfe/actions/runs/30200737991)
+- GHCR-Publish: [erfolgreicher Lauf 30200833102](https://github.com/hackepeter87/nachhilfe/actions/runs/30200833102)
+- Image: `ghcr.io/hackepeter87/nachhilfe:0.32.3`
+- Plattform: `linux/amd64`
+- Registry-Digest: `sha256:3418d5382ac20e97046c2c47a85db6d0726b09a347b82f54cca770a00e658f28`
+- OCI-Revision: `96c5b4d7e851d4bcd896f1fb5460db4e239481d8`
+
+Der Publish-Workflow erzeugt kein GitHub Release automatisch. Das Release wird separat aus diesem geprüften Bericht angelegt; Tag und Container werden dabei nicht verändert.
+
 Der Ausgangsbefund stammt aus einer realen Gerätenutzung. Die korrigierte Fassung wurde noch nicht erneut vollständig auf dem echten Gerät abgenommen. Eine Lehrkraftfreigabe oder pädagogische Wirksamkeit wird nicht behauptet.

@@ -16,6 +16,8 @@ Der Workflow setzt die OCI-Labels für Quelle, Revision, Version, Erstellungszei
 
 Release-Images werden ausschließlich für die DMZ-Zielarchitektur `linux/amd64` gebaut. Die Compose-Datei deklariert diese Plattform ausdrücklich, damit eine unpassende Hostarchitektur nicht stillschweigend über Emulation betrieben wird. Historische Tags behalten ihre bereits veröffentlichten Manifeste; erst Releases ab `0.10.1` sind AMD64-only.
 
+Der aktuell dokumentierte Stand ist das [GitHub Release v0.32.3](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.3) mit dem Image `ghcr.io/hackepeter87/nachhilfe:0.32.3`. Deployment und Rollback verwenden weiterhin konkrete Image-Tags, nicht `latest`.
+
 ## Voraussetzungen auf dem DMZ-Host
 
 - Linux-Host mit Architektur `x86_64` beziehungsweise `linux/amd64`, Podman und einem Compose-Provider

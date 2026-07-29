@@ -14,8 +14,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 - Schriftliche Subtraktion bis 1000 ohne oder mit genau einer Entbündelung und abschließender Additionsprobe
 - Körperansichten einfacher Würfelgebäude aus zwei bis fünf sichtbaren Würfeln: vorne, rechts und von oben
 - Kontrollierte 90-Grad-Drehungen bekannter Würfelgebäude sowie einzelne Rasterfaltungen und einfache Faltschnitte
-- Tabellen, Strichlisten, Bild- und Säulendiagramme sowie sichtbare Zufallsexperimente
-- Wahrscheinlichkeit mit sicheren, möglichen und unmöglichen Ereignissen sowie kleinen Häufigkeitsvergleichen
+- Tabellen, Strichlisten sowie Bild- und Säulendiagramme
 - Systematisches Zählen von `2×2`- und `3×2`-Kombinationen sowie einer sichtbaren Ausnahme bei `3×3`
 - Uhrzeiten und einfache vorwärts gerichtete Zeitspannen sowie Masse und Rauminhalt bis zur jeweiligen Grundeinheit
 - Ebene Figuren, regelmäßige Muster, Flächen aus Einheitsquadraten und Umfang als vollständig markierte Randlänge
@@ -101,9 +100,11 @@ Die einzige fachlich zu pflegende Quelle ist `content/catalogs/nrw-klasse3-foerd
 - Körperansichtsvorlagen mit fester Orientierung, Würfelanzahl, drei Blickrichtungen und stufengerechten Gebäudegrenzen
 - Rotationsvorlagen mit senkrechter Achse, Links-/Rechtsrichtung, drei wirksamen Stufen und eindeutig unterscheidbaren Folgezuständen
 - die verbindliche Darstellungsrichtlinie mit bekannten, unbekannten und erst nach Erfolg aufgedeckten mathematischen Größen
-- geprüfte Inhalte für Daten, Wahrscheinlichkeit, Zeit, Masse, Rauminhalt und ebene Geometrie
+- geprüfte Inhalte für Daten, Kombinatorik, Zeit, Masse, Rauminhalt und ebene Geometrie
 
 Die Metadaten trennen `schemaVersion` (technische Struktur), `catalogVersion` (fachlicher Inhalt), `catalogId`, `releasedAt` und den Status `draft`, `ready-for-review`, `active` oder `disabled`. Der Gesamtkatalog steht auf `ready-for-review`; technisch, mathematisch und intern didaktisch geprüfte Laufzeitkompetenzen stehen auf `active`. Das ist keine dokumentierte Freigabe durch eine Lehrkraft.
+
+Der Katalogeintrag `probability` und die zugehörigen Generatoren bleiben als historische Entwicklungsgrundlage erhalten, stehen seit 0.32.3 aber auf `disabled`. Sie werden weder in produktiven Runden noch im Entwicklungs-Prüfstand angeboten.
 
 Die Rechenlogik bleibt bewusst in TypeScript: Zufallsgeneratoren, Addition/Subtraktion, Multiplikation/Division, Stellenwertberechnung, Nachbarzahlen, Rundung, Spiegelung, Distraktorprüfung, Lösungsprüfung, Sitzungsplanung und Adaptivität stehen weiterhin unter `src/domain/`. Der JSON-Katalog enthält keine ausführbare Logik.
 
@@ -188,6 +189,6 @@ Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: r
 
 ## Entwicklungsstand 0.32.3
 
-Version 0.32.3 führt keine neue Kompetenz ein. Der Bereich `probability` ist im zentralen Katalog deaktiviert und aus dem produktiven Sitzungsplan entfernt. Niedrige Lernwerte oder vorhandene lokale Fortschritte können diese Aufgaben nicht erneut auswählen. Kombinatorik, Tabellen und Diagramme bleiben davon unabhängig aktiv. App 0.32.3 verwendet Katalog 0.31.2 bei unverändertem Schema 19. Details stehen im [Patchbericht](docs/release-0.32.3.md) und in den [Release Notes](RELEASE_NOTES.md).
+Version 0.32.3 führt keine neue Kompetenz ein. Der Bereich `probability` ist im zentralen Katalog deaktiviert und aus dem produktiven Sitzungsplan entfernt. Niedrige Lernwerte oder vorhandene lokale Fortschritte können diese Aufgaben nicht erneut auswählen. Kombinatorik, Tabellen und Diagramme bleiben davon unabhängig aktiv. App 0.32.3 verwendet Katalog 0.31.2 bei unverändertem Schema 19. Details stehen im [Patchbericht](docs/release-0.32.3.md), im [GitHub Release](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.3) und in den [Release Notes](RELEASE_NOTES.md).
 
 Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.3 wurde dort noch nicht erneut vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

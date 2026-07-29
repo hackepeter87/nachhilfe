@@ -1,6 +1,6 @@
 # Fachliche Roadmap ab 0.21
 
-Stand: 19. Juli 2026. Seit Version 0.21 gilt der [didaktische Qualitätsstandard](didactic-quality-standard.md) verbindlich für jede neue und migrierte Kompetenz. Mathematische Korrektheit ist Voraussetzung; abgeschlossen ist eine Kompetenz erst, wenn die App den zugehörigen Denkprozess aufbaut, begleitet und in einen neuen Zusammenhang übertragen lässt.
+Stand: 29. Juli 2026. Seit Version 0.21 gilt der [didaktische Qualitätsstandard](didactic-quality-standard.md) verbindlich für jede neue und migrierte Kompetenz. Mathematische Korrektheit ist Voraussetzung; abgeschlossen ist eine Kompetenz erst, wenn die App den zugehörigen Denkprozess aufbaut, begleitet und in einen neuen Zusammenhang übertragen lässt.
 
 Die curriculare Zuordnung folgt dem [Lehrplan Mathematik Primarstufe NRW, Erlass vom 01.07.2021](https://www.schulentwicklung.nrw.de/lehrplaene/lehrplannavigator-primarstufe-neu/lehrplaene.html): Zahlen und Operationen, Raum und Form, Größen und Messen sowie Daten, Häufigkeiten und Wahrscheinlichkeiten werden mit Problemlösen, Modellieren, Argumentieren, Kommunizieren und Darstellen verbunden.
 
@@ -16,7 +16,7 @@ Der Förderkern am Ende von Klasse 3 ist in Version 0.21 bereits breit abgedeckt
 | --- | --- | --- |
 | **0.31** | Entwicklungsprüfstand mit echter Runtime, reproduzierbaren Szenarien, Befundvorlage und Produktionsausschluss | implementiert; interne Browser-Stichprobe, keine vollständige menschliche Variantenabnahme |
 | **0.32** | Addition, Subtraktion, Multiplikation, Division, Zahlverständnis, Rechnen bis 1000, schriftliche Verfahren und Sachaufgaben familienweise prüfen und korrigieren | konkrete Lehrkraftbeispiele und iPhone-Befunde umgesetzt; vollständige menschliche Variantenabnahme bleibt offen |
-| **0.33** | Größen, Daten, Wahrscheinlichkeit, Kombinatorik und Raum/Form familienweise prüfen und korrigieren | offen |
+| **0.33** | Größen, Daten, Kombinatorik und Raum/Form familienweise prüfen und korrigieren; Wahrscheinlichkeit bleibt deaktiviert und wird nicht durch Textkorrekturen reaktiviert | offen |
 | **0.34** | vollständige reale iPhone-Checkliste, PWA-/Offline-/Updateabnahme und Releasekandidat | offen; vorhandene Screenshots sind nur eine Teilprüfung |
 
 Technische Tests bleiben in jeder Version Release-Gates, gelten aber nicht als didaktische Abnahme. Issue #58 zur externen Lehrkraftprüfung bleibt eine getrennte Gesamtbewertung und blockiert Korrekturreleases nicht.
@@ -42,7 +42,7 @@ Die vorgeschlagene Reihenfolge wird fachlich angepasst:
 2. Halbschriftliche Addition, Subtraktion und Ergänzen bis 1000 kommen vor den schriftlichen Verfahren. Eine Spaltennotation darf tragfähige Stellenwert- und Rechenstrategien nicht ersetzen.
 3. Runden folgt auf Stellenwert, Nachbarzahlen und Rechnen im Zahlenraum. Dadurch kann es als Abschätzen und Beurteilen von Genauigkeit gelernt werden, nicht als isolierte Endziffernregel.
 4. Sachrechnen wird nach der Migration der grundlegenden Operationsvorstellungen gebündelt. Modellieren bleibt jedoch bereits in jedem vorherigen Release ein Transferkriterium.
-5. Daten und Wahrscheinlichkeit werden ausdrücklich eingeplant. Sie gehören zum curricularen Förderkern und dürfen nicht hinter Zahlen und Geometrie verschwinden.
+5. Daten und Kombinatorik werden ausdrücklich eingeplant. Wahrscheinlichkeit gehört zwar zum curricularen Förderkern, die bisherige Aufgabenfamilie bleibt nach dem Praxisbefund aus 0.32.3 jedoch deaktiviert. Eine spätere Reaktivierung setzt eine eigenständige didaktische Neuentwicklung voraus.
 6. Die Releasefolge ist keine Reihenfolge für eine Kindersitzung. Die App mischt weiterhin passende vertraute Bereiche; die Reihenfolge steuert nur Entwicklung und Abnahme.
 
 ## Releasefolge
@@ -70,7 +70,7 @@ Ein Release darf kleiner geschnitten werden, wenn die Abnahme sonst unübersicht
 - Sachaufgaben dürfen eine Operation nur verlangen, deren Grundvorstellung zuvor aufgebaut wurde; ein Grundlagenmodus bleibt erreichbar.
 - Größenaufgaben trennen zunächst Bezugsgröße, Messen, Vergleichen und Rechnen. Umrechnen ist kein Einstieg.
 - Diagramme beginnen mit Daten sammeln und ordnen; das Lesen fertiger Skalen ist nicht der einzige Lernweg.
-- Wahrscheinlichkeit verbindet Vorhersage, Ergebnisraum und Auswertung, ohne einzelne Zufallsergebnisse als Gesetz zu deuten.
+- Eine zukünftige Wahrscheinlichkeitseinheit muss Vorhersage, Durchführung und Auswertung als beobachtbare Lernhandlung verbinden. Die deaktivierten Auswahlaufgaben erfüllen dieses Kriterium nicht und werden nicht produktiv eingeplant.
 - Rotation setzt Körperansichten voraus; Falten setzt Spiegelung voraus; Fläche und Umfang setzen das Erkennen und Zusammensetzen ebener Figuren voraus.
 
 ## Ein Runtime-Modell
