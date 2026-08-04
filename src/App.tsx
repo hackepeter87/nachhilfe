@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, BookOpen, Check, CircleHelp, Compass, Download, House, Info, Menu, RefreshCw, RotateCcw, ShieldCheck, Sparkles, Trash2, Wifi, WifiOff, X } from 'lucide-react'
+import { ArrowLeft, Check, CircleHelp, Compass, Download, House, Info, Menu, RefreshCw, RotateCcw, ShieldCheck, Sparkles, Trash2, Wifi, WifiOff, X } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import {
   createRemediationExercise,
@@ -11,7 +11,6 @@ import {
   type CompletedSession,
   type Profile,
   type ProgressMap,
-  type SelfAssessment,
   type SessionPlan
 } from './domain'
 import { ExerciseCard } from './components/ExerciseCard'
@@ -89,13 +88,14 @@ function Onboarding({ onComplete }: { onComplete: (nickname: string) => void }) 
 interface NavigationMenuProps {
   open: boolean
   canGoHome: boolean
+  completedRound: boolean
   onClose: () => void
   onGoHome: () => void
   onNewRound: () => void
   onReset: () => void
 }
 
-function NavigationMenu({ open, canGoHome, onClose, onGoHome, onNewRound, onReset }: NavigationMenuProps) {
+function NavigationMenu({ open, canGoHome, completedRound, onClose, onGoHome, onNewRound, onReset }: NavigationMenuProps) {
   useEffect(() => {
     if (!open) return undefined
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -122,7 +122,7 @@ function NavigationMenu({ open, canGoHome, onClose, onGoHome, onNewRound, onRese
           {canGoHome && (
             <button type="button" onClick={onGoHome}>
               <House aria-hidden="true" />
-              <span><strong>Zur Startseite</strong><small>Die aktuelle Runde verlassen</small></span>
+              <span><strong>Zur Startseite</strong><small>{completedRound ? 'Zur Übersicht deiner Reise' : 'Die aktuelle Runde verlassen'}</small></span>
             </button>
           )}
           <button type="button" onClick={onNewRound}>
@@ -286,17 +286,17 @@ function Home({ profile, progress, sessions, offlineReady, online, catalogMetada
 
 interface SummaryProps {
   results: AttemptResult[]
-  onFinish: (assessment: SelfAssessment) => void
+  onNewRound: () => void
   onGoHome: () => void
   onOpenMenu: () => void
 }
 
-function Summary({ results, onFinish, onGoHome, onOpenMenu }: SummaryProps) {
+function Summary({ results, onNewRound, onGoHome, onOpenMenu }: SummaryProps) {
   const firstTry = results.filter((result) => result.correct).length
   return (
     <main className="page summary-page">
       <header className="summary-navigation">
-        <button className="brand-button" type="button" onClick={onGoHome} aria-label="Runde verlassen und zur Startseite">
+        <button className="brand-button" type="button" onClick={onGoHome} aria-label="Zur Startseite">
           <ArrowLeft aria-hidden="true" />
           <span>Mathe-Reise</span>
         </button>
@@ -308,14 +308,16 @@ function Summary({ results, onFinish, onGoHome, onOpenMenu }: SummaryProps) {
       <span className="eyebrow">Etappe geschafft</span>
       <h1>Das war eine gute Runde!</h1>
       <p>Du hast {results.length} Aufgaben bearbeitet. {firstTry} davon klappten direkt beim ersten Versuch.</p>
-      <section className="self-check" aria-labelledby="self-check-title">
-        <h2 id="self-check-title">Was hat dir heute geholfen?</h2>
-        <div className="assessment-options">
-          <button type="button" onClick={() => onFinish('material')}><BookOpen aria-hidden="true" />Die Bilder</button>
-          <button type="button" onClick={() => onFinish('hint')}><CircleHelp aria-hidden="true" />Ein Tipp</button>
-          <button type="button" onClick={() => onFinish('thinking')}><Sparkles aria-hidden="true" />Mein Denken</button>
-        </div>
-      </section>
+      <div className="summary-actions">
+        <button className="primary-button primary-button--wide" type="button" onClick={onNewRound}>
+          <RotateCcw aria-hidden="true" />
+          Neue Runde beginnen
+        </button>
+        <button className="quiet-button" type="button" onClick={onGoHome}>
+          <House aria-hidden="true" />
+          Zur Startseite
+        </button>
+      </div>
     </main>
   )
 }
@@ -419,8 +421,12 @@ function LearningApp() {
   const requestNavigation = (action: NavigationAction) => {
     setMenuOpen(false)
     setNavigationError('')
-    if (action === 'new-round' && screen === 'home') {
+    if (action === 'new-round' && (screen === 'home' || screen === 'summary')) {
       startRound()
+      return
+    }
+    if (action === 'home' && screen === 'summary') {
+      setScreen('home')
       return
     }
     setPendingNavigation(action)
@@ -490,32 +496,31 @@ function LearningApp() {
       setRepeatCount((current) => current + 1)
     }
 
-    setResults((current) => [...current, result])
+    const nextResults = [...results, result]
+    setResults(nextResults)
     if (exerciseIndex + 1 >= nextExercises.length) {
+      const completed: CompletedSession = {
+        id: session.id,
+        catalogId: session.catalogId,
+        catalogVersion: session.catalogVersion,
+        schemaVersion: session.schemaVersion,
+        appVersion: session.appVersion,
+        startedAt: session.startedAt,
+        completedAt: new Date().toISOString(),
+        results: nextResults,
+        selfAssessment: 'not-asked'
+      }
+      await Promise.all([
+        saveSkillProgress(nextProgress),
+        saveCompletedSession(completed)
+      ])
+      setSessions((current) => [completed, ...current])
+      setSession(null)
       setScreen('summary')
     } else {
       setExerciseIndex((current) => current + 1)
+      await saveSkillProgress(nextProgress)
     }
-    await saveSkillProgress(nextProgress)
-  }
-
-  const finishRound = async (selfAssessment: SelfAssessment) => {
-    if (!session) return
-    const completed: CompletedSession = {
-      id: session.id,
-      catalogId: session.catalogId,
-      catalogVersion: session.catalogVersion,
-      schemaVersion: session.schemaVersion,
-      appVersion: session.appVersion,
-      startedAt: session.startedAt,
-      completedAt: new Date().toISOString(),
-      results,
-      selfAssessment
-    }
-    await saveCompletedSession(completed)
-    setSessions((current) => [completed, ...current])
-    setSession(null)
-    setScreen('home')
   }
 
   const navigationOverlays = (
@@ -523,6 +528,7 @@ function LearningApp() {
       <NavigationMenu
         open={menuOpen}
         canGoHome={screen !== 'home'}
+        completedRound={screen === 'summary'}
         onClose={() => setMenuOpen(false)}
         onGoHome={() => requestNavigation('home')}
         onNewRound={() => requestNavigation('new-round')}
@@ -564,8 +570,8 @@ function LearningApp() {
     <>
       <Summary
         results={results}
-        onFinish={finishRound}
-        onGoHome={() => requestNavigation('home')}
+        onNewRound={startRound}
+        onGoHome={() => setScreen('home')}
         onOpenMenu={() => setMenuOpen(true)}
       />
       {navigationOverlays}

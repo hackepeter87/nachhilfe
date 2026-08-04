@@ -15,12 +15,12 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
     }
     const continueWithHelp = page.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ })
     if (await continueWithHelp.isVisible().catch(() => false)) {
-      await continueWithHelp.click()
+      await continueWithHelp.evaluate((button: HTMLButtonElement) => button.click())
       continue
     }
     const next = page.getByRole('button', { name: 'Weiter', exact: true })
     if (await next.isVisible().catch(() => false)) {
-      await next.click()
+      await next.evaluate((button: HTMLButtonElement) => button.click())
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
       continue
     }
@@ -143,7 +143,7 @@ async function finishSubtractionWarmups(page: Page) {
   }
 }
 
-test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline', async ({ page, context }) => {
+test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline', async ({ page, context }, testInfo) => {
   const consoleErrors: string[] = []
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text())
@@ -162,8 +162,11 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
     geometry: ['body-views', 'cube-rotation', 'folding', 'plane-shapes', 'patterns', 'area', 'perimeter']
   }
   for (const skills of Object.values(focusDomains)) expect(skills.some((skillId) => firstRoundSkills.has(skillId))).toBe(true)
-  await page.getByRole('button', { name: 'Mein Denken' }).click()
-  await expect(page.getByText('1', { exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Neue Runde beginnen' })).toBeVisible()
+  const summaryHomeButton = page.locator('.summary-actions').getByRole('button', { name: 'Zur Startseite', exact: true })
+  await expect(summaryHomeButton).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('summary-375x812.png') })
   const completedSessionMetadata = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open('mathe-reise')
@@ -181,15 +184,20 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
       catalogId: session.catalogId,
       catalogVersion: session.catalogVersion,
       schemaVersion: session.schemaVersion,
-      appVersion: session.appVersion
+      appVersion: session.appVersion,
+      selfAssessment: session.selfAssessment
     }
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
     catalogVersion: '0.31.2',
     schemaVersion: 19,
-    appVersion: '0.32.4'
+    appVersion: '0.32.5',
+    selfAssessment: 'not-asked'
   })
+
+  await summaryHomeButton.click()
+  await expect(page.getByText('1', { exact: true }).first()).toBeVisible()
 
   await page.reload()
   await expect(page.getByText('Hallo, Nova!')).toBeVisible()
@@ -208,8 +216,12 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   await expect(reopenedPage.getByText('Hallo, Nova!')).toBeVisible()
   await reopenedPage.getByRole('button', { name: /Mathe-Runde starten/i }).click()
   await finishCurrentRound(reopenedPage)
-  await reopenedPage.getByRole('button', { name: 'Ein Tipp' }).click()
-  await expect(reopenedPage.getByRole('button', { name: /Mathe-Runde starten/i })).toBeVisible()
+  await reopenedPage.setViewportSize({ width: 812, height: 375 })
+  expect(await reopenedPage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await reopenedPage.screenshot({ path: testInfo.outputPath('summary-812x375.png') })
+  await reopenedPage.getByRole('button', { name: 'Neue Runde beginnen' }).click()
+  await expect(reopenedPage.locator('.task-count')).toContainText(/^1 \/ /)
+  await expect(reopenedPage.locator('.exercise-panel')).toBeVisible()
   expect(consoleErrors).toEqual([])
 })
 

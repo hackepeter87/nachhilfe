@@ -1,5 +1,11 @@
 # Mathe-Reise
 
+## Noch nicht veröffentlicht
+
+- Abgeschlossene Runden werden unmittelbar nach der letzten Aufgabe gespeichert und können im Abschluss nicht mehr versehentlich verworfen werden.
+- Die verpflichtende, nicht adaptiv ausgewertete Frage „Was hat dir heute geholfen?“ wurde entfernt.
+- Der Abschluss bietet jetzt direkt „Neue Runde beginnen“ und „Zur Startseite“; eine fertige Runde benötigt dafür keine weitere Bestätigung.
+
 ## Navigation und lokales Zurücksetzen 0.32.4
 
 - Eine sichtbare Navigation steht auf der Startseite, in einer laufenden Runde und im Abschluss zur Verfügung.

@@ -338,7 +338,6 @@ p {
 .text-button,
 .answer-option,
 .symmetry-option,
-.assessment-options button,
 .brand-button {
   min-height: 48px;
   border: 0;
@@ -594,7 +593,6 @@ p {
 .text-button svg,
 .feedback svg,
 .scaffold svg,
-.assessment-options svg,
 .brand-button svg,
 .update-banner svg {
   width: 20px;
@@ -1589,36 +1587,26 @@ p {
   color: var(--muted);
 }
 
-.self-check {
+.summary-actions {
+  display: grid;
+  gap: 10px;
   margin-top: 20px;
   padding-top: 22px;
   border-top: 1px solid var(--line);
 }
 
-.self-check h2 {
-  font-size: 1.15rem;
-}
-
-.assessment-options {
-  display: grid;
-  gap: 10px;
-}
-
-.assessment-options button {
+.summary-actions .quiet-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  padding: 13px 15px;
+  width: 100%;
+  padding: 13px 20px;
   border: 2px solid var(--line);
   color: var(--ink);
-  text-align: left;
   font-weight: 750;
   background: var(--white);
 }
-
-.assessment-options button:nth-child(1) svg { color: var(--coral); }
-.assessment-options button:nth-child(2) svg { color: var(--blue); }
-.assessment-options button:nth-child(3) svg { color: var(--green); }
 
 .loading-page,
 .error-page {

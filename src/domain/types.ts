@@ -241,7 +241,7 @@ export interface ReviewScenario {
   errorPath?: 'remediation'
 }
 
-export type SelfAssessment = 'material' | 'hint' | 'thinking'
+export type SelfAssessment = 'material' | 'hint' | 'thinking' | 'not-asked'
 
 export interface CompletedSession extends SessionReleaseMetadata {
   id: string

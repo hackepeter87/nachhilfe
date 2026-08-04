@@ -2,7 +2,7 @@
 
 > Automatisch aus `content/catalogs/nrw-klasse3-foerderkern/catalog.json` erzeugt. Nicht manuell bearbeiten; `npm run curriculum:build` verwenden.
 
-- App-Release: 0.32.4
+- App-Release: 0.32.5
 - Katalog: nrw-klasse3-foerderkern 0.31.2
 - Schema: 19
 - Katalogstatus: ready-for-review
