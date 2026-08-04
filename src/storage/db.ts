@@ -89,6 +89,16 @@ export async function saveCompletedSession(session: CompletedSession): Promise<v
   await put(stores.sessions, session)
 }
 
+export async function clearAppData(): Promise<void> {
+  const database = await openDatabase()
+  const transaction = database.transaction(Object.values(stores), 'readwrite')
+  for (const storeName of Object.values(stores)) {
+    transaction.objectStore(storeName).clear()
+  }
+  await transactionDone(transaction)
+  database.close()
+}
+
 export interface AppData {
   profile: Profile | null
   settings: AppSettings

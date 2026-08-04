@@ -6,6 +6,7 @@ Mathe-Reise ist eine mobile, deutschsprachige Mathematik-Förderapp für Kinder 
 
 - Optionales lokales Onboarding mit frei wählbarem Spitznamen
 - Vollständige Mathe-Runden mit acht Aufgaben und höchstens drei gezielten Wiederholungen
+- Sichtbare Navigation zur Startseite oder in eine neue Runde sowie bestätigtes lokales Zurücksetzen von Spitzname und Lernstand
 - Adaptive Addition und Subtraktion bis 20 sowie reihenspezifisches Einmaleins und Division ohne Rest
 - Stellenwerte bis 1000, Zerlegen und Zusammensetzen von Zahlen
 - Nachbarzehner, Nachbarhunderter sowie Runden auf Zehner und Hunderter

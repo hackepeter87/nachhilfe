@@ -1,5 +1,13 @@
 # Mathe-Reise
 
+## Noch nicht veröffentlicht
+
+- Eine sichtbare Navigation steht auf der Startseite, in einer laufenden Runde und im Abschluss zur Verfügung.
+- Das Verlassen oder Ersetzen einer laufenden Runde benötigt eine Bestätigung; Abbrechen erhält den aktuellen Aufgabenstand.
+- Eine neue Runde beginnt mit einem frischen Sitzungsplan bei Aufgabe 1.
+- „App zurücksetzen“ löscht nach ausdrücklicher Bestätigung Profil, Einstellungen, Lernstand und abgeschlossene Runden ausschließlich aus IndexedDB des aktuellen Geräts. Die installierte PWA und ihr Offline-Cache bleiben erhalten.
+- Komponenten-, IndexedDB- und mobile Playwright-Tests decken Navigation, Abbrechen, Rundenwechsel und Zurücksetzen ab.
+
 ## Zufallsaufgaben deaktiviert 0.32.3
 
 - Der Kompetenzbereich `probability` ist im zentralen Katalog auf `disabled` gesetzt.

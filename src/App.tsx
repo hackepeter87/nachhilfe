@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, Check, CircleHelp, Compass, Download, Info, RefreshCw, ShieldCheck, Sparkles, Wifi, WifiOff } from 'lucide-react'
+import { ArrowLeft, BookOpen, Check, CircleHelp, Compass, Download, House, Info, Menu, RefreshCw, RotateCcw, ShieldCheck, Sparkles, Trash2, Wifi, WifiOff, X } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import {
   createRemediationExercise,
@@ -15,12 +15,15 @@ import {
   type SessionPlan
 } from './domain'
 import { ExerciseCard } from './components/ExerciseCard'
-import { loadAppData, saveCompletedSession, saveProfile, saveSettings, saveSkillProgress } from './storage/db'
+import { clearAppData, loadAppData, saveCompletedSession, saveProfile, saveSettings, saveSkillProgress } from './storage/db'
 import { verifyOfflineReadiness } from './pwa/offlineReadiness'
 import { getActiveCatalogMetadata, type CatalogMetadata } from './content/catalog'
 import { APP_VERSION } from './version'
 
 type Screen = 'loading' | 'onboarding' | 'home' | 'session' | 'summary' | 'error'
+type NavigationAction = 'home' | 'new-round' | 'reset'
+
+const DEFAULT_SETTINGS: AppSettings = { key: 'app-settings', installHelpDismissed: false, schemaVersion: 1 }
 
 const ReviewWorkbench = import.meta.env.DEV ? lazy(() => import('./review/ReviewWorkbench')) : null
 
@@ -83,6 +86,113 @@ function Onboarding({ onComplete }: { onComplete: (nickname: string) => void }) 
   )
 }
 
+interface NavigationMenuProps {
+  open: boolean
+  canGoHome: boolean
+  onClose: () => void
+  onGoHome: () => void
+  onNewRound: () => void
+  onReset: () => void
+}
+
+function NavigationMenu({ open, canGoHome, onClose, onGoHome, onNewRound, onReset }: NavigationMenuProps) {
+  useEffect(() => {
+    if (!open) return undefined
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [open, onClose])
+
+  if (!open) return null
+  return (
+    <div className="dialog-backdrop" onMouseDown={onClose}>
+      <section className="navigation-dialog" role="dialog" aria-modal="true" aria-labelledby="navigation-title" onMouseDown={(event) => event.stopPropagation()}>
+        <header>
+          <div>
+            <span className="eyebrow">Navigation</span>
+            <h2 id="navigation-title">Wohin möchtest du?</h2>
+          </div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Navigation schließen" title="Schließen" autoFocus>
+            <X aria-hidden="true" />
+          </button>
+        </header>
+        <div className="navigation-actions">
+          {canGoHome && (
+            <button type="button" onClick={onGoHome}>
+              <House aria-hidden="true" />
+              <span><strong>Zur Startseite</strong><small>Die aktuelle Runde verlassen</small></span>
+            </button>
+          )}
+          <button type="button" onClick={onNewRound}>
+            <RotateCcw aria-hidden="true" />
+            <span><strong>Neue Runde beginnen</strong><small>Mit neuen Aufgaben bei 1 starten</small></span>
+          </button>
+          <button className="navigation-action--danger" type="button" onClick={onReset}>
+            <Trash2 aria-hidden="true" />
+            <span><strong>App zurücksetzen</strong><small>Spitzname und Lernstand auf diesem Gerät löschen</small></span>
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+interface ConfirmNavigationProps {
+  action: NavigationAction | null
+  busy: boolean
+  error: string
+  onCancel: () => void
+  onConfirm: () => void
+}
+
+function ConfirmNavigation({ action, busy, error, onCancel, onConfirm }: ConfirmNavigationProps) {
+  useEffect(() => {
+    if (!action || busy) return undefined
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onCancel()
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [action, busy, onCancel])
+
+  if (!action) return null
+  const content = {
+    home: {
+      title: 'Zur Startseite?',
+      description: 'Die aktuelle Runde wird beendet. Dein bisheriger Lernstand bleibt gespeichert.',
+      confirmLabel: 'Zur Startseite'
+    },
+    'new-round': {
+      title: 'Neue Runde beginnen?',
+      description: 'Die aktuelle Runde wird beendet. Die neue Runde startet wieder bei Aufgabe 1.',
+      confirmLabel: 'Neue Runde starten'
+    },
+    reset: {
+      title: 'App wirklich zurücksetzen?',
+      description: 'Spitzname, Lernstand und abgeschlossene Runden werden auf diesem Gerät gelöscht. Die App bleibt installiert.',
+      confirmLabel: 'Alles zurücksetzen'
+    }
+  }[action]
+
+  return (
+    <div className="dialog-backdrop" onMouseDown={busy ? undefined : onCancel}>
+      <section className="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-navigation-title" aria-describedby="confirm-navigation-description" onMouseDown={(event) => event.stopPropagation()}>
+        <h2 id="confirm-navigation-title">{content.title}</h2>
+        <p id="confirm-navigation-description">{content.description}</p>
+        {error && <p className="dialog-error" role="alert">{error}</p>}
+        <div className="confirm-dialog__actions">
+          <button className="quiet-action" type="button" onClick={onCancel} disabled={busy} autoFocus>Abbrechen</button>
+          <button className={action === 'reset' ? 'danger-action' : 'primary-button'} type="button" onClick={onConfirm} disabled={busy}>
+            {busy ? 'Wird zurückgesetzt …' : content.confirmLabel}
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
 interface HomeProps {
   profile: Profile
   progress: ProgressMap
@@ -94,9 +204,10 @@ interface HomeProps {
   onStart: () => void
   onShowInstall: () => void
   onUpdate: () => void
+  onOpenMenu: () => void
 }
 
-function Home({ profile, progress, sessions, offlineReady, online, catalogMetadata, updateAvailable, onStart, onShowInstall, onUpdate }: HomeProps) {
+function Home({ profile, progress, sessions, offlineReady, online, catalogMetadata, updateAvailable, onStart, onShowInstall, onUpdate, onOpenMenu }: HomeProps) {
   const practiced = Object.values(progress).filter(Boolean)
   const secure = practiced.filter((entry) => entry?.status === 'secure').length
   const mostImproved = [...practiced].sort((a, b) => (b?.mastery ?? 0) - (a?.mastery ?? 0))[0]
@@ -115,7 +226,12 @@ function Home({ profile, progress, sessions, offlineReady, online, catalogMetada
           <h1>Hallo{profile.nickname ? `, ${profile.nickname}` : ''}!</h1>
           <p>Heute wartet eine neue Etappe auf dich.</p>
         </div>
-        <img src="/mathe-reise-island.png" alt="Die Mathe-Insel" />
+        <div className="home-header__side">
+          <button className="icon-button" type="button" onClick={onOpenMenu} aria-label="Navigation öffnen" title="Navigation">
+            <Menu aria-hidden="true" />
+          </button>
+          <img src="/mathe-reise-island.png" alt="Die Mathe-Insel" />
+        </div>
       </header>
 
       <section className="journey-band" aria-labelledby="journey-title">
@@ -168,10 +284,26 @@ function Home({ profile, progress, sessions, offlineReady, online, catalogMetada
   )
 }
 
-function Summary({ results, onFinish }: { results: AttemptResult[]; onFinish: (assessment: SelfAssessment) => void }) {
+interface SummaryProps {
+  results: AttemptResult[]
+  onFinish: (assessment: SelfAssessment) => void
+  onGoHome: () => void
+  onOpenMenu: () => void
+}
+
+function Summary({ results, onFinish, onGoHome, onOpenMenu }: SummaryProps) {
   const firstTry = results.filter((result) => result.correct).length
   return (
     <main className="page summary-page">
+      <header className="summary-navigation">
+        <button className="brand-button" type="button" onClick={onGoHome} aria-label="Runde verlassen und zur Startseite">
+          <ArrowLeft aria-hidden="true" />
+          <span>Mathe-Reise</span>
+        </button>
+        <button className="icon-button" type="button" onClick={onOpenMenu} aria-label="Navigation öffnen" title="Navigation">
+          <Menu aria-hidden="true" />
+        </button>
+      </header>
       <div className="summary-mark"><Check aria-hidden="true" /></div>
       <span className="eyebrow">Etappe geschafft</span>
       <h1>Das war eine gute Runde!</h1>
@@ -191,7 +323,7 @@ function Summary({ results, onFinish }: { results: AttemptResult[]; onFinish: (a
 function LearningApp() {
   const [screen, setScreen] = useState<Screen>('loading')
   const [profile, setProfileState] = useState<Profile | null>(null)
-  const [settings, setSettingsState] = useState<AppSettings>({ key: 'app-settings', installHelpDismissed: false, schemaVersion: 1 })
+  const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_SETTINGS)
   const [progress, setProgress] = useState<ProgressMap>({})
   const [sessions, setSessions] = useState<CompletedSession[]>([])
   const [session, setSession] = useState<SessionPlan | null>(null)
@@ -202,6 +334,10 @@ function LearningApp() {
   const [offlineReady, setOfflineReady] = useState(false)
   const [online, setOnline] = useState(navigator.onLine)
   const [updateAvailable, setUpdateAvailable] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [pendingNavigation, setPendingNavigation] = useState<NavigationAction | null>(null)
+  const [resetting, setResetting] = useState(false)
+  const [navigationError, setNavigationError] = useState('')
   const updateServiceWorker = useRef<((reloadPage?: boolean) => Promise<void>) | null>(null)
   const catalogMetadata = useMemo(() => getActiveCatalogMetadata(), [])
 
@@ -280,6 +416,62 @@ function LearningApp() {
     setScreen('session')
   }
 
+  const requestNavigation = (action: NavigationAction) => {
+    setMenuOpen(false)
+    setNavigationError('')
+    if (action === 'new-round' && screen === 'home') {
+      startRound()
+      return
+    }
+    setPendingNavigation(action)
+  }
+
+  const cancelNavigation = () => {
+    if (resetting) return
+    setPendingNavigation(null)
+    setNavigationError('')
+  }
+
+  const discardCurrentRound = () => {
+    setSession(null)
+    setResults([])
+    setExerciseIndex(0)
+    setRepeatCount(0)
+  }
+
+  const confirmNavigation = async () => {
+    if (pendingNavigation === 'home') {
+      discardCurrentRound()
+      setPendingNavigation(null)
+      setScreen('home')
+      return
+    }
+    if (pendingNavigation === 'new-round') {
+      setPendingNavigation(null)
+      startRound()
+      return
+    }
+    if (pendingNavigation !== 'reset') return
+
+    setResetting(true)
+    setNavigationError('')
+    try {
+      await clearAppData()
+      setProfileState(null)
+      setSettingsState(DEFAULT_SETTINGS)
+      setProgress({})
+      setSessions([])
+      discardCurrentRound()
+      setShowInstallHelp(false)
+      setPendingNavigation(null)
+      setScreen('onboarding')
+    } catch {
+      setNavigationError('Das Zurücksetzen hat nicht geklappt. Deine gespeicherten Daten wurden nicht absichtlich verändert.')
+    } finally {
+      setResetting(false)
+    }
+  }
+
   const completeExercise = async (result: AttemptResult) => {
     if (!session || !currentExercise) return
     const nextProgress = updateSkillProgress(progress[result.skillId], result)
@@ -326,37 +518,77 @@ function LearningApp() {
     setScreen('home')
   }
 
+  const navigationOverlays = (
+    <>
+      <NavigationMenu
+        open={menuOpen}
+        canGoHome={screen !== 'home'}
+        onClose={() => setMenuOpen(false)}
+        onGoHome={() => requestNavigation('home')}
+        onNewRound={() => requestNavigation('new-round')}
+        onReset={() => requestNavigation('reset')}
+      />
+      <ConfirmNavigation
+        action={pendingNavigation}
+        busy={resetting}
+        error={navigationError}
+        onCancel={cancelNavigation}
+        onConfirm={() => { void confirmNavigation() }}
+      />
+    </>
+  )
+
   if (screen === 'loading') return <main className="page loading-page"><Compass className="loading-compass" aria-hidden="true" /><p>Die Mathe-Reise wird vorbereitet …</p></main>
   if (screen === 'error') return <main className="page error-page"><ShieldCheck aria-hidden="true" /><h1>Das hat gerade nicht geklappt.</h1><p>Bitte lade die App neu. Deine bisherigen Aufgaben bleiben gespeichert.</p></main>
   if (showInstallHelp) return <InstallHelp onDismiss={dismissInstallHelp} />
   if (screen === 'onboarding') return <Onboarding onComplete={completeOnboarding} />
   if (screen === 'home' && profile) return (
-    <Home
-      profile={profile}
-      progress={progress}
-      sessions={sessions}
-      offlineReady={offlineReady}
-      online={online}
-      catalogMetadata={catalogMetadata}
-      updateAvailable={updateAvailable}
-      onStart={startRound}
-      onShowInstall={() => setShowInstallHelp(true)}
-      onUpdate={() => { void updateServiceWorker.current?.(true) }}
-    />
+    <>
+      <Home
+        profile={profile}
+        progress={progress}
+        sessions={sessions}
+        offlineReady={offlineReady}
+        online={online}
+        catalogMetadata={catalogMetadata}
+        updateAvailable={updateAvailable}
+        onStart={startRound}
+        onShowInstall={() => setShowInstallHelp(true)}
+        onUpdate={() => { void updateServiceWorker.current?.(true) }}
+        onOpenMenu={() => setMenuOpen(true)}
+      />
+      {navigationOverlays}
+    </>
   )
-  if (screen === 'summary') return <Summary results={results} onFinish={finishRound} />
+  if (screen === 'summary') return (
+    <>
+      <Summary
+        results={results}
+        onFinish={finishRound}
+        onGoHome={() => requestNavigation('home')}
+        onOpenMenu={() => setMenuOpen(true)}
+      />
+      {navigationOverlays}
+    </>
+  )
 
   return (
     <main className="session-page">
       <header className="session-header">
-        <button className="brand-button" type="button" onClick={() => setScreen('home')} aria-label="Runde verlassen und zur Startseite">
-          <Compass aria-hidden="true" />
+        <button className="brand-button" type="button" onClick={() => requestNavigation('home')} aria-label="Runde verlassen und zur Startseite">
+          <ArrowLeft aria-hidden="true" />
           <span>Mathe-Reise</span>
         </button>
-        <span className="task-count">{exerciseIndex + 1} / {session?.exercises.length ?? 8}</span>
+        <div className="session-header__actions">
+          <span className="task-count">{exerciseIndex + 1} / {session?.exercises.length ?? 8}</span>
+          <button className="icon-button" type="button" onClick={() => setMenuOpen(true)} aria-label="Navigation öffnen" title="Navigation">
+            <Menu aria-hidden="true" />
+          </button>
+        </div>
       </header>
       <div className="session-progress" aria-hidden="true"><span style={{ width: `${((exerciseIndex + 1) / (session?.exercises.length ?? 8)) * 100}%` }} /></div>
       {currentExercise && <ExerciseCard key={currentExercise.id} exercise={currentExercise} onComplete={completeExercise} />}
+      {navigationOverlays}
     </main>
   )
 }

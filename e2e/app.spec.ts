@@ -222,6 +222,39 @@ test('Landscape bleibt vollständig bedienbar und ohne horizontales Overflow', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
+test('Navigation, Rundenwechsel und Zurücksetzen bleiben mobil verständlich', async ({ page }, testInfo) => {
+  await onboard(page, 'Nova')
+  await page.getByRole('button', { name: 'Navigation öffnen' }).click()
+  await expect(page.getByRole('dialog', { name: 'Wohin möchtest du?' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('navigation-375x812.png') })
+
+  await page.getByRole('button', { name: /Neue Runde beginnen/ }).click()
+  await expect(page.locator('.exercise-panel')).toBeVisible()
+  await expect(page.locator('.task-count')).toContainText(/^1 \/ /)
+
+  const exerciseId = await page.locator('.exercise-panel').getAttribute('data-exercise-id')
+  await page.getByRole('button', { name: 'Navigation öffnen' }).click()
+  await page.getByRole('button', { name: /Neue Runde beginnen/ }).click()
+  await expect(page.getByRole('alertdialog', { name: 'Neue Runde beginnen?' })).toBeVisible()
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  await expect(page.locator('.exercise-panel')).toHaveAttribute('data-exercise-id', exerciseId ?? '')
+
+  await page.getByRole('button', { name: 'Runde verlassen und zur Startseite' }).click()
+  await page.getByRole('button', { name: 'Zur Startseite', exact: true }).click()
+  await expect(page.getByRole('button', { name: /Mathe-Runde starten/i })).toBeVisible()
+
+  await page.setViewportSize({ width: 812, height: 375 })
+  await page.getByRole('button', { name: 'Navigation öffnen' }).click()
+  await expect(page.getByRole('dialog', { name: 'Wohin möchtest du?' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('navigation-812x375.png') })
+
+  await page.getByRole('button', { name: /App zurücksetzen/ }).click()
+  await page.getByRole('button', { name: 'Alles zurücksetzen' }).click()
+  await expect(page.getByText('Wie möchtest du hier heißen?')).toBeVisible()
+})
+
 test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()

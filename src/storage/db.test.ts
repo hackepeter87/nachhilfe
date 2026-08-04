@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createSkillProgress } from '../domain'
 import {
+  clearAppData,
   databaseMetadata,
   LEGACY_SESSION_METADATA,
   loadAppData,
@@ -56,6 +57,32 @@ describe('IndexedDB-Speicherung', () => {
     expect(data.settings.installHelpDismissed).toBe(true)
     expect(data.progress['round-tens']?.mastery).toBe(47)
     expect(data.progress['round-tens']?.subskills['round-tens-midpoint']?.recentErrors).toBe(1)
+  })
+
+  it('löscht beim Zurücksetzen alle lokal gespeicherten App-Daten', async () => {
+    await saveProfile({ id: 'local-profile', nickname: 'Lina', createdAt: '2026-07-16T10:00:00.000Z' })
+    await saveSettings({ key: 'app-settings', installHelpDismissed: true, schemaVersion: 1 })
+    await saveSkillProgress({ ...createSkillProgress('round-tens'), attempts: 2, mastery: 47 })
+    await saveCompletedSession({
+      id: 'session-reset',
+      catalogId: 'nrw-klasse3-foerderkern',
+      catalogVersion: '0.31.2',
+      schemaVersion: 19,
+      appVersion: '0.32.3',
+      startedAt: '2026-07-16T09:00:00.000Z',
+      completedAt: '2026-07-16T09:10:00.000Z',
+      results: [],
+      selfAssessment: 'thinking'
+    })
+
+    await clearAppData()
+
+    expect(await loadAppData()).toEqual({
+      profile: null,
+      settings: { key: 'app-settings', installHelpDismissed: false, schemaVersion: 1 },
+      progress: {},
+      sessions: []
+    })
   })
 
   it('ergänzt bei alten Lernständen eine ableitbare Lernphase', () => {
