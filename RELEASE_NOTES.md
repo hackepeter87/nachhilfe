@@ -1,10 +1,13 @@
 # Mathe-Reise
 
-## Noch nicht veröffentlicht
+## Direkter Rundenabschluss 0.32.5
 
 - Abgeschlossene Runden werden unmittelbar nach der letzten Aufgabe gespeichert und können im Abschluss nicht mehr versehentlich verworfen werden.
 - Die verpflichtende, nicht adaptiv ausgewertete Frage „Was hat dir heute geholfen?“ wurde entfernt.
 - Der Abschluss bietet jetzt direkt „Neue Runde beginnen“ und „Zur Startseite“; eine fertige Runde benötigt dafür keine weitere Bestätigung.
+- App 0.32.5 verwendet unverändert Katalog 0.31.2 und Schema 19; es kommt keine neue Kompetenz hinzu.
+
+Lokal und in GitHub Actions erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 490 Unit-/Komponententests, Produktionsbuild, 21 Playwright-Szenarien in Chromium und WebKit sowie der gehärtete AMD64-Containerbuild. Ein echter iPhone-Test dieser Änderung und eine externe Lehrkraftprüfung sind noch nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
 
 ## Navigation und lokales Zurücksetzen 0.32.4
 
