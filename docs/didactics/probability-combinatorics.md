@@ -1,6 +1,6 @@
 # Wahrscheinlichkeit und Kombinatorik
 
-**Produktstatus 0.32.3:** `combinatorics` ist aktiv. `probability` ist im Katalog auf `disabled` gesetzt und wird weder in Kinderrunden noch im Entwicklungs-Prüfstand ausgewählt. Die folgenden Wahrscheinlichkeitsabschnitte dokumentieren die bisherige fachliche Grundlage und die Anforderungen an eine mögliche Neuentwicklung, nicht einen produktiv freigegebenen Lernweg.
+**Produktstatus 0.32.4:** `combinatorics` ist aktiv. `probability` ist im Katalog auf `disabled` gesetzt und wird weder in Kinderrunden noch im Entwicklungs-Prüfstand ausgewählt. Die folgenden Wahrscheinlichkeitsabschnitte dokumentieren die bisherige fachliche Grundlage und die Anforderungen an eine mögliche Neuentwicklung, nicht einen produktiv freigegebenen Lernweg.
 
 ## 1. Bezug zum Förderbedarf
 Kinder sollen Zufallssituationen anhand sichtbarer möglicher Ergebnisse beurteilen und kleine Anzahlen von Kombinationen systematisch bestimmen. Begriffe werden an konkrete Versuche gebunden; Bruchwahrscheinlichkeiten sind nicht Teil dieses Lernwegs.

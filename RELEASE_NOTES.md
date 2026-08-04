@@ -1,12 +1,15 @@
 # Mathe-Reise
 
-## Noch nicht veröffentlicht
+## Navigation und lokales Zurücksetzen 0.32.4
 
 - Eine sichtbare Navigation steht auf der Startseite, in einer laufenden Runde und im Abschluss zur Verfügung.
 - Das Verlassen oder Ersetzen einer laufenden Runde benötigt eine Bestätigung; Abbrechen erhält den aktuellen Aufgabenstand.
 - Eine neue Runde beginnt mit einem frischen Sitzungsplan bei Aufgabe 1.
 - „App zurücksetzen“ löscht nach ausdrücklicher Bestätigung Profil, Einstellungen, Lernstand und abgeschlossene Runden ausschließlich aus IndexedDB des aktuellen Geräts. Die installierte PWA und ihr Offline-Cache bleiben erhalten.
 - Komponenten-, IndexedDB- und mobile Playwright-Tests decken Navigation, Abbrechen, Rundenwechsel und Zurücksetzen ab.
+- App 0.32.4 verwendet unverändert Katalog 0.31.2 und Schema 19; es kommt keine neue Kompetenz hinzu.
+
+Lokal und in GitHub Actions erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 490 Unit-/Komponententests, Produktionsbuild, 21 Playwright-Szenarien in Chromium und WebKit sowie der gehärtete AMD64-Containerbetrieb. Ein echter iPhone-Test dieser Änderung und eine externe Lehrkraftprüfung sind noch nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
 
 ## Zufallsaufgaben deaktiviert 0.32.3
 

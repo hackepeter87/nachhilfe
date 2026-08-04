@@ -1,6 +1,6 @@
 # Didaktischer Prüfstand
 
-Stand: App 0.32.3, Katalog 0.31.2, Schema 19.
+Stand: App 0.32.4, Katalog 0.31.2, Schema 19.
 
 Der Prüfstand macht Aufgabenvarianten reproduzierbar sichtbar. Er ist ein Arbeitswerkzeug für interne Reviews und kein Nachweis pädagogischer Wirksamkeit. Die Ansicht verwendet denselben Katalog, dieselben Generatoren und dieselbe `ExerciseCard` wie eine produktive Mathe-Runde. Es gibt keine zweite Aufgabenruntime.
 

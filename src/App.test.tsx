@@ -54,7 +54,7 @@ describe('App-Ablauf', () => {
     expect(screen.getByText('nrw-klasse3-foerderkern 0.31.2')).not.toBeVisible()
     await user.click(screen.getByLabelText('Versionsinformationen öffnen'))
     expect(screen.getByText('nrw-klasse3-foerderkern 0.31.2')).toBeVisible()
-    expect(screen.getByText('0.32.3')).toBeVisible()
+    expect(screen.getByText('0.32.4')).toBeVisible()
     expect(screen.getByText('ready-for-review')).toBeVisible()
   })
 
@@ -100,7 +100,7 @@ describe('App-Ablauf', () => {
     await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
     await user.click(await screen.findByRole('button', { name: /mathe-runde starten/i }))
 
-    await user.click(screen.getByRole('button', { name: 'Navigation öffnen' }))
+    await user.click(await screen.findByRole('button', { name: 'Navigation öffnen' }))
     await user.click(screen.getByRole('button', { name: /Neue Runde beginnen/ }))
     expect(screen.getByRole('alertdialog', { name: 'Neue Runde beginnen?' })).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Neue Runde starten' }))
@@ -116,7 +116,7 @@ describe('App-Ablauf', () => {
     await user.type(await screen.findByLabelText('Dein Spitzname'), 'Nova')
     await user.click(screen.getByRole('button', { name: 'Los geht’s' }))
 
-    await user.click(screen.getByRole('button', { name: 'Navigation öffnen' }))
+    await user.click(await screen.findByRole('button', { name: 'Navigation öffnen' }))
     await user.click(screen.getByRole('button', { name: /App zurücksetzen/ }))
     const dialog = screen.getByRole('alertdialog', { name: 'App wirklich zurücksetzen?' })
     await user.click(within(dialog).getByRole('button', { name: 'Abbrechen' }))
