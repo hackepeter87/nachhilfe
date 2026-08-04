@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.31.2",
+  "catalogVersion": "0.31.3",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-07-26",
+  "releasedAt": "2026-08-04",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -589,7 +589,7 @@
     },
     {
       "id": "division",
-      "label": "Umkehraufgaben",
+      "label": "Teilen und verteilen",
       "curriculumArea": "Zahlen und Operationen",
       "supportGoal": "Division ohne Rest als Gruppieren und Verteilen verstehen und als Umkehrung der Multiplikation nutzen.",
       "misconceptions": [
@@ -621,12 +621,12 @@
         }
       ],
       "hints": [
-        "Welche Zahl mal {divisor} ergibt {dividend}?",
-        "Nutze die Umkehraufgabe: {divisor} · ? = {dividend}."
+        "Prüfe zuerst: Kennst du die Anzahl der Gruppen oder die Punkte in jeder Gruppe?",
+        "Alle {dividend} Punkte müssen gleichmäßig aufgeteilt werden."
       ],
       "prompt": "{dividend} : {divisor} = ?",
       "errorFeedback": "Prüfe, welche Größe bekannt ist: die Größe jeder Gruppe oder die Anzahl der Gruppen. Die Gesamtmenge muss vollständig aufgeteilt sein.",
-      "explanation": "Beim Gruppieren wird die Anzahl gleich großer Gruppen gesucht, beim Verteilen die Größe jeder Gruppe. {divisor} · {quotient} = {dividend}. Deshalb ist {dividend} : {divisor} = {quotient}.",
+      "explanation": "Beim Gruppieren fragst du: Wie viele Gruppen entstehen? Beim Verteilen fragst du: Wie viele kommen in jede Gruppe?",
       "difficultyBounds": {
         "minLevel": 1,
         "maxLevel": 3,
@@ -697,7 +697,7 @@
         }
       ],
       "workedExample": "42 : 6 kann bedeuten: Gruppen zu je 6 bilden und die 7 Gruppen zählen oder auf 6 Gruppen verteilen und je 7 bestimmen. 6 · 7 = 42.",
-      "successFeedback": "Du hast die Gesamtmenge vollständig in gleich große Gruppen aufgeteilt.",
+      "successFeedback": "Du hast alle Punkte passend aufgeteilt.",
       "remediation": {
         "strategy": "Lege die gesamte Menge im passenden Gruppierungs- oder Verteilmodell vollständig in gleich große Gruppen.",
         "foundationStrategy": "Nutze eine kleinere Gesamtmenge und lege jeden Punkt sichtbar in genau eine gleich große Gruppe.",
@@ -766,10 +766,12 @@
       "id": "place-value",
       "label": "Stellenwerte",
       "curriculumArea": "Zahlen und Operationen",
-      "supportGoal": "Den Wert einer Ziffer im Stellenwertsystem bis 1000 bestimmen.",
+      "supportGoal": "Ziffernwerte im Stellenwertsystem bis 1000 bestimmen sowie dreistellige Zahlen von links nach rechts vergleichen und ordnen.",
       "misconceptions": [
         "Ziffer und Stellenwert werden gleichgesetzt.",
-        "Einer, Zehner und Hunderter werden verwechselt."
+        "Einer, Zehner und Hunderter werden verwechselt.",
+        "Beim Vergleichen wird nicht an der ersten unterschiedlichen Stelle begonnen.",
+        "Das Vergleichszeichen wird in die falsche Richtung gelesen."
       ],
       "misconceptionFeedback": [
         {
@@ -781,6 +783,16 @@
           "id": "place-value-column-confusion",
           "misconception": "Einer, Zehner und Hunderter werden verwechselt.",
           "feedback": "Ordne das Material zuerst in Hunderterflächen, Zehnerstangen und Einerpunkte."
+        },
+        {
+          "id": "place-value-first-difference",
+          "misconception": "Beim Vergleichen wird nicht an der ersten unterschiedlichen Stelle begonnen.",
+          "feedback": "Vergleiche zuerst die Hunderter. Nur wenn sie gleich sind, vergleichst du Zehner und danach Einer."
+        },
+        {
+          "id": "place-value-comparison-direction",
+          "misconception": "Das Vergleichszeichen wird in die falsche Richtung gelesen.",
+          "feedback": "Die offene Seite des Zeichens zeigt zur größeren Zahl."
         }
       ],
       "hints": [
@@ -830,7 +842,7 @@
         },
         {
           "level": 2,
-          "description": "Eine Null als Platzhalter wird gezielt abgefragt; Tafel auf Hilfe",
+          "description": "Eine Null als Platzhalter wird gezielt abgefragt; als leichtere Ordnungsübung werden drei Zahlen Stelle für Stelle verglichen",
           "numberRange": "100 bis 999",
           "representation": "hint",
           "requirements": {
@@ -844,7 +856,7 @@
         },
         {
           "level": 3,
-          "description": "Eine oder zwei Nullstellen ohne Tafel: zuerst Ziffer, dann Stellenwert bestimmen",
+          "description": "Eine oder zwei Nullstellen ohne Tafel bestimmen; im Transfer vier Zahlen an der ersten unterschiedlichen Stelle vergleichen und ordnen",
           "numberRange": "100 bis 999",
           "representation": "none",
           "requirements": {
@@ -860,8 +872,8 @@
       "workedExample": "In 472 steht die 7 bei den Zehnern. Ihr Wert ist 70.",
       "successFeedback": "Du hast den richtigen Stellenwert erkannt.",
       "remediation": {
-        "strategy": "Die Zahl wird mit Hundertern, Zehnern und Einern gelegt.",
-        "foundationStrategy": "Baue die Zahl mit Hunderterflächen, Zehnerstangen und Einerpunkten. Ordne danach jede Ziffer ihrer Stelle zu.",
+        "strategy": "Bleibe bei derselben Aufgabe: Bestimme einen Ziffernwert erneut oder vergleiche beim Ordnen zunächst nur zwei Zahlen.",
+        "foundationStrategy": "Nutze eine H-Z-E-Tafel. Beim Ziffernwert ordnest du jede Ziffer ihrer Stelle zu. Beim Ordnen vergleichst du zuerst die Hunderter.",
         "representation": "Stellenwerttafel",
         "keepSubskill": true
       },
@@ -896,7 +908,8 @@
           "id": "independent-practice",
           "goal": "Die Kompetenz mit reduzierter Hilfe und variierten Aufgaben anwenden.",
           "exerciseTypes": [
-            "place-value:independent"
+            "place-value:independent",
+            "place-value:independent-order"
           ],
           "releaseStatus": "active"
         },
@@ -1370,9 +1383,9 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Vorgänger, Nachfolger und beide direkten Nachbarzehner als unterschiedliche Zahlbeziehungen bestimmen.",
+          "goal": "Den unteren und oberen Nachbarzehner einer Zahl bestimmen.",
           "exerciseTypes": [
-            "neighbor-tens:guided-number-relations"
+            "neighbor-tens:guided-neighbors"
           ],
           "releaseStatus": "active"
         },
@@ -1531,9 +1544,9 @@
         },
         {
           "id": "guided-practice",
-          "goal": "Vorgänger, Nachfolger und beide direkten Nachbarhunderter als unterschiedliche Zahlbeziehungen bestimmen.",
+          "goal": "Den unteren und oberen Nachbarhunderter einer Zahl bestimmen.",
           "exerciseTypes": [
-            "neighbor-hundreds:guided-number-relations"
+            "neighbor-hundreds:guided-neighbors"
           ],
           "releaseStatus": "active"
         },
@@ -4494,7 +4507,7 @@
           "exerciseTypes": [
             "probability:chance-classify-foundation"
           ],
-          "releaseStatus": "active"
+          "releaseStatus": "disabled"
         },
         {
           "id": "understand",
@@ -4502,7 +4515,7 @@
           "exerciseTypes": [
             "probability:chance-complete-outcome-space"
           ],
-          "releaseStatus": "active"
+          "releaseStatus": "disabled"
         },
         {
           "id": "guided-practice",
@@ -4510,7 +4523,7 @@
           "exerciseTypes": [
             "probability:chance-classify-guided"
           ],
-          "releaseStatus": "active"
+          "releaseStatus": "disabled"
         },
         {
           "id": "independent-practice",
@@ -4518,7 +4531,7 @@
           "exerciseTypes": [
             "probability:chance-classify-independent"
           ],
-          "releaseStatus": "active"
+          "releaseStatus": "disabled"
         },
         {
           "id": "automate",
@@ -4526,7 +4539,7 @@
           "exerciseTypes": [
             "probability:chance-classify-fluent"
           ],
-          "releaseStatus": "active"
+          "releaseStatus": "disabled"
         },
         {
           "id": "transfer",
@@ -4534,7 +4547,7 @@
           "exerciseTypes": [
             "probability:chance-predict-and-evaluate"
           ],
-          "releaseStatus": "active"
+          "releaseStatus": "disabled"
         }
       ],
       "successCriteria": [
@@ -5985,18 +5998,18 @@
         "Wie viele Muscheln findet Mila am Strand?"
       ],
       "plausibility": {
-        "prompt": "Mila hatte {first} Muscheln und findet {second} dazu. Welche Aussage muss stimmen?",
+        "prompt": "Kann {result} Muscheln stimmen?",
         "options": [
           {
-            "label": "Das Ergebnis {result} ist größer als die Anfangsmenge {first}.",
+            "label": "Ja. Es sind mehr als vorher, weil {second} Muscheln dazukommen.",
             "correct": true
           },
           {
-            "label": "Das Ergebnis {result} ist kleiner als die Anfangsmenge {first}.",
+            "label": "Nein. Es müssten weniger als {first} Muscheln sein.",
             "correct": false
           },
           {
-            "label": "Das Ergebnis {result} ist genauso groß wie die neu gefundenen {second}.",
+            "label": "Nein. Es dürften nur die {second} neuen Muscheln sein.",
             "correct": false
           }
         ]
@@ -6046,18 +6059,18 @@
         "Wie viele Buntstifte werden herausgenommen?"
       ],
       "plausibility": {
-        "prompt": "Von {first} Buntstiften werden {second} herausgenommen. Welche Aussage muss stimmen?",
+        "prompt": "Kann es stimmen, dass {result} Buntstifte bleiben?",
         "options": [
           {
-            "label": "Die verbleibenden {result} sind kleiner als die Anfangsmenge {first}.",
+            "label": "Ja. Nach dem Herausnehmen müssen weniger als {first} Stifte da sein.",
             "correct": true
           },
           {
-            "label": "Die verbleibenden {result} sind größer als die Anfangsmenge {first}.",
+            "label": "Nein. Nach dem Herausnehmen können es nicht mehr als {first} sein.",
             "correct": false
           },
           {
-            "label": "Nach dem Herausnehmen bleiben weiterhin genau {first} Stifte.",
+            "label": "Nein. Dann wäre kein Stift herausgenommen worden.",
             "correct": false
           }
         ]
@@ -6107,18 +6120,18 @@
         "Wie viele Weltraumbücher stehen im Regal?"
       ],
       "plausibility": {
-        "prompt": "{first} Tierbücher und {second} Weltraumbücher werden zusammengezählt. Welche Aussage stimmt?",
+        "prompt": "Kann {result} Bücher zusammen stimmen?",
         "options": [
           {
-            "label": "Die Gesamtzahl {result} ist größer als jede der beiden Teilmengen.",
+            "label": "Ja. Zusammen sind es mehr als {first} und mehr als {second} Bücher.",
             "correct": true
           },
           {
-            "label": "Die Gesamtzahl {result} muss kleiner als {first} sein.",
+            "label": "Nein. Zusammen müssten es weniger als {first} Bücher sein.",
             "correct": false
           },
           {
-            "label": "Die Gesamtzahl ist nur die größere Teilmenge {first}.",
+            "label": "Nein. Es würden nur die {first} Tierbücher zählen.",
             "correct": false
           }
         ]
@@ -6168,18 +6181,18 @@
         "Wie viele Sticker hat Lia?"
       ],
       "plausibility": {
-        "prompt": "Noah hat {first}, Lia {second} Sticker. Welche Aussage über den Unterschied {result} stimmt?",
+        "prompt": "Kann der Unterschied {result} Sticker sein?",
         "options": [
           {
-            "label": "Der Unterschied {result} ist kleiner als Noahs Menge {first}.",
+            "label": "Ja. Der Unterschied ist kleiner als Noahs {first} Sticker.",
             "correct": true
           },
           {
-            "label": "Der Unterschied {result} ist größer als Noahs Menge {first}.",
+            "label": "Nein. Der Unterschied wäre größer als alle Sticker von Noah.",
             "correct": false
           },
           {
-            "label": "Der Unterschied ist die Summe {first} + {second}.",
+            "label": "Nein. Dann wären beide Stickerzahlen zusammengezählt.",
             "correct": false
           }
         ]
@@ -6229,18 +6242,18 @@
         "Wie viele Plätze sind besetzt?"
       ],
       "plausibility": {
-        "prompt": "Der Bus hat {first} Plätze, davon sind {second} besetzt. Welche Prüfung ist richtig?",
+        "prompt": "Kann es stimmen, dass {result} Plätze frei sind?",
         "options": [
           {
-            "label": "{second} besetzte plus {result} freie Plätze ergeben {first} Plätze.",
+            "label": "Ja. {second} besetzte und {result} freie Plätze ergeben zusammen {first}.",
             "correct": true
           },
           {
-            "label": "{second} besetzte plus {result} freie Plätze ergeben nur {second} Plätze.",
+            "label": "Nein. Besetzte und freie Plätze ergäben nur {second}.",
             "correct": false
           },
           {
-            "label": "Die Zahl der freien Plätze {result} ist größer als alle {first} Plätze.",
+            "label": "Nein. Es wären mehr freie Plätze als der Bus überhaupt hat.",
             "correct": false
           }
         ]
@@ -6290,18 +6303,18 @@
         "Wie viele Kinder sind in einem Team?"
       ],
       "plausibility": {
-        "prompt": "{first} Teams haben je {second} Kinder. Welche Aussage zur Gesamtzahl {result} stimmt?",
+        "prompt": "Kann es stimmen, dass insgesamt {result} Kinder mitspielen?",
         "options": [
           {
-            "label": "Die Gesamtzahl {result} ist größer als die Kinderzahl {second} eines Teams.",
+            "label": "Ja. Mehrere Teams haben zusammen mehr Kinder als ein Team.",
             "correct": true
           },
           {
-            "label": "Die Gesamtzahl {result} ist kleiner als die Kinderzahl {second} eines Teams.",
+            "label": "Nein. Alle Teams zusammen hätten weniger Kinder als ein Team.",
             "correct": false
           },
           {
-            "label": "Die Gesamtzahl {result} ist kleiner als die Anzahl der Teams {first}.",
+            "label": "Nein. Dann gäbe es nicht einmal ein Kind pro Team.",
             "correct": false
           }
         ]
@@ -6351,18 +6364,18 @@
         "Auf wie viele Kinder werden die Karten verteilt?"
       ],
       "plausibility": {
-        "prompt": "{total} Karten werden auf {first} Kinder verteilt. Welche Aussage zu {result} Karten je Kind stimmt?",
+        "prompt": "Kann jedes Kind {result} Karten bekommen?",
         "options": [
           {
-            "label": "{first} Gruppen mit je {result} Karten ergeben zusammen {total} Karten.",
+            "label": "Ja. {first} Kinder mit je {result} Karten brauchen zusammen {total} Karten.",
             "correct": true
           },
           {
-            "label": "Jedes Kind bekommt mehr als die Gesamtzahl {total}.",
+            "label": "Nein. Jedes Kind bekäme mehr Karten, als vorhanden sind.",
             "correct": false
           },
           {
-            "label": "{result} Karten je Kind ergeben zusammen nur {first} Karten.",
+            "label": "Nein. Dabei wurden Karten pro Kind und Kinderzahl verwechselt.",
             "correct": false
           }
         ]
@@ -6416,18 +6429,18 @@
         "Wie viele Bücher werden ausgeliehen?"
       ],
       "plausibility": {
-        "prompt": "Nach dem Dazukommen sind es {intermediate} Bücher, danach werden {third} ausgeliehen. Welche Prüfung passt?",
+        "prompt": "Kann am Ende {result} Bücher stimmen?",
         "options": [
           {
-            "label": "{result} plus {third} ergibt wieder {intermediate}.",
+            "label": "Ja. Legt man die {third} ausgeliehenen Bücher zurück, sind es wieder {intermediate}.",
             "correct": true
           },
           {
-            "label": "Das Endergebnis {result} muss größer als {intermediate} sein.",
+            "label": "Nein. Nach dem Ausleihen müssten mehr als {intermediate} Bücher da sein.",
             "correct": false
           },
           {
-            "label": "Die ausgeliehenen {third} Bücher sind das Endergebnis.",
+            "label": "Nein. Es würden nur die ausgeliehenen Bücher gezählt.",
             "correct": false
           }
         ]
@@ -6486,18 +6499,18 @@
         "Wie viele neue Aufkleber bekommt Mira?"
       ],
       "plausibility": {
-        "prompt": "Nach dem Verschenken bleiben {intermediate} Aufkleber. Dann kommen {third} dazu. Welche Prüfung passt?",
+        "prompt": "Kann am Ende {result} Aufkleber stimmen?",
         "options": [
           {
-            "label": "Das Ergebnis {result} ist um {third} größer als {intermediate}.",
+            "label": "Ja. Nach den {third} neuen Aufklebern sind es mehr als vorher.",
             "correct": true
           },
           {
-            "label": "Das Ergebnis {result} muss kleiner als {intermediate} sein.",
+            "label": "Nein. Trotz neuer Aufkleber wären es weniger als vorher.",
             "correct": false
           },
           {
-            "label": "Die neuen {third} Aufkleber sind allein das Endergebnis.",
+            "label": "Nein. Es würden nur die neuen Aufkleber gezählt.",
             "correct": false
           }
         ]
@@ -8278,7 +8291,8 @@
           "kurz",
           "lang"
         ],
-        "question": "Wie viele Outfits kannst du zusammenstellen?"
+        "question": "Wie viele Outfits kannst du zusammenstellen?",
+        "selectionQuestion": "Stelle ein Outfit zusammen: Wähle ein T-Shirt und eine Hose."
       },
       {
         "id": "breakfast-2x2",
@@ -8294,7 +8308,8 @@
           "Apfel",
           "Banane"
         ],
-        "question": "Wie viele Frühstücke sind möglich?"
+        "question": "Wie viele Frühstücke sind möglich?",
+        "selectionQuestion": "Stelle ein Frühstück zusammen: Wähle ein Getränk und eine Obstsorte."
       },
       {
         "id": "ice-cream-3x2",
@@ -8311,7 +8326,8 @@
           "bunt",
           "Schoko"
         ],
-        "question": "Wie viele Eis-Kombinationen sind möglich?"
+        "question": "Wie viele Eis-Kombinationen sind möglich?",
+        "selectionQuestion": "Stelle ein Eis zusammen: Wähle eine Eissorte und eine Sorte Streusel."
       },
       {
         "id": "bottle-design-2x3",
@@ -8328,7 +8344,8 @@
           "Welle",
           "Sonne"
         ],
-        "question": "Wie viele verschiedene Trinkflaschen kannst du gestalten?"
+        "question": "Wie viele verschiedene Trinkflaschen kannst du gestalten?",
+        "selectionQuestion": "Gestalte eine Trinkflasche: Wähle eine Farbe und einen Aufkleber."
       },
       {
         "id": "craft-3x3-excluded",
@@ -8347,6 +8364,7 @@
           "gelb"
         ],
         "question": "Wie viele erlaubte Anhänger sind möglich?",
+        "selectionQuestion": "Gestalte einen Anhänger: Wähle eine Form und eine Farbe.",
         "excludedPair": [
           "Stern",
           "gelb"
@@ -8369,6 +8387,7 @@
           "Ei"
         ],
         "question": "Wie viele erlaubte Brote sind möglich?",
+        "selectionQuestion": "Belege ein Brot: Wähle eine Brotsorte und einen Belag.",
         "excludedPair": [
           "dunkel",
           "Ei"

@@ -22,10 +22,10 @@ export type FocusDomain = keyof typeof FOCUS_DOMAINS
 
 export const CLASSROOM_PRACTICE_ROTATION = [
   { skillId: 'place-value', phase: 'guided-practice', typeId: 'guided-material-table' },
-  { skillId: 'place-value', phase: 'transfer', typeId: 'transfer-compare' },
+  { skillId: 'place-value', phase: 'transfer', typeId: 'transfer-order' },
   { skillId: 'compose', phase: 'transfer', typeId: 'transfer-number-word' },
-  { skillId: 'neighbor-tens', phase: 'guided-practice', typeId: 'guided-number-relations' },
-  { skillId: 'neighbor-hundreds', phase: 'guided-practice', typeId: 'guided-number-relations' },
+  { skillId: 'neighbor-tens', phase: 'guided-practice', typeId: 'guided-neighbors' },
+  { skillId: 'neighbor-hundreds', phase: 'guided-practice', typeId: 'guided-neighbors' },
   { skillId: 'patterns', phase: 'transfer', typeId: 'pattern-transfer-number-sequence' },
   { skillId: 'addition-1000', phase: 'guided-practice', typeId: 'guided-bridge' },
   { skillId: 'subtraction-1000', phase: 'guided-practice', typeId: 'guided-bridge' }

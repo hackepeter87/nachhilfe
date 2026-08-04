@@ -1,5 +1,23 @@
 # Mathe-Reise
 
+## Katalog- und Darstellungsabgleich 0.32.6 (noch nicht veröffentlicht)
+
+- Subtraktions-Rechenstriche zeigen die bekannte Ausgangszahl auch dann am richtigen Bezugspunkt, wenn sie rechts vom unbekannten Ergebnis liegt. Das Ergebnis bleibt bis zur richtigen Lösung maskiert.
+- Eine Stellenwert-Remediation zu Vergleichen und Ordnen bleibt in derselben Aufgabenfamilie: drei statt vier Zahlen, dieselbe Vergleichsrichtung und kurze, auf den aktuellen Schritt bezogene Hilfen.
+- Der konkrete vom Generator erzeugte Aufgabentyp bleibt erhalten, wenn er für die Lernphase im Katalog eingetragen ist. Die Runtime ersetzt ihn nicht mehr pauschal durch den ersten Phasentyp.
+- Die deaktivierte Kompetenz `probability` ist nun auch in allen sechs Lernphasen auf `disabled` gesetzt. Die Katalogvalidierung weist widersprüchliche Mischzustände zurück.
+- Nachbarzehner und Nachbarhunderter fragen in geführten Aufgaben nur noch die beiden in der Überschrift gesuchten Nachbarn ab. Vorgänger und Nachfolger wurden aus dieser Aufgabenfamilie entfernt.
+- Mehrschrittige Aufgaben setzen Eingaben, Auswahl, Tipps und Rückmeldungen beim Schrittwechsel vollständig zurück.
+- Division unterscheidet Gruppieren und Verteilen auch in der Darstellung: Gesuchte Gruppen oder Gruppengrößen bleiben bis zur richtigen Antwort verborgen.
+- Zahlworterklärungen verwenden die kanonische Stellenwertzerlegung, etwa `700 + 30 = 730`.
+- Kombinatorik-Einstiege und Sachaufgaben-Plausibilitätsfragen verwenden konkrete Kindersprache statt interner Kategorien und bereits ausgefüllter Lösungsraster.
+- Farbpunkte werden passend zu ihrer Beschriftung gerendert; Wahrscheinlichkeit bleibt dennoch produktiv deaktiviert.
+- App 0.32.6 verwendet Katalog 0.31.3 und unverändert Schema 19. Es kommt keine neue Kompetenz hinzu.
+
+Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 501 Unit-/Komponententests, Produktionsbuild, 21 Playwright-Szenarien gegen Vite Preview und erneut 21 Szenarien gegen den gehärteten Read-only-Container. Das lokale AMD64-Image `mathe-reise:local` lief als UID 101 ohne Capabilities, mit `/tmp` als einzigem `tmpfs` und meldete `healthy`; Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen.
+
+Die Änderung ist noch nicht als Git-Tag, GitHub Release oder GHCR-Image veröffentlicht. Ein erneuter echter iPhone-Test und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
+
 ## Direkter Rundenabschluss 0.32.5
 
 - Abgeschlossene Runden werden unmittelbar nach der letzten Aufgabe gespeichert und können im Abschluss nicht mehr versehentlich verworfen werden.

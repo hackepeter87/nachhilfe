@@ -62,7 +62,7 @@ describe('curriculare Gesamtintegration', () => {
   }, 60_000)
 
   it('hält Hilfetexte, Darstellungsverfügbarkeit und katalogisierte Sichtbarkeit synchron', () => {
-    const visualReference = /(Balken|Bild|Diagramm|Gefäß|Gruppe|Material|Messstrecke|Münz|Punktefeld|Raster|Rechenstrich|Stellenwerttafel|Tabelle|Waage|Zahlenstrahl)/i
+    const visualReference = /(Balken|Bild|Diagramm|Gefäß|Gruppenbild|Gruppierungsmodell|Verteilmodell|Material|Messstrecke|Münz|Punktefeld|Raster|Rechenstrich|Stellenwerttafel|Tabelle|Waage|Zahlenstrahl)/i
     for (const skill of getTaskCatalog().skills.filter((candidate) => candidate.releaseStatus === 'active')) {
       for (const level of skill.difficultyLevels) {
         const exercise = generateExercise(skill.id, 8_000 + level.level, level.level)

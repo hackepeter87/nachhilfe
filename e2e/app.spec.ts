@@ -1,5 +1,30 @@
 import { expect, test, type Page } from '@playwright/test'
 
+interface RoutedCatalog {
+  skills: Array<{
+    id: string
+    releaseStatus: string
+    learningPhases?: Array<{ releaseStatus: string }>
+  }>
+}
+
+function disableSkill(skill: RoutedCatalog['skills'][number]) {
+  skill.releaseStatus = 'disabled'
+  skill.learningPhases?.forEach((phase) => { phase.releaseStatus = 'disabled' })
+}
+
+function keepOnlySkills(catalog: RoutedCatalog, enabled: string[]) {
+  catalog.skills.forEach((skill) => {
+    if (!enabled.includes(skill.id)) disableSkill(skill)
+  })
+}
+
+function disableSkills(catalog: RoutedCatalog, disabled: string[]) {
+  catalog.skills.forEach((skill) => {
+    if (disabled.includes(skill.id)) disableSkill(skill)
+  })
+}
+
 async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => void) {
   const reportedExercises = new Set<string>()
   for (let action = 0; action < 80; action += 1) {
@@ -190,9 +215,9 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.31.2',
+    catalogVersion: '0.31.3',
     schemaVersion: 19,
-    appVersion: '0.32.5',
+    appVersion: '0.32.6',
     selfAssessment: 'not-asked'
   })
 
@@ -270,10 +295,8 @@ test('Navigation, Rundenwechsel und Zurücksetzen bleiben mobil verständlich', 
 test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'read-tables'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'read-tables'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -295,10 +318,8 @@ test('Tabellen und Diagramme bleiben mobil lesbar und Antworten starten neutral'
 test('Kombinatorik bleibt mobil lesbar und deaktivierte Zufallsaufgaben erscheinen nicht', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'combinatorics'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'combinatorics'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -359,10 +380,8 @@ test('Kombinatorik bleibt mobil lesbar und deaktivierte Zufallsaufgaben erschein
 test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'time', 'mass', 'capacity'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'time', 'mass', 'capacity'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -421,10 +440,8 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
 test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'plane-shapes', 'patterns'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'plane-shapes', 'patterns'])
     await route.fulfill({ response, json: catalog })
   })
   await onboard(page, 'Form')
@@ -471,10 +488,8 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
 test('Fläche und Umfang beginnen mit unterschiedlichen Einheiten und maskieren das Ergebnis', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'area', 'perimeter'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'area', 'perimeter'])
     await route.fulfill({ response, json: catalog })
   })
   await onboard(page, 'Raster')
@@ -535,10 +550,8 @@ test('Fläche und Umfang beginnen mit unterschiedlichen Einheiten und maskieren 
 test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (['addition', 'subtraction', 'division'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    disableSkills(catalog, ['addition', 'subtraction', 'division'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -564,13 +577,11 @@ test('Punktgruppen zeigen auf dem mobilen Viewport jede Gruppe und jeden Punkt',
   await page.screenshot({ path: testInfo.outputPath('punktgruppen-375x812.png'), fullPage: true })
 })
 
-test('Division zeigt mobil die vollständige Gruppierung oder Verteilung ohne numerische Lösung', async ({ page }, testInfo) => {
+test('Division zeigt beim Erkennen der gesuchten Größe noch kein numerisches Ergebnis', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (['addition', 'subtraction', 'multiplication'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    disableSkills(catalog, ['addition', 'subtraction', 'multiplication'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -581,26 +592,38 @@ test('Division zeigt mobil die vollständige Gruppierung oder Verteilung ohne nu
   await expect(model).toHaveAttribute('aria-label', /vollständig.*unbekannt/i)
   await expect(model.locator(':scope > strong').last()).toContainText('?')
   const counts = await model.evaluate((element) => ({
+    grouping: element.classList.contains('division-model--grouping'),
     pool: element.querySelectorAll('.known-pool i').length,
     partition: element.querySelectorAll('.division-partition i').length,
     groups: element.querySelectorAll('.division-group').length,
     pointsPerGroup: [...element.querySelectorAll('.division-group')].map((group) => group.querySelectorAll('i').length)
   }))
   expect(counts.pool).toBeGreaterThanOrEqual(4)
-  expect(counts.partition).toBe(counts.pool)
-  expect(counts.groups).toBeGreaterThanOrEqual(2)
-  expect(new Set(counts.pointsPerGroup).size).toBe(1)
+  if (counts.grouping) {
+    expect(counts.groups).toBe(1)
+    expect(counts.partition).toBeGreaterThanOrEqual(2)
+    expect(counts.partition).toBeLessThan(counts.pool)
+  } else {
+    expect(counts.groups).toBeGreaterThanOrEqual(2)
+    expect(counts.partition).toBe(0)
+  }
+  await page.getByRole('button', { name: counts.grouping ? 'die Anzahl der Gruppen' : 'die Punkte in jeder Gruppe', exact: true }).click()
+  await expect(model.locator(':scope > strong').last()).toContainText('?')
+  const afterChoice = await model.evaluate((element) => ({
+    pool: element.querySelectorAll('.known-pool i').length,
+    partition: element.querySelectorAll('.division-partition i').length
+  }))
+  expect(afterChoice.partition).toBe(counts.partition)
+  expect(afterChoice.partition).toBeLessThan(afterChoice.pool)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-  await page.screenshot({ path: testInfo.outputPath('division-vollstaendig-375x812.png'), fullPage: true })
+  await page.screenshot({ path: testInfo.outputPath('division-gesuchte-groesse-375x812.png'), fullPage: true })
 })
 
 test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'symmetry'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'symmetry'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -635,10 +658,8 @@ test('Symmetrie zeigt mobil eine Achse zwischen den Zellen ohne Overflow', async
 test('Körperansichten beginnen mit der Blickrichtung und bleiben mobil ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'body-views'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'body-views'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -666,10 +687,8 @@ test('Körperansichten beginnen mit der Blickrichtung und bleiben mobil ohne Ove
 test('Würfelrotation beginnt mit Achse und Drehrichtung mobil ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'cube-rotation'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'cube-rotation'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -721,10 +740,8 @@ test('Würfelrotation beginnt mit Achse und Drehrichtung mobil ohne Overflow', a
 test('Einzelfaltung beginnt mit Achse und bewegter Papierhälfte mobil ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'folding'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'folding'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -775,13 +792,10 @@ test('Einzelfaltung beginnt mit Achse und bewegter Papierhälfte mobil ohne Over
 test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen Rechnung', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as {
-      skills: Array<{ id: string; releaseStatus: string }>
+    const catalog = await response.json() as RoutedCatalog & {
       wordProblems: Array<{ id: string }>
     }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'word-problem'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    keepOnlySkills(catalog, ['addition', 'word-problem'])
     catalog.wordProblems = catalog.wordProblems.filter((template) => template.id === 'shells-addition')
     await route.fulfill({ response, json: catalog })
   })
@@ -836,8 +850,10 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   if (first === undefined || second === undefined) throw new Error('Rechnung ist nicht lesbar')
   await expect(model).toBeVisible()
   await page.getByRole('button', { name: `${first} + ${second} = ?`, exact: true }).click()
-  await expect(page.locator('.feedback--step-success')).toBeVisible()
+  await expect(page.locator('.feedback--step-success')).toHaveCount(0)
   await expect(model).toBeVisible()
+  await expect(page.getByRole('heading', { level: 3 })).toBeFocused()
+  await expect(page.getByLabel('Dein Ergebnis')).toBeVisible()
   await page.getByLabel('Dein Ergebnis').fill(String(first + second))
   await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
   await page.getByRole('button', { name: `Mila hat jetzt ${first + second} Muscheln.` }).click()
@@ -847,10 +863,8 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
 test('Schriftliche Addition wird nach den Voraussetzungen mobil vollständig bearbeitet', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'written-addition'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'written-addition'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -927,10 +941,8 @@ test('Schriftliche Addition wird nach den Voraussetzungen mobil vollständig bea
 test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['subtraction', 'written-subtraction'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['subtraction', 'written-subtraction'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -1011,10 +1023,8 @@ test('Schriftliche Subtraktion entbündelt mobil sichtbar und vollständig', asy
 test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', async ({ page }, testInfo) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'money', 'lengths'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'money', 'lengths'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -1075,10 +1085,8 @@ test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung 
     const page = await context.newPage()
     await page.route('**/content/task-catalog.json', async (route) => {
       const response = await route.fetch()
-      const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-      catalog.skills.forEach((skill) => {
-        if (!['addition', scenario.skillId].includes(skill.id)) skill.releaseStatus = 'disabled'
-      })
+      const catalog = await response.json() as RoutedCatalog
+      keepOnlySkills(catalog, ['addition', scenario.skillId])
       await route.fulfill({ response, json: catalog })
     })
 

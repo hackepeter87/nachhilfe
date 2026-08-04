@@ -208,6 +208,20 @@ describe('ExerciseCard', () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, subskillId: 'division-grouping-by-5' }))
   })
 
+  it('deckt beim Erkennen der gesuchten Divisionsgröße noch kein Ergebnis auf', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('division', 125, 1, 'division-grouping-by-5', 'activate')
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const correct = exercise.options?.find((option) => option.value === exercise.correctAnswer)
+    if (!correct) throw new Error('Richtige Auswahl zur gesuchten Divisionsgröße fehlt')
+
+    expect(container.querySelector('.division-model > strong:last-child')).toHaveTextContent('?')
+    expect(container.querySelectorAll('.division-partition i').length).toBeLessThan(container.querySelectorAll('.known-pool i').length)
+    await user.click(screen.getByRole('button', { name: correct.label }))
+    expect(container.querySelector('.division-model > strong:last-child')).toHaveTextContent('?')
+    expect(container.querySelectorAll('.division-partition i').length).toBeLessThan(container.querySelectorAll('.known-pool i').length)
+  })
+
   it('wechselt bei der zweiten Geteiltaufgabe auch die sichtbare Verteilhandlung', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('division', 125, 3, 'division-grouping-by-5', 'transfer')
@@ -245,6 +259,18 @@ describe('ExerciseCard', () => {
     await user.type(screen.getByLabelText('Deine Antwort'), exercise.correctAnswer)
     await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
     expect(endLabel()).toHaveTextContent(exercise.correctAnswer)
+  })
+
+  it('behält bei einer Minusaufgabe den bekannten Startwert sichtbar und deckt nur das Ergebnis auf', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('subtraction', 42, 1)
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+    const labels = () => [...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)
+
+    expect(labels()).toEqual(['?', String(exercise.variant.values.first)])
+    await user.type(screen.getByLabelText('Deine Antwort'), exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(labels()).toEqual([exercise.correctAnswer, String(exercise.variant.values.first)])
   })
 
   it('führt eine mehrschrittige Strategieaufgabe vollständig aus', async () => {
@@ -317,7 +343,7 @@ describe('ExerciseCard', () => {
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
 
     await user.click(screen.getByRole('button', { name: 'Ich brauche einen Tipp' }))
-    expect(screen.getByText(exercise.hints[0].text)).toBeVisible()
+    expect(screen.getByText(exercise.steps?.[0]?.errorFeedback ?? '')).toBeVisible()
     expect(screen.queryByText(exercise.hints[1].text)).not.toBeInTheDocument()
     expect(screen.queryByText('Tipp geöffnet')).not.toBeInTheDocument()
   })
@@ -567,7 +593,7 @@ describe('ExerciseCard', () => {
     expect(screen.queryByText(generated.explanation)).not.toBeInTheDocument()
   })
 
-  it('zeigt positives Zwischenfeedback bei Sachaufgaben grün', async () => {
+  it('entfernt Zwischenfeedback und Hinweise beim Wechsel zum nächsten Sachaufgabenschritt', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('word-problem', 42, 1, undefined, 'guided-practice')
     render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
@@ -575,11 +601,13 @@ describe('ExerciseCard', () => {
     const equationStep = exercise.steps?.find((step) => step.id === 'equation')
     const correct = equationStep?.options?.find((option) => option.value === equationStep.correctAnswer)
     if (!equationStep || !correct) throw new Error('Geführte Rechnungswahl fehlt')
+    await user.click(screen.getByRole('button', { name: 'Ich brauche einen Tipp' }))
+    expect(screen.getByText(equationStep.errorFeedback)).toBeVisible()
     await user.click(screen.getByRole('button', { name: correct.label }))
 
-    const feedback = screen.getByText(equationStep.successFeedback)
-    expect(feedback).toHaveClass('feedback--step-success')
-    expect(feedback).not.toHaveClass('feedback--try')
+    expect(screen.queryByText(equationStep.successFeedback)).not.toBeInTheDocument()
+    expect(screen.queryByText(equationStep.errorFeedback)).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3 })).toHaveFocus()
   })
 
   it('startet Auswahlaufgaben neutral und trennt Fokus von Auswahl', () => {

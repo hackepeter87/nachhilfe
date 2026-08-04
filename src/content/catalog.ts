@@ -780,6 +780,7 @@ function isSkill(value: unknown, numberRange: { min: number; max: number }): val
     ['always', 'hint', 'none'].includes(level.representation as string) && LEARNING_PHASES.includes(level.learningPhase as LearningPhase) && hasValidRequirements(level.requirements)
   )) return false
   if (!CONTENT_STATUSES.includes(value.releaseStatus as ContentStatus)) return false
+  if (value.releaseStatus === 'disabled' && value.learningPhases.some((phase) => (phase as CatalogLearningPhase).releaseStatus !== 'disabled')) return false
   if (!Array.isArray(value.misconceptions) || value.misconceptions.length === 0 || !value.misconceptions.every(isNonEmptyString)) return false
   if (value.misconceptionFeedback !== undefined) {
     if (!Array.isArray(value.misconceptionFeedback) || value.misconceptionFeedback.length === 0 ||

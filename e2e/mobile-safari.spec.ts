@@ -1,5 +1,21 @@
 import { expect, test, type Page } from '@playwright/test'
 
+interface RoutedCatalog {
+  skills: Array<{
+    id: string
+    releaseStatus: string
+    learningPhases?: Array<{ releaseStatus: string }>
+  }>
+}
+
+function keepOnlySkills(catalog: RoutedCatalog, enabled: string[]) {
+  catalog.skills.forEach((skill) => {
+    if (enabled.includes(skill.id)) return
+    skill.releaseStatus = 'disabled'
+    skill.learningPhases?.forEach((phase) => { phase.releaseStatus = 'disabled' })
+  })
+}
+
 async function onboard(page: Page) {
   await page.goto('/')
   const installButton = page.getByRole('button', { name: 'Weiter zur Mathe-Reise' })
@@ -34,10 +50,8 @@ async function finishAdditionWarmups(page: Page) {
 test('Mobile-Safari-Näherung startet Aufgaben neutral und setzt Touch-Zustände zurück', async ({ page }) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'body-views'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'body-views'])
     await route.fulfill({ response, json: catalog })
   })
 
@@ -75,10 +89,8 @@ test('Mobile-Safari-Näherung startet Aufgaben neutral und setzt Touch-Zustände
 test('Mobile-Safari-Näherung zeigt eine kontrollierte Würfelrotation neutral und vollständig', async ({ page }) => {
   await page.route('**/content/task-catalog.json', async (route) => {
     const response = await route.fetch()
-    const catalog = await response.json() as { skills: Array<{ id: string; releaseStatus: string }> }
-    catalog.skills.forEach((skill) => {
-      if (!['addition', 'cube-rotation'].includes(skill.id)) skill.releaseStatus = 'disabled'
-    })
+    const catalog = await response.json() as RoutedCatalog
+    keepOnlySkills(catalog, ['addition', 'cube-rotation'])
     await route.fulfill({ response, json: catalog })
   })
 

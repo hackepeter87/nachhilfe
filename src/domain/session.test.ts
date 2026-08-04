@@ -19,9 +19,9 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.31.2',
+      catalogVersion: '0.31.3',
       schemaVersion: 19,
-      appVersion: '0.32.5'
+      appVersion: '0.32.6'
     })
   })
 
@@ -96,7 +96,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.31.2')
+      expect(runningSession.catalogVersion).toBe('0.31.3')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {
@@ -321,6 +321,24 @@ describe('Sitzungsplanung', () => {
     expect(repetition.learningPhase).toBe(defaultLearningPhaseForDifficulty(original.skillId, 2))
     expect(repetition.subskillId).toBe(original.subskillId)
     expect(repetition.variant.key).not.toBe(original.variant.key)
+  })
+
+  it('hält Stellenwert-Remediation beim Vergleichen und Ordnen statt zum Ziffernwert zu wechseln', () => {
+    for (let seed = 1; seed <= 100; seed += 1) {
+      const original = generateExercise('place-value', seed, 3, undefined, 'transfer')
+      const repetition = createRemediationExercise(original, 10_000 + seed)
+      expect(original).toMatchObject({ typeId: 'transfer-order', subskillId: 'place-value-order' })
+      expect(repetition).toMatchObject({
+        typeId: 'independent-order',
+        subskillId: 'place-value-order',
+        difficulty: 2,
+        learningPhase: 'independent-practice'
+      })
+      expect(repetition.prompt).toMatch(/^Ordne diese 3 Zahlen/)
+      expect(repetition.steps?.map((step) => step.interaction)).toEqual(['select', 'order'])
+      expect(repetition.explanation).toMatch(/[<>]/)
+      expect(repetition.explanation).not.toMatch(/steht die .* bei den/i)
+    }
   })
 
   it('führt nach einem Fehler bei schriftlicher Subtraktion auf eine sichtbare verwandte Entbündelung zurück', () => {

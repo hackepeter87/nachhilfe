@@ -53,11 +53,13 @@ export function ExerciseCard({ exercise, onComplete }: ExerciseCardProps) {
 function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const panelRef = useRef<HTMLElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null)
   const [answer, setAnswer] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>('answering')
   const [checks, setChecks] = useState(0)
   const [hadError, setHadError] = useState(false)
   const [hintsShown, setHintsShown] = useState(0)
+  const [hintsUsed, setHintsUsed] = useState(0)
   const [message, setMessage] = useState('')
   const [messageKind, setMessageKind] = useState<MessageKind>('success')
   const [stepIndex, setStepIndex] = useState(0)
@@ -72,12 +74,30 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     headingRef.current?.focus({ preventScroll: true })
   }, [])
 
+  useLayoutEffect(() => {
+    if (stepIndex > 0) stepHeadingRef.current?.focus({ preventScroll: true })
+  }, [stepIndex])
+
   const currentStep = steps?.[stepIndex]
   const currentInteraction = currentStep?.interaction ?? 'select'
-  const visibleHintLimit = exercise.answerMode === 'guided-word' && currentStep?.id !== 'model' ? 1 : 2
+  const contextualHints = currentStep
+    ? [{ level: 1, text: currentStep.errorFeedback }]
+    : exercise.hints
+  const visibleHintLimit = Math.min(exercise.answerMode === 'guided-word' && currentStep?.id !== 'model' ? 1 : 2, contextualHints.length)
 
   const showNextHint = () => {
-    setHintsShown((current) => Math.min(visibleHintLimit, current + 1))
+    if (hintsShown >= visibleHintLimit) return
+    setHintsShown(hintsShown + 1)
+    setHintsUsed((count) => count + 1)
+  }
+
+  const resetForNextStep = () => {
+    setAnswer('')
+    setPairingSelections([])
+    setOrderSelections([])
+    setHintsShown(0)
+    setMessage('')
+    setMessageKind('success')
   }
 
   const registerWrongAnswer = (feedback: string, misconceptionId?: string) => {
@@ -90,7 +110,6 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setAnswer('')
     setPairingSelections([])
     setOrderSelections([])
-    setHintsShown((current) => Math.max(current, 1))
     if (nextChecks >= 2) setAnswerState('scaffold')
   }
 
@@ -130,15 +149,13 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     }
     setChecks((current) => current + 1)
     setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: value }))
-    setMessage(currentStep.successFeedback)
-    setMessageKind('success')
     if (stepIndex === (steps?.length ?? 1) - 1) {
+      setMessage(currentStep.successFeedback)
+      setMessageKind('success')
       setAnswerState('correct')
     } else {
+      resetForNextStep()
       setStepIndex((current) => current + 1)
-      setAnswer('')
-      setPairingSelections([])
-      setOrderSelections([])
     }
   }
 
@@ -149,7 +166,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       subskillId: exercise.subskillId,
       variantKey: exercise.variant.key,
       correct: !hadError && answerState === 'correct',
-      hintsUsed: hintsShown,
+      hintsUsed,
       attempts: Math.max(1, checks),
       detectedMisconceptions: [...new Set(detectedMisconceptions)],
       completedAt: new Date().toISOString()
@@ -166,10 +183,14 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const continueStep = () => {
     if (!currentStep) return
     setCompletedStepAnswers((current) => ({ ...current, [currentStep.id]: currentStep.correctAnswer }))
-    setMessage(currentStep.successFeedback)
-    setMessageKind('success')
-    if (stepIndex === (steps?.length ?? 1) - 1) setAnswerState('correct')
-    else setStepIndex((current) => current + 1)
+    if (stepIndex === (steps?.length ?? 1) - 1) {
+      setMessage(currentStep.successFeedback)
+      setMessageKind('success')
+      setAnswerState('correct')
+    } else {
+      resetForNextStep()
+      setStepIndex((current) => current + 1)
+    }
   }
 
   const togglePairing = (value: string) => {
@@ -249,7 +270,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       }
     : displayedRepresentation
 
-  const presentationRepresentation = progressivelyRevealedRepresentation && answerState === 'correct'
+  const presentationRepresentation = progressivelyRevealedRepresentation && answerState === 'correct' && progressivelyRevealedRepresentation.revealUnknownOnCorrect !== false
     ? {
         ...progressivelyRevealedRepresentation,
         valueRoles: {
@@ -305,7 +326,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
           <div className="step-dots" aria-label={`Schritt ${stepIndex + 1} von ${steps?.length}`}>
             {steps?.map((step, index) => <span className={index <= stepIndex ? 'step-dot step-dot--active' : 'step-dot'} key={step.id} />)}
           </div>
-          <h3>{stepIndex + 1}. {currentStep.prompt}</h3>
+          <h3 ref={stepHeadingRef} tabIndex={-1}>{stepIndex + 1}. {currentStep.prompt}</h3>
           {(currentStep.representation ?? persistentWordModel) && <MathRepresentation representation={(currentStep.representation ?? persistentWordModel)!} />}
           {['select', 'mark', 'match', 'complete-model', 'identify-error', 'choose-strategy'].includes(currentInteraction) && renderOptions()}
           {currentInteraction === 'build-pairing' && (
@@ -451,7 +472,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
             <div className="hint" aria-live="polite">
               <Lightbulb aria-hidden="true" />
               <div>
-                {exercise.hints.slice(0, Math.min(hintsShown, visibleHintLimit)).map((hint) => <p key={hint.level}>{hint.text}</p>)}
+                {contextualHints.slice(0, Math.min(hintsShown, visibleHintLimit)).map((hint) => <p key={hint.level}>{hint.text}</p>)}
               </div>
             </div>
           )}

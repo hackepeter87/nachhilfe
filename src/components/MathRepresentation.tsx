@@ -378,7 +378,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
       <div className={`math-visual chance-display chance-display--${experimentType}`} role="img" aria-label={description}>
         <strong>{textValue(values.title)}</strong>
         <div className="chance-outcomes" aria-hidden="true">
-          {outcomes.map((outcome, index) => <span key={`${outcome}-${index}`}><i>{experimentType === 'die' ? '□' : experimentType === 'coin' ? '○' : '●'}</i>{String(outcome)}</span>)}
+          {outcomes.map((outcome, index) => <span key={`${outcome}-${index}`}><i style={{ color: outcomeColor(String(outcome)) }}>{experimentType === 'die' ? '□' : experimentType === 'coin' ? '○' : '●'}</i>{String(outcome)}</span>)}
         </div>
         {values.eventALabel && values.eventBLabel && <p><b>{textValue(values.eventALabel)}</b><span>vergleichen mit</span><b>{textValue(values.eventBLabel)}</b></p>}
       </div>
@@ -386,6 +386,7 @@ export function MathRepresentation({ representation }: { representation: Exercis
   }
 
   if (representation.kind === 'combination-display') {
+    const displayMode = values.displayMode === 'selection' ? 'selection' : 'grid'
     const firstCount = Number(values.firstCount)
     const secondCount = Number(values.secondCount)
     const firstOptions = Array.from({ length: firstCount }, (_, index) => values[`first${index}`])
@@ -401,23 +402,29 @@ export function MathRepresentation({ representation }: { representation: Exercis
     return (
       <div className="math-visual combination-display" role="img" aria-label={description}>
         <strong>{textValue(values.title)}</strong>
-        <div className="combination-table" aria-hidden="true" style={{ '--combination-columns': secondCount } as CSSProperties}>
-          <span className="combination-corner">{textValue(values.firstLabel)} / {textValue(values.secondLabel)}</span>
-          {secondOptions.map((option) => <b className="combination-heading" key={String(option)}>{String(option)}</b>)}
-          {firstOptions.flatMap((first) => [
-            <b className="combination-heading combination-heading--row" key={`${first}-heading`}>{String(first)}</b>,
-            ...secondOptions.map((second) => {
-              const blocked = first === values.excludedFirst && second === values.excludedSecond
-              const missing = first === missingFirst && second === missingSecond
-              const className = blocked
-                ? 'combination-cell combination-cell--blocked'
-                : missing && !missingPairVisible
-                  ? 'combination-cell combination-cell--missing'
-                  : 'combination-cell combination-cell--filled'
-              return <span className={className} key={`${first}-${second}`}>{blocked ? '×' : missing && !missingPairVisible ? '?' : '✓'}</span>
-            })
-          ])}
-        </div>
+        {displayMode === 'selection'
+          ? <div className="combination-groups" aria-hidden="true">
+              <section><b>{textValue(values.firstLabel)}</b>{firstOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
+              <span className="combination-sign">und</span>
+              <section><b>{textValue(values.secondLabel)}</b>{secondOptions.map((option) => <span key={String(option)}>{String(option)}</span>)}</section>
+            </div>
+          : <div className="combination-table" aria-hidden="true" style={{ '--combination-columns': secondCount } as CSSProperties}>
+              <span className="combination-corner">{textValue(values.firstLabel)} / {textValue(values.secondLabel)}</span>
+              {secondOptions.map((option) => <b className="combination-heading" key={String(option)}>{String(option)}</b>)}
+              {firstOptions.flatMap((first) => [
+                <b className="combination-heading combination-heading--row" key={`${first}-heading`}>{String(first)}</b>,
+                ...secondOptions.map((second) => {
+                  const blocked = first === values.excludedFirst && second === values.excludedSecond
+                  const missing = first === missingFirst && second === missingSecond
+                  const className = blocked
+                    ? 'combination-cell combination-cell--blocked'
+                    : missing && !missingPairVisible
+                      ? 'combination-cell combination-cell--missing'
+                      : 'combination-cell combination-cell--filled'
+                  return <span className={className} key={`${first}-${second}`}>{blocked ? '×' : missing && !missingPairVisible ? '?' : '✓'}</span>
+                })
+              ])}
+            </div>}
         {excluded && <small>{textValue(values.excludedLabel)}: {excluded}</small>}
       </div>
     )
@@ -686,6 +693,8 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const markerKey = values.marker !== undefined ? 'marker' : values.target !== undefined ? 'target' : 'end'
     const markerVisible = isValueVisible(markerKey)
     const jumpsVisible = isValueVisible('jumps')
+    const waypoints = [...new Set(jumps.flatMap((jump) => [jump.from, jump.to]))]
+      .filter((value) => value !== scaleStart && value !== scaleEnd && value !== marker)
     const tickStep = Number(values.tickStep ?? 0)
     const ticks = Number.isInteger(tickStep) && tickStep > 0 && (scaleEnd - scaleStart) / tickStep <= 20
       ? Array.from({ length: Math.floor((scaleEnd - scaleStart) / tickStep) + 1 }, (_, index) => scaleStart + index * tickStep)
@@ -693,10 +702,12 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const lower = Number(values.lower)
     const upper = Number(values.upper)
     const scaleStartVisible = (scaleStart === start && startVisible) ||
+      (scaleStart === end && endVisible) ||
       (scaleStart === lower && isValueVisible('lower')) ||
       (scaleStart === upper && isValueVisible('upper')) ||
       (scaleStart !== start && scaleStart !== end && jumpsVisible)
-    const scaleEndVisible = (scaleEnd === end && endVisible) ||
+    const scaleEndVisible = (scaleEnd === start && startVisible) ||
+      (scaleEnd === end && endVisible) ||
       (scaleEnd === lower && isValueVisible('lower')) ||
       (scaleEnd === upper && isValueVisible('upper')) ||
       (scaleEnd !== start && scaleEnd !== end && jumpsVisible)
@@ -737,6 +748,9 @@ export function MathRepresentation({ representation }: { representation: Exercis
               </span>
             )
           })}
+          {waypoints.map((waypoint) => (
+            <strong className="number-line-waypoint" key={waypoint} style={{ left: `${positionFor(waypoint)}%` }}>{waypoint}</strong>
+          ))}
         </div>
         <div className="number-line-labels">
           <span>{scaleStartVisible ? scaleStart : '?'}</span>
@@ -825,13 +839,13 @@ export function MathRepresentation({ representation }: { representation: Exercis
         <span className="model-arrow" aria-hidden="true">↓</span>
         <span className="model-caption">{grouping ? `Immer ${groupSize} Punkte zusammen` : `Auf ${groupCount} Gruppen verteilen`}</span>
         <div className="division-partition" aria-hidden="true">
-          {Array.from({ length: groupCount }, (_, group) => (
+          {Array.from({ length: grouping && !answerVisible ? 1 : groupCount }, (_, group) => (
             <span
-              className="visual-group division-group"
+              className={`visual-group division-group${grouping && !answerVisible ? ' sample-group' : ''}`}
               key={group}
               style={{ '--point-columns': Math.min(groupSize, 5) } as CSSProperties}
             >
-              {Array.from({ length: groupSize }, (_, item) => <i key={item} />)}
+              {(grouping || answerVisible) && Array.from({ length: groupSize }, (_, item) => <i key={item} />)}
             </span>
           ))}
         </div>

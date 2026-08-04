@@ -1020,6 +1020,13 @@ p {
   font-size: .78rem;
   transform: translateX(-50%);
 }
+.number-line-waypoint {
+  position: absolute;
+  top: 11px;
+  color: #19577d;
+  font-size: .72rem;
+  transform: translateX(-50%);
+}
 .number-line-tick { position: absolute; top: 50%; width: 2px; height: 12px; background: #6f8a79; transform: translate(-50%, -50%); }
 .number-line-tick small { position: absolute; top: 15px; left: 50%; color: #19577d; font-size: .64rem; font-weight: 850; transform: translateX(-50%); }
 .number-line-jump {
@@ -1101,7 +1108,7 @@ p {
 .combination-groups section { display: grid; gap: 5px; min-width: 0; }
 .combination-groups section b { color: #557060; font-size: .72rem; }
 .combination-groups section span { overflow-wrap: anywhere; padding: 6px; border: 1px solid #78a88d; border-radius: 4px; background: #fff; font-size: .76rem; font-weight: 800; }
-.combination-sign { color: #2876a8; font-size: 1.2rem; font-weight: 900; }
+.combination-sign { color: #2876a8; font-size: .82rem; font-weight: 900; }
 .combination-table { --combination-columns: 2; display: grid; grid-template-columns: minmax(72px, 1fr) repeat(var(--combination-columns), minmax(48px, 1fr)); gap: 4px; width: 100%; }
 .combination-corner, .combination-heading { display: grid; place-items: center; min-width: 0; padding: 5px 3px; color: #557060; font-size: .66rem; line-height: 1.1; overflow-wrap: anywhere; }
 .combination-corner { text-align: left; }

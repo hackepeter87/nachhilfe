@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.2')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.3')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -94,6 +94,19 @@ describe('versionierter Aufgabenkatalog', () => {
       expect(skill.transferPrompt.length).toBeGreaterThan(0)
       expect(skill.releaseStatus).toBe(skill.id === 'probability' ? 'disabled' : 'active')
     })
+  })
+
+  it('deaktiviert bei einer deaktivierten Kompetenz auch sämtliche Lernphasen', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const disabledSkills = catalog.skills.filter((skill) => skill.releaseStatus === 'disabled')
+    expect(disabledSkills.map((skill) => skill.id)).toEqual(['probability'])
+    disabledSkills.forEach((skill) => {
+      expect(skill.learningPhases.every((phase) => phase.releaseStatus === 'disabled')).toBe(true)
+    })
+
+    const inconsistent = structuredClone(catalog)
+    inconsistent.skills.find((skill) => skill.id === 'probability')!.learningPhases[0]!.releaseStatus = 'active'
+    expect(validateTaskCatalog(inconsistent)).toBe(false)
   })
 
   it('klassifiziert didaktische Felder nach ihrer tatsächlichen Verwendung', () => {
@@ -217,12 +230,22 @@ describe('versionierter Aufgabenkatalog', () => {
       expect(new Set([template.modelType, ...template.modelDistractors]).size).toBe(3)
       expect(new Set([template.equation, ...template.equationDistractors]).size).toBe(3)
       expect(template.plausibility.options.filter((option) => option.correct)).toHaveLength(1)
+      expect([template.plausibility.prompt, ...template.plausibility.options.map((option) => option.label)].join(' '))
+        .not.toMatch(/Teilmenge|Gesamtzahl|Mengenbeziehung|Endergebnis|Bestand/)
     })
     expect(catalog.wordProblemSteps.modellingProgression.map((stage) => stage.stage)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
     expect(catalog.wordProblemSteps.runtimeSequence.map((step) => step.id)).toEqual([
       'question', 'relevant', 'model', 'equation', 'calculate', 'second-equation', 'final-calculation', 'plausibility', 'check'
     ])
     expect(JSON.stringify(catalog.wordProblemSteps)).not.toMatch(/Mengenbeziehung|Welche Rechenart/i)
+  })
+
+  it('liefert für jede Kombinationsvorlage eine kindgerechte Auswahlfrage', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    catalog.chanceContent.combinationTemplates.forEach((template) => {
+      expect(template.selectionQuestion).toBeTruthy()
+      expect(template.selectionQuestion).not.toMatch(/nimmt genau eine Möglichkeit|Ergebnisraum/)
+    })
   })
 
   it('verwendet in Remediation konkrete Handlungen statt interner Defizitsprache', () => {
@@ -250,7 +273,8 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     expect(catalog.skills.filter((skill) => skill.id !== 'probability').every((skill) => skill.releaseStatus === 'active')).toBe(true)
     expect(catalog.skills.find((skill) => skill.id === 'probability')?.releaseStatus).toBe('disabled')
-    expect(catalog.skills.every((skill) => skill.learningPhases.some((phase) => phase.releaseStatus === 'active'))).toBe(true)
+    expect(catalog.skills.filter((skill) => skill.releaseStatus === 'active')
+      .every((skill) => skill.learningPhases.some((phase) => phase.releaseStatus === 'active'))).toBe(true)
     expect(catalog.preparedTopics.map((topic) => topic.id)).toEqual(['spatial-reasoning'])
     expect(catalog.skills.filter((skill) => ['money', 'lengths'].includes(skill.id)).every((skill) => skill.releaseStatus === 'active')).toBe(true)
     expect(catalog.preparedTopics.every((topic) => topic.releaseStatus === 'disabled')).toBe(true)
@@ -353,7 +377,10 @@ describe('versionierter Aufgabenkatalog', () => {
   it('akzeptiert einen fokussierten Sachaufgabenkatalog für die mobile Abnahme', () => {
     const focused = structuredClone(FALLBACK_TASK_CATALOG)
     focused.skills.forEach((skill) => {
-      if (!['addition', 'word-problem'].includes(skill.id)) skill.releaseStatus = 'disabled'
+      if (!['addition', 'word-problem'].includes(skill.id)) {
+        skill.releaseStatus = 'disabled'
+        skill.learningPhases.forEach((phase) => { phase.releaseStatus = 'disabled' })
+      }
     })
     focused.wordProblems = focused.wordProblems.filter((template) => template.id === 'shells-addition')
     expect(resolveTaskCatalog(focused)).toBe(focused)

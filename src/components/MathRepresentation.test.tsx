@@ -144,6 +144,8 @@ describe('MathRepresentation Zufall und Kombinationen', () => {
     }} />)
     expect(screen.getByRole('img', { name: /rot, rot, blau/ })).toBeVisible()
     expect(container.querySelectorAll('.chance-outcomes span')).toHaveLength(3)
+    expect(container.querySelectorAll('.chance-outcomes i')[0]).toHaveStyle({ color: '#d9533f' })
+    expect(container.querySelectorAll('.chance-outcomes i')[2]).toHaveStyle({ color: '#2876a8' })
     expect(container).not.toHaveTextContent(/sicher|möglich|unmöglich/i)
   })
 
@@ -322,7 +324,7 @@ describe('MathRepresentation Sachaufgabenmodelle', () => {
     }} />)
     expect(screen.getByRole('img', { name: '24 Punkte werden vollständig auf 4 gleich große Gruppen verteilt. Punkte je Gruppe: unbekannt.' })).toBeVisible()
     expect(container.querySelectorAll('.division-group')).toHaveLength(4)
-    expect(container.querySelectorAll('.division-group i')).toHaveLength(24)
+    expect(container.querySelectorAll('.division-group i')).toHaveLength(0)
     expect(container).not.toHaveTextContent('6')
   })
 
@@ -550,6 +552,23 @@ describe('MathRepresentation mathematische Rollen', () => {
     expect(container.querySelector('.number-line-labels')).toHaveTextContent('26')
   })
 
+  it('zeigt bei einer Subtraktion die bekannte Ausgangszahl am rechten Bezugspunkt', () => {
+    const representation: ExerciseRepresentation = {
+      kind: 'number-line', visibility: 'always', label: 'Subtraktion auf dem Rechenstrich',
+      values: { start: 7, end: 3, marker: 7, jumps: [{ from: 7, to: 3, label: '−4' }] },
+      valueRoles: { knownValues: ['start', 'marker', 'jumps'], unknownValues: ['end'], revealedValues: [] }
+    }
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
+    expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual(['?', '7'])
+    expect(container.querySelector('.number-line-marker-label')).toBeNull()
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: ['end'] }
+    }} />)
+    expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual(['3', '7'])
+  })
+
   it('zeigt bei Nachbarzahlen nur die gegebene Zahl, nicht die gesuchten Nachbarn', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{
       kind: 'number-line', visibility: 'always', label: 'Nachbarzehner',
@@ -631,17 +650,75 @@ describe('MathRepresentation mathematische Rollen', () => {
     expect(container).toHaveTextContent('Rückgeld: 3,70 €')
   })
 
-  it('stellt den vollständigen Gruppierungsprozess ohne numerische Gruppenanzahl dar', () => {
+  it('zeigt beim Gruppieren vor der Rechnung nur eine Mustergruppe', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{
       kind: 'grouping-model', visibility: 'always', label: 'Vollständiges Gruppierungsmodell',
       values: { total: 24, groupSize: 6, groupCount: 4 },
       valueRoles: { knownValues: ['total', 'groupSize'], unknownValues: ['groupCount'], revealedValues: [] }
     }} />)
     expect(screen.getByRole('img', { name: /vollständig.*Gruppen mit je 6 Punkten.*Anzahl der Gruppen: unbekannt/i })).toBeVisible()
-    expect(container.querySelectorAll('.division-group')).toHaveLength(4)
-    expect(container.querySelectorAll('.division-group i')).toHaveLength(24)
+    expect(container.querySelectorAll('.division-group')).toHaveLength(1)
+    expect(container.querySelectorAll('.division-group i')).toHaveLength(6)
     expect(container).toHaveTextContent('Zähle die Gruppen: ?')
     expect(container).not.toHaveTextContent('Zähle die Gruppen: 4')
+  })
+
+  it('zeigt beim Rechenstrich den bekannten Start und den bekannten Zwischenschritt, aber nicht das Ergebnis', () => {
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: '16 minus 7 in zwei Schritten',
+      values: {
+        start: 16,
+        end: 9,
+        marker: 16,
+        step: 7,
+        jumps: [{ from: 16, to: 10, label: '−6' }, { from: 10, to: 9, label: '−1' }]
+      },
+      valueRoles: {
+        knownValues: ['start', 'marker', 'step', 'jumps'],
+        unknownValues: ['end'],
+        revealedValues: []
+      }
+    }} />)
+    expect(container).toHaveTextContent('16')
+    expect(container.querySelector('.number-line-waypoint')).toHaveTextContent('10')
+    expect(container).toHaveTextContent('?')
+    expect(container).not.toHaveTextContent(/^9$/)
+
+    rerender(<RuntimeMathRepresentation representation={{
+      kind: 'number-line', visibility: 'always', label: '16 minus 7 in zwei Schritten',
+      values: {
+        start: 16,
+        end: 9,
+        marker: 16,
+        step: 7,
+        jumps: [{ from: 16, to: 10, label: '−6' }, { from: 10, to: 9, label: '−1' }]
+      },
+      valueRoles: {
+        knownValues: ['start', 'marker', 'step', 'jumps'],
+        unknownValues: ['end'],
+        revealedValues: ['end']
+      }
+    }} />)
+    expect(container).toHaveTextContent('9')
+  })
+
+  it('zeigt beim Einstieg in Kombinationen nur die beiden Auswahlgruppen', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={{
+      kind: 'combination-display', visibility: 'always', label: 'Frühstück wählen',
+      values: {
+        title: 'Frühstück wählen', displayMode: 'selection', firstLabel: 'Getränk', firstCount: 2,
+        first0: 'Milch', first1: 'Tee', secondLabel: 'Obst', secondCount: 2,
+        second0: 'Apfel', second1: 'Banane', excludedLabel: 'Nicht erlaubt'
+      },
+      valueRoles: {
+        knownValues: ['title', 'displayMode', 'firstLabel', 'firstCount', 'first0', 'first1', 'secondLabel', 'secondCount', 'second0', 'second1', 'excludedLabel'],
+        unknownValues: ['combinationCount'],
+        revealedValues: []
+      }
+    }} />)
+    expect(container.querySelector('.combination-groups')).toBeVisible()
+    expect(container.querySelectorAll('.combination-cell')).toHaveLength(0)
+    expect(container).not.toHaveTextContent('✓')
   })
 
   it.each([

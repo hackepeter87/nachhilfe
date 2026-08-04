@@ -39,6 +39,16 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(germanNumberWord(number)).toBe(word)
   })
 
+  it('erklärt Zahlwörter mit der tatsächlichen Stellenwertzerlegung', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('compose', seed, 2, undefined, 'transfer')
+      const answer = Number(exercise.correctAnswer)
+      const terms = [Math.floor(answer / 100) * 100, Math.floor((answer % 100) / 10) * 10, answer % 10]
+        .filter((value) => value > 0)
+      expect(exercise.explanation).toBe(`${terms.join(' + ')} = ${answer}.`)
+    }
+  })
+
   it('setzt die katalogisierte Sichtbarkeit verpflichtender Darstellungen um', () => {
     for (const skill of getTaskCatalog().skills) {
       for (const difficulty of [1, 2, 3] as const) {
@@ -391,7 +401,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
-  it('verknüpft Vorgänger, Nachfolger und direkte Nachbargrenzen über 1.000 Seeds', () => {
+  it('fragt bei Nachbaraufgaben ausschließlich die beiden direkten Grenzen ab', () => {
     for (const skill of ['neighbor-tens', 'neighbor-hundreds'] as const) {
       const unit = skill === 'neighbor-tens' ? 10 : 100
       for (let seed = 1; seed <= 1_000; seed += 1) {
@@ -399,8 +409,9 @@ describe('deterministische Aufgabengeneratoren', () => {
         const number = Number(exercise.variant.values.number)
         const lower = Number(exercise.variant.values.lower)
         const upper = Number(exercise.variant.values.upper)
-        expect(exercise.steps?.map((step) => step.id)).toEqual(['predecessor', 'successor', 'lower', 'upper'])
-        expect(exercise.steps?.map((step) => Number(step.correctAnswer))).toEqual([number - 1, number + 1, lower, upper])
+        expect(exercise.steps?.map((step) => step.id)).toEqual(['lower', 'upper'])
+        expect(exercise.steps?.map((step) => Number(step.correctAnswer))).toEqual([lower, upper])
+        expect(exercise.steps?.map((step) => step.prompt).join(' ')).not.toMatch(/direkt vor|direkt nach|Vorgänger|Nachfolger/)
         expect(lower).toBe(Math.floor(number / unit) * unit)
         expect(upper).toBe(lower + unit)
         expect(exercise.representation?.values).toMatchObject({ start: lower, end: upper, marker: number })
@@ -645,6 +656,26 @@ describe('deterministische Aufgabengeneratoren', () => {
           }
         }
       }
+    }
+  })
+
+  it('verwendet in Sachaufgaben kurze Plausibilitätsfragen ohne interne Mengenbegriffe', () => {
+    const forbidden = /Teilmenge|Gesamtzahl|Mengenbeziehung|Endergebnis|Bestand/
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('word-problem', seed, 3, undefined, 'transfer')
+      const step = exercise.steps?.find((candidate) => candidate.id === 'plausibility')
+      expect(step).toBeDefined()
+      expect(step?.prompt).not.toMatch(forbidden)
+      expect(step?.options?.map((option) => option.label).join(' ')).not.toMatch(forbidden)
+    }
+  })
+
+  it('beginnt Kombinationen mit einer kindgerechten Auswahl ohne ausgefülltes Raster', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('combinatorics', seed, 1, undefined, 'activate')
+      expect(exercise.prompt).toMatch(/Wähle|Stelle|Suche|Kombiniere/)
+      expect(exercise.prompt).not.toMatch(/nimmt genau eine Möglichkeit|Ergebnisraum/)
+      expect(exercise.representation?.values.displayMode).toBe('selection')
     }
   })
 

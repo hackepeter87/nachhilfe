@@ -426,7 +426,7 @@ function division(seed: number, difficulty: Difficulty, focus?: string, phase?: 
         { value: grouping ? 'die Punkte in jeder Gruppe' : 'die Anzahl der Gruppen', misconception: 'Gruppenanzahl und Gruppengröße werden verwechselt.', misconceptionId: 'division-group-roles' },
         { value: 'die Gesamtzahl der Punkte', misconception: 'Eine bereits bekannte Größe wird als gesucht behandelt.', misconceptionId: 'division-known-total' }
       ]),
-      representation: { ...divisionRepresentation, visibility: 'always' }
+      representation: { ...divisionRepresentation, visibility: 'always', revealUnknownOnCorrect: false }
     })
   }
 
@@ -442,7 +442,7 @@ function division(seed: number, difficulty: Difficulty, focus?: string, phase?: 
         { value: grouping ? `${dividend} Punkte, ${divisor} Gruppen, gesucht sind die Punkte je Gruppe` : `${dividend} Punkte, immer ${divisor} je Gruppe, gesucht sind die Gruppen`, misconception: 'Gruppenanzahl und Gruppengröße werden verwechselt.', misconceptionId: 'division-group-roles' },
         { value: `${quotient} Punkte sind bekannt, gesucht ist die Gesamtmenge`, misconception: 'Eine unbekannte Größe wird als bekannt behandelt.', misconceptionId: 'division-known-total' }
       ]),
-      representation: { ...divisionRepresentation, visibility: 'always' }
+      representation: { ...divisionRepresentation, visibility: 'always', revealUnknownOnCorrect: false }
     })
   }
 
@@ -528,8 +528,29 @@ function division(seed: number, difficulty: Difficulty, focus?: string, phase?: 
     ...shared,
     typeId: grouping ? 'division-grouping' : 'division-sharing',
     subskillId,
+    prompt: grouping
+      ? `Lege ${dividend} Punkte in Gruppen mit je ${divisor} Punkten. Wie viele Gruppen entstehen?`
+      : `Verteile ${dividend} Punkte gleichmäßig auf ${divisor} Gruppen. Wie viele Punkte kommen in jede Gruppe?`,
     answerMode: 'number',
     correctAnswer: String(quotient),
+    hints: grouping
+      ? [
+          { level: 1, text: `Nimm immer ${divisor} Punkte für eine Gruppe.` },
+          { level: 2, text: `Zähle, wie oft du ${divisor} Punkte aus den ${dividend} Punkten nehmen kannst.` }
+        ]
+      : [
+          { level: 1, text: `Verteile die ${dividend} Punkte der Reihe nach auf ${divisor} Gruppen.` },
+          { level: 2, text: 'Am Ende müssen in allen Gruppen gleich viele Punkte liegen.' }
+        ],
+    successFeedback: grouping
+      ? `Richtig. Es entstehen ${quotient} Gruppen mit je ${divisor} Punkten.`
+      : `Richtig. In jede der ${divisor} Gruppen kommen ${quotient} Punkte.`,
+    errorFeedback: grouping
+      ? `Bilde aus allen ${dividend} Punkten Gruppen mit je ${divisor} Punkten.`
+      : `Verteile alle ${dividend} Punkte gleichmäßig auf die ${divisor} Gruppen.`,
+    explanation: grouping
+      ? `${quotient} Gruppen mit je ${divisor} Punkten sind zusammen ${dividend} Punkte.`
+      : `${divisor} Gruppen mit je ${quotient} Punkten sind zusammen ${dividend} Punkte.`,
     representation: divisionRepresentation
   })
 }
@@ -556,7 +577,7 @@ export function germanNumberWord(number: number): string {
   return `${unitPrefix[hundreds]}hundert${rest === 0 ? '' : germanNumberWord(rest)}`
 }
 
-function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase): Exercise {
+function placeValue(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
   const hundreds = integer(random, 1, 9)
   let tens = integer(random, 1, 9)
@@ -624,7 +645,7 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
     const correct = position === 'Hunderter' ? `${digit} Hunderterflächen` : position === 'Zehner' ? `${digit} Zehnerstangen` : `${digit} Einerpunkte`
     return withMetadata({
       ...shared,
-      typeId: 'place-value-activate-material', prompt: `Welche Materialgruppe zeigt die ${position} von ${number}?`,
+      typeId: 'place-value-activate-material', subskillId: 'place-value-material', prompt: `Welche Materialgruppe zeigt die ${position} von ${number}?`,
       answerMode: 'choice', correctAnswer: correct, representation: material,
       options: textOptions(random, correct, [
         { value: `${digit} Einerpunkte`, misconception: 'Einer, Zehner und Hunderter werden verwechselt.', misconceptionId: 'place-value-column-confusion' },
@@ -637,7 +658,7 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
     const correct = `${digit} ${position} haben den Wert ${answer}`
     return withMetadata({
       ...shared,
-      typeId: 'place-value-understand-digit-value', prompt: 'Welche Aussage verbindet Ziffer, Stelle und Wert richtig?',
+      typeId: 'place-value-understand-digit-value', subskillId: 'place-value-digit-value', prompt: 'Welche Aussage verbindet Ziffer, Stelle und Wert richtig?',
       answerMode: 'choice', correctAnswer: correct, representation: material,
       options: textOptions(random, correct, [
         { value: `${digit} ${position} haben den Wert ${digit}`, misconception: 'Ziffer und Stellenwert werden gleichgesetzt.', misconceptionId: 'place-value-digit-as-value' },
@@ -650,6 +671,7 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
     return withMetadata({
       ...shared,
       typeId: 'place-value-guided-material-table',
+      subskillId: 'place-value-material',
       prompt: 'Übertrage das Material in die H-Z-E-Tafel.',
       answerMode: 'guided-number',
       correctAnswer: String(number),
@@ -664,7 +686,7 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
       representation: { ...material, visibility: 'always' }
     })
   }
-  if (phase === 'transfer') {
+  if (phase === 'transfer' || focus === 'place-value-order') {
     const candidates = [
       number,
       hundreds * 100 + ones * 10 + tens,
@@ -675,8 +697,10 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
       number - 100,
       number + 1,
       number - 1
-    ].filter((value, index, all) => value >= 100 && value <= 999 && all.indexOf(value) === index).slice(0, 4)
-    if (candidates.length !== 4) throw new Error('Zu wenige unterschiedliche Zahlen zum Ordnen.')
+    ].filter((value, index, all) => value >= 100 && value <= 999 && all.indexOf(value) === index)
+      .slice(0, phase === 'transfer' ? 4 : 3)
+    const expectedCount = phase === 'transfer' ? 4 : 3
+    if (candidates.length !== expectedCount) throw new Error('Zu wenige unterschiedliche Zahlen zum Ordnen.')
     const descending = random() < 0.5
     const ordered = [...candidates].sort((first, second) => descending ? second - first : first - second)
     const correct = ordered.join('|')
@@ -695,17 +719,30 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
         ...shared.variant,
         values: { ...shared.variant.values, comparisonFirst, comparisonSecond, comparisonPlace }
       },
-      typeId: 'place-value-transfer-order',
-      prompt: `Vergleiche und ordne die Zahlen. Beginne danach mit der ${descending ? 'größten' : 'kleinsten'} Zahl.`,
+      typeId: phase === 'transfer' ? 'transfer-order' : 'independent-order',
+      subskillId: 'place-value-order',
+      prompt: `Ordne diese ${expectedCount} Zahlen. Beginne mit der ${descending ? 'größten' : 'kleinsten'} Zahl.`,
       answerMode: 'guided-choice',
       correctAnswer: correct,
+      hints: [
+        { level: 1, text: 'Vergleiche zuerst die Hunderter. Sind sie gleich, vergleiche die Zehner und dann die Einer.' },
+        { level: 2, text: `Suche zuerst die ${descending ? 'größte' : 'kleinste'} Zahl und tippe sie als Erste an.` }
+      ],
+      successFeedback: 'Du hast die Zahlen richtig verglichen und geordnet.',
+      errorFeedback: 'Vergleiche die Zahlen Stelle für Stelle: zuerst Hunderter, dann Zehner, dann Einer.',
+      explanation: `${ordered.join(descending ? ' > ' : ' < ')}. Verglichen wird von links nach rechts.`,
+      remediation: {
+        ...shared.remediation,
+        strategy: 'Vergleiche zunächst nur zwei Zahlen. Beginne bei den Hundertern und gehe nur bei Gleichstand zur nächsten Stelle.',
+        representation: 'Zwei Zahlen mit hervorgehobener erster unterschiedlicher Stelle'
+      },
       steps: [{
         id: 'compare-numbers',
         interaction: 'select',
         prompt: `Welches Zeichen passt zwischen ${comparisonFirst} und ${comparisonSecond}?`,
         options: textOptions(random, comparisonAnswer, [
-          { value: comparisonAnswer === '<' ? '>' : '<', misconception: `${comparisonPlace} wurden in der falschen Richtung verglichen.`, misconceptionId: 'place-value-column-confusion' },
-          { value: '=', misconception: `Die Zahlen unterscheiden sich bei den ${comparisonPlace}n.`, misconceptionId: 'place-value-digit-as-value' }
+          { value: comparisonAnswer === '<' ? '>' : '<', misconception: `${comparisonPlace} wurden in der falschen Richtung verglichen.`, misconceptionId: 'place-value-comparison-direction' },
+          { value: '=', misconception: `Die Zahlen unterscheiden sich bei den ${comparisonPlace}n.`, misconceptionId: 'place-value-first-difference' }
         ]),
         correctAnswer: comparisonAnswer,
         errorFeedback: `Prüfe zuerst die ${comparisonPlace}stelle.`,
@@ -725,6 +762,7 @@ function placeValue(seed: number, difficulty: Difficulty, phase?: LearningPhase)
   return withMetadata({
     ...shared,
     typeId: 'digit-place-value',
+    subskillId: 'place-value-digit-value',
     answerMode: difficulty === 3 ? 'guided-choice' : 'choice',
     correctAnswer: String(answer),
     steps,
@@ -839,14 +877,24 @@ function compose(seed: number, difficulty: Difficulty, phase?: LearningPhase): E
   }
   if (phase === 'transfer') {
     const numberWord = germanNumberWord(answer)
+    const canonicalHundreds = Math.floor(answer / 100) * 100
+    const canonicalTens = Math.floor((answer % 100) / 10) * 10
+    const canonicalOnes = answer % 10
+    const canonicalTerms = [canonicalHundreds, canonicalTens, canonicalOnes].filter((value) => value > 0)
+    const canonicalSum = canonicalTerms.length > 1 ? canonicalTerms.join(' + ') : String(canonicalTerms[0] ?? 0)
     return withMetadata({
       ...shared,
       typeId: 'compose-transfer-number-word',
       prompt: `Schreibe das Zahlwort „${numberWord}“ als Zahl.`,
       answerMode: 'number',
       correctAnswer: String(answer),
+      hints: [
+        { level: 1, text: `Höre auf Hunderter, Zehner und Einer in „${numberWord}“.` },
+        { level: 2, text: `${canonicalSum} ergibt die gesuchte Zahl.` }
+      ],
       successFeedback: `Das Zahlwort „${numberWord}“ gehört zur Zahl ${answer}.`,
-      errorFeedback: 'Höre auf Hunderter, Zehner und Einer und setze die Ziffern an die passenden Stellen.'
+      errorFeedback: 'Höre auf Hunderter, Zehner und Einer und setze die Ziffern an die passenden Stellen.',
+      explanation: `${canonicalSum} = ${answer}.`
     })
   }
   return withMetadata({
@@ -871,9 +919,7 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
   const upper = lower + unit
   const answer = `${lower} und ${upper}`
   const skillId: SkillId = unit === 10 ? 'neighbor-tens' : 'neighbor-hundreds'
-  const predecessor = number - 1
-  const successor = number + 1
-  const values = { number, lower, upper, predecessor, successor }
+  const values = { number, lower, upper }
   const shared = { ...base(skillId, seed, difficulty, values), ...contentFor(skillId, values, difficulty) }
   const referenceStart = lower
   const referenceEnd = upper
@@ -916,27 +962,19 @@ function neighbors(seed: number, difficulty: Difficulty, unit: 10 | 100, phase?:
     const unitLabel = unit === 10 ? 'Nachbarzehner' : 'Nachbarhunderter'
     const steps: ExerciseStep[] = [
       {
-        id: 'predecessor', interaction: 'guided-number', prompt: `Welche Zahl steht direkt vor ${number}?`,
-        correctAnswer: String(predecessor), errorFeedback: `Gehe von ${number} genau einen Schritt zurück.`, successFeedback: `Der Vorgänger ist ${predecessor}.`
-      },
-      {
-        id: 'successor', interaction: 'guided-number', prompt: `Welche Zahl steht direkt nach ${number}?`,
-        correctAnswer: String(successor), errorFeedback: `Gehe von ${number} genau einen Schritt weiter.`, successFeedback: `Der Nachfolger ist ${successor}.`
-      },
-      {
-        id: 'lower', interaction: 'guided-number', prompt: `Welcher untere ${unitLabel} gehört zu ${number}?`,
+        id: 'lower', interaction: 'guided-number', prompt: `Welcher ${unitLabel} liegt direkt unter ${number}?`,
         correctAnswer: String(lower), errorFeedback: `Suche den vollen ${unit === 10 ? 'Zehner' : 'Hunderter'} direkt unter ${number}.`, successFeedback: `Der untere ${unitLabel} ist ${lower}.`
       },
       {
-        id: 'upper', interaction: 'guided-number', prompt: `Welcher obere ${unitLabel} folgt direkt?`,
+        id: 'upper', interaction: 'guided-number', prompt: `Welcher ${unitLabel} liegt direkt über ${number}?`,
         correctAnswer: String(upper), errorFeedback: `Vom unteren ${unitLabel} geht es genau ${unit} weiter.`, successFeedback: `Der obere ${unitLabel} ist ${upper}.`
       }
     ]
     return withMetadata({
       ...shared,
-      typeId: `${skillId}-guided-number-relations`,
+      typeId: `${skillId}-guided-neighbors`,
       answerMode: 'guided-number',
-      correctAnswer: [predecessor, successor, lower, upper].join('|'),
+      correctAnswer: [lower, upper].join('|'),
       steps,
       representation: { ...numberLine, visibility: 'always' }
     })
@@ -3537,9 +3575,10 @@ function probability(seed: number, difficulty: Difficulty, phase?: LearningPhase
   })
 }
 
-function combinationRepresentation(template: CombinationTemplate, missingPair?: string): ExerciseRepresentation {
+function combinationRepresentation(template: CombinationTemplate, missingPair?: string, displayMode: 'selection' | 'grid' = 'grid'): ExerciseRepresentation {
   const values: ExerciseRepresentation['values'] = {
     title: template.title,
+    displayMode,
     firstLabel: template.firstLabel,
     firstCount: template.firstOptions.length,
     secondLabel: template.secondLabel,
@@ -3577,13 +3616,13 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
     const correct = allowedPairs[0]!
     return withMetadata({
       ...base('combinatorics', seed, difficulty, generatedValues), ...generatedContent,
-      prompt: `Welche Auswahl nimmt genau eine Möglichkeit aus „${template.firstLabel}“ und eine aus „${template.secondLabel}“?`,
+      prompt: template.selectionQuestion ?? `Wähle eine Möglichkeit aus ${template.firstLabel} und eine aus ${template.secondLabel}.`,
       typeId: 'combinations-identify-pair', subskillId: 'combinations-systematic', answerMode: 'choice', correctAnswer: correct.value,
       options: textOptions(random, correct.value, [
         { value: `${template.firstOptions[0]} + ${template.firstOptions[1] ?? template.firstOptions[0]}`, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' },
         { value: `${template.secondOptions[0]} + ${template.secondOptions[1] ?? template.secondOptions[0]}`, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' }
       ]).map((option) => ({ ...option, label: option.value.replace(' + ', ' mit ') })),
-      representation: combinationRepresentation(template)
+      representation: combinationRepresentation(template, undefined, 'selection')
     })
   }
   const missingPair = pick(random, allowedPairs)
@@ -3634,7 +3673,7 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'subtraction': return subtraction(seed, difficulty, focus, phase)
     case 'multiplication': return multiplication(seed, difficulty, focus, phase)
     case 'division': return division(seed, difficulty, focus, phase)
-    case 'place-value': return placeValue(seed, difficulty, phase)
+    case 'place-value': return placeValue(seed, difficulty, focus, phase)
     case 'decompose': return decompose(seed, difficulty, phase)
     case 'compose': return compose(seed, difficulty, phase)
     case 'neighbor-tens': return neighbors(seed, difficulty, 10, phase)
@@ -3666,8 +3705,10 @@ export function generateExercise(skillId: SkillId, seed: number, difficulty: Dif
     case 'perimeter': return perimeter(seed, difficulty, phase)
     }
   })()
-  const catalogType = getSkillContent(skillId).learningPhases.find((entry) => entry.id === phase)?.exerciseTypes[0]
+  const catalogTypes = getSkillContent(skillId).learningPhases.find((entry) => entry.id === phase)?.exerciseTypes ?? []
   const prefix = `${skillId}:`
+  const generatedCatalogType = `${prefix}${generated.typeId}`
+  const catalogType = catalogTypes.includes(generatedCatalogType) ? generatedCatalogType : catalogTypes[0]
   if (!catalogType?.startsWith(prefix)) throw new Error(`Kein katalogisierter Runtime-Typ für ${skillId}/${phase}.`)
   return {
     ...generated,

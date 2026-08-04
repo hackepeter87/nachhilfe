@@ -107,6 +107,7 @@ export interface ExerciseRepresentation {
   kind: RepresentationKind
   visibility: 'always' | 'hint' | 'scaffold'
   label: string
+  revealUnknownOnCorrect?: boolean
   values: Record<string, number | string | number[] | NumberLineJump[]>
   valueRoles: {
     knownValues: string[]

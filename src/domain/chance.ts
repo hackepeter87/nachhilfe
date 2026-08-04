@@ -23,6 +23,7 @@ export interface CombinationTemplate {
   secondLabel: string
   secondOptions: string[]
   question: string
+  selectionQuestion?: string
   excludedPair?: [string, string]
 }
 
@@ -58,6 +59,7 @@ export function isValidCombinationTemplate(value: unknown): value is Combination
   const template = value as Partial<CombinationTemplate>
   if (typeof template.id !== 'string' || !template.id || ![1, 2, 3].includes(template.difficulty as number) ||
     typeof template.title !== 'string' || !template.title || typeof template.question !== 'string' || !template.question ||
+    (template.selectionQuestion !== undefined && (typeof template.selectionQuestion !== 'string' || !template.selectionQuestion.trim())) ||
     typeof template.firstLabel !== 'string' || !template.firstLabel || typeof template.secondLabel !== 'string' || !template.secondLabel ||
     !isTextArray(template.firstOptions, 2, 3) || !isTextArray(template.secondOptions, 2, 3) ||
     new Set(template.firstOptions).size !== template.firstOptions.length || new Set(template.secondOptions).size !== template.secondOptions.length) return false
