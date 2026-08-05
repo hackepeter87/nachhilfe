@@ -1,6 +1,6 @@
 # Mathe-Reise
 
-## Katalog- und Darstellungsabgleich 0.32.6 (noch nicht veröffentlicht)
+## Katalog- und Darstellungsabgleich 0.32.6
 
 - Subtraktions-Rechenstriche zeigen die bekannte Ausgangszahl auch dann am richtigen Bezugspunkt, wenn sie rechts vom unbekannten Ergebnis liegt. Das Ergebnis bleibt bis zur richtigen Lösung maskiert.
 - Eine Stellenwert-Remediation zu Vergleichen und Ordnen bleibt in derselben Aufgabenfamilie: drei statt vier Zahlen, dieselbe Vergleichsrichtung und kurze, auf den aktuellen Schritt bezogene Hilfen.
@@ -16,7 +16,7 @@
 
 Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 501 Unit-/Komponententests, Produktionsbuild, 21 Playwright-Szenarien gegen Vite Preview und erneut 21 Szenarien gegen den gehärteten Read-only-Container. Das lokale AMD64-Image `mathe-reise:local` lief als UID 101 ohne Capabilities, mit `/tmp` als einzigem `tmpfs` und meldete `healthy`; Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen.
 
-Die Änderung ist noch nicht als Git-Tag, GitHub Release oder GHCR-Image veröffentlicht. Ein erneuter echter iPhone-Test und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
+Der Release wird als Git-Tag `v0.32.6`, GitHub Release und AMD64-Image `ghcr.io/hackepeter87/nachhilfe:0.32.6` veröffentlicht. Ein erneuter echter iPhone-Test und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
 
 ## Direkter Rundenabschluss 0.32.5
 

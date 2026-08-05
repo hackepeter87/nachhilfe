@@ -16,7 +16,7 @@ Der Workflow setzt die OCI-Labels für Quelle, Revision, Version, Erstellungszei
 
 Release-Images werden ausschließlich für die DMZ-Zielarchitektur `linux/amd64` gebaut. Die Compose-Datei deklariert diese Plattform ausdrücklich, damit eine unpassende Hostarchitektur nicht stillschweigend über Emulation betrieben wird. Historische Tags behalten ihre bereits veröffentlichten Manifeste; erst Releases ab `0.10.1` sind AMD64-only.
 
-Der aktuell dokumentierte Stand ist das [GitHub Release v0.32.5](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.5) mit dem Image `ghcr.io/hackepeter87/nachhilfe:0.32.5`. Deployment und Rollback verwenden weiterhin konkrete Image-Tags, nicht `latest`.
+Der aktuell dokumentierte Stand ist das [GitHub Release v0.32.6](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.6) mit dem Image `ghcr.io/hackepeter87/nachhilfe:0.32.6`. Deployment und Rollback verwenden weiterhin konkrete Image-Tags, nicht `latest`.
 
 ## Voraussetzungen auf dem DMZ-Host
 
@@ -43,7 +43,7 @@ Das erste erfolgreiche Publish legt das Paket in GitHub Container Registry an. F
 Ein öffentliches Paket kann ohne Anmeldung geladen werden:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.32.5
+podman pull ghcr.io/hackepeter87/nachhilfe:0.32.6
 ```
 
 Solange das Paket privat ist, erfolgt die Anmeldung mit einem technisch geeigneten GitHub-Token mit `read:packages`. Tokens gehören weder in die Compose-Datei noch in das Repository:

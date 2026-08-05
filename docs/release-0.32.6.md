@@ -1,6 +1,6 @@
 # Katalog- und Darstellungsabgleich 0.32.6
 
-Stand: lokaler, noch unveröffentlichter Arbeitsstand mit App 0.32.6, Katalog 0.31.3, Schema 19 und Status `ready-for-review`.
+Stand: Release v0.32.6 mit App 0.32.6, Katalog 0.31.3, Schema 19 und Status `ready-for-review`.
 
 ## Behobene Befunde
 
@@ -41,4 +41,4 @@ Lokal erfolgreich ausgeführt wurden:
 - Healthcheck sowie Abruf von Einstieg, Manifest, Service Worker und Katalog mit den vorgesehenen MIME-, Cache- und Security-Headern
 - `npm run test:e2e:container`: 21 Playwright-Szenarien gegen den gehärteten Container
 
-Das lokale AMD64-Testimage trägt den Tag `mathe-reise:local`. Es wurde kein Git-Tag, GitHub Release oder GHCR-Image erzeugt. Ein erneuter Test dieses Arbeitsstands auf dem echten iPhone und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt lediglich eine Mobile-Safari-Näherung.
+Das lokale AMD64-Testimage trägt den Tag `mathe-reise:local`. Der Release wird über Git-Tag `v0.32.6` und das AMD64-GHCR-Image `ghcr.io/hackepeter87/nachhilfe:0.32.6` veröffentlicht. Ein erneuter Test dieses Arbeitsstands auf dem echten iPhone und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt lediglich eine Mobile-Safari-Näherung.
