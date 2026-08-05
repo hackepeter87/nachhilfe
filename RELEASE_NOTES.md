@@ -16,7 +16,7 @@
 
 Lokal erfolgreich geprüft wurden Katalogabgleich, Curriculum-Matrix, Typecheck, Lint, 501 Unit-/Komponententests, Produktionsbuild, 21 Playwright-Szenarien gegen Vite Preview und erneut 21 Szenarien gegen den gehärteten Read-only-Container. Das lokale AMD64-Image `mathe-reise:local` lief als UID 101 ohne Capabilities, mit `/tmp` als einzigem `tmpfs` und meldete `healthy`; Einstieg, Manifest, Service Worker und Katalog wurden mit den vorgesehenen MIME-, Cache- und Security-Headern abgerufen.
 
-Der Release wird als Git-Tag `v0.32.6`, GitHub Release und AMD64-Image `ghcr.io/hackepeter87/nachhilfe:0.32.6` veröffentlicht. Ein erneuter echter iPhone-Test und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
+Der Release ist als Git-Tag `v0.32.6`, [GitHub Release](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.6) und AMD64-Image `ghcr.io/hackepeter87/nachhilfe:0.32.6` veröffentlicht. GitHub Actions erzeugte außerdem `sha-a41f957` und `latest`; alle drei Tags verweisen auf den Digest `sha256:008865834189882cfccc3068117c8044d506d77925ed026e028f4e13357d803b`. Ein erneuter echter iPhone-Test und eine externe Lehrkraftprüfung sind nicht erfolgt; WebKit bleibt nur eine Mobile-Safari-Näherung.
 
 ## Direkter Rundenabschluss 0.32.5
 
