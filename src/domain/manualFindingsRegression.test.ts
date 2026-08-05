@@ -3,6 +3,22 @@ import { getTaskCatalog } from '../content/catalog'
 import { generateExercise } from './generators'
 
 describe('Regressionen aus der manuellen Kinderansicht', () => {
+  it('hält Ergänzungsaufgabe, Zehnerfeld und Erfolgsfeedback über alle Seeds synchron', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('addition', seed, 1, undefined, 'activate')
+      const first = Number(exercise.variant.values.first)
+      const missing = 10 - first
+
+      expect(exercise.correctAnswer).toBe(String(missing))
+      expect(exercise.variant.values).toMatchObject({ first, second: missing, answer: 10, toTen: missing, rest: 0, mode: 'complete-to-ten' })
+      expect(exercise.representation?.values).toMatchObject({ first, second: missing, answer: 10, mode: 'complete-to-ten' })
+      expect(exercise.representation?.valueRoles.unknownValues).toEqual(['second'])
+      expect(exercise.successFeedback).toContain(`${first} und ${missing}`)
+      expect(exercise.explanation).toContain(`${first} + ${missing} = 10`)
+      expect(`${exercise.successFeedback} ${exercise.explanation}`).not.toMatch(/= 1[1-9]/)
+    }
+  })
+
   it('stellt die Tauschaufgabe wirklich in getauschter Reihenfolge dar und erklärt genau dieses Lernziel', () => {
     for (let seed = 1; seed <= 200; seed += 1) {
       const exercise = generateExercise('addition', seed, 3, undefined, 'transfer')

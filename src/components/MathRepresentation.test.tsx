@@ -100,6 +100,30 @@ describe('MathRepresentation lokaler Zahlenstrahl', () => {
 })
 
 describe('MathRepresentation Zehnerfelder', () => {
+  it('zeigt eine Ergänzung bis 10 in einem gemeinsamen Zehnerfeld und deckt sie erst nach der Lösung auf', () => {
+    const representation = {
+      kind: 'ten-frame' as const, visibility: 'always' as const, label: 'Ergänzen bis 10',
+      values: { first: 9, second: 1, answer: 10, toTen: 1, rest: 0, mode: 'complete-to-ten' },
+      valueRoles: {
+        knownValues: ['first', 'answer', 'toTen', 'rest', 'mode'],
+        unknownValues: ['second'],
+        revealedValues: []
+      }
+    }
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={representation} />)
+
+    expect(container.querySelectorAll('.ten-frame')).toHaveLength(1)
+    expect(container.querySelectorAll('.ten-frame-dot--filled')).toHaveLength(9)
+    expect(screen.getByRole('img')).toHaveAccessibleName(/9 von 10 Plätzen sind belegt/)
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: ['second'] }
+    }} />)
+    expect(container.querySelectorAll('.ten-frame-dot--filled')).toHaveLength(10)
+    expect(screen.getByRole('img')).toHaveAccessibleName(/9 Punkte und 1 ergänzte Punkte ergeben 10/)
+  })
+
   it('stellt Aufgabenfamilien bis 20 ohne ungültige oder abgeschnittene Mengen dar', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{
       kind: 'ten-frame', visibility: 'always', label: '20 zerlegt in 8 und 12',

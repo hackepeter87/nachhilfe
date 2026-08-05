@@ -176,16 +176,33 @@ function addition(seed: number, difficulty: Difficulty, focus?: string, phase?: 
   const shared = { ...base('addition', seed, difficulty, values), ...contentFor('addition', values, difficulty) }
   if (phase === 'activate') {
     const missing = 10 - first
+    const complementValues = { first, second: missing, answer: 10, toTen: missing, rest: 0, mode: 'complete-to-ten' }
+    const complementShared = {
+      ...base('addition', seed, difficulty, complementValues),
+      ...contentFor('addition', complementValues, difficulty)
+    }
     return withMetadata({
-      ...shared,
+      ...complementShared,
       typeId: 'addition-activate-complement-to-ten', subskillId: 'addition-complement-10',
       prompt: `Welche Zahl ergänzt ${first} bis 10?`, answerMode: 'choice', correctAnswer: String(missing),
+      hints: [
+        { level: 1, text: `Im Zehnerfeld sind ${first} Plätze belegt. Zähle die freien Plätze.` },
+        { level: 2, text: `Es fehlen ${missing} bis 10.` }
+      ],
+      successFeedback: `Richtig. ${first} und ${missing} füllen das Zehnerfeld bis 10.`,
+      errorFeedback: 'Zähle nur die freien Plätze im Zehnerfeld.',
+      explanation: `${first} + ${missing} = 10. Es fehlten ${missing} bis zum vollen Zehnerfeld.`,
+      remediation: {
+        ...complementShared.remediation,
+        strategy: `Lege ${first} Punkte in ein Zehnerfeld und zähle die freien Plätze.`,
+        representation: 'Zehnerfeld'
+      },
       options: numberOptions(random, missing, [
         { value: Math.max(0, missing - 1), misconception: 'Beim Ergänzen wird ein Punkt ausgelassen', misconceptionId: 'addition-bridge-step' },
         { value: missing + 1, misconception: 'Beim Ergänzen wird ein Punkt zu viel gezählt', misconceptionId: 'addition-bridge-step' },
         { value: first, misconception: 'Die bekannte Menge wird als Ergänzung übernommen', misconceptionId: 'addition-operation-reversal' }
       ]),
-      representation: representation('addition', difficulty, 'ten-frame', 'Ergänzen zur Zehn', { first, second: missing }, ['second'])
+      representation: representation('addition', difficulty, 'ten-frame', 'Ergänzen bis 10', complementValues, ['second'])
     })
   }
   if (phase === 'understand') {

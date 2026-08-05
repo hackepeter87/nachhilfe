@@ -104,9 +104,35 @@ export function MathRepresentation({ representation }: { representation: Exercis
   if (representation.kind === 'ten-frame') {
     const first = Number(values.first)
     const second = Number(values.second)
+    const mode = values.mode
     const valid = Number.isInteger(first) && Number.isInteger(second) && first >= 0 && second >= 0 && first <= 20 && second <= 20
     if (!valid) return <div className="math-visual math-visual--error" role="alert">Das Punktefeld enthält ungültige Mengen.</div>
     const secondVisible = isValueVisible('second')
+    if (mode === 'complete-to-ten') {
+      const validComplement = first > 0 && first < 10 && first + second === 10
+      if (!validComplement) return <div className="math-visual math-visual--error" role="alert">Das Zehnerfeld enthält keine gültige Ergänzungsaufgabe.</div>
+      return (
+        <div
+          className="math-visual ten-frame-complement-visual"
+          role="img"
+          aria-label={secondVisible
+            ? `Zehnerfeld: ${first} Punkte und ${second} ergänzte Punkte ergeben 10.`
+            : `Zehnerfeld: ${first} von 10 Plätzen sind belegt. Die fehlende Anzahl ist unbekannt.`}
+        >
+          <span>Zehnerfeld bis 10</span>
+          <div className="ten-frame" aria-hidden="true">
+            {Array.from({ length: 10 }, (_, index) => {
+              const className = index < first
+                ? 'ten-frame-dot ten-frame-dot--filled'
+                : secondVisible
+                  ? 'ten-frame-dot ten-frame-dot--filled ten-frame-dot--completed'
+                  : 'ten-frame-dot'
+              return <i className={className} key={index} />
+            })}
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="math-visual ten-frame-visual" role="img" aria-label={`${representation.label}. Erste Menge ${first}, zweite Menge ${secondVisible ? second : 'unbekannt'}.`}>
         {[{ label: 'erste Menge', count: first, visible: true }, { label: 'zweite Menge', count: second, visible: secondVisible }].map((quantity) => {
