@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.3')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.4')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -244,6 +244,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     catalog.chanceContent.combinationTemplates.forEach((template) => {
       expect(template.selectionQuestion).toBeTruthy()
+      expect(template.selectionQuestion).toMatch(/Welche Auswahl passt/)
       expect(template.selectionQuestion).not.toMatch(/nimmt genau eine Möglichkeit|Ergebnisraum/)
     })
   })

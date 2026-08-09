@@ -3631,6 +3631,7 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
     .map((second) => ({ value: `${first} + ${second}`, label: `${first} mit ${second}` })))
   if (phase === 'activate') {
     const correct = allowedPairs[0]!
+    const [correctFirst, correctSecond] = correct.value.split(' + ')
     return withMetadata({
       ...base('combinatorics', seed, difficulty, generatedValues), ...generatedContent,
       prompt: template.selectionQuestion ?? `Wähle eine Möglichkeit aus ${template.firstLabel} und eine aus ${template.secondLabel}.`,
@@ -3638,7 +3639,19 @@ function combinatorics(seed: number, difficulty: Difficulty, phase?: LearningPha
       options: textOptions(random, correct.value, [
         { value: `${template.firstOptions[0]} + ${template.firstOptions[1] ?? template.firstOptions[0]}`, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' },
         { value: `${template.secondOptions[0]} + ${template.secondOptions[1] ?? template.secondOptions[0]}`, misconception: 'Optionen derselben Gruppe werden miteinander kombiniert.', misconceptionId: 'combinations-same-group' }
-      ]).map((option) => ({ ...option, label: option.value.replace(' + ', ' mit ') })),
+      ]).map((option) => ({ ...option, label: option.value.replace(' + ', ' und ') })),
+      hints: [
+        { level: 1, text: `Wähle links eine Möglichkeit bei „${template.firstLabel}“ und rechts eine bei „${template.secondLabel}“.` },
+        { level: 2, text: `„${correctFirst}“ gehört zu „${template.firstLabel}“. Dazu passt zum Beispiel „${correctSecond}“ aus „${template.secondLabel}“.` }
+      ],
+      successFeedback: `Richtig: „${correctFirst}“ gehört zu „${template.firstLabel}“ und „${correctSecond}“ zu „${template.secondLabel}“.`,
+      errorFeedback: `Prüfe beide Teile: Einer muss zu „${template.firstLabel}“ gehören, der andere zu „${template.secondLabel}“.`,
+      explanation: `Eine passende Auswahl besteht aus „${correctFirst}“ bei „${template.firstLabel}“ und „${correctSecond}“ bei „${template.secondLabel}“.`,
+      remediation: {
+        ...generatedContent.remediation,
+        strategy: `Zeige zuerst auf eine Möglichkeit bei „${template.firstLabel}“. Verbinde sie dann mit einer Möglichkeit bei „${template.secondLabel}“.`,
+        representation: 'Zwei klar beschriftete Auswahlgruppen ohne ausgefüllte Kombinationstabelle'
+      },
       representation: combinationRepresentation(template, undefined, 'selection')
     })
   }

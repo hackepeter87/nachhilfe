@@ -673,9 +673,27 @@ describe('deterministische Aufgabengeneratoren', () => {
   it('beginnt Kombinationen mit einer kindgerechten Auswahl ohne ausgefülltes Raster', () => {
     for (let seed = 1; seed <= 1_000; seed += 1) {
       const exercise = generateExercise('combinatorics', seed, 1, undefined, 'activate')
-      expect(exercise.prompt).toMatch(/Wähle|Stelle|Suche|Kombiniere/)
+      expect(exercise.prompt).toMatch(/Welche Auswahl passt/)
       expect(exercise.prompt).not.toMatch(/nimmt genau eine Möglichkeit|Ergebnisraum/)
       expect(exercise.representation?.values.displayMode).toBe('selection')
+      expect(exercise.options).toHaveLength(3)
+      expect(exercise.options?.every((option) => option.label?.includes(' und '))).toBe(true)
+      expect(exercise.options?.filter((option) => option.value === exercise.correctAnswer)).toHaveLength(1)
+      expect(exercise.hints.map((hint) => hint.text).join(' ')).not.toMatch(/Ergebnisraum|Tableau/)
+      expect([exercise.successFeedback, exercise.errorFeedback, exercise.explanation].join(' ')).not.toMatch(/Ergebnisraum/)
+      expect(exercise.successFeedback).toMatch(/gehört zu/)
+      expect(exercise.errorFeedback).toMatch(/Prüfe beide Teile/)
+
+      const representation = exercise.representation!
+      const firstOptions = Array.from({ length: Number(representation.values.firstCount) }, (_, index) => representation.values[`first${index}`])
+      const secondOptions = Array.from({ length: Number(representation.values.secondCount) }, (_, index) => representation.values[`second${index}`])
+      const [correctFirst, correctSecond] = exercise.correctAnswer.split(' + ')
+      expect(firstOptions).toContain(correctFirst)
+      expect(secondOptions).toContain(correctSecond)
+      for (const distractor of exercise.options?.filter((option) => option.value !== exercise.correctAnswer) ?? []) {
+        const [first, second] = distractor.value.split(' + ')
+        expect(firstOptions.includes(first) && secondOptions.includes(second)).toBe(false)
+      }
     }
   })
 

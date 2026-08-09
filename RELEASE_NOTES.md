@@ -1,5 +1,11 @@
 # Mathe-Reise
 
+## Unveröffentlicht
+
+- Der Kombinatorik-Einstieg fragt nun konkret nach einer passenden Auswahl aus zwei sichtbar beschrifteten Gruppen.
+- Antworttexte verbinden die beiden gewählten Dinge mit „und“. Hilfen, Fehlerfeedback und Erklärung behandeln ausschließlich diesen ersten Lernschritt und sprechen noch nicht vom vollständigen Ergebnisraum.
+- Katalog 0.31.4 ist eine noch unveröffentlichte Textkorrektur bei unverändertem Schema 19. Es kommt keine neue Kompetenz hinzu.
+
 ## Katalog- und Darstellungsabgleich 0.32.6
 
 - Subtraktions-Rechenstriche zeigen die bekannte Ausgangszahl auch dann am richtigen Bezugspunkt, wenn sie rechts vom unbekannten Ergebnis liegt. Das Ergebnis bleibt bis zur richtigen Lösung maskiert.

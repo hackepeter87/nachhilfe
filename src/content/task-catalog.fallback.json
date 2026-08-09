@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.31.3",
+  "catalogVersion": "0.31.4",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-08-04",
+  "releasedAt": "2026-08-09",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -8292,7 +8292,7 @@
           "lang"
         ],
         "question": "Wie viele Outfits kannst du zusammenstellen?",
-        "selectionQuestion": "Stelle ein Outfit zusammen: Wähle ein T-Shirt und eine Hose."
+        "selectionQuestion": "Ein Outfit braucht ein T-Shirt und eine Hose. Welche Auswahl passt?"
       },
       {
         "id": "breakfast-2x2",
@@ -8309,7 +8309,7 @@
           "Banane"
         ],
         "question": "Wie viele Frühstücke sind möglich?",
-        "selectionQuestion": "Stelle ein Frühstück zusammen: Wähle ein Getränk und eine Obstsorte."
+        "selectionQuestion": "Ein Frühstück braucht ein Getränk und eine Obstsorte. Welche Auswahl passt?"
       },
       {
         "id": "ice-cream-3x2",
@@ -8327,7 +8327,7 @@
           "Schoko"
         ],
         "question": "Wie viele Eis-Kombinationen sind möglich?",
-        "selectionQuestion": "Stelle ein Eis zusammen: Wähle eine Eissorte und eine Sorte Streusel."
+        "selectionQuestion": "Ein Eis bekommt eine Eissorte und eine Sorte Streusel. Welche Auswahl passt?"
       },
       {
         "id": "bottle-design-2x3",
@@ -8345,7 +8345,7 @@
           "Sonne"
         ],
         "question": "Wie viele verschiedene Trinkflaschen kannst du gestalten?",
-        "selectionQuestion": "Gestalte eine Trinkflasche: Wähle eine Farbe und einen Aufkleber."
+        "selectionQuestion": "Eine Trinkflasche bekommt eine Farbe und einen Aufkleber. Welche Auswahl passt?"
       },
       {
         "id": "craft-3x3-excluded",
@@ -8364,7 +8364,7 @@
           "gelb"
         ],
         "question": "Wie viele erlaubte Anhänger sind möglich?",
-        "selectionQuestion": "Gestalte einen Anhänger: Wähle eine Form und eine Farbe.",
+        "selectionQuestion": "Ein Anhänger bekommt eine Form und eine Farbe. Welche Auswahl passt?",
         "excludedPair": [
           "Stern",
           "gelb"
@@ -8387,7 +8387,7 @@
           "Ei"
         ],
         "question": "Wie viele erlaubte Brote sind möglich?",
-        "selectionQuestion": "Belege ein Brot: Wähle eine Brotsorte und einen Belag.",
+        "selectionQuestion": "Ein belegtes Brot braucht eine Brotsorte und einen Belag. Welche Auswahl passt?",
         "excludedPair": [
           "dunkel",
           "Ei"
