@@ -36,10 +36,10 @@ Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erheb
 
 - Node.js 24 oder neuer
 - npm (im Lockfile wurde npm 11 verwendet)
-- Für E2E-Tests: Playwright Chromium
+- Für E2E-Tests: Playwright Chromium und WebKit
 - Optional: Docker oder Podman für das Container-Image
 
-Entwickelt und geprüft wurde mit Node.js `v24.14.0` und npm `11.18.0`. Die Datei `.nvmrc` legt nur den unterstützten Major-Release fest, keinen Patchstand.
+Der Wartungsstand vom 04.09.2026 wird mit Node.js `v24.20.0` und npm `11.19.0` geprüft. Die Datei `.nvmrc` legt nur den unterstützten Major-Release fest, keinen Patchstand. Node 24 bleibt die LTS-Basis; `@types/node` folgt ebenfalls Major 24. Details und zurückgestellte Updates stehen im [Wartungsbericht](docs/software-maintenance-2026-09-04.md).
 
 ## Lokale Entwicklung
 
@@ -65,7 +65,9 @@ npm run build
 
 Die Unit- und Komponententests prüfen Generatoren, fachliche Grenzen, Lernstandsregeln, Adaptivität, IndexedDB-Persistenz, Onboarding, Hilfen und Feedback.
 
-Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` dieselben Qualitätsbefehle mit Node.js 24 aus. Separate, bewusst kleine Jobs prüfen Chromium-E2E und den Container-Build ohne Registry-Publish.
+Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` dieselben Qualitätsbefehle mit Node.js 24 aus. Separate Jobs prüfen npm-Sicherheitsmeldungen, Chromium/WebKit sowie den gehärteten AMD64-Container einschließlich Trivy-Scan und Browser-/Offline-Tests. Der Publish-Workflow ruft diese CI für denselben Commit auf und veröffentlicht erst nach erfolgreichen Prüfungen. Ein ausgefallener Sicherheitsdienst gilt nicht als erfolgreiche Prüfung.
+
+Dependabot eröffnet wöchentliche Wartungs-PRs für npm, Docker und GitHub Actions. Kompatible npm-Updates werden gruppiert, Major-Wechsel getrennt geprüft; automatisches Mergen ist nicht eingerichtet.
 
 Für die Browser-Tests wird Chromium einmalig installiert:
 
@@ -74,7 +76,7 @@ npx playwright install chromium webkit
 npm run test:e2e
 ```
 
-Die E2E-Suite verwendet den Produktionsbuild über Vite Preview und prüft eine vollständige Runde bei `375 x 812`, Landscape bei `812 x 375`, horizontales Overflow, Konsolenfehler, Reload, Offline-Neustart und eine vollständige Offline-Runde.
+Die E2E-Suite verwendet den Produktionsbuild über Vite Preview und prüft eine vollständige Runde bei `375 x 812`, Landscape bei `812 x 375`, horizontales Overflow, Konsolenfehler, Reload, Offline-Neustart und eine vollständige Offline-Runde. Ein zusätzlicher Test wechselt die Service-Worker-Version über einen lokalen Testproxy, bestätigt die Aktualisierung und prüft das erhaltene Profil auch offline. Mit `E2E_BASE_URL=http://127.0.0.1:18080 npm run test:e2e:container` laufen dieselben Tests gegen einen separaten Testcontainer.
 
 ## Produktionsbuild
 

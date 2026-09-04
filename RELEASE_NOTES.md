@@ -2,6 +2,17 @@
 
 ## Unveröffentlicht
 
+### Software-Wartung vom 04.09.2026
+
+- Sicherheitsupdates für fast-uri, undici, postcss, brace-expansion und browserslist; keine fachlichen Katalogänderungen durch dieses Wartungsupdate.
+- Kompatible Updates für React, Lucide, Vite, Playwright, Testing Library, ESLint und Vitest; Node-Typen passend zu Node 24.
+- CI-Actions aktualisiert, automatische Wartungs-PRs eingerichtet, Containerbasen werden vor Builds frisch bezogen. Image-Publish wartet auf Qualitäts-, Sicherheits- und Browserprüfungen für denselben Commit.
+- Echter Service-Worker-Update-Test ergänzt: Aktualisierung nach Bestätigung, Profil bleibt auch offline erhalten.
+- React-Buildplugin 6.1.1 wegen Babel-Peer-Konflikt zurückgestellt. TypeScript 7, Vitest 5 und jest-dom 7 bleiben separate Migrationen.
+- Noch kein neues Release oder GHCR-Image veröffentlicht. Prüfbelege und verbleibende Grenzen stehen im [Wartungsbericht](docs/software-maintenance-2026-09-04.md).
+
+### Bereits vorbereitete Inhaltskorrektur
+
 - Der Kombinatorik-Einstieg fragt nun konkret nach einer passenden Auswahl aus zwei sichtbar beschrifteten Gruppen.
 - Antworttexte verbinden die beiden gewählten Dinge mit „und“. Hilfen, Fehlerfeedback und Erklärung behandeln ausschließlich diesen ersten Lernschritt und sprechen noch nicht vom vollständigen Ergebnisraum.
 - Katalog 0.31.4 ist eine noch unveröffentlichte Textkorrektur bei unverändertem Schema 19. Es kommt keine neue Kompetenz hinzu.
