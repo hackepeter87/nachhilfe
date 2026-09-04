@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
-import packageJson from './package.json'
+import packageJson from './package.json' with { type: 'json' }
 
 export default defineConfig({
   define: {
