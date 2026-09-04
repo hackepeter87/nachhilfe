@@ -149,7 +149,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.32.6
+podman pull ghcr.io/hackepeter87/nachhilfe:0.32.7
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -190,8 +190,8 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.32.6
+## Entwicklungsstand 0.32.7
 
-Version 0.32.6 führt keine neue Kompetenz ein. Sie korrigiert Bezugspunkte auf Subtraktions-Rechenstrichen, geführte Nachbaraufgaben, Divisionsmodelle, mehrschrittige UI-Zustände, Zahlwortzerlegungen, Kombinatorik-Einstiege und kindliche Sachaufgabentexte. Stellenwert-Remediation bleibt beim Vergleichen und Ordnen; Wahrscheinlichkeit ist in allen Katalogphasen konsistent deaktiviert. App 0.32.6 verwendet Katalog 0.31.3 bei unverändertem Schema 19. Details stehen im [Patchbericht](docs/release-0.32.6.md) und im [GitHub Release](https://github.com/hackepeter87/nachhilfe/releases/tag/v0.32.6).
+Version 0.32.7 aktualisiert Sicherheitsabhängigkeiten und kompatible Entwicklungswerkzeuge. CI prüft den gehärteten AMD64-Container einschließlich Browser- und Sicherheitsprüfungen vor dem Publish. Der Kombinatorik-Einstieg formuliert Auswahl, Hilfen und Feedback konkreter. App 0.32.7 verwendet Katalog 0.31.4 bei unverändertem Schema 19; es kommt keine neue Kompetenz hinzu. Details und Freigabeweg stehen im [Releasebericht](docs/release-0.32.7.md).
 
-Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.6 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
+Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.7 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

@@ -1,6 +1,6 @@
 # Mathe-Reise
 
-## Unveröffentlicht
+## Software-Wartung und Kombinatorik-Klarstellung 0.32.7
 
 ### Software-Wartung vom 04.09.2026
 
@@ -9,13 +9,13 @@
 - CI-Actions aktualisiert, automatische Wartungs-PRs eingerichtet, Containerbasen werden vor Builds frisch bezogen. Image-Publish wartet auf Qualitäts-, Sicherheits- und Browserprüfungen für denselben Commit.
 - Echter Service-Worker-Update-Test ergänzt: Aktualisierung nach Bestätigung, Profil bleibt auch offline erhalten.
 - React-Buildplugin 6.1.1 wegen Babel-Peer-Konflikt zurückgestellt. TypeScript 7, Vitest 5 und jest-dom 7 bleiben separate Migrationen.
-- Noch kein neues Release oder GHCR-Image veröffentlicht. Prüfbelege und verbleibende Grenzen stehen im [Wartungsbericht](docs/software-maintenance-2026-09-04.md).
+- Prüfbelege und verbleibende Grenzen des Wartungslaufs stehen im [Wartungsbericht](docs/software-maintenance-2026-09-04.md); Releaseumfang und Freigabeweg im [Releasebericht 0.32.7](docs/release-0.32.7.md).
 
-### Bereits vorbereitete Inhaltskorrektur
+### Inhaltskorrektur
 
 - Der Kombinatorik-Einstieg fragt nun konkret nach einer passenden Auswahl aus zwei sichtbar beschrifteten Gruppen.
 - Antworttexte verbinden die beiden gewählten Dinge mit „und“. Hilfen, Fehlerfeedback und Erklärung behandeln ausschließlich diesen ersten Lernschritt und sprechen noch nicht vom vollständigen Ergebnisraum.
-- Katalog 0.31.4 ist eine noch unveröffentlichte Textkorrektur bei unverändertem Schema 19. Es kommt keine neue Kompetenz hinzu.
+- App 0.32.7 verwendet Katalog 0.31.4 mit dieser Textkorrektur bei unverändertem Schema 19. Es kommt keine neue Kompetenz hinzu.
 
 ## Katalog- und Darstellungsabgleich 0.32.6
 

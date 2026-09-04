@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit
       - run: npm run catalog:check
       - run: npm run curriculum:check
       - run: npm run typecheck
@@ -48,7 +48,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:e2e
 
@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit
       - run: npx playwright install --with-deps chromium webkit
       - uses: docker/setup-buildx-action@v4
       - uses: docker/build-push-action@v7
