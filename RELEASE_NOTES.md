@@ -5,6 +5,7 @@
 - Das npm-Lockfile wird in CI verpflichtend mit Trivy 0.74.0 einschließlich Entwicklungsabhängigkeiten ab Schweregrad `MEDIUM` geprüft.
 - Der npm-Audit-Runner wiederholt eindeutig technische Dienstfehler dreimal. Sicherheitsfunde ab `moderate` und unbekannte Fehler blockieren weiterhin sofort.
 - Nur ein dreimal bestätigter Netzwerk-, Rate-Limit- oder HTTP-5xx-Ausfall des npm-Advisory-Diensts wird nach bestandenem Trivy-Scan als sichtbare Warnung behandelt.
+- Das Runtime-Image aktualisiert `libuuid` auf den gepatchten Alpine-Stand und beseitigt sieben im ersten Remote-Lauf neu gemeldete `HIGH`-CVE.
 - Sieben Unit-Tests prüfen Klassifikation, Wiederholung und CI-Verdrahtung. Aufgaben, Lernlogik, Katalog 0.31.4 und Schema 19 bleiben unverändert.
 - Anlass und Freigabeweg stehen im [Releasebericht 0.32.8](docs/release-0.32.8.md).
 

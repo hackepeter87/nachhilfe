@@ -23,6 +23,9 @@ Freigabezustände behandeln.
   nach drei Versuchen Exitcode 75. Nach bereits bestandenem Trivy-Scan wandelt
   der Workflow ausschließlich diesen Zustand in eine sichtbare Warnung um.
 - Unit-Tests sichern Klassifikation, Wiederholung und Workflow-Verdrahtung ab.
+- Der erste Remote-CI-Lauf meldete im Runtime-Basisimage sieben neue `HIGH`-CVE
+  in `libuuid` 2.42.1-r0. Der Runtime-Stage aktualisiert das Paket deshalb vor
+  dem Wechsel zurück zu UID 101 auf den gepatchten Alpine-Stand.
 
 Die Änderung beseitigt keinen Sicherheits-Gate. Sie ersetzt die unkontrollierte
 Abhängigkeit von einem einzelnen externen POST-Aufruf durch einen verpflichtenden

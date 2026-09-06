@@ -192,6 +192,6 @@ Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: r
 
 ## Entwicklungsstand 0.32.8
 
-Version 0.32.8 korrigiert den Release-Gate nach den wiederholten technischen Ausfällen des npm-Audit-Endpunkts. Ein verpflichtender Trivy-Lockfile-Scan blockiert ab `MEDIUM`; der npm-Audit-Runner wiederholt echte Dienstfehler dreimal und unterscheidet sie von Sicherheitsfunden und internen Fehlern. App 0.32.8 verwendet unverändert Katalog 0.31.4 und Schema 19; Aufgaben und Laufzeitverhalten entsprechen 0.32.7. Details stehen im [Releasebericht](docs/release-0.32.8.md).
+Version 0.32.8 korrigiert den Release-Gate nach den wiederholten technischen Ausfällen des npm-Audit-Endpunkts. Ein verpflichtender Trivy-Lockfile-Scan blockiert ab `MEDIUM`; der npm-Audit-Runner wiederholt echte Dienstfehler dreimal und unterscheidet sie von Sicherheitsfunden und internen Fehlern. Das Runtime-Image aktualisiert außerdem `libuuid` auf den gepatchten Alpine-Stand. App 0.32.8 verwendet unverändert Katalog 0.31.4 und Schema 19; Aufgaben und Laufzeitverhalten entsprechen 0.32.7. Details stehen im [Releasebericht](docs/release-0.32.8.md).
 
 Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.8 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
