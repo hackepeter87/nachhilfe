@@ -1,7 +1,7 @@
 {
   "name": "mathe-reise",
   "private": true,
-  "version": "0.32.7",
+  "version": "0.32.8",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -16,6 +16,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build && npm run review:check-production",
     "review:check-production": "node scripts/review-build-check.mjs",
+    "security:audit": "node scripts/security-audit.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",

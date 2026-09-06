@@ -65,7 +65,7 @@ npm run build
 
 Die Unit- und Komponententests prüfen Generatoren, fachliche Grenzen, Lernstandsregeln, Adaptivität, IndexedDB-Persistenz, Onboarding, Hilfen und Feedback.
 
-Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` dieselben Qualitätsbefehle mit Node.js 24 aus. Separate Jobs prüfen npm-Sicherheitsmeldungen, Chromium/WebKit sowie den gehärteten AMD64-Container einschließlich Trivy-Scan und Browser-/Offline-Tests. Der Publish-Workflow ruft diese CI für denselben Commit auf und veröffentlicht erst nach erfolgreichen Prüfungen. Ein ausgefallener Sicherheitsdienst gilt nicht als erfolgreiche Prüfung.
+Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` dieselben Qualitätsbefehle mit Node.js 24 aus. Separate Jobs prüfen das npm-Lockfile verpflichtend mit Trivy, fragen zusätzlich die npm-Advisory-Datenbank ab und testen Chromium/WebKit sowie den gehärteten AMD64-Container. Der Publish-Workflow ruft diese CI für denselben Commit auf und veröffentlicht erst nach erfolgreichen Prüfungen. Sicherheitsfunde und unbekannte Audit-Fehler blockieren; nur ein dreimal eindeutig technisch ausgefallener npm-Dienst wird nach bestandenem Trivy-Lockfile-Scan als Warnung behandelt.
 
 Dependabot eröffnet wöchentliche Wartungs-PRs für npm, Docker und GitHub Actions. Kompatible npm-Updates werden gruppiert, Major-Wechsel getrennt geprüft; automatisches Mergen ist nicht eingerichtet.
 
@@ -149,7 +149,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.32.7
+podman pull ghcr.io/hackepeter87/nachhilfe:0.32.8
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -190,8 +190,8 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.32.7
+## Entwicklungsstand 0.32.8
 
-Version 0.32.7 aktualisiert Sicherheitsabhängigkeiten und kompatible Entwicklungswerkzeuge. CI prüft den gehärteten AMD64-Container einschließlich Browser- und Sicherheitsprüfungen vor dem Publish. Der Kombinatorik-Einstieg formuliert Auswahl, Hilfen und Feedback konkreter. App 0.32.7 verwendet Katalog 0.31.4 bei unverändertem Schema 19; es kommt keine neue Kompetenz hinzu. Details und Freigabeweg stehen im [Releasebericht](docs/release-0.32.7.md).
+Version 0.32.8 korrigiert den Release-Gate nach den wiederholten technischen Ausfällen des npm-Audit-Endpunkts. Ein verpflichtender Trivy-Lockfile-Scan blockiert ab `MEDIUM`; der npm-Audit-Runner wiederholt echte Dienstfehler dreimal und unterscheidet sie von Sicherheitsfunden und internen Fehlern. App 0.32.8 verwendet unverändert Katalog 0.31.4 und Schema 19; Aufgaben und Laufzeitverhalten entsprechen 0.32.7. Details stehen im [Releasebericht](docs/release-0.32.8.md).
 
-Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.7 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
+Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.8 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

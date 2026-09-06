@@ -1,6 +1,13 @@
 # Software-Wartung vom 04.09.2026
 
-Status: lokal umgesetzt, noch nicht veröffentlicht. App-Version bleibt 0.32.6.
+> Nachtrag vom 06.09.2026: Die Wartungsbasis wurde als App 0.32.7 veröffentlicht,
+> der Container-Publish scheiterte jedoch wiederholt am zeitweise nicht antwortenden
+> npm-Audit-Endpunkt. Patch 0.32.8 ergänzt deshalb einen verpflichtenden
+> Trivy-Lockfile-Scan und unterscheidet nach drei npm-Audit-Versuchen zwischen
+> Sicherheitsfunden, technischen Dienstausfällen und unbekannten Fehlern.
+
+Ursprünglicher Status am 04.09.2026: lokal umgesetzt, noch nicht veröffentlicht.
+Die App-Version blieb zu diesem Zeitpunkt 0.32.6.
 Keine neuen fachlichen Aufgaben oder Katalogänderungen in diesem Update.
 Die bereits vorhandene Inhaltskorrektur in Commit `3a84610` und Katalog 0.31.4
 bleibt unverändert und wird in den Release Notes getrennt geführt.
