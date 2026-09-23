@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.32.6, Katalog 0.31.4, Schema 19.
+Stand: App 0.32.8, Katalog 0.31.5, Schema 19.
 
 ## Verbindliche Regel
 
@@ -23,6 +23,8 @@ Der Renderer lehnt doppelte, überlappende, unvollständige oder unzulässig auf
 | Nachbarzehner/-hunderter | Beide gesuchten Nachbarn waren beschriftet. | Nur die gegebene Zahl ist beschriftet; beide Nachbarn bleiben `?`. |
 | Ergänzen | Sprungbeschriftungen ergaben unmittelbar die gesuchte Ergänzung. | Start und bekannte Zielzahl bleiben sichtbar; Sprünge bleiben bis zur Lösung unbekannt. |
 | Division | Die Anzahl gezeichneter Gruppen wurde nur durch eine einzelne Beispielgruppe angedeutet; Gruppieren und Verteilen waren nicht getrennt. | Gruppierungs- und Verteilmodell verarbeiten die vollständige Gesamtmenge. Die gesuchte Anzahl beziehungsweise Gruppengröße bleibt numerisch `?`, während der Aufteilungsprozess vollständig sichtbar ist. |
+| Schriftliche Subtraktion | Eine zweite Entbündelung und der Tausch über eine Null konnten nicht dargestellt werden. | Jede Tauschaktionen wird in Reihenfolge berechnet; alle veränderten Stellen werden gemeinsam angezeigt und die Differenz bleibt bis zur Bearbeitung verborgen. |
+| Aufgabenpäckchen | Es gab keine eigene Darstellung für zusammengehörige Rechnungen. | Die bekannten Rechnungen dürfen vollständig sichtbar sein. Die gesuchte Veränderungsregel erscheint ausschließlich in den Antwortoptionen. |
 | Geld | Der summierte Betrag stand im `aria-label`. | Einzelne bekannte Münzen und ein Zahlbetrag bleiben sichtbar; Gesamtbetrag oder Rückgeld sind visuell und für Screenreader unbekannt. |
 | Messstrecke | Der gesuchte Endwert stand als Zahl und im `aria-label`. | Die Strecke bleibt messbar, ihr Zahlenwert wird bis zur Lösung durch `?` ersetzt. |
 | Balkenmodelle | Gesuchte Teile waren bereits maskiert. | Die bestehende Maskierung bleibt verbindlich und verwendet dieselben Rollen. |

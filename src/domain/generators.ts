@@ -18,6 +18,7 @@ import { createFoldingOutcomes, foldingCellsKey, type FoldingTemplate } from './
 import { createDataDistractors, sameDataValues, varyDataValues, type DataDisplayType, type DataSetTemplate } from './dataDisplays'
 import { classifyEvent, combinationCount, compareEventFrequency, type CombinationTemplate, type ProbabilityTemplate } from './chance'
 import { areaInUnitSquares, perimeterInUnitEdges } from './planeGeometry'
+import { analyzeWrittenSubtraction, type WrittenSubtractionUnbundlePattern } from './writtenSubtraction'
 
 export function getSkillLabel(skillId: SkillId): string {
   return getSkillContent(skillId).label
@@ -1931,7 +1932,7 @@ function writtenSubtractionSteps(values: Record<string, number | string>, diffic
   })
   const steps: ExerciseStep[] = []
   if (difficulty === 2) {
-    steps.push(step('unbundle', content.unbundlePrompt, 1, content.unbundleError, content.unbundleSuccess))
+    steps.push(step('unbundle-tens', content.unbundlePrompt, 1, content.unbundleError, content.unbundleSuccess))
   }
   steps.push(
     step('ones', content.onesPrompt, Number(values.onesResult),
@@ -1962,7 +1963,7 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
   let secondHundreds: number
   let secondTens: number
   let secondOnes: number
-  let unbundleFrom: 'none' | 'tens' | 'hundreds' = 'none'
+  let requestedPattern: WrittenSubtractionUnbundlePattern = 'none'
 
   if (calculationLevel === 1) {
     firstHundreds = integer(random, 4, 9)
@@ -1972,7 +1973,7 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     firstOnes = integer(random, 1, 9)
     secondOnes = integer(random, 0, firstOnes)
   } else if (calculationLevel === 2 || random() < 0.5) {
-    unbundleFrom = 'tens'
+    requestedPattern = 'tens'
     firstHundreds = integer(random, 4, 9)
     secondHundreds = integer(random, 1, firstHundreds - 1)
     firstTens = integer(random, 2, 9)
@@ -1980,19 +1981,47 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     firstOnes = integer(random, 0, 7)
     secondOnes = integer(random, firstOnes + 1, 9)
   } else {
-    unbundleFrom = 'hundreds'
-    firstHundreds = integer(random, 3, 9)
-    secondHundreds = integer(random, 1, firstHundreds - 2)
-    firstTens = integer(random, 0, 7)
-    secondTens = integer(random, firstTens + 1, 9)
-    firstOnes = integer(random, 1, 9)
-    secondOnes = integer(random, 0, firstOnes)
+    const hardPattern = integer(random, 0, 2)
+    if (hardPattern === 0) {
+      requestedPattern = 'hundreds'
+      firstHundreds = integer(random, 3, 9)
+      secondHundreds = integer(random, 1, firstHundreds - 2)
+      firstTens = integer(random, 0, 7)
+      secondTens = integer(random, firstTens + 1, 9)
+      firstOnes = integer(random, 1, 9)
+      secondOnes = integer(random, 0, firstOnes)
+    } else if (hardPattern === 1) {
+      requestedPattern = 'both'
+      firstHundreds = integer(random, 4, 9)
+      secondHundreds = integer(random, 1, firstHundreds - 2)
+      firstTens = integer(random, 1, 8)
+      secondTens = integer(random, firstTens, 9)
+      firstOnes = integer(random, 0, 7)
+      secondOnes = integer(random, firstOnes + 1, 9)
+    } else {
+      requestedPattern = 'across-zero'
+      firstHundreds = integer(random, 4, 9)
+      secondHundreds = integer(random, 1, firstHundreds - 2)
+      firstTens = 0
+      secondTens = integer(random, 0, 9)
+      firstOnes = integer(random, 0, 7)
+      secondOnes = integer(random, firstOnes + 1, 9)
+    }
   }
-  if (phase === 'activate') secondHundreds = 0
+  if (phase === 'activate') {
+    secondHundreds = 0
+    if (secondTens === 0 && secondOnes === 0) secondOnes = 1
+  }
 
   const first = firstHundreds * 100 + firstTens * 10 + firstOnes
   const second = secondHundreds * 100 + secondTens * 10 + secondOnes
   const answer = first - second
+  const subtractionAnalysis = analyzeWrittenSubtraction(first, second)
+  if (!subtractionAnalysis || subtractionAnalysis.pattern !== requestedPattern) {
+    throw new Error(`Ungültige schriftliche Subtraktion ${first} − ${second} für ${requestedPattern}.`)
+  }
+  const unbundleFrom = subtractionAnalysis.pattern
+  const unbundle = subtractionAnalysis.exchanges.length
   const values = {
     first,
     second,
@@ -2000,7 +2029,7 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     onesResult: answer % 10,
     tensResult: Math.floor(answer / 10) % 10,
     hundredsResult: Math.floor(answer / 100),
-    unbundle: calculationLevel === 1 ? 0 : 1,
+    unbundle,
     unbundleFrom,
     firstHundreds, firstTens, firstOnes, secondHundreds, secondTens, secondOnes
   }
@@ -2011,18 +2040,22 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
       ? `${second} hat ${secondTens} Zehner und ${secondOnes} Einer. Deshalb bleibt die Hunderterspalte frei.`
       : calculationLevel === 1
         ? `Du hast jede Spalte von rechts nach links subtrahiert. Es musste nichts entbündelt werden. Das Ergebnis ist ${answer}. Die Probe ${answer} + ${second} ergibt ${first}.`
-        : `Du hast von rechts nach links gerechnet und genau an der nötigen Stelle entbündelt. Das Ergebnis ist ${answer}. Die Probe ${answer} + ${second} ergibt ${first}.`,
+        : `Du hast von rechts nach links gerechnet und an ${unbundle === 1 ? 'der nötigen Stelle' : 'den nötigen Stellen'} entbündelt. Das Ergebnis ist ${answer}. Die Probe ${answer} + ${second} ergibt ${first}.`,
     subskillId: calculationLevel === 1
       ? 'written-subtraction-no-unbundling'
       : unbundleFrom === 'tens'
         ? 'written-subtraction-ones-unbundling'
-        : 'written-subtraction-tens-unbundling',
+        : unbundleFrom === 'hundreds'
+          ? 'written-subtraction-tens-unbundling'
+          : unbundleFrom === 'across-zero'
+            ? 'written-subtraction-zero-chain'
+            : 'written-subtraction-double-unbundling',
   }
   const column = representation('written-subtraction', difficulty, 'column-calculation', 'Schriftliche Subtraktion in der Stellenwerttafel', {
     first,
     second,
     operation: '−',
-    unbundle: calculationLevel === 1 ? 0 : 1,
+    unbundle,
     unbundleFrom
   }, ['result'])
   if (phase === 'activate') {
@@ -2056,17 +2089,110 @@ function writtenSubtraction(seed: number, difficulty: Difficulty, phase?: Learni
     })
   }
   if (phase === 'transfer') {
-    const probe = `${answer} + ${second} = ${first}`
+    const transferMode = seed % 4
+    if (transferMode === 0) {
+      const probe = `${answer} + ${second} = ${first}`
+      return withMetadata({
+        ...shared,
+        typeId: 'transfer-addition-check',
+        prompt: `Welche Additionsprobe prüft ${first} − ${second} = ${answer}?`,
+        answerMode: 'choice', correctAnswer: probe,
+        options: textOptions(random, probe, [
+          { value: `${first} + ${second} = ${first + second}`, misconception: 'Die Ausgangszahl wird statt der Differenz ergänzt.', misconceptionId: 'written-subtraction-probe-start' },
+          { value: `${answer} − ${second} = ${Math.max(0, answer - second)}`, misconception: 'Für die Probe wird erneut subtrahiert.', misconceptionId: 'written-subtraction-probe-operation' }
+        ]),
+        representation: { ...column, visibility: 'always' }
+      })
+    }
+    if (transferMode === 1) {
+      const roundedFirst = Math.round(first / 100) * 100
+      const roundedSecond = Math.round(second / 100) * 100
+      const estimate = roundedFirst - roundedSecond
+      const equationIsCorrect = Math.floor(seed / 4) % 2 === 0
+      const proposedResult = equationIsCorrect ? answer : answer <= 699 ? answer + 300 : answer - 300
+      const estimateText = `${roundedFirst} − ${roundedSecond} sind ungefähr ${estimate}`
+      const correct = equationIsCorrect
+        ? `Ja. ${estimateText}; ${proposedResult} liegt in der Nähe.`
+        : `Nein. ${estimateText}; ${proposedResult} liegt nicht in der Nähe.`
+      const opposite = equationIsCorrect
+        ? `Nein. ${estimateText}; ${proposedResult} liegt nicht in der Nähe.`
+        : `Ja. ${estimateText}; ${proposedResult} liegt in der Nähe.`
+      return withMetadata({
+        ...shared,
+        typeId: 'transfer-estimate-check',
+        prompt: `Kann ${first} − ${second} = ${proposedResult} stimmen? Wähle den passenden Überschlag.`,
+        answerMode: 'choice', correctAnswer: correct,
+        options: textOptions(random, correct, [
+          { value: opposite, misconception: 'Das Ergebnis des Überschlags wird nicht mit dem vorgeschlagenen Ergebnis verglichen.', misconceptionId: 'written-subtraction-estimate-comparison' },
+          { value: 'Das lässt sich mit einem Überschlag nicht prüfen.', misconception: 'Der Überschlag wird nicht als Plausibilitätsprüfung genutzt.', misconceptionId: 'written-subtraction-estimate-purpose' }
+        ]),
+        hints: [
+          { level: 1, text: 'Runde beide Zahlen auf volle Hunderter.' },
+          { level: 2, text: `Rechne ungefähr: ${roundedFirst} − ${roundedSecond} = ${estimate}.` }
+        ],
+        explanation: `${estimateText}. Damit kannst du prüfen, ob ${proposedResult} ungefähr passen kann.`
+      })
+    }
+    if (transferMode === 2) {
+      const mental = Math.floor(seed / 4) % 2 === 0
+      const mentalTasks = [[950, 400], [860, 320], [740, 210]] as const
+      const writtenTasks = [[751, 157], [654, 456], [708, 409], [777, 399]] as const
+      const [taskFirst, taskSecond] = mental
+        ? mentalTasks[Math.floor(seed / 8) % mentalTasks.length]!
+        : writtenTasks[Math.floor(seed / 8) % writtenTasks.length]!
+      const correct = mental
+        ? 'Im Kopf. Die vollen Hunderter und Zehner lassen sich schrittweise abziehen.'
+        : 'Schriftlich. An mehreren Stellen muss entbündelt werden.'
+      return withMetadata({
+        ...shared,
+        variant: { ...shared.variant, values: { first: taskFirst, second: taskSecond, answer: taskFirst - taskSecond, strategy: mental ? 'mental' : 'written' } },
+        typeId: 'transfer-strategy-choice',
+        prompt: `Wie rechnest du ${taskFirst} − ${taskSecond} am sinnvollsten?`,
+        answerMode: 'choice', correctAnswer: correct,
+        options: textOptions(random, correct, [
+          { value: mental ? 'Schriftlich. Jede Subtraktion muss untereinander stehen.' : 'Im Kopf. Ich ziehe einfach alle Ziffern einzeln ab.', misconception: 'Die Rechenstrategie wird ohne Blick auf die Stellen und nötigen Entbündelungen gewählt.', misconceptionId: 'written-subtraction-strategy-fit' },
+          { value: 'Raten. Ob das Ergebnis passt, prüfe ich erst danach.', misconception: 'Eine passende Rechenstrategie wird durch Raten ersetzt.', misconceptionId: 'written-subtraction-strategy-guess' }
+        ]),
+        hints: [
+          { level: 1, text: 'Prüfe, ob du volle Hunderter oder Zehner direkt abziehen kannst.' },
+          { level: 2, text: mental ? 'Hier bleiben die Stellen beim Abziehen übersichtlich.' : 'Hier musst du an mehreren Stellen entbündeln.' }
+        ],
+        explanation: correct
+      })
+    }
+
+    const seriesMode = Math.floor(seed / 4) % 3
+    const rows = seriesMode === 0
+      ? [[752, 122], [722, 122], [692, 122]]
+      : seriesMode === 1
+        ? [[981, 51], [981, 81], [981, 111]]
+        : [[587, 105], [587, 75], [587, 45]]
+    const seriesValues = Object.fromEntries(rows.flatMap(([rowFirst, rowSecond], index) => [
+      [`first${index}`, rowFirst],
+      [`second${index}`, rowSecond],
+      [`result${index}`, rowFirst! - rowSecond!]
+    ])) as Record<string, number>
+    const seriesAnswers = [
+      'Die erste Zahl wird immer 30 kleiner. Das Ergebnis wird auch 30 kleiner.',
+      'Die zweite Zahl wird immer 30 größer. Das Ergebnis wird 30 kleiner.',
+      'Die zweite Zahl wird immer 30 kleiner. Das Ergebnis wird 30 größer.'
+    ]
+    const correct = seriesAnswers[seriesMode]!
     return withMetadata({
       ...shared,
-      typeId: 'written-subtraction-transfer-addition-check',
-      prompt: `Welche Additionsprobe prüft ${first} − ${second} = ${answer}?`,
-      answerMode: 'choice', correctAnswer: probe,
-      options: textOptions(random, probe, [
-        { value: `${first} + ${second} = ${first + second}`, misconception: 'Die Ausgangszahl wird statt der Differenz ergänzt.', misconceptionId: 'written-subtraction-probe-start' },
-        { value: `${answer} − ${second} = ${Math.max(0, answer - second)}`, misconception: 'Für die Probe wird erneut subtrahiert.', misconceptionId: 'written-subtraction-probe-operation' }
-      ]),
-      representation: { ...column, visibility: 'always' }
+      variant: { ...shared.variant, values: { count: 3, ...seriesValues, seriesMode } },
+      typeId: 'transfer-calculation-series',
+      prompt: 'Was verändert sich von Zeile zu Zeile?',
+      answerMode: 'choice', correctAnswer: correct,
+      options: textOptions(random, correct, seriesAnswers
+        .filter((answerOption) => answerOption !== correct)
+        .map((answerOption) => ({ value: answerOption, misconception: 'Die Veränderung einer Zahl wird nicht mit der Veränderung des Ergebnisses verbunden.', misconceptionId: 'written-subtraction-series-relation' }))),
+      hints: [
+        { level: 1, text: 'Vergleiche zuerst die erste Zahl in allen drei Zeilen.' },
+        { level: 2, text: 'Vergleiche danach die zweite Zahl und die drei Ergebnisse.' }
+      ],
+      explanation: correct,
+      representation: representation('written-subtraction', difficulty, 'calculation-series', 'Drei zusammengehörige Subtraktionen', { count: 3, ...seriesValues })
     })
   }
   return withMetadata({

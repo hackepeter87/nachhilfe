@@ -456,7 +456,7 @@ describe('ExerciseCard', () => {
     const result = () => container.querySelector('.column-row--result')?.textContent
 
     expect(screen.getByRole('img', { name: /schriftliche Subtraktion/i })).toBeVisible()
-    expect(exercise.steps?.map((step) => step.id)).toEqual(['unbundle', 'ones', 'tens', 'hundreds'])
+    expect(exercise.steps?.map((step) => step.id)).toEqual(['unbundle-tens', 'ones', 'tens', 'hundreds'])
     expect(adjustment()).toBe('')
     expect(result()).toBe('???')
 
@@ -494,7 +494,7 @@ describe('ExerciseCard', () => {
     const user = userEvent.setup()
     const exercise = generateExercise('written-subtraction', 42, 2)
     const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
-    const unbundleStep = exercise.steps?.find((step) => step.id === 'unbundle')
+    const unbundleStep = exercise.steps?.find((step) => step.id === 'unbundle-tens')
     if (!unbundleStep) throw new Error('Entbündelungsschritt fehlt')
 
     await user.type(screen.getByLabelText('Dein Ergebnis'), '2')

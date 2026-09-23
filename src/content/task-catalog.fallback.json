@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.31.4",
+  "catalogVersion": "0.31.5",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-08-09",
+  "releasedAt": "2026-09-23",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -2824,16 +2824,21 @@
       "id": "written-subtraction",
       "label": "Schriftlich subtrahieren",
       "curriculumArea": "Zahlen und Operationen",
-      "supportGoal": "Minuend und Subtrahend stellengerecht anordnen und eine schriftliche Subtraktion bis 1000 mit höchstens einer Entbündelung verständig ausführen und prüfen.",
+      "supportGoal": "Minuend und Subtrahend stellengerecht anordnen, schriftliche Subtraktionen bis 1000 auch mit mehreren Entbündelungen verständig ausführen und Ergebnisse durch Probe oder Überschlag prüfen.",
       "misconceptions": [
         "Einer, Zehner und Hunderter werden nicht stellengerecht ausgerichtet.",
         "Die kleinere Ziffer wird unabhängig von der Rechenrichtung von der größeren abgezogen.",
         "Nach dem Entbündeln wird die abgebende Stelle nicht um eins vermindert.",
-        "Die Entbündelung wird in einer weiteren Spalte unnötig fortgesetzt.",
+        "Eine nötige zweite Entbündelung oder der Tausch über eine Null wird ausgelassen.",
         "Beim Entbündeln wird die Stelle nicht in zehn kleinere Einheiten getauscht.",
         "Die Tauschrichtung wird umgekehrt.",
         "Die Ausgangszahl wird statt der Differenz ergänzt.",
-        "Für die Probe wird erneut subtrahiert."
+        "Für die Probe wird erneut subtrahiert.",
+        "Das Ergebnis des Überschlags wird nicht mit dem vorgeschlagenen Ergebnis verglichen.",
+        "Der Überschlag wird nicht als Plausibilitätsprüfung genutzt.",
+        "Die Rechenstrategie wird ohne Blick auf die Stellen und nötigen Entbündelungen gewählt.",
+        "Eine passende Rechenstrategie wird durch Raten ersetzt.",
+        "Die Veränderung einer Zahl wird nicht mit der Veränderung des Ergebnisses verbunden."
       ],
       "misconceptionFeedback": [
         {
@@ -2855,11 +2860,36 @@
           "id": "written-subtraction-probe-operation",
           "misconception": "Für die Probe wird erneut subtrahiert.",
           "feedback": "Die Subtraktion wird mit der umgekehrten Rechenart Addition geprüft."
+        },
+        {
+          "id": "written-subtraction-estimate-comparison",
+          "misconception": "Das Ergebnis des Überschlags wird nicht mit dem vorgeschlagenen Ergebnis verglichen.",
+          "feedback": "Vergleiche das vorgeschlagene Ergebnis mit deinem ungefähren Ergebnis. Beide sollten nahe beieinanderliegen."
+        },
+        {
+          "id": "written-subtraction-estimate-purpose",
+          "misconception": "Der Überschlag wird nicht als Plausibilitätsprüfung genutzt.",
+          "feedback": "Ein Überschlag zeigt dir, ob ein Ergebnis ungefähr passen kann."
+        },
+        {
+          "id": "written-subtraction-strategy-fit",
+          "misconception": "Die Rechenstrategie wird ohne Blick auf die Stellen und nötigen Entbündelungen gewählt.",
+          "feedback": "Prüfe zuerst die Stellen: Volle Hunderter und Zehner gehen oft gut im Kopf; mehrere Entbündelungen sprechen für die schriftliche Rechnung."
+        },
+        {
+          "id": "written-subtraction-strategy-guess",
+          "misconception": "Eine passende Rechenstrategie wird durch Raten ersetzt.",
+          "feedback": "Wähle vor dem Rechnen einen nachvollziehbaren Rechenweg."
+        },
+        {
+          "id": "written-subtraction-series-relation",
+          "misconception": "Die Veränderung einer Zahl wird nicht mit der Veränderung des Ergebnisses verbunden.",
+          "feedback": "Vergleiche in jeder Zeile zuerst beide Ausgangszahlen und danach das Ergebnis."
         }
       ],
       "hints": [
-        "Beginne rechts bei den Einern. Reicht die obere Stelle nicht, entbündele genau eine Einheit der linken Nachbarstelle.",
-        "Nach dem Entbündeln besitzt die aktuelle Stelle zehn Einheiten mehr und die linke Nachbarstelle eine Einheit weniger."
+        "Beginne rechts bei den Einern. Reicht die obere Stelle nicht, entbündele eine Einheit der linken Nachbarstelle.",
+        "Prüfe nach jedem Tausch die nächste Spalte erneut. Bei einer Null kann zuerst ein Hunderter in zehn Zehner und danach ein Zehner in zehn Einer getauscht werden."
       ],
       "prompt": "Rechne {first} − {second} schriftlich.",
       "errorFeedback": "Prüfe nur die aktuelle Spalte. Ziehe die untere Ziffer von der oberen Stellenmenge ab und beachte eine sichtbare Entbündelung.",
@@ -2890,8 +2920,10 @@
       ],
       "representations": [
         "Stellenwerttafel",
-        "Spaltendarstellung mit sichtbarer Entbündelung",
-        "Additionsprobe"
+        "Spaltendarstellung mit allen sichtbaren Entbündelungen",
+        "Additionsprobe",
+        "Überschlag auf volle Hunderter",
+        "Aufgabenpäckchen mit drei zusammengehörigen Rechnungen"
       ],
       "difficultyLevels": [
         {
@@ -2924,7 +2956,7 @@
         },
         {
           "level": 3,
-          "description": "Genau eine selbstständige Entbündelung aus der Zehner- oder Hunderterstelle; Spaltendarstellung nur als Hilfe und Abschluss mit Additionsprobe",
+          "description": "Eine oder mehrere Entbündelungen selbstständig ausführen, auch über eine Null; Spaltendarstellung nur als Hilfe und Abschluss mit Additionsprobe",
           "numberRange": "100 bis 999",
           "representation": "hint",
           "requirements": {
@@ -2937,7 +2969,7 @@
           "learningPhase": "automate"
         }
       ],
-      "workedExample": "Bei 532 − 218 reichen 2 Einer nicht für 8 Einer. Ein Zehner wird in 10 Einer entbündelt: Aus 5 H, 3 Z, 2 E werden 5 H, 2 Z, 12 E. Dann wird von rechts nach links gerechnet.",
+      "workedExample": "Bei 500 − 237 reichen 0 Einer nicht für 7 Einer. Zuerst wird 1 Hunderter in 10 Zehner getauscht, dann 1 Zehner in 10 Einer. Aus 5 H, 0 Z, 0 E werden 4 H, 9 Z, 10 E. Danach wird von rechts nach links gerechnet.",
       "successFeedback": "Du hast die Stellen nacheinander richtig subtrahiert.",
       "remediation": {
         "strategy": "Bearbeite eine leichtere, verwandte Aufgabe mit sichtbarer Entbündelung und markierten Stellen.",
@@ -2945,7 +2977,7 @@
         "representation": "Stellenwerttafel mit Spaltendarstellung",
         "keepSubskill": false
       },
-      "transferPrompt": "Erkläre die Entbündelung und prüfe das Ergebnis mit der passenden Addition.",
+      "transferPrompt": "Prüfe ein Ergebnis mit Addition oder Überschlag, wähle einen sinnvollen Rechenweg und beschreibe Veränderungen in einem Aufgabenpäckchen.",
       "releaseStatus": "active",
       "learningPhases": [
         {
@@ -2982,7 +3014,7 @@
         },
         {
           "id": "automate",
-          "goal": "Genau eine Entbündelung selbstständig erkennen und mit einer Additionsprobe prüfen.",
+          "goal": "Eine oder mehrere Entbündelungen einschließlich des Tauschs über eine Null selbstständig ausführen und mit einer Additionsprobe prüfen.",
           "exerciseTypes": [
             "written-subtraction:self-unbundling"
           ],
@@ -2990,9 +3022,12 @@
         },
         {
           "id": "transfer",
-          "goal": "Die Entbündelung anhand des Stellenwerts begründen und die Umkehrbeziehung zur Addition nutzen.",
+          "goal": "Ergebnisse prüfen, Rechenwege passend wählen und Veränderungen in zusammengehörigen Subtraktionsaufgaben begründen.",
           "exerciseTypes": [
-            "written-subtraction:transfer-addition-check"
+            "written-subtraction:transfer-addition-check",
+            "written-subtraction:transfer-estimate-check",
+            "written-subtraction:transfer-strategy-choice",
+            "written-subtraction:transfer-calculation-series"
           ],
           "releaseStatus": "active"
         }
@@ -3000,8 +3035,11 @@
       "successCriteria": [
         "Minuend und Subtrahend stehen stellengerecht untereinander.",
         "Jede Spalte wird von rechts nach links genau einmal bearbeitet.",
-        "Eine Entbündelung vermindert die linke Nachbarstelle um eins und vergrößert die aktuelle Stelle um zehn.",
-        "Die Additionsprobe aus Differenz und Subtrahend ergibt den Minuenden."
+        "Jede Entbündelung vermindert die linke Nachbarstelle um eins und vergrößert die aktuelle Stelle um zehn.",
+        "Bei einer Null wird der Tausch über zwei Stellen vollständig notiert.",
+        "Die Additionsprobe aus Differenz und Subtrahend ergibt den Minuenden.",
+        "Ein Überschlag wird als ungefähre Prüfung und nicht als exakte Rechnung verwendet.",
+        "In einem Aufgabenpäckchen wird die Veränderung der Ausgangszahlen mit der Veränderung der Differenz verbunden."
       ]
     },
     {

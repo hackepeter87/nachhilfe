@@ -234,7 +234,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
           carry: completedStepAnswers.carry || (exercise.difficulty === 3 && completedStepAnswers.hundreds)
             ? exercise.representation.values.carry
             : 0,
-          unbundle: exercise.representation.values.operation === '−' && (exercise.difficulty === 3 || completedStepAnswers.unbundle)
+          unbundle: exercise.representation.values.operation === '−' && (exercise.difficulty === 3 || Object.keys(completedStepAnswers).some((key) => key.startsWith('unbundle-')))
             ? exercise.representation.values.unbundle
             : 0,
           revealedDigits: [
@@ -250,7 +250,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
                 ? 'hundreds'
                 : currentStep?.id === 'carry'
                   ? 'carry'
-                  : currentStep?.id === 'unbundle'
+                  : currentStep?.id.startsWith('unbundle-')
                     ? 'unbundle'
                   : 'none'
         }

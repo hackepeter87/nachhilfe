@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { areaInUnitSquares, clockHandAngles, isConnectedGridFigure, isValidCubeBuilding, perimeterInUnitEdges, validateGridCells, type CubeBuilding, type ExerciseRepresentation } from '../domain'
+import { analyzeWrittenSubtraction, areaInUnitSquares, clockHandAngles, isConnectedGridFigure, isValidCubeBuilding, perimeterInUnitEdges, validateGridCells, type CubeBuilding, type ExerciseRepresentation } from '../domain'
 import { WORD_MODEL_UNKNOWN_QUANTITY } from '../content/catalog'
 
 const isValidGroupValue = (value: number) => Number.isInteger(value) && value >= 1 && value <= 10
@@ -299,23 +299,18 @@ export function MathRepresentation({ representation }: { representation: Exercis
     const unbundleFrom = values.unbundleFrom
     const onesCarry = first % 10 + second % 10 >= 10 ? 1 : 0
     const tensCarry = Math.floor(first / 10) % 10 + Math.floor(second / 10) % 10 + onesCarry >= 10 ? 1 : 0
-    const onesUnbundle = first % 10 < second % 10 ? 1 : 0
-    const tensUnbundle = Math.floor(first / 10) % 10 - onesUnbundle < Math.floor(second / 10) % 10 ? 1 : 0
+    const subtractionAnalysis = operation === '−' ? analyzeWrittenSubtraction(first, second) : null
+    const expectedUnbundle = subtractionAnalysis?.exchanges.length ?? 0
     const visibleCarryMatches = carry === 0 ||
       (onesCarry + tensCarry === 1 && (onesCarry === 1 ? carryColumn === 'tens' : carryColumn === 'hundreds'))
-    const visibleUnbundleMatches = unbundle === 0 ||
-      (onesUnbundle + tensUnbundle === 1 && (onesUnbundle === 1 ? unbundleFrom === 'tens' : unbundleFrom === 'hundreds'))
-    const declaredUnbundleMatches = onesUnbundle + tensUnbundle === 0
-      ? unbundleFrom === 'none'
-      : onesUnbundle === 1
-        ? unbundleFrom === 'tens'
-        : unbundleFrom === 'hundreds'
+    const visibleUnbundleMatches = unbundle === 0 || unbundle === expectedUnbundle
+    const declaredUnbundleMatches = subtractionAnalysis?.pattern === unbundleFrom
     const validBase = Number.isInteger(first) && first >= 100 && first <= 999 &&
       Number.isInteger(second) && second >= 1 && second <= 999
     const validAddition = operation === '+' && first + second <= 999 && (carry === 0 || carry === 1) &&
       ['none', 'tens', 'hundreds'].includes(String(carryColumn)) && visibleCarryMatches
-    const validSubtraction = operation === '−' && first > second && (unbundle === 0 || unbundle === 1) &&
-      ['none', 'tens', 'hundreds'].includes(String(unbundleFrom)) && onesUnbundle + tensUnbundle <= 1 &&
+    const validSubtraction = operation === '−' && subtractionAnalysis !== null && Number.isInteger(unbundle) && unbundle >= 0 && unbundle <= 2 &&
+      ['none', 'tens', 'hundreds', 'both', 'across-zero'].includes(String(unbundleFrom)) &&
       declaredUnbundleMatches && visibleUnbundleMatches
     const valid = validBase && (validAddition || validSubtraction)
     if (!valid) {
@@ -334,10 +329,8 @@ export function MathRepresentation({ representation }: { representation: Exercis
       : [-1, -1, -1]
     const activeColumn = typeof values.activeColumn === 'string' ? values.activeColumn : 'none'
     const carryIndex = carryColumn === 'hundreds' ? 0 : carryColumn === 'tens' ? 1 : -1
-    const adjustedDigits: Array<number | null> = unbundle === 1
-      ? unbundleFrom === 'tens'
-        ? [null, firstDigits[1]! - 1, firstDigits[2]! + 10]
-        : [firstDigits[0]! - 1, firstDigits[1]! + 10, null]
+    const adjustedDigits: Array<number | null> = unbundle > 0 && subtractionAnalysis
+      ? subtractionAnalysis.adjustedDigits.map((digit, index) => digit === firstDigits[index] ? null : digit)
       : [null, null, null]
     const resultVisible = isValueVisible('result')
     const resultDescription = resultVisible ? `Das Ergebnis ist ${answerDigits.join('')}.` : 'Das Ergebnis ist noch offen.'
@@ -345,8 +338,8 @@ export function MathRepresentation({ representation }: { representation: Exercis
       ? carry === 1
         ? `Schriftliche Addition ${first} plus ${second}. Ein Übertrag zur ${carryColumn === 'hundreds' ? 'Hunderter' : 'Zehner'}spalte ist sichtbar. ${resultDescription}`
         : `Schriftliche Addition ${first} plus ${second}. ${resultDescription}`
-      : unbundle === 1
-        ? `Schriftliche Subtraktion ${first} minus ${second}. Eine ${unbundleFrom === 'tens' ? 'Zehnerstelle wird in zehn Einer' : 'Hunderterstelle wird in zehn Zehner'} entbündelt. ${resultDescription}`
+      : unbundle > 0 && subtractionAnalysis
+        ? `Schriftliche Subtraktion ${first} minus ${second}. ${subtractionAnalysis.exchanges.map((exchange) => `Eine ${exchange.from === 'hundreds' ? 'Hunderterstelle wird in zehn Zehner' : 'Zehnerstelle wird in zehn Einer'} entbündelt.`).join(' ')} ${resultDescription}`
         : `Schriftliche Subtraktion ${first} minus ${second}. ${resultDescription}`
     return (
       <div className="math-visual column-calculation" role="img" aria-label={description}>
@@ -368,6 +361,28 @@ export function MathRepresentation({ representation }: { representation: Exercis
             {revealedDigits.map((digit, index) => <strong className={activeColumn === ['hundreds', 'tens', 'ones'][index] ? 'column-cell--active' : ''} key={index}>{digit < 0 ? '?' : digit}</strong>)}
           </div>
         </div>
+      </div>
+    )
+  }
+
+  if (representation.kind === 'calculation-series') {
+    const count = Number(values.count)
+    const rows = Array.from({ length: count }, (_, index) => ({
+      first: Number(values[`first${index}`]),
+      second: Number(values[`second${index}`]),
+      result: Number(values[`result${index}`])
+    }))
+    const valid = Number.isInteger(count) && count >= 2 && count <= 5 && rows.every((row) =>
+      Number.isInteger(row.first) && Number.isInteger(row.second) && Number.isInteger(row.result) &&
+      row.first > row.second && row.first - row.second === row.result
+    )
+    if (!valid) return <div className="math-visual math-visual--error" role="alert">Das Aufgabenpäckchen enthält ungültige Rechendaten.</div>
+    const description = rows.map((row) => `${row.first} minus ${row.second} gleich ${row.result}`).join('. ')
+    return (
+      <div className="math-visual calculation-series" role="img" aria-label={`${representation.label}. ${description}.`}>
+        {rows.map((row, index) => <div className="calculation-series__row" aria-hidden="true" key={index}>
+          <strong>{row.first}</strong><span>−</span><strong>{row.second}</strong><span>=</span><strong>{row.result}</strong>
+        </div>)}
       </div>
     )
   }

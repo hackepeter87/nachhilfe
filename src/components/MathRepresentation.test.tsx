@@ -276,14 +276,17 @@ describe('MathRepresentation schriftliche Subtraktion', () => {
     expect(container.querySelector('.column-cell--source-adjusted')).not.toBeInTheDocument()
   })
 
-  it('lehnt eine Kettenentbündelung sichtbar ab', () => {
-    render(<MathRepresentation representation={{
+  it('zeigt eine Kettenentbündelung über eine Null vollständig an', () => {
+    const { container } = render(<MathRepresentation representation={{
       kind: 'column-calculation',
       visibility: 'always',
       label: 'Spaltendarstellung',
-      values: { first: 500, second: 237, operation: '−', unbundle: 1, unbundleFrom: 'tens' }
+      values: { first: 500, second: 237, operation: '−', unbundle: 2, unbundleFrom: 'across-zero' }
     }} />)
-    expect(screen.getByRole('alert')).toHaveTextContent('ungültige Rechendaten')
+    expect(screen.getByRole('img', { name: /500 minus 237.*Hunderter.*zehn Zehner.*Zehner.*zehn Einer/i })).toBeVisible()
+    expect(container.querySelector('.column-row--carry')).toHaveTextContent('4910')
+    expect(container.querySelectorAll('.column-cell--source-adjusted')).toHaveLength(3)
+    expect(container.querySelector('.column-row--result')).toHaveTextContent('???')
   })
 
   it('lehnt auch bei verborgener Entbündelung eine falsche Quellstelle ab', () => {
@@ -294,6 +297,23 @@ describe('MathRepresentation schriftliche Subtraktion', () => {
       values: { first: 532, second: 218, operation: '−', unbundle: 0, unbundleFrom: 'hundreds' }
     }} />)
     expect(screen.getByRole('alert')).toHaveTextContent('ungültige Rechendaten')
+  })
+})
+
+describe('MathRepresentation Aufgabenpäckchen', () => {
+  it('zeigt mehrere zusammengehörige Subtraktionen in einer lesbaren Folge', () => {
+    render(<MathRepresentation representation={{
+      kind: 'calculation-series',
+      visibility: 'always',
+      label: 'Aufgabenpäckchen',
+      values: {
+        count: 3,
+        first0: 587, second0: 105, result0: 482,
+        first1: 587, second1: 75, result1: 512,
+        first2: 587, second2: 45, result2: 542
+      }
+    }} />)
+    expect(screen.getByRole('img', { name: /587 minus 105 gleich 482.*587 minus 75 gleich 512.*587 minus 45 gleich 542/i })).toBeVisible()
   })
 })
 

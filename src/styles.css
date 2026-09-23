@@ -993,6 +993,27 @@ p {
   box-shadow: inset 0 0 0 2px #c38a13;
 }
 
+.calculation-series {
+  display: grid;
+  width: min(100%, 300px);
+  margin-inline: auto;
+  gap: 8px;
+  padding: 14px 18px;
+  background: #f4f8f5;
+}
+
+.calculation-series__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr) 24px minmax(0, 1fr);
+  align-items: center;
+  min-height: 40px;
+  border-bottom: 1px solid #cfdbd4;
+  text-align: center;
+}
+
+.calculation-series__row:last-child { border-bottom: 0; }
+.calculation-series__row strong { font-size: 1.1rem; }
+
 .number-line-track {
   position: relative;
   height: 4px;

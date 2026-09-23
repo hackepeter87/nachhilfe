@@ -64,7 +64,7 @@ describe('curriculare Konvergenz 0.30', () => {
           generated += 1
         }
       }
-      expect(seenTypes.size, `${skill.id}: keine sechs unterschiedlichen Runtime-Typen`).toBe(6)
+      expect(seenTypes.size, `${skill.id}: weniger als sechs unterschiedliche Runtime-Typen erreicht`).toBeGreaterThanOrEqual(6)
     }
     expect(generated).toBe(activeSkills.length * 6 * 1_000)
   }, 120_000)

@@ -32,7 +32,7 @@ describe('versionierter Aufgabenkatalog', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
     expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.4')
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.5')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
@@ -129,18 +129,24 @@ describe('versionierter Aufgabenkatalog', () => {
     catalog.skills.forEach((skill) => expect(skill.successFeedback).not.toMatch(forbidden))
   })
 
-  it('beschreibt die schriftliche Subtraktion als begrenzte Entbündelungsprogression', () => {
+  it('beschreibt schriftliche Subtraktion bis zur Kettenentbündelung und zum Transfer', () => {
     const catalog = readPublicCatalog() as TaskCatalog
     const skill = catalog.skills.find((candidate) => candidate.id === 'written-subtraction')!
     expect(skill.prerequisites.join(' ')).toMatch(/Stellenwerte.*Subtraktion/i)
     expect(skill.difficultyLevels.map((level) => level.description)).toEqual([
       expect.stringMatching(/ohne Entbündelung/i),
       expect.stringMatching(/genau eine.*sichtbar/i),
-      expect.stringMatching(/selbstständig.*Additionsprobe/i)
+      expect.stringMatching(/mehrere.*Additionsprobe/i)
     ])
     expect(skill.misconceptions.join(' ')).toMatch(/kleinere Ziffer.*größeren/i)
     expect(skill.remediation.foundationStrategy).toMatch(/ohne Entbündelung/i)
     expect(catalog.strategySteps.writtenSubtraction.checkPrompt).toMatch(/Additionsprobe/i)
+    expect(skill.learningPhases.find((phase) => phase.id === 'transfer')?.exerciseTypes).toEqual([
+      'written-subtraction:transfer-addition-check',
+      'written-subtraction:transfer-estimate-check',
+      'written-subtraction:transfer-strategy-choice',
+      'written-subtraction:transfer-calculation-series'
+    ])
   })
 
   it('beschreibt eindeutig lösbare Sachaufgaben', () => {

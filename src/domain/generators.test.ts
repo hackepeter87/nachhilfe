@@ -498,12 +498,32 @@ describe('deterministische Aufgabengeneratoren', () => {
     }
   })
 
-  it('erzeugt schriftliche Subtraktionen mit höchstens genau einer vorgesehenen Entbündelung', () => {
+  it('erzeugt schriftliche Subtraktionen bis hin zu zwei nachvollziehbaren Entbündelungen', () => {
     const unbundlings = (first: number, second: number) => {
-      const ones = first % 10 < second % 10 ? 1 : 0
-      const tens = Math.floor(first / 10) % 10 - ones < Math.floor(second / 10) % 10 ? 1 : 0
-      const hundreds = Math.floor(first / 100) - tens < Math.floor(second / 100) ? 1 : 0
-      return { ones, tens, hundreds, count: ones + tens + hundreds }
+      let hundreds = Math.floor(first / 100)
+      let tens = Math.floor(first / 10) % 10
+      let ones = first % 10
+      const secondTens = Math.floor(second / 10) % 10
+      const secondOnes = second % 10
+      let count = 0
+      let acrossZero = false
+      if (ones < secondOnes) {
+        if (tens === 0) {
+          hundreds -= 1
+          tens += 10
+          count += 1
+          acrossZero = true
+        }
+        tens -= 1
+        ones += 10
+        count += 1
+      }
+      if (tens < secondTens) {
+        hundreds -= 1
+        tens += 10
+        count += 1
+      }
+      return { count, acrossZero, adjusted: [hundreds, tens, ones] }
     }
     const hardSubskills = new Set<string>()
     for (const difficulty of [1, 2, 3] as const) {
@@ -517,16 +537,17 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(answer).toBe(first - second)
         expect(answer).toBeGreaterThanOrEqual(100)
         expect(answer).toBeLessThanOrEqual(999)
-        expect(exchanges.count).toBe(difficulty === 1 ? 0 : 1)
-        expect(exchanges.hundreds).toBe(0)
+        if (difficulty === 1) expect(exchanges.count).toBe(0)
+        if (difficulty === 2) expect(exchanges.count).toBe(1)
+        if (difficulty === 3) expect(exchanges.count).toBeGreaterThanOrEqual(1)
+        if (difficulty === 3) expect(exchanges.count).toBeLessThanOrEqual(2)
         expect(exercise.answerMode).toBe('guided-number')
         expect(exercise.steps?.find((step) => step.id === 'ones')?.correctAnswer).toBe(String(answer % 10))
         expect(exercise.steps?.find((step) => step.id === 'tens')?.correctAnswer).toBe(String(Math.floor(answer / 10) % 10))
         expect(exercise.steps?.find((step) => step.id === 'hundreds')?.correctAnswer).toBe(String(Math.floor(answer / 100)))
         if (difficulty === 2) {
-          expect(exchanges.ones).toBe(1)
           expect(exercise.subskillId).toBe('written-subtraction-ones-unbundling')
-          expect(exercise.steps?.find((step) => step.id === 'unbundle')?.correctAnswer).toBe('1')
+          expect(exercise.steps?.find((step) => step.id === 'unbundle-tens')?.correctAnswer).toBe('1')
         }
         if (difficulty === 3) {
           hardSubskills.add(exercise.subskillId ?? '')
@@ -534,7 +555,12 @@ describe('deterministische Aufgabengeneratoren', () => {
         }
       }
     }
-    expect(hardSubskills).toEqual(new Set(['written-subtraction-ones-unbundling', 'written-subtraction-tens-unbundling']))
+    expect(hardSubskills).toEqual(new Set([
+      'written-subtraction-ones-unbundling',
+      'written-subtraction-tens-unbundling',
+      'written-subtraction-double-unbundling',
+      'written-subtraction-zero-chain'
+    ]))
   })
 
   it('macht die drei Stufen der schriftlichen Subtraktion objektiv verschieden', () => {
@@ -544,7 +570,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(easy.representation?.visibility).toBe('always')
     expect(easy.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds'])
     expect(medium.representation?.visibility).toBe('always')
-    expect(medium.steps?.map((step) => step.id)).toEqual(['unbundle', 'ones', 'tens', 'hundreds'])
+    expect(medium.steps?.map((step) => step.id)).toEqual(['unbundle-tens', 'ones', 'tens', 'hundreds'])
     expect(hard.representation?.visibility).toBe('hint')
     expect(hard.steps?.map((step) => step.id)).toEqual(['ones', 'tens', 'hundreds', 'check'])
   })
@@ -556,7 +582,7 @@ describe('deterministische Aufgabengeneratoren', () => {
       'guided-practice': 'guided-columns',
       'independent-practice': 'visible-unbundling',
       automate: 'self-unbundling',
-      transfer: 'transfer-addition-check'
+      transfer: 'transfer'
     } as const
     for (const phase of Object.keys(expectedTypes) as Array<keyof typeof expectedTypes>) {
       const typeIds = new Set<string>()
@@ -568,7 +594,16 @@ describe('deterministische Aufgabengeneratoren', () => {
         if (phase === 'activate') expect(exercise.representation?.valueRoles.unknownValues).toContain('second')
         if (phase === 'understand' || phase === 'transfer') expect(exercise.options).toHaveLength(3)
       }
-      expect(typeIds).toEqual(new Set([expectedTypes[phase]]))
+      if (phase === 'transfer') {
+        expect(typeIds).toEqual(new Set([
+          'transfer-addition-check',
+          'transfer-estimate-check',
+          'transfer-strategy-choice',
+          'transfer-calculation-series'
+        ]))
+      } else {
+        expect(typeIds).toEqual(new Set([expectedTypes[phase]]))
+      }
     }
   })
 

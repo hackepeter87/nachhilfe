@@ -159,10 +159,10 @@ Stand: Katalogversion 0.31.2. Die Stufen beschreiben die produktive Heuristik vo
 - **Vorkenntnisse:** Stellenwert und halbschriftliche Subtraktion bis 1000 jeweils mindestens in independent-practice.
 - **Stufe 1:** dreistellige Aufgaben ohne Entbündelung; H-Z-E-Spalten sind von Anfang an sichtbar.
 - **Stufe 2:** genau eine Zehner-zu-Einer-Entbündelung wird als eigener Schritt eingegeben; veränderte Stellen erscheinen erst danach.
-- **Stufe 3 / Ziel 0.12:** genau eine Entbündelung aus Zehnern oder Hundertern wird selbstständig erkannt; die Darstellung ist eine Hilfe und eine Additionsprobe schließt die Aufgabe ab.
-- **Erhöhen / Zurückstufen:** Spaltenfolge, Stellenanpassung und Probe sicher / Ziffern vertauschen, abgebende Stelle nicht vermindern oder Entbündelung fortsetzen.
-- **Hilfe / Transfer:** eine linke Einheit in zehn aktuelle Einheiten tauschen / Differenz und Subtrahend zum Minuenden addieren.
-- **Später:** mehrere Entbündelungen, Entbündeln über Nullstellen und freie vollständige Spaltennotation.
+- **Stufe 3:** eine oder zwei Entbündelungen werden selbstständig erkannt; eingeschlossen ist der vollständige Tausch über eine Null. Die Darstellung ist eine Hilfe und eine Additionsprobe schließt die Rechnung ab.
+- **Erhöhen / Zurückstufen:** Spaltenfolge, alle Stellenanpassungen und Probe sicher / Ziffern vertauschen, abgebende Stelle nicht vermindern oder einen nötigen zweiten Tausch auslassen.
+- **Hilfe / Transfer:** eine linke Einheit in zehn aktuelle Einheiten tauschen / Addition als Probe, Überschlag, Strategiewahl und Veränderungsregeln in Aufgabenpäckchen.
+- **Später:** freie vollständige Spaltennotation und schriftliche Subtraktionen mit vierstelligen Zahlen.
 
 ### Ergänzen bis zur vollen Zahl
 

@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.32.6, Katalog 0.31.4, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.32.8, Katalog 0.31.5, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 Die manuelle Erprobung von 0.30.0 hat gezeigt, dass die hier dokumentierte strukturelle Katalogabdeckung keine kindgerechte Verständlichkeit belegt. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) hat Vorrang, wo frühere Aussagen eine weitergehende didaktische Abnahme nahelegen.
 
@@ -27,7 +27,9 @@ Die manuelle Erprobung von 0.30.0 hat gezeigt, dass die hier dokumentierte struk
 | `workedExample`, `processCompetencies`, `successCriteria` | Review | fachliche Konsistenz und spätere Gesamtprüfung |
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
-## Aktive Veränderungen bis 0.30.0
+## Aktive Veränderungen
+
+- Arbeitsstand Katalog 0.31.5: Die schriftliche Subtraktion übernimmt aus der vorgelegten Schulbuchseite vier fachliche Handlungen statt einzelner Aufgabenwerte: schriftliches Rechnen mit bis zu zwei Entbündelungen einschließlich Nullstelle, Plausibilitätsprüfung durch Überschlag, bewusste Wahl zwischen Kopf- und schriftlichem Rechnen sowie das Beschreiben von Veränderungen in Aufgabenpäckchen. Die konkreten Zahlen werden weiterhin deterministisch variiert.
 
 - App 0.30.0, Katalog 0.29.0 und Schema 19: Alle 34 aktiven Kompetenzen verwenden denselben sechsphasigen Runtimepfad. Direkte Generatoraufrufe, Wiederholungen und Remediation bleiben an katalogisierte Lernphase und Typkennung gebunden. Details stehen in `docs/didactic-convergence-audit-0.30.0.md`.
 
