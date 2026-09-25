@@ -216,7 +216,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   })
   expect(completedSessionMetadata).toEqual({
     catalogId: 'nrw-klasse3-foerderkern',
-    catalogVersion: '0.31.5',
+    catalogVersion: '0.31.6',
     schemaVersion: 19,
     appVersion: '0.32.8',
     selfAssessment: 'not-asked'
