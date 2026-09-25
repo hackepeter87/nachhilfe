@@ -1,6 +1,6 @@
 # Darstellungsrichtlinie
 
-Stand: App 0.32.8, Katalog 0.31.5, Schema 19.
+Stand: App 0.32.8, Katalog 0.31.6, Schema 19.
 
 ## Verbindliche Regel
 
@@ -22,7 +22,7 @@ Der Renderer lehnt doppelte, überlappende, unvollständige oder unzulässig auf
 | Rechenstrich bis 1000 | Teilsprünge nannten Zwischen- und Zielwerte. | Rechenschritte dürfen sichtbar sein, numerische Ziele bleiben maskiert. |
 | Nachbarzehner/-hunderter | Beide gesuchten Nachbarn waren beschriftet. | Nur die gegebene Zahl ist beschriftet; beide Nachbarn bleiben `?`. |
 | Ergänzen | Sprungbeschriftungen ergaben unmittelbar die gesuchte Ergänzung. | Start und bekannte Zielzahl bleiben sichtbar; Sprünge bleiben bis zur Lösung unbekannt. |
-| Division | Die Anzahl gezeichneter Gruppen wurde nur durch eine einzelne Beispielgruppe angedeutet; Gruppieren und Verteilen waren nicht getrennt. | Gruppierungs- und Verteilmodell verarbeiten die vollständige Gesamtmenge. Die gesuchte Anzahl beziehungsweise Gruppengröße bleibt numerisch `?`, während der Aufteilungsprozess vollständig sichtbar ist. |
+| Division | Die Anzahl gezeichneter Gruppen wurde nur durch eine einzelne Beispielgruppe angedeutet; Gruppieren und Verteilen waren nicht getrennt. | Kleine Mengen nutzen das vollständige Gruppierungs- oder Verteilmodell. Dreistellige Dividenden nutzen eine kompakte Zerlegung statt Punktbildern; großer Anteil, Rest, Teilquotienten und Ergebnis werden erst nach dem jeweiligen richtigen Schritt sichtbar. |
 | Schriftliche Subtraktion | Eine zweite Entbündelung und der Tausch über eine Null konnten nicht dargestellt werden. | Jede Tauschaktionen wird in Reihenfolge berechnet; alle veränderten Stellen werden gemeinsam angezeigt und die Differenz bleibt bis zur Bearbeitung verborgen. |
 | Aufgabenpäckchen | Es gab keine eigene Darstellung für zusammengehörige Rechnungen. | Die bekannten Rechnungen dürfen vollständig sichtbar sein. Die gesuchte Veränderungsregel erscheint ausschließlich in den Antwortoptionen. |
 | Geld | Der summierte Betrag stand im `aria-label`. | Einzelne bekannte Münzen und ein Zahlbetrag bleiben sichtbar; Gesamtbetrag oder Rückgeld sind visuell und für Screenreader unbekannt. |

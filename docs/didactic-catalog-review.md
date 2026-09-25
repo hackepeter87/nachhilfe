@@ -1,6 +1,6 @@
 # Didaktischer Katalog-Runtime-Abgleich
 
-Stand: App 0.32.8, Katalog 0.31.5, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
+Stand: App 0.32.8, Katalog 0.31.6, Schema 19, Status ready-for-review. Diese Datei ist keine Lehrkraftfreigabe.
 
 Die manuelle Erprobung von 0.30.0 hat gezeigt, dass die hier dokumentierte strukturelle Katalogabdeckung keine kindgerechte Verständlichkeit belegt. Der [kritische Audit 0.30.1](didactic-critical-audit-0.30.1.md) hat Vorrang, wo frühere Aussagen eine weitergehende didaktische Abnahme nahelegen.
 
@@ -28,6 +28,8 @@ Die manuelle Erprobung von 0.30.0 hat gezeigt, dass die hier dokumentierte struk
 | `transferPrompt` | Planned | dokumentiert nächsten sinnvollen Transfer, wird nicht als aktive UI behauptet |
 
 ## Aktive Veränderungen
+
+- Arbeitsstand Katalog 0.31.6: Dreistellige Divisionen ohne Rest übernehmen aus den vorgelegten Arbeitsblättern eine vierteilige Strategie: größtmöglichen Anteil mit vollem Zehnerquotienten bestimmen, Rest bilden, beide Teile durch denselben Divisor teilen und die Teilquotienten addieren. Die Runtime führt diese Handlungen in fünf prüfbaren Eingabeschritten aus und zeigt keine dreistelligen Punktmengen.
 
 - Arbeitsstand Katalog 0.31.5: Die schriftliche Subtraktion übernimmt aus der vorgelegten Schulbuchseite vier fachliche Handlungen statt einzelner Aufgabenwerte: schriftliches Rechnen mit bis zu zwei Entbündelungen einschließlich Nullstelle, Plausibilitätsprüfung durch Überschlag, bewusste Wahl zwischen Kopf- und schriftlichem Rechnen sowie das Beschreiben von Veränderungen in Aufgabenpäckchen. Die konkreten Zahlen werden weiterhin deterministisch variiert.
 

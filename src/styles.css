@@ -1275,6 +1275,36 @@ p {
 .division-model--grouping .division-group { border-color: #315d45; }
 .division-model--sharing .division-group { border-style: dashed; border-color: #2876a8; background: #eef7fb; }
 .division-model > strong { color: #244d38; text-align: center; }
+.division-split-visual { display: grid; gap: 12px; overflow: hidden; }
+.division-split-task { color: var(--ink); font-size: 1.25rem; text-align: center; }
+.division-split-decomposition {
+  display: grid;
+  grid-template-columns: minmax(2.6rem, auto) auto minmax(2.6rem, auto) auto minmax(2.6rem, auto);
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.division-split-decomposition span,
+.division-split-parts span {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #78a88d;
+  background: #f8fffa;
+  font-weight: 850;
+  text-align: center;
+}
+.division-split-decomposition b,
+.division-split-result { color: #2876a8; }
+.division-split-parts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.division-split-result { display: block; padding-top: 2px; color: #244d38; text-align: center; white-space: nowrap; }
+@media (max-width: 390px) {
+  .division-split-visual { gap: 9px; }
+  .division-split-decomposition { gap: 4px; font-size: .88rem; }
+  .division-split-decomposition span,
+  .division-split-parts span { padding: 7px 4px; font-size: .78rem; }
+  .division-split-result { font-size: .9rem; }
+}
 .groups-question { flex-basis: 100%; }
 .known-pool { display: grid; justify-items: center; gap: 6px; }
 .known-pool > span { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; max-width: 220px; }

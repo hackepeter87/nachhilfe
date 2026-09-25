@@ -237,6 +237,33 @@ describe('ExerciseCard', () => {
     expect(screen.getByRole('img', { name: /Punkte werden vollständig/ })).toBeVisible()
   })
 
+  it('deckt die Zerlegung einer dreistelligen Division Schritt für Schritt auf', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('division', 365, 3)
+    const steps = exercise.steps ?? []
+    const { container } = render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    const decomposition = () => container.querySelector('.division-split-decomposition')
+
+    expect(steps.map((step) => step.id)).toEqual(['easyPart', 'easyQuotient', 'remainingPart', 'remainingQuotient', 'quotient'])
+    expect(container.querySelector('.division-split-visual')).toBeVisible()
+    expect(decomposition()).toHaveTextContent(`${exercise.variant.values.dividend}=?+?`)
+
+    const firstStep = steps[0]!
+    const firstOption = firstStep.options?.find((option) => option.value === firstStep.correctAnswer)
+    if (!firstOption) throw new Error('Der größte einfache Anteil fehlt')
+    await user.click(screen.getByRole('button', { name: firstOption.label }))
+    expect(decomposition()).toHaveTextContent(String(exercise.variant.values.easyPart))
+
+    for (const step of steps.slice(1)) {
+      await user.type(screen.getByLabelText('Dein Ergebnis'), step.correctAnswer)
+      await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
+    }
+    expect(container.querySelector('.division-split-result')).toHaveTextContent(exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'division', correct: true }))
+  })
+
   it('reagiert bei Multiplikation auf das Addieren der Faktoren mit passender Hilfe', async () => {
     const user = userEvent.setup()
     const exercise = generateExercise('multiplication', 128, 2, 'times-4', 'independent-practice')

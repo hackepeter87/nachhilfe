@@ -76,6 +76,53 @@ describe('MathRepresentation Gruppenbild', () => {
   })
 })
 
+describe('MathRepresentation Divisionszerlegung', () => {
+  const representation = {
+    kind: 'division-split' as const,
+    visibility: 'always' as const,
+    label: 'Division in zwei einfachen Teilen',
+    values: {
+      dividend: 365,
+      divisor: 5,
+      easyPart: 350,
+      easyQuotient: 70,
+      remainingPart: 15,
+      remainingQuotient: 3,
+      quotient: 73
+    },
+    valueRoles: {
+      knownValues: ['dividend', 'divisor'],
+      unknownValues: ['easyPart', 'easyQuotient', 'remainingPart', 'remainingQuotient', 'quotient'],
+      revealedValues: [] as string[]
+    }
+  }
+
+  it('zeigt nur die Ausgangsaufgabe und keine ungelösten Zwischenwerte', () => {
+    const { container } = render(<RuntimeMathRepresentation representation={representation} />)
+    expect(screen.getByRole('img', { name: /365 geteilt durch 5/ })).toBeVisible()
+    expect(container).toHaveTextContent('365 : 5')
+    for (const hiddenValue of ['350', '70', '15', '3', '73']) {
+      expect(container.textContent?.split(/\s+/)).not.toContain(hiddenValue)
+    }
+  })
+
+  it('deckt gelöste Teilschritte nacheinander auf', () => {
+    const { container, rerender } = render(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: ['easyPart', 'easyQuotient'] }
+    }} />)
+    expect(container).toHaveTextContent('350 : 5 = 70')
+    expect(container).not.toHaveTextContent('15 : 5 = 3')
+
+    rerender(<RuntimeMathRepresentation representation={{
+      ...representation,
+      valueRoles: { ...representation.valueRoles, revealedValues: [...representation.valueRoles.unknownValues] }
+    }} />)
+    expect(container).toHaveTextContent('365=350+15')
+    expect(container).toHaveTextContent('70 + 3 = 73')
+  })
+})
+
 describe('MathRepresentation lokaler Zahlenstrahl', () => {
   it('positioniert 801 direkt hinter 800 statt in der Mitte eines globalen Strahls', () => {
     const { container } = render(<RuntimeMathRepresentation representation={{

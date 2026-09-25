@@ -132,7 +132,14 @@ describe('didaktisch migrierte Lernhandlungen', () => {
             expect(Number(exercise.variant.values.first) * Number(exercise.variant.values.second)).toBe(Number(exercise.variant.values.answer))
           } else {
             expect(Number(exercise.variant.values.divisor)).toBeLessThanOrEqual(10)
-            expect(Number(exercise.variant.values.quotient)).toBeLessThanOrEqual(10)
+            if (phase === 'automate') {
+              expect(Number(exercise.variant.values.quotient)).toBeGreaterThanOrEqual(41)
+              expect(Number(exercise.variant.values.quotient)).toBeLessThanOrEqual(99)
+              expect(Number(exercise.variant.values.easyQuotient) % 10).toBe(0)
+              expect(Number(exercise.variant.values.easyQuotient) + Number(exercise.variant.values.remainingQuotient)).toBe(Number(exercise.variant.values.quotient))
+            } else {
+              expect(Number(exercise.variant.values.quotient)).toBeLessThanOrEqual(10)
+            }
             expect(Number(exercise.variant.values.divisor) * Number(exercise.variant.values.quotient)).toBe(Number(exercise.variant.values.dividend))
           }
         }

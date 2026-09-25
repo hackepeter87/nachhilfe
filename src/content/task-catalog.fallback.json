@@ -1,8 +1,8 @@
 {
   "schemaVersion": 19,
-  "catalogVersion": "0.31.5",
+  "catalogVersion": "0.31.6",
   "catalogId": "nrw-klasse3-foerderkern",
-  "releasedAt": "2026-09-23",
+  "releasedAt": "2026-09-25",
   "status": "ready-for-review",
   "representationPolicy": {
     "rule": "Darstellungen visualisieren bekannte mathematische Informationen. Gesuchte Größen werden vor Abschluss des Bearbeitungsschritts niemals numerisch dargestellt.",
@@ -591,12 +591,15 @@
       "id": "division",
       "label": "Teilen und verteilen",
       "curriculumArea": "Zahlen und Operationen",
-      "supportGoal": "Division ohne Rest als Gruppieren und Verteilen verstehen und als Umkehrung der Multiplikation nutzen.",
+      "supportGoal": "Division ohne Rest als Gruppieren und Verteilen verstehen, als Umkehrung der Multiplikation nutzen und dreistellige Dividenden in einen großen einfachen Anteil und den Rest zerlegen.",
       "misconceptions": [
         "Gruppenanzahl und Gruppengröße werden verwechselt.",
         "Die Gesamtmenge wird nicht vollständig oder nicht gleichmäßig aufgeteilt.",
         "Eine bereits bekannte Größe wird als gesucht behandelt.",
-        "Gruppieren und Verteilen werden als derselbe Vorgang behandelt."
+        "Gruppieren und Verteilen werden als derselbe Vorgang behandelt.",
+        "Bei einer dreistelligen Division wird ein teilbarer, aber unnötig kleiner Anteil gewählt.",
+        "Der gewählte Anteil ist größer als die Ausgangszahl.",
+        "Die beiden Teilergebnisse werden nicht zum Gesamtergebnis addiert."
       ],
       "misconceptionFeedback": [
         {
@@ -618,6 +621,21 @@
           "id": "division-operation-choice",
           "misconception": "Gruppieren und Verteilen werden als derselbe Vorgang behandelt.",
           "feedback": "Eine passende Malprobe verbindet Gruppenanzahl und Gruppengröße wieder mit der Gesamtmenge."
+        },
+        {
+          "id": "division-split-not-largest",
+          "misconception": "Bei einer dreistelligen Division wird ein teilbarer, aber unnötig kleiner Anteil gewählt.",
+          "feedback": "Suche eine größere Zehneraufgabe derselben Reihe, die noch in die Ausgangszahl passt."
+        },
+        {
+          "id": "division-split-too-large",
+          "misconception": "Der gewählte Anteil ist größer als die Ausgangszahl.",
+          "feedback": "Der große Teil darf die Ausgangszahl nicht überschreiten. Gehe eine Zehneraufgabe zurück."
+        },
+        {
+          "id": "division-split-results-not-combined",
+          "misconception": "Die beiden Teilergebnisse werden nicht zum Gesamtergebnis addiert.",
+          "feedback": "Addiere das Ergebnis des großen Teils und das Ergebnis des Restes."
         }
       ],
       "hints": [
@@ -631,7 +649,7 @@
         "minLevel": 1,
         "maxLevel": 3,
         "minValue": 0,
-        "maxValue": 90
+        "maxValue": 999
       },
       "processCompetencies": [
         {
@@ -650,7 +668,8 @@
       "representations": [
         "Vollständiges Gruppierungsmodell",
         "Vollständiges Verteilmodell",
-        "Aufgabenfamilie"
+        "Aufgabenfamilie",
+        "Zerlegung in großen einfachen Teil und Rest"
       ],
       "difficultyLevels": [
         {
@@ -683,23 +702,23 @@
         },
         {
           "level": 3,
-          "description": "Gruppieren und Verteilen durch 6, 7, 8 oder 9; vollständiges Modell erst in der Remediation",
-          "numberRange": "Dividend bis 90",
-          "representation": "none",
+          "description": "Dreistellige Dividenden ohne Rest durch 3 bis 9 teilen; zuerst den größten Anteil mit vollem Zehnerquotienten, dann den Rest teilen und beide Teilergebnisse addieren",
+          "numberRange": "Dividend von 100 bis 999",
+          "representation": "always",
           "requirements": {
             "requiresNeighborIdentification": false,
             "requiresRepresentationChoice": false,
             "requiresOperationChoice": false,
             "requiresJustification": false,
-            "requiresMultiStepCalculation": false
+            "requiresMultiStepCalculation": true
           },
           "learningPhase": "automate"
         }
       ],
-      "workedExample": "42 : 6 kann bedeuten: Gruppen zu je 6 bilden und die 7 Gruppen zählen oder auf 6 Gruppen verteilen und je 7 bestimmen. 6 · 7 = 42.",
+      "workedExample": "365 : 5 wird in 350 : 5 und 15 : 5 zerlegt. 350 ist der größte passende Anteil aus einer Zehneraufgabe der 5er-Reihe. 70 + 3 = 73.",
       "successFeedback": "Du hast alle Punkte passend aufgeteilt.",
       "remediation": {
-        "strategy": "Lege die gesamte Menge im passenden Gruppierungs- oder Verteilmodell vollständig in gleich große Gruppen.",
+        "strategy": "Nutze bei kleinen Aufgaben das passende Gruppierungs- oder Verteilmodell. Zerlege dreistellige Dividenden in einen großen Anteil mit vollem Zehnerquotienten und den Rest.",
         "foundationStrategy": "Nutze eine kleinere Gesamtmenge und lege jeden Punkt sichtbar in genau eine gleich große Gruppe.",
         "representation": "Vollständiges Gruppierungs- oder Verteilmodell",
         "keepSubskill": true
@@ -741,9 +760,9 @@
         },
         {
           "id": "automate",
-          "goal": "Bekannte Aufgaben sicher und ohne Zeitdruck lösen.",
+          "goal": "Dreistellige Divisionen ohne Rest in einen großen einfachen Anteil und den Rest zerlegen, beide Teile teilen und die Teilergebnisse addieren.",
           "exerciseTypes": [
-            "division:difficulty-3"
+            "division:division-split-large-dividend"
           ],
           "releaseStatus": "active"
         },

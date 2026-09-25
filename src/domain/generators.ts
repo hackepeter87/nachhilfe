@@ -399,6 +399,98 @@ function multiplication(seed: number, difficulty: Difficulty, focus?: string, ph
 
 function division(seed: number, difficulty: Difficulty, focus?: string, phase?: LearningPhase): Exercise {
   const random = seededRandom(seed)
+
+  if (difficulty === 3 && phase === 'automate') {
+    let quotient = integer(random, 41, 99)
+    if (quotient % 10 === 0) quotient += random() < 0.5 ? -1 : 1
+    const divisor = pick(random, [3, 4, 5, 6, 7, 8, 9])
+    const dividend = divisor * quotient
+    const easyQuotient = Math.floor(quotient / 10) * 10
+    const remainingQuotient = quotient - easyQuotient
+    const easyPart = divisor * easyQuotient
+    const remainingPart = divisor * remainingQuotient
+    const values = { dividend, divisor, quotient, easyPart, easyQuotient, remainingPart, remainingQuotient }
+    const shared = { ...base('division', seed, difficulty, values), ...contentFor('division', values, difficulty) }
+    const splitRepresentation = representation(
+      'division',
+      difficulty,
+      'division-split',
+      'Division in zwei einfachen Teilen',
+      values,
+      ['easyPart', 'easyQuotient', 'remainingPart', 'remainingQuotient', 'quotient']
+    )
+    splitRepresentation.visibility = 'always'
+
+    return withMetadata({
+      ...shared,
+      typeId: 'division-split-large-dividend',
+      subskillId: `division-decompose-by-${divisor}`,
+      prompt: `Wie viel ist ${dividend} : ${divisor}? Zerlege die Zahl zuerst in einen möglichst großen einfachen Teil und den Rest.`,
+      answerMode: 'guided-number',
+      correctAnswer: String(quotient),
+      hints: [
+        { level: 1, text: `Suche in der ${divisor}er-Reihe eine große Aufgabe mit 10, 20, 30 und so weiter.` },
+        { level: 2, text: `Der große Teil ist ${easyPart}. Danach bleiben noch ${remainingPart}.` }
+      ],
+      successFeedback: `Richtig. ${easyPart} : ${divisor} = ${easyQuotient} und ${remainingPart} : ${divisor} = ${remainingQuotient}. Zusammen sind das ${quotient}.`,
+      errorFeedback: 'Teile zuerst den großen einfachen Teil, dann den Rest. Addiere danach beide Ergebnisse.',
+      explanation: `${dividend} = ${easyPart} + ${remainingPart}. Deshalb ist ${dividend} : ${divisor} = ${easyQuotient} + ${remainingQuotient} = ${quotient}.`,
+      steps: [
+        {
+          id: 'easyPart',
+          prompt: `Welche möglichst große Zahl unter ${dividend} kannst du durch ${divisor} teilen? Das Ergebnis soll eine Zehnerzahl sein.`,
+          interaction: 'select',
+          options: numberOptions(random, easyPart, [
+            { value: easyPart - divisor * 10, misconception: 'Der Anteil ist teilbar, aber noch nicht möglichst groß.', misconceptionId: 'division-split-not-largest' },
+            { value: easyPart + divisor * 10, misconception: 'Der Anteil ist größer als die Ausgangszahl.', misconceptionId: 'division-split-too-large' }
+          ]),
+          correctAnswer: String(easyPart),
+          errorFeedback: `Probiere als Ergebnis 40, 50, 60 und so weiter. Rechne die Zahl mal ${divisor}. Gesucht ist die größte passende Zahl unter ${dividend}.`,
+          successFeedback: `${easyPart} ist der größte passende einfache Teil.`
+        },
+        {
+          id: 'easyQuotient',
+          prompt: `Teile den großen Teil: ${easyPart} : ${divisor} = ?`,
+          interaction: 'guided-number',
+          correctAnswer: String(easyQuotient),
+          errorFeedback: `Nutze die Zehneraufgabe: ${divisor} · ? = ${easyPart}.`,
+          successFeedback: `${easyPart} : ${divisor} = ${easyQuotient}.`
+        },
+        {
+          id: 'remainingPart',
+          prompt: `Wie viel bleibt von ${dividend} übrig, wenn du ${easyPart} abziehst?`,
+          interaction: 'guided-number',
+          correctAnswer: String(remainingPart),
+          errorFeedback: `Rechne ${dividend} − ${easyPart}.`,
+          successFeedback: `Der Rest ist ${remainingPart}.`
+        },
+        {
+          id: 'remainingQuotient',
+          prompt: `Teile jetzt den Rest: ${remainingPart} : ${divisor} = ?`,
+          interaction: 'guided-number',
+          correctAnswer: String(remainingQuotient),
+          errorFeedback: `Suche die passende kleine Aufgabe der ${divisor}er-Reihe.`,
+          successFeedback: `${remainingPart} : ${divisor} = ${remainingQuotient}.`
+        },
+        {
+          id: 'quotient',
+          prompt: `Addiere beide Ergebnisse: ${easyQuotient} + ${remainingQuotient} = ?`,
+          interaction: 'guided-number',
+          correctAnswer: String(quotient),
+          errorFeedback: `Addiere ${easyQuotient} und ${remainingQuotient}.`,
+          successFeedback: `${dividend} : ${divisor} = ${quotient}.`
+        }
+      ],
+      representation: splitRepresentation,
+      remediation: {
+        ...shared.remediation,
+        strategy: `Zerlege ${dividend} sichtbar in ${easyPart} und ${remainingPart}. Teile beide Zahlen durch ${divisor} und addiere die Ergebnisse.`,
+        representation: 'Zerlegung in großen einfachen Teil und Rest',
+        keepSubskill: true
+      }
+    })
+  }
+
   const rows = difficulty === 1 ? [2, 5, 10] : difficulty === 2 ? [3, 4, 6] : [6, 7, 8, 9]
   const focusedSituation = focus?.startsWith('division-grouping-by-')
     ? 'grouping'

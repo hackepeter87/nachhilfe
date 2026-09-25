@@ -115,8 +115,9 @@ async function onboard(page: Page, nickname = 'Nova') {
   await expect(startButton).toBeVisible()
 }
 
-async function finishAdditionWarmups(page: Page) {
+async function finishAdditionWarmups(page: Page, stopAtSkill?: string) {
   for (let exercise = 0; exercise < 2; exercise += 1) {
+    if (stopAtSkill && await page.locator('.exercise-panel').getAttribute('data-skill-id') === stopAtSkill) return
     const prompt = await page.locator('.exercise-heading h2').textContent() ?? ''
     const complement = prompt.match(/Welche Zahl ergänzt (\d+) bis 10\?/)
     if (complement) {
@@ -1072,12 +1073,13 @@ test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', asyn
   expect(lengthSeen).toBe(true)
 })
 
-test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung mobil vollständig', async ({ browser }, testInfo) => {
+test('Stellenwert, Zahlbeziehungen, Zehnerübergang und Divisionszerlegung zeigen ihre Lernhandlung mobil vollständig', async ({ browser }, testInfo) => {
   const scenarios = [
     { id: 'place-value-guided', skillId: 'place-value', phase: 'guided-practice', difficulty: 1, completedSessionCount: 0, expected: '.place-material-stack', interaction: '.place-value-inputs' },
     { id: 'place-value-transfer', skillId: 'place-value', phase: 'transfer', difficulty: 3, completedSessionCount: 1, expected: '.answer-options', interaction: '.answer-option' },
     { id: 'neighbor-hundreds', skillId: 'neighbor-hundreds', phase: 'guided-practice', difficulty: 1, completedSessionCount: 4, expected: '.number-line-visual', interaction: '#guided-number-answer' },
-    { id: 'addition-1000', skillId: 'addition-1000', phase: 'guided-practice', difficulty: 1, completedSessionCount: 6, expected: '.number-line-visual', interaction: '.answer-option' }
+    { id: 'addition-1000', skillId: 'addition-1000', phase: 'guided-practice', difficulty: 1, completedSessionCount: 6, expected: '.number-line-visual', interaction: '.answer-option' },
+    { id: 'division-split', skillId: 'division', phase: 'automate', difficulty: 3, completedSessionCount: 8, expected: '.division-split-visual', interaction: '.answer-option' }
   ] as const
 
   for (const scenario of scenarios) {
@@ -1134,7 +1136,7 @@ test('Stellenwert, Zahlbeziehungen und Zehnerübergang zeigen ihre Lernhandlung 
     }, scenario)
     await page.reload()
     await page.getByRole('button', { name: /Mathe-Runde starten/i }).click()
-    await finishAdditionWarmups(page)
+    await finishAdditionWarmups(page, scenario.id === 'division-split' ? 'division' : undefined)
 
     await expect(page.locator(scenario.expected)).toBeVisible()
     await expect(page.locator(scenario.interaction).first()).toBeVisible()

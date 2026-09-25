@@ -98,11 +98,13 @@ describe('deterministische Aufgabengeneratoren', () => {
       expect(Number(generateExercise('multiplication', seed, 2).correctAnswer)).toBeLessThanOrEqual(60)
       expect(Number(generateExercise('division', seed, 2).variant.values.dividend)).toBeLessThanOrEqual(60)
       expect(Number(generateExercise('multiplication', seed, 3).correctAnswer)).toBeLessThanOrEqual(90)
-      expect(Number(generateExercise('division', seed, 3).variant.values.dividend)).toBeLessThanOrEqual(90)
+      const division = generateExercise('division', seed, 3)
+      expect(Number(division.variant.values.dividend)).toBeGreaterThanOrEqual(100)
+      expect(Number(division.variant.values.dividend)).toBeLessThanOrEqual(999)
     }
   })
 
-  it('hält Faktoren, Divisoren und Quotienten im kleinen Einmaleins und bildet Gruppen exakt ab', () => {
+  it('hält Faktoren und die ersten beiden Divisionsstufen im kleinen Einmaleins und bildet Gruppen exakt ab', () => {
     const divisionSituations = new Set<string>()
     for (const difficulty of [1, 2, 3] as const) {
       for (let seed = 1; seed <= 1_000; seed += 1) {
@@ -116,6 +118,8 @@ describe('deterministische Aufgabengeneratoren', () => {
         expect(first * second).toBe(Number(multiplication.correctAnswer))
         expect(multiplication.representation?.values).toMatchObject({ groups: first, size: second })
         expect(multiplication.representation?.visibility).toBe(difficulty === 1 ? 'always' : difficulty === 2 ? 'hint' : 'scaffold')
+
+        if (difficulty === 3) continue
 
         const division = generateExercise('division', seed, difficulty)
         const dividend = Number(division.variant.values.dividend)
@@ -146,6 +150,47 @@ describe('deterministische Aufgabengeneratoren', () => {
       }
     }
     expect(divisionSituations).toEqual(new Set(['grouping-model', 'sharing-model']))
+  })
+
+  it('zerlegt dreistellige Divisionen in den größten einfachen Anteil und den Rest', () => {
+    for (let seed = 1; seed <= 1_000; seed += 1) {
+      const exercise = generateExercise('division', seed, 3)
+      const values = exercise.variant.values
+      const dividend = Number(values.dividend)
+      const divisor = Number(values.divisor)
+      const quotient = Number(values.quotient)
+      const easyPart = Number(values.easyPart)
+      const easyQuotient = Number(values.easyQuotient)
+      const remainingPart = Number(values.remainingPart)
+      const remainingQuotient = Number(values.remainingQuotient)
+
+      expect(exercise.typeId).toBe('division-split-large-dividend')
+      expect(exercise.answerMode).toBe('guided-number')
+      expect(exercise.representation).toMatchObject({
+        kind: 'division-split',
+        values: { dividend, divisor, quotient, easyPart, easyQuotient, remainingPart, remainingQuotient },
+        valueRoles: {
+          knownValues: ['dividend', 'divisor'],
+          unknownValues: ['easyPart', 'easyQuotient', 'remainingPart', 'remainingQuotient', 'quotient'],
+          revealedValues: []
+        }
+      })
+      expect(dividend).toBe(divisor * quotient)
+      expect(easyPart).toBe(divisor * easyQuotient)
+      expect(easyQuotient % 10).toBe(0)
+      expect(remainingPart).toBe(dividend - easyPart)
+      expect(remainingPart).toBe(divisor * remainingQuotient)
+      expect(remainingQuotient).toBeGreaterThanOrEqual(1)
+      expect(remainingQuotient).toBeLessThanOrEqual(9)
+      expect(quotient).toBe(easyQuotient + remainingQuotient)
+      expect(exercise.steps?.map((step) => [step.id, step.correctAnswer])).toEqual([
+        ['easyPart', String(easyPart)],
+        ['easyQuotient', String(easyQuotient)],
+        ['remainingPart', String(remainingPart)],
+        ['remainingQuotient', String(remainingQuotient)],
+        ['quotient', String(quotient)]
+      ])
+    }
   })
 
   it.each([
@@ -659,7 +704,7 @@ describe('deterministische Aufgabengeneratoren', () => {
     expect(new Set([easy.variant.key, medium.variant.key, hard.variant.key]).size).toBeGreaterThan(1)
     expect(easy.representation?.visibility).toBe('always')
     expect(medium.representation?.visibility).toBe('hint')
-    expect(hard.representation?.visibility).toBe('scaffold')
+    expect(hard.representation?.visibility).toBe(skill === 'division' ? 'always' : 'scaffold')
   })
 
   it('zeigt bei Sachaufgaben zuerst ein offenes Modell und verlangt die Modellwahl erst selbstständig', () => {

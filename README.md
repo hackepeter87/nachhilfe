@@ -192,7 +192,7 @@ Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: r
 
 ## Entwicklungsstand 0.32.8
 
-Im Arbeitsstand nach 0.32.8 liegt Katalog 0.31.5 vor. Die schriftliche Subtraktion umfasst dort zusätzlich zwei Entbündelungen, den Tausch über eine Null, Überschlagsprüfungen, Strategiewahl und Aufgabenpäckchen. Dieser Katalogstand ist `ready-for-review` und noch kein veröffentlichtes App-Release.
+Im Arbeitsstand nach 0.32.8 liegt Katalog 0.31.6 vor. Die schriftliche Subtraktion umfasst dort zusätzlich zwei Entbündelungen, den Tausch über eine Null, Überschlagsprüfungen, Strategiewahl und Aufgabenpäckchen. Dreistellige Divisionen ohne Rest werden in einen möglichst großen einfachen Anteil mit vollem Zehnerquotienten und den verbleibenden Rest zerlegt; beide Teilquotienten werden anschließend addiert. Dieser Katalogstand ist `ready-for-review` und noch kein veröffentlichtes App-Release.
 
 Version 0.32.8 korrigiert den Release-Gate nach den wiederholten technischen Ausfällen des npm-Audit-Endpunkts. Ein verpflichtender Trivy-Lockfile-Scan blockiert ab `MEDIUM`; der npm-Audit-Runner wiederholt echte Dienstfehler dreimal und unterscheidet sie von Sicherheitsfunden und internen Fehlern. Das Runtime-Image aktualisiert außerdem `libuuid` auf den gepatchten Alpine-Stand. App 0.32.8 verwendet unverändert Katalog 0.31.4 und Schema 19; Aufgaben und Laufzeitverhalten entsprechen 0.32.7. Details stehen im [Releasebericht](docs/release-0.32.8.md).
 

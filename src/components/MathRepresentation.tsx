@@ -898,6 +898,52 @@ export function MathRepresentation({ representation }: { representation: Exercis
     )
   }
 
+  if (representation.kind === 'division-split') {
+    const dividend = Number(values.dividend)
+    const divisor = Number(values.divisor)
+    const easyPart = Number(values.easyPart)
+    const easyQuotient = Number(values.easyQuotient)
+    const remainingPart = Number(values.remainingPart)
+    const remainingQuotient = Number(values.remainingQuotient)
+    const quotient = Number(values.quotient)
+    const expectedUnknowns = ['easyPart', 'easyQuotient', 'remainingPart', 'remainingQuotient', 'quotient']
+    const valid = Number.isInteger(dividend) && dividend >= 100 && dividend <= 999 &&
+      Number.isInteger(divisor) && divisor >= 2 && divisor <= 9 &&
+      Number.isInteger(quotient) && quotient * divisor === dividend &&
+      Number.isInteger(easyPart) && easyPart > 0 && easyPart < dividend &&
+      Number.isInteger(easyQuotient) && easyQuotient >= 10 && easyQuotient % 10 === 0 && easyPart === divisor * easyQuotient &&
+      Number.isInteger(remainingPart) && remainingPart === dividend - easyPart && remainingPart > 0 &&
+      Number.isInteger(remainingQuotient) && remainingQuotient >= 1 && remainingQuotient <= 9 && remainingPart === divisor * remainingQuotient &&
+      quotient === easyQuotient + remainingQuotient && expectedUnknowns.every((key) => unknown.has(key))
+    if (!valid) {
+      return <div className="math-visual math-visual--error" role="alert">Die Divisionszerlegung enthält widersprüchliche Zahlen.</div>
+    }
+    const shown = (key: string, value: number) => isValueVisible(key) ? String(value) : '?'
+    const accessibleSteps = [
+      `Ausgangsaufgabe ${dividend} geteilt durch ${divisor}.`,
+      isValueVisible('easyPart') ? `Großer einfacher Teil ${easyPart}.` : 'Der große einfache Teil ist noch unbekannt.',
+      isValueVisible('easyQuotient') ? `${easyPart} geteilt durch ${divisor} ist ${easyQuotient}.` : 'Das erste Teilergebnis ist noch unbekannt.',
+      isValueVisible('remainingPart') ? `Rest ${remainingPart}.` : 'Der Rest ist noch unbekannt.',
+      isValueVisible('remainingQuotient') ? `${remainingPart} geteilt durch ${divisor} ist ${remainingQuotient}.` : 'Das zweite Teilergebnis ist noch unbekannt.',
+      isValueVisible('quotient') ? `Ergebnis ${quotient}.` : 'Das Endergebnis ist noch unbekannt.'
+    ].join(' ')
+    return (
+      <div className="math-visual division-split-visual" role="img" aria-label={accessibleSteps}>
+        <strong className="division-split-task">{dividend} : {divisor}</strong>
+        <div className="division-split-decomposition" aria-hidden="true">
+          <span>{dividend}</span><b>=</b><span>{shown('easyPart', easyPart)}</span><b>+</b><span>{shown('remainingPart', remainingPart)}</span>
+        </div>
+        <div className="division-split-parts" aria-hidden="true">
+          <span>{shown('easyPart', easyPart)} : {divisor} = {shown('easyQuotient', easyQuotient)}</span>
+          <span>{shown('remainingPart', remainingPart)} : {divisor} = {shown('remainingQuotient', remainingQuotient)}</span>
+        </div>
+        <strong className="division-split-result" aria-hidden="true">
+          {shown('easyQuotient', easyQuotient)} + {shown('remainingQuotient', remainingQuotient)} = {shown('quotient', quotient)}
+        </strong>
+      </div>
+    )
+  }
+
   if (representation.kind === 'groups') {
     if (isCatalogWordModel && (!hasValidUnknownQuantity || !unknown.has(expectedUnknownQuantity!))) {
       return <div className="math-visual math-visual--error" role="alert">Das Gruppenbild benennt die unbekannte Größe nicht eindeutig.</div>
