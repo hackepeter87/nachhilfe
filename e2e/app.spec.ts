@@ -1088,7 +1088,7 @@ test('Stellenwert, Zahlbeziehungen, Zehnerübergang und Divisionszerlegung zeige
     await page.route('**/content/task-catalog.json', async (route) => {
       const response = await route.fetch()
       const catalog = await response.json() as RoutedCatalog
-      keepOnlySkills(catalog, ['addition', scenario.skillId])
+      keepOnlySkills(catalog, scenario.id === 'division-split' ? ['division'] : ['addition', scenario.skillId])
       await route.fulfill({ response, json: catalog })
     })
 
