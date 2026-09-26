@@ -19,10 +19,94 @@ describe('Sitzungsplanung', () => {
     expect(new Set(session.exercises.map((exercise) => exercise.variant.key)).size).toBe(8)
     expect(session).toMatchObject({
       catalogId: 'nrw-klasse3-foerderkern',
-      catalogVersion: '0.31.6',
-      schemaVersion: 19,
-      appVersion: '0.32.9'
+      catalogVersion: '0.31.7',
+      schemaVersion: 20,
+      appVersion: '0.32.10'
     })
+  })
+
+  it('garantiert die neueste fällige Katalogeinführung genau einmal in der nächsten Runde', () => {
+    const division = {
+      ...createSkillProgress('division'),
+      attempts: 10,
+      difficulty: 3 as const,
+      learningPhase: 'transfer' as const,
+      mastery: 95,
+      status: 'secure' as const
+    }
+
+    const first = createSessionPlan({ division }, 15_001)
+    const introduced = first.exercises.filter((exercise) => exercise.introductionId)
+    expect(introduced).toHaveLength(1)
+    expect(introduced[0]).toMatchObject({
+      skillId: 'division',
+      typeId: 'division-split-large-dividend',
+      introductionId: 'division-split-large-dividend',
+      learningPhase: 'automate'
+    })
+
+    const completed = {
+      ...division,
+      completedIntroductionIds: ['division-split-large-dividend']
+    }
+    expect(createSessionPlan({ division: completed }, 15_002).exercises.some(
+      (exercise) => exercise.introductionId === 'division-split-large-dividend'
+    )).toBe(false)
+  })
+
+  it('erzwingt Einführungen erst nach erreichter Lernphase', () => {
+    const division = {
+      ...createSkillProgress('division'),
+      attempts: 5,
+      difficulty: 2 as const,
+      learningPhase: 'independent-practice' as const
+    }
+    expect(createSessionPlan({ division }, 15_003).exercises.some(
+      (exercise) => exercise.introductionId === 'division-split-large-dividend'
+    )).toBe(false)
+  })
+
+  it('führt schriftliche Subtraktionsfamilien einzeln und in Katalogreihenfolge ein', () => {
+    const independent = { attempts: 8, mastery: 85, difficulty: 2 as const, status: 'secure' as const, learningPhase: 'independent-practice' as const }
+    const written = {
+      ...createSkillProgress('written-subtraction'),
+      attempts: 12,
+      mastery: 95,
+      difficulty: 3 as const,
+      status: 'secure' as const,
+      learningPhase: 'transfer' as const,
+      completedIntroductionIds: ['division-split-large-dividend']
+    }
+    const progress = {
+      'place-value': { ...createSkillProgress('place-value'), ...independent },
+      'subtraction-1000': { ...createSkillProgress('subtraction-1000'), ...independent },
+      'written-subtraction': written
+    }
+
+    const expected = [
+      'written-subtraction-double-unbundling',
+      'written-subtraction-zero-chain',
+      'written-subtraction-estimate-check',
+      'written-subtraction-strategy-choice',
+      'written-subtraction-calculation-series'
+    ]
+    for (const [index, introductionId] of expected.entries()) {
+      const exercise = createSessionPlan(progress, 16_000 + index).exercises.find((candidate) => candidate.introductionId)
+      expect(exercise?.introductionId).toBe(introductionId)
+      written.completedIntroductionIds.push(introductionId)
+    }
+    expect(createSessionPlan(progress, 16_100).exercises.some((exercise) => exercise.introductionId)).toBe(false)
+  })
+
+  it('plant schriftliche Subtraktionseinführungen nicht ohne beide fachlichen Voraussetzungen', () => {
+    const written = {
+      ...createSkillProgress('written-subtraction'),
+      learningPhase: 'transfer' as const,
+      completedIntroductionIds: ['division-split-large-dividend']
+    }
+    expect(createSessionPlan({ 'written-subtraction': written }, 16_200).exercises.some(
+      (exercise) => exercise.introductionId?.startsWith('written-subtraction-')
+    )).toBe(false)
   })
 
   it('macht in jeder normalen Runde eine Lehrkraft-Übungsform erreichbar', () => {
@@ -96,7 +180,7 @@ describe('Sitzungsplanung', () => {
       setTaskCatalog(nextCatalog)
       const nextSession = createSessionPlan({}, 322)
 
-      expect(runningSession.catalogVersion).toBe('0.31.6')
+      expect(runningSession.catalogVersion).toBe('0.31.7')
       expect(runningSession.exercises.map((exercise) => exercise.prompt)).toEqual(runningPrompts)
       expect(nextSession.catalogVersion).toBe('0.10.1')
     } finally {

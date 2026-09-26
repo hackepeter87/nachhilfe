@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 19,
-  "catalogVersion": "0.31.6",
+  "schemaVersion": 20,
+  "catalogVersion": "0.31.7",
   "catalogId": "nrw-klasse3-foerderkern",
   "releasedAt": "2026-09-25",
   "status": "ready-for-review",
@@ -589,6 +589,14 @@
     },
     {
       "id": "division",
+      "introductions": [
+        {
+          "id": "division-split-large-dividend",
+          "introducedIn": "0.31.6",
+          "phase": "automate",
+          "typeId": "division-split-large-dividend"
+        }
+      ],
       "label": "Teilen und verteilen",
       "curriculumArea": "Zahlen und Operationen",
       "supportGoal": "Division ohne Rest als Gruppieren und Verteilen verstehen, als Umkehrung der Multiplikation nutzen und dreistellige Dividenden in einen großen einfachen Anteil und den Rest zerlegen.",
@@ -2841,6 +2849,40 @@
     },
     {
       "id": "written-subtraction",
+      "introductions": [
+        {
+          "id": "written-subtraction-double-unbundling",
+          "introducedIn": "0.31.5",
+          "phase": "automate",
+          "typeId": "self-unbundling",
+          "subskillId": "written-subtraction-double-unbundling"
+        },
+        {
+          "id": "written-subtraction-zero-chain",
+          "introducedIn": "0.31.5",
+          "phase": "automate",
+          "typeId": "self-unbundling",
+          "subskillId": "written-subtraction-zero-chain"
+        },
+        {
+          "id": "written-subtraction-estimate-check",
+          "introducedIn": "0.31.5",
+          "phase": "transfer",
+          "typeId": "transfer-estimate-check"
+        },
+        {
+          "id": "written-subtraction-strategy-choice",
+          "introducedIn": "0.31.5",
+          "phase": "transfer",
+          "typeId": "transfer-strategy-choice"
+        },
+        {
+          "id": "written-subtraction-calculation-series",
+          "introducedIn": "0.31.5",
+          "phase": "transfer",
+          "typeId": "transfer-calculation-series"
+        }
+      ],
       "label": "Schriftlich subtrahieren",
       "curriculumArea": "Zahlen und Operationen",
       "supportGoal": "Minuend und Subtrahend stellengerecht anordnen, schriftliche Subtraktionen bis 1000 auch mit mehreren Entbündelungen verständig ausführen und Ergebnisse durch Probe oder Überschlag prüfen.",

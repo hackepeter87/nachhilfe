@@ -1,7 +1,7 @@
 import { defaultLearningPhaseForDifficulty, generateExercise } from './generators'
 import { dailySeed, seededRandom, shuffle } from './random'
 import { selectionWeight, subskillWeight } from './progress'
-import { getActiveCatalogMetadata, getLearningPhaseModel, isSkillEnabled } from '../content/catalog'
+import { getActiveCatalogMetadata, getLearningPhaseModel, getTaskCatalog, isSkillEnabled, type CatalogIntroduction } from '../content/catalog'
 import { APP_VERSION } from '../version'
 import type { Difficulty, Exercise, LearningPhase, ProgressMap, SessionPlan, SessionReleaseMetadata, SkillId, SkillProgress } from './types'
 
@@ -39,6 +39,31 @@ export interface SessionPlanningOptions {
 interface PlannedSkill {
   skillId: SkillId
   phase?: LearningPhase
+  introduction?: CatalogIntroduction
+}
+
+function pendingIntroduction(progress: ProgressMap): { skillId: SkillId; introduction: CatalogIntroduction } | undefined {
+  return getTaskCatalog().skills
+    .flatMap((skill) => (skill.introductions ?? []).map((introduction, order) => ({ skillId: skill.id, introduction, order })))
+    .filter(({ skillId, introduction }) => isSkillEligible(skillId, progress) &&
+      hasReachedPhase(progress[skillId], introduction.phase) &&
+      !(progress[skillId]?.completedIntroductionIds ?? []).includes(introduction.id))
+    .sort((left, right) => right.introduction.introducedIn.localeCompare(left.introduction.introducedIn, undefined, { numeric: true }) || left.order - right.order)[0]
+}
+
+function forceIntroduction(skills: PlannedSkill[], progress: ProgressMap): PlannedSkill[] {
+  const pending = pendingIntroduction(progress)
+  if (!pending) return skills
+  const planned = [...skills]
+  let index = planned.findIndex(({ skillId }) => skillId === pending.skillId)
+  if (index < 0 && WARMUP_SKILLS.includes(pending.skillId)) index = 1
+  if (index < 0) {
+    const domain = focusDomainFor(pending.skillId)
+    index = domain ? planned.findIndex(({ skillId }, candidate) => candidate >= 2 && candidate < 6 && (FOCUS_DOMAINS[domain] as readonly SkillId[]).includes(skillId)) : -1
+  }
+  if (index < 0) return skills
+  planned[index] = { skillId: pending.skillId, phase: pending.introduction.phase, introduction: pending.introduction }
+  return planned
 }
 
 const FOCUS_SKILLS: SkillId[] = Object.values(FOCUS_DOMAINS).flat()
@@ -206,6 +231,16 @@ function uniqueExercise(skillId: SkillId, seed: number, difficulty: Difficulty, 
   return exercise
 }
 
+function introductionExercise(skillId: SkillId, introduction: CatalogIntroduction, seed: number, difficulty: Difficulty, lastVariantKey?: string | null): Exercise {
+  for (let attempt = 0; attempt < 512; attempt += 1) {
+    const candidate = generateExercise(skillId, seed + attempt * 97, difficulty, introduction.subskillId, introduction.phase)
+    if (candidate.typeId === introduction.typeId && (!introduction.subskillId || candidate.subskillId === introduction.subskillId) && candidate.variant.key !== lastVariantKey) {
+      return { ...candidate, introductionId: introduction.id }
+    }
+  }
+  throw new Error(`Katalogeinführung ${introduction.id} kann nicht erzeugt werden.`)
+}
+
 function settingsForProgress(progress: SkillProgress | undefined): { difficulty: Difficulty; phase: LearningPhase } {
   const phase = progress?.learningPhase ?? 'activate'
   const difficulty: Difficulty = phase === 'independent-practice'
@@ -273,17 +308,20 @@ export function createSessionPlan(
   const releaseMetadata = options.releaseMetadata ?? currentSessionReleaseMetadata()
   const warmups = warmupSkills(progress, seed + 17)
   const focus = focusSkillsWithClassroomPractice(progress, seed + 31, 4, options.completedSessionCount)
-  const skills: PlannedSkill[] = [
+  const skills = forceIntroduction([
     ...warmups.map((skillId) => ({ skillId })),
     ...focus,
     ...(['word-problem', 'symmetry'] as SkillId[]).filter(isSkillEnabled).map((skillId) => ({ skillId }))
-  ]
-  const exercises = skills.map(({ skillId, phase: plannedPhase }, index) => {
+  ], progress)
+  const exercises = skills.map(({ skillId, phase: plannedPhase, introduction }, index) => {
     const skillProgress = progress[skillId]
     const { difficulty, phase } = plannedPhase ? settingsForPhase(plannedPhase) : settingsForSkill(skillId, progress)
     const exerciseSeed = seed + (index + 1) * 113
     const focus = selectSubskill(skillId, progress, exerciseSeed + 41, difficulty)
-    return applyLearningPhase(uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus, phase), phase)
+    const exercise = introduction
+      ? introductionExercise(skillId, introduction, exerciseSeed, difficulty, skillProgress?.lastVariantKey)
+      : uniqueExercise(skillId, exerciseSeed, difficulty, skillProgress?.lastVariantKey, focus, phase)
+    return applyLearningPhase(exercise, phase)
   })
   return {
     id: `session-${seed}`,

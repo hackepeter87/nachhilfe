@@ -157,6 +157,7 @@ export interface Exercise {
     axisLegend: string
   }
   subskillId?: string
+  introductionId?: string
   representation?: ExerciseRepresentation
   hints: [Hint, Hint]
   successFeedback: string
@@ -185,6 +186,7 @@ export interface AttemptResult {
   exerciseId: string
   skillId: SkillId
   subskillId?: string
+  introductionId?: string
   variantKey: string
   correct: boolean
   hintsUsed: number
@@ -218,6 +220,7 @@ export interface SkillProgress {
   lastVariantKey: string | null
   status: LearningStatus
   subskills: Record<string, SubskillProgress>
+  completedIntroductionIds: string[]
 }
 
 export interface SessionReleaseMetadata {

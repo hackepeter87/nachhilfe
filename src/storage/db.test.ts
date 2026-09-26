@@ -88,7 +88,11 @@ describe('IndexedDB-Speicherung', () => {
   it('ergänzt bei alten Lernständen eine ableitbare Lernphase', () => {
     const legacy = createSkillProgress('place-value')
     delete (legacy as Partial<typeof legacy>).learningPhase
-    expect(migrateSkillProgress(legacy).learningPhase).toBe('activate')
+    delete (legacy as Partial<typeof legacy>).completedIntroductionIds
+    expect(migrateSkillProgress(legacy)).toMatchObject({
+      learningPhase: 'activate',
+      completedIntroductionIds: []
+    })
   })
 
   it('speichert den fachlichen Releasekontext einer abgeschlossenen Sitzung', async () => {

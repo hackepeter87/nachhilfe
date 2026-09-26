@@ -31,11 +31,22 @@ describe('versionierter Aufgabenkatalog', () => {
   it('ist syntaktisch gültig und erfüllt das kleine Laufzeitschema', () => {
     const catalog = readPublicCatalog()
     expect(validateTaskCatalog(catalog)).toBe(true)
-    expect((catalog as TaskCatalog).schemaVersion).toBe(19)
-    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.6')
+    expect((catalog as TaskCatalog).schemaVersion).toBe(20)
+    expect((catalog as TaskCatalog).catalogVersion).toBe('0.31.7')
     expect((catalog as TaskCatalog).catalogId).toBe('nrw-klasse3-foerderkern')
     expect((catalog as TaskCatalog).status).toBe('ready-for-review')
     expect((catalog as TaskCatalog).numberRange).toEqual({ min: 0, max: 1000 })
+  })
+
+  it('führt neue Aufgabenfamilien mit eindeutiger Version, Phase und Typkennung', () => {
+    const catalog = readPublicCatalog() as TaskCatalog
+    const introductions = catalog.skills.flatMap((skill) => skill.introductions ?? [])
+    expect(introductions).toHaveLength(6)
+    expect(new Set(introductions.map(({ id }) => id)).size).toBe(introductions.length)
+
+    const future = structuredClone(catalog)
+    future.skills.find((skill) => skill.id === 'division')!.introductions![0]!.introducedIn = '99.0.0'
+    expect(validateTaskCatalog(future)).toBe(false)
   })
 
   it('hält öffentlichen Katalog und eingebauten Fallback auf demselben geprüften Stand', () => {

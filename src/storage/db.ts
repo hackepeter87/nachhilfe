@@ -46,7 +46,8 @@ export function migrateCompletedSession(session: CompletedSession | Record<strin
 export function migrateSkillProgress(progress: SkillProgress): SkillProgress {
   return {
     ...progress,
-    learningPhase: progress.learningPhase ?? learningPhaseFor(progress.attempts, progress.mastery, progress.difficulty, progress.status)
+    learningPhase: progress.learningPhase ?? learningPhaseFor(progress.attempts, progress.mastery, progress.difficulty, progress.status),
+    completedIntroductionIds: progress.completedIntroductionIds ?? []
   }
 }
 

@@ -30,7 +30,7 @@ import { isValidDataSetTemplate, type DataSetTemplate } from '../domain/dataDisp
 import { isValidCombinationTemplate, isValidProbabilityTemplate, type CombinationTemplate, type ProbabilityTemplate } from '../domain/chance'
 
 export const TASK_CATALOG_URL = '/content/task-catalog.json'
-export const CATALOG_SCHEMA_VERSION = 19
+export const CATALOG_SCHEMA_VERSION = 20
 export const TASK_CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export type ContentStatus = 'draft' | 'ready-for-review' | 'active' | 'disabled'
@@ -73,6 +73,7 @@ export interface CatalogSkill {
   supportGoal: string
   prerequisites: string[]
   learningPhases: CatalogLearningPhase[]
+  introductions?: CatalogIntroduction[]
   difficultyLevels: [CatalogDifficultyLevel, CatalogDifficultyLevel, CatalogDifficultyLevel]
   representations: string[]
   misconceptions: string[]
@@ -89,6 +90,14 @@ export interface CatalogSkill {
   releaseStatus: SkillReleaseStatus
   halfExplanation?: string
   difficultyBounds: DifficultyBounds
+}
+
+export interface CatalogIntroduction {
+  id: string
+  introducedIn: string
+  phase: LearningPhase
+  typeId: string
+  subskillId?: string
 }
 
 export interface CatalogDifficultyLevel {
@@ -774,6 +783,15 @@ function isSkill(value: unknown, numberRange: { min: number; max: number }): val
   if (!Array.isArray(value.prerequisites) || !value.prerequisites.every(isNonEmptyString)) return false
   if (!Array.isArray(value.learningPhases) || value.learningPhases.length !== LEARNING_PHASES.length || !value.learningPhases.every(isLearningPhase) ||
     new Set(value.learningPhases.map((phase) => (phase as CatalogLearningPhase).id)).size !== LEARNING_PHASES.length) return false
+  if (value.introductions !== undefined && (!Array.isArray(value.introductions) || !value.introductions.every((introduction) => {
+    if (!isRecord(introduction) || !isNonEmptyString(introduction.id) ||
+      !isNonEmptyString(introduction.introducedIn) || !/^\d+\.\d+\.\d+$/.test(introduction.introducedIn as string) ||
+      !LEARNING_PHASES.includes(introduction.phase as LearningPhase) || !isNonEmptyString(introduction.typeId) ||
+      (introduction.subskillId !== undefined && !isNonEmptyString(introduction.subskillId))) return false
+    const phase = (value.learningPhases as CatalogLearningPhase[]).find((entry) => entry.id === introduction.phase)
+    return Boolean(phase?.exerciseTypes.includes(`${value.id}:${introduction.typeId}`) &&
+      (value.releaseStatus === 'disabled' || phase.releaseStatus === 'active'))
+  }))) return false
   if (!Array.isArray(value.representations) || value.representations.length === 0 || !value.representations.every(isNonEmptyString)) return false
   if (!Array.isArray(value.difficultyLevels) || value.difficultyLevels.length !== 3 || !value.difficultyLevels.every((level, index) =>
     isRecord(level) && level.level === index + 1 && isNonEmptyString(level.description) && isNonEmptyString(level.numberRange) &&
@@ -921,6 +939,10 @@ export function validateTaskCatalog(value: unknown): value is TaskCatalog {
   if (!Array.isArray(value.skills) || value.skills.length !== SKILL_IDS.length || !value.skills.every((skill) => isSkill(skill, numberRange as { min: number; max: number }))) return false
   const skillIds = value.skills.map((skill) => (skill as CatalogSkill).id)
   if (new Set(skillIds).size !== SKILL_IDS.length || !SKILL_IDS.every((id) => skillIds.includes(id))) return false
+  const introductionIds = value.skills.flatMap((skill) => (skill as CatalogSkill).introductions?.map(({ id }) => id) ?? [])
+  if (new Set(introductionIds).size !== introductionIds.length) return false
+  if (value.skills.some((skill) => ((skill as CatalogSkill).introductions ?? []).some((introduction) =>
+    introduction.introducedIn.localeCompare(value.catalogVersion as string, undefined, { numeric: true }) > 0))) return false
   const symmetrySkill = value.skills.find((skill) => (skill as CatalogSkill).id === 'symmetry') as CatalogSkill | undefined
   const expectedSymmetryExerciseTypes = [
     ['symmetry:symmetry-identify-side-change'],

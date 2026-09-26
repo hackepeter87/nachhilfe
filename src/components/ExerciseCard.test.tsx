@@ -5,6 +5,19 @@ import { generateExercise, type ExerciseStep } from '../domain'
 import { ExerciseCard } from './ExerciseCard'
 
 describe('ExerciseCard', () => {
+  it('gibt die katalogisierte Einführung erst beim vollständigen Abschluss zurück', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = { ...generateExercise('addition', 17, 1), introductionId: 'test-introduction' }
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+
+    await user.type(screen.getByLabelText('Deine Antwort'), exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    expect(onComplete).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: 'Weiter' }))
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ introductionId: 'test-introduction' }))
+  })
+
   it('routet eine erkannte Fehlvorstellung in spezifisches Feedback und das Versuchsergebnis', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

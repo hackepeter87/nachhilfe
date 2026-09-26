@@ -25,7 +25,8 @@ export function createSkillProgress(skillId: SkillId): SkillProgress {
     correctStreak: 0,
     lastVariantKey: null,
     status: 'not_started',
-    subskills: {}
+    subskills: {},
+    completedIntroductionIds: []
   }
 }
 
@@ -107,7 +108,10 @@ export function updateSkillProgress(current: SkillProgress | undefined, result: 
     correctStreak,
     lastVariantKey: result.variantKey,
     status,
-    subskills
+    subskills,
+    completedIntroductionIds: result.introductionId
+      ? [...new Set([...(previous.completedIntroductionIds ?? []), result.introductionId])]
+      : previous.completedIntroductionIds ?? []
   }
 }
 

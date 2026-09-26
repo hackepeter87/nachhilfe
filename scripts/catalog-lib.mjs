@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const CATALOG_SCHEMA_VERSION = 19
+export const CATALOG_SCHEMA_VERSION = 20
 export const CATALOG_ID = 'nrw-klasse3-foerderkern'
 
 export const SKILL_IDS = [
@@ -79,7 +79,7 @@ function validatePlaceholders(value, pathLabel = 'catalog') {
   }
 }
 
-function validateSkill(skill, numberRange) {
+function validateSkill(skill, numberRange, catalogVersion) {
   if (!isRecord(skill) || !SKILL_IDS.includes(skill.id)) fail(`unbekannte Kompetenz ${String(skill?.id)}`)
   const context = `skills.${skill.id}`
   for (const field of ['label', 'curriculumArea', 'supportGoal', 'workedExample', 'prompt', 'successFeedback', 'errorFeedback', 'explanation', 'transferPrompt']) {
@@ -108,6 +108,22 @@ function validateSkill(skill, numberRange) {
     fail(`${context}.learningPhases ist unvollständig`)
   }
   requireUnique(skill.learningPhases.map((phase) => phase.id), `${context}.learningPhases`)
+  if (skill.introductions !== undefined) {
+    if (!Array.isArray(skill.introductions)) fail(`${context}.introductions ist ungültig`)
+    skill.introductions.forEach((introduction, index) => {
+      const introContext = `${context}.introductions[${index}]`
+      if (!isRecord(introduction) || !isText(introduction.id) || !isText(introduction.introducedIn) ||
+        !/^\d+\.\d+\.\d+$/.test(introduction.introducedIn) || introduction.introducedIn.localeCompare(catalogVersion, undefined, { numeric: true }) > 0 ||
+        !phases.includes(introduction.phase) || !isText(introduction.typeId) ||
+        (introduction.subskillId !== undefined && !isText(introduction.subskillId))) fail(`${introContext} ist ungültig`)
+      const phase = skill.learningPhases.find((entry) => entry.id === introduction.phase)
+      if (!phase?.exerciseTypes.includes(`${skill.id}:${introduction.typeId}`) ||
+        (skill.releaseStatus !== 'disabled' && phase.releaseStatus !== 'active')) {
+        fail(`${introContext} verweist nicht auf einen aktiven Aufgabentyp`)
+      }
+    })
+    requireUnique(skill.introductions.map(({ id }) => id), `${context}.introductions IDs`)
+  }
   if (!Array.isArray(skill.hints) || skill.hints.length !== 2 || !skill.hints.every(isText)) fail(`${context}.hints muss zwei Texte enthalten`)
   if (!statuses.includes(skill.releaseStatus)) fail(`${context}.releaseStatus ist ungültig`)
   if (!Array.isArray(skill.successCriteria) || skill.successCriteria.length === 0 || !skill.successCriteria.every(isText)) fail(`${context}.successCriteria ist unvollständig`)
@@ -555,7 +571,9 @@ export function validateCatalog(catalog) {
   const skillIds = catalog.skills.map((skill) => skill.id)
   requireUnique(skillIds, 'Kompetenz-IDs')
   if (!SKILL_IDS.every((id) => skillIds.includes(id))) fail('mindestens eine bekannte Kompetenz fehlt')
-  catalog.skills.forEach((skill) => validateSkill(skill, numberRange))
+  catalog.skills.forEach((skill) => validateSkill(skill, numberRange, catalog.catalogVersion))
+  const introductionIds = catalog.skills.flatMap((skill) => skill.introductions?.map(({ id }) => id) ?? [])
+  requireUnique(introductionIds, 'Einführungs-IDs')
   const symmetrySkill = catalog.skills.find((skill) => skill.id === 'symmetry')
   const expectedSymmetryExerciseTypes = [
     ['symmetry:symmetry-identify-side-change'],

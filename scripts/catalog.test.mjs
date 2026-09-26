@@ -63,11 +63,22 @@ describe('Katalog-Buildpipeline', () => {
   it('validiert die getrennten Katalogmetadaten', () => {
     const catalog = parseAndValidateCatalog(fs.readFileSync(catalogPaths.source, 'utf8'))
     expect(catalog).toMatchObject({
-      schemaVersion: 19,
-      catalogVersion: '0.31.6',
+      schemaVersion: 20,
+      catalogVersion: '0.31.7',
       catalogId: 'nrw-klasse3-foerderkern',
       status: 'ready-for-review'
     })
+  })
+
+  it('validiert katalogisierte Einführungen und ihre global eindeutigen IDs', () => {
+    const catalog = sourceCatalog()
+    const division = catalog.skills.find((skill) => skill.id === 'division')
+    division.introductions[0].typeId = 'nicht-vorhanden'
+    expect(() => parseAndValidateCatalog(JSON.stringify(catalog))).toThrow('aktiven Aufgabentyp')
+
+    const duplicate = sourceCatalog()
+    duplicate.skills.find((skill) => skill.id === 'written-subtraction').introductions[0].id = 'division-split-large-dividend'
+    expect(() => parseAndValidateCatalog(JSON.stringify(duplicate))).toThrow('Einführungs-IDs')
   })
 
   it.each([

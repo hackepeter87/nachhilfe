@@ -1,5 +1,14 @@
 # Mathe-Reise
 
+## Verlässliche Einführung neuer Aufgabenfamilien 0.32.10
+
+- Katalogeinträge bestimmen jetzt, ab welcher Lernphase eine neue Aufgabenfamilie fällig ist.
+- Pro Runde wird genau eine noch nicht vollständig bearbeitete Familie garantiert; die neueste Katalogergänzung kommt zuerst.
+- Der Abschluss bleibt in vorhandenen und neuen Profilen erhalten. Fehler und Tipps beeinflussen weiterhin den Lernwert, verhindern aber nicht die Kennzeichnung als vollständig bearbeitet.
+- Altprofile werden ohne Zurücksetzen migriert. Nicht begonnene Aufgaben gelten nicht als abgeschlossen.
+- App 0.32.10 verwendet Katalog 0.31.7 und Schema 20. Die fachlichen Inhalte bleiben `ready-for-review` und sind nicht extern durch eine Lehrkraft freigegeben.
+- Umfang und Freigabeweg stehen im [Releasebericht 0.32.10](docs/release-0.32.10.md).
+
 ## Schriftliche Subtraktion und Divisionszerlegung 0.32.9
 
 - Die schriftliche Subtraktion übernimmt weitere belegte Übungsformen: zwei Entbündelungen, Tausch über eine Null, Überschlagsprüfung, Strategiewahl und Aufgabenpäckchen.

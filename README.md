@@ -149,7 +149,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.32.9
+podman pull ghcr.io/hackepeter87/nachhilfe:0.32.10
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -190,10 +190,12 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.32.9
+## Entwicklungsstand 0.32.10
+
+Version 0.32.10 veröffentlicht Katalog 0.31.7 und Schema 20. Neue Aufgabenfamilien werden kataloggesteuert einzeln in der nächsten fachlich passenden Runde garantiert. Eine vollständig bearbeitete Familie wird im bestehenden Lernstand gespeichert und danach nicht erneut erzwungen; Fehler und verwendete Tipps verhindern diesen Abschluss nicht. Details stehen im [Releasebericht](docs/release-0.32.10.md).
 
 Version 0.32.9 veröffentlicht Katalog 0.31.6. Die schriftliche Subtraktion umfasst zusätzlich zwei Entbündelungen, den Tausch über eine Null, Überschlagsprüfungen, Strategiewahl und Aufgabenpäckchen. Dreistellige Divisionen ohne Rest werden in einen möglichst großen einfachen Anteil mit vollem Zehnerquotienten und den verbleibenden Rest zerlegt; beide Teilquotienten werden anschließend addiert. Das Runtime-Image aktualisiert außerdem `libexpat` auf den gepatchten Alpine-Stand. Details stehen im [Releasebericht](docs/release-0.32.9.md).
 
 Version 0.32.8 korrigierte zuvor den Release-Gate nach den wiederholten technischen Ausfällen des npm-Audit-Endpunkts. Ein verpflichtender Trivy-Lockfile-Scan blockiert ab `MEDIUM`; der npm-Audit-Runner wiederholt echte Dienstfehler dreimal und unterscheidet sie von Sicherheitsfunden und internen Fehlern. Das Runtime-Image aktualisierte außerdem `libuuid` auf den gepatchten Alpine-Stand. Details stehen im [Releasebericht](docs/release-0.32.8.md).
 
-Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.9 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
+Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.10 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

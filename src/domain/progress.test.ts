@@ -76,4 +76,20 @@ describe('Lernstandsmodell', () => {
     expect(learningPhaseFor(8, 92, 3, 'secure')).toBe('transfer')
     expect(learningPhaseFor(8, 100, 2, 'secure')).toBe('independent-practice')
   })
+
+  it('merkt vollständig bearbeitete Katalogeinführungen unabhängig vom Ergebnis genau einmal', () => {
+    let progress = createSkillProgress('division')
+    progress = updateSkillProgress(progress, result({
+      skillId: 'division',
+      correct: false,
+      hintsUsed: 2,
+      introductionId: 'division-split-large-dividend'
+    }))
+    progress = updateSkillProgress(progress, result({
+      skillId: 'division',
+      introductionId: 'division-split-large-dividend'
+    }))
+
+    expect(progress.completedIntroductionIds).toEqual(['division-split-large-dividend'])
+  })
 })

@@ -1135,4 +1135,18 @@ describe('deterministische Aufgabengeneratoren', () => {
       expect(axes).toEqual(difficulty === 1 ? new Set(['vertical']) : new Set(['vertical', 'horizontal']))
     }
   })
+
+  it('kann jede katalogisierte Einführung in ihrer vorgesehenen Phase erzeugen', () => {
+    for (const skill of getTaskCatalog().skills) {
+      for (const introduction of skill.introductions ?? []) {
+        const difficulty = introduction.phase === 'independent-practice' ? 2 :
+          introduction.phase === 'automate' || introduction.phase === 'transfer' ? 3 : 1
+        const generated = Array.from({ length: 512 }, (_, index) =>
+          generateExercise(skill.id, 20_000 + index * 97, difficulty, introduction.subskillId, introduction.phase)
+        ).find((exercise) => exercise.typeId === introduction.typeId &&
+          (!introduction.subskillId || exercise.subskillId === introduction.subskillId))
+        expect(generated, introduction.id).toBeDefined()
+      }
+    }
+  })
 })

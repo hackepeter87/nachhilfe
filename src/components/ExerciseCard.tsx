@@ -164,6 +164,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
       exerciseId: exercise.id,
       skillId: exercise.skillId,
       subskillId: exercise.subskillId,
+      introductionId: exercise.introductionId,
       variantKey: exercise.variant.key,
       correct: !hadError && answerState === 'correct',
       hintsUsed,
