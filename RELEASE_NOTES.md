@@ -1,5 +1,14 @@
 # Mathe-Reise
 
+## Schriftliche Subtraktion und Divisionszerlegung 0.32.9
+
+- Die schriftliche Subtraktion übernimmt weitere belegte Übungsformen: zwei Entbündelungen, Tausch über eine Null, Überschlagsprüfung, Strategiewahl und Aufgabenpäckchen.
+- Dreistellige Divisionen ohne Rest werden in einen möglichst großen einfachen Anteil mit vollem Zehnerquotienten und den Rest zerlegt. Beide Teile werden getrennt dividiert und anschließend addiert.
+- Die neue Divisionsdarstellung führt durch genau diese Handlung und deckt die Schritte mit Generator-, Komponenten- und mobilen Browsertests ab.
+- Das Runtime-Image aktualisiert `libexpat` auf `2.8.5-r0` und behebt damit `CVE-2026-93990`; der Trivy-Gate bleibt unverändert verpflichtend.
+- App 0.32.9 verwendet Katalog 0.31.6 und Schema 19. Die fachlichen Ergänzungen sind nicht extern durch eine Lehrkraft freigegeben.
+- Umfang und Freigabeweg stehen im [Releasebericht 0.32.9](docs/release-0.32.9.md).
+
 ## Robuster Security-Gate 0.32.8
 
 - Das npm-Lockfile wird in CI verpflichtend mit Trivy 0.74.0 einschließlich Entwicklungsabhängigkeiten ab Schweregrad `MEDIUM` geprüft.
