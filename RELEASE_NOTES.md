@@ -1,5 +1,13 @@
 # Mathe-Reise
 
+## Test- und PWA-Werkzeugmigration 0.32.12
+
+- Vitest 5.0.3, jest-dom 7.0.1, jsdom 30.1.2 und vite-plugin-pwa 2.0.0 ersetzen die bisherigen Hauptversionen.
+- `@testing-library/dom` ist als direkter Peer deklariert; die erforderliche Node-Untergrenze ist 24.15.0.
+- TypeScript bleibt auf 6.0.3, weil typescript-eslint 8.71.1 TypeScript 7 noch nicht unterstützt. Es gibt keine Peer-Overrides.
+- App 0.32.12 verwendet unverändert Katalog 0.31.7 und Schema 20. Aufgaben, Lernlogik und gespeicherte Profile ändern sich nicht.
+- Umfang und Freigabeweg stehen im [Releasebericht 0.32.12](docs/release-0.32.12.md).
+
 ## Sicherheits- und Wartungsrelease 0.32.11
 
 - Alle bestätigten npm-Sicherheitsfunde wurden durch gepatchte Versionen von `undici`, `brace-expansion`, `fast-uri` und `source-map-js` beseitigt.
