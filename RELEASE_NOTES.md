@@ -1,5 +1,13 @@
 # Mathe-Reise
 
+## Sicherheits- und Wartungsrelease 0.32.11
+
+- Alle bestätigten npm-Sicherheitsfunde wurden durch gepatchte Versionen von `undici`, `brace-expansion`, `fast-uri` und `source-map-js` beseitigt.
+- React 19.3, Vite 8.3, Playwright 1.64, ESLint 10.12, Lucide 1.55 und weitere kompatible Werkzeuge wurden aktualisiert. Node bleibt auf Version 24 LTS; Major-Migrationen bleiben separat geplant.
+- Das Runtime-Image aktualisiert alle installierten Alpine-Pakete. Trivy 0.75.0 blockiert Lockfile und Runtime-Image nun einheitlich ab Schweregrad `MEDIUM`.
+- App 0.32.11 verwendet unverändert Katalog 0.31.7 und Schema 20. Aufgaben, Lernlogik und gespeicherte Profile ändern sich nicht.
+- Umfang und Freigabeweg stehen im [Releasebericht 0.32.11](docs/release-0.32.11.md).
+
 ## Verlässliche Einführung neuer Aufgabenfamilien 0.32.10
 
 - Katalogeinträge bestimmen jetzt, ab welcher Lernphase eine neue Aufgabenfamilie fällig ist.
