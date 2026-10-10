@@ -14,7 +14,7 @@ ARG OCI_REVISION=unknown
 ARG OCI_CREATED=unknown
 
 USER root
-RUN apk upgrade --no-cache libexpat libuuid
+RUN apk upgrade --no-cache
 
 LABEL org.opencontainers.image.title="Mathe-Reise" \
       org.opencontainers.image.description="Offline-fähige Mathematik-Förderapp für die dritte Klasse" \
