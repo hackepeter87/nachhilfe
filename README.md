@@ -34,12 +34,16 @@ Die manuelle Erprobung von 0.30.0 hat trotz grüner technischer Prüfungen erheb
 
 ## Voraussetzungen
 
-- Node.js 24 oder neuer
+- Node.js 24.15 oder neuer
 - npm (im Lockfile wurde npm 11 verwendet)
 - Für E2E-Tests: Playwright Chromium und WebKit
 - Optional: Docker oder Podman für das Container-Image
 
-Der Wartungsstand vom 04.09.2026 wird mit Node.js `v24.20.0` und npm `11.19.0` geprüft. Die Datei `.nvmrc` legt nur den unterstützten Major-Release fest, keinen Patchstand. Node 24 bleibt die LTS-Basis; `@types/node` folgt ebenfalls Major 24. Details und zurückgestellte Updates stehen im [Wartungsbericht](docs/software-maintenance-2026-09-04.md).
+Die Datei `.nvmrc` legt weiterhin Node 24 LTS fest. Seit der
+[Toolchain-Migration vom 10.10.2026](docs/toolchain-migration-2026-10-10.md)
+ist mindestens Node 24.15 erforderlich; `@types/node` folgt weiterhin Major 24.
+TypeScript 7 bleibt bis zur offiziellen Unterstützung durch typescript-eslint
+zurückgestellt.
 
 ## Lokale Entwicklung
 
