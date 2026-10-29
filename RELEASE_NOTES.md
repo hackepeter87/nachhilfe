@@ -1,5 +1,13 @@
 # Mathe-Reise
 
+## Automatisierte und gehärtete Wartung 0.32.14
+
+- Renovate erkennt Updates für npm, Node, Docker, Compose und GitHub Actions; Auto-Merge bleibt deaktiviert und Major-Updates benötigen eine Freigabe.
+- GitHub Actions und Container-Basisimages sind auf unveränderliche Digests festgelegt. Trivy 0.76.1 prüft Lockfile und Runtime-Image.
+- CI installiert Abhängigkeiten ohne Paketskripte. Pull Requests müssen die Gates `security`, `quality`, `e2e` und `container` bestehen.
+- App 0.32.14 verwendet unverändert Katalog 0.31.7 und Schema 20. Aufgaben, Lernlogik und gespeicherte Profile ändern sich nicht.
+- Umfang und Freigabeweg stehen im [Releasebericht 0.32.14](docs/release-0.32.14.md).
+
 ## Sicherheitsrelease 0.32.13
 
 - `undici` 8.12.3, `zod` 4.6.7, `fast-uri` 3.1.9 und `serialize-javascript` 7.1.4 beseitigen alle bekannten npm-Funde ab `moderate`.
