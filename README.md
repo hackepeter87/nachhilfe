@@ -153,7 +153,7 @@ Podman war in der Entwicklungsumgebung nicht installiert; diese beiden Befehle w
 Versionierte Release-Images für die DMZ-Zielarchitektur `linux/amd64` werden unter `ghcr.io/hackepeter87/nachhilfe` veröffentlicht. Das Compose-Deployment pinnt ein konkretes Release, erzwingt diese Plattform und bindet die App nur an die lokale Reverse-Proxy-Schnittstelle:
 
 ```bash
-podman pull ghcr.io/hackepeter87/nachhilfe:0.32.12
+podman pull ghcr.io/hackepeter87/nachhilfe:0.32.13
 podman compose -f deploy/compose.yaml up -d
 ```
 
@@ -194,7 +194,9 @@ Profil, Einstellungen, Kompetenzstände und abgeschlossene Sitzungen liegen vers
 
 Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: richtig ohne Hilfe `+12`, richtig mit Hilfe `+6`, falsch `-10`, begrenzt auf `0..100`. Der Status `secure` erfordert mindestens fünf Versuche und einen Lernwert von mindestens 80. Niedrige Lernwerte, kürzliche Fehler und lange nicht geübte Kompetenzen erhöhen das Auswahlgewicht. Für Grundrechenarten werden nur didaktisch wirksame Unterkompetenzen getrennt geführt, etwa Zehnerübergang, konkrete Einmaleinsreihe oder passender Divisor. Die Lernphase steuert die tatsächlich erzeugte Schwierigkeit und Hilfsdarstellung: Aktivieren, Verstehen und geführtes Üben beginnen auf Stufe 1, selbstständiges Üben nutzt Stufe 2, Automatisieren und Transfer Stufe 3. Diese Regeln sind anpassbare Produktheuristiken und kein wissenschaftlich validiertes Diagnosemodell.
 
-## Entwicklungsstand 0.32.12
+## Entwicklungsstand 0.32.13
+
+Version 0.32.13 aktualisiert die verwundbaren Build- und Testabhängigkeiten `undici`, `zod`, `fast-uri` und `serialize-javascript` auf gepatchte Versionen. npm Audit meldet keine Funde ab `moderate`; der verbleibende Low-Risk-Upstream-Fund in `deepmerge` wird in Issue #170 verfolgt. Katalog 0.31.7 und Schema 20 bleiben unverändert. Details stehen im [Releasebericht](docs/release-0.32.13.md).
 
 Version 0.32.12 migriert die Test- und PWA-Werkzeuge auf Vitest 5, jest-dom 7, jsdom 30 und vite-plugin-pwa 2. Die direkte Peer-Abhängigkeit `@testing-library/dom` ist nun explizit deklariert; die Node-Untergrenze steigt auf 24.15.0. TypeScript bleibt ohne Peer-Override auf 6.0.3, bis typescript-eslint TypeScript 7 unterstützt. Katalog 0.31.7 und Schema 20 bleiben unverändert. Details stehen im [Releasebericht](docs/release-0.32.12.md).
 
@@ -206,4 +208,4 @@ Version 0.32.9 veröffentlicht Katalog 0.31.6. Die schriftliche Subtraktion umfa
 
 Version 0.32.8 korrigierte zuvor den Release-Gate nach den wiederholten technischen Ausfällen des npm-Audit-Endpunkts. Ein verpflichtender Trivy-Lockfile-Scan blockiert ab `MEDIUM`; der npm-Audit-Runner wiederholt echte Dienstfehler dreimal und unterscheidet sie von Sicherheitsfunden und internen Fehlern. Das Runtime-Image aktualisierte außerdem `libuuid` auf den gepatchten Alpine-Stand. Details stehen im [Releasebericht](docs/release-0.32.8.md).
 
-Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.12 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.
+Die familienweise manuelle Prüfung ist damit nicht abgeschlossen. Der aktuelle Stand setzt die konkret belegten Befunde und Lehrkraftbeispiele um, ist aber keine vollständige Abnahme aller Varianten. Die vorhandenen echten Gerätefotos belegen Ausgangsfehler; Version 0.32.13 wurde dort noch nicht vollständig abgenommen. Eine externe Lehrkraftprüfung und eine Unterrichtserprobung sind weiterhin nicht erfolgt.

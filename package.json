@@ -1,7 +1,7 @@
 {
   "name": "mathe-reise",
   "private": true,
-  "version": "0.32.12",
+  "version": "0.32.13",
   "type": "module",
   "engines": {
     "node": ">=24.15.0"

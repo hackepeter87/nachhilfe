@@ -1,5 +1,12 @@
 # Mathe-Reise
 
+## Sicherheitsrelease 0.32.13
+
+- `undici` 8.12.3, `zod` 4.6.7, `fast-uri` 3.1.9 und `serialize-javascript` 7.1.4 beseitigen alle bekannten npm-Funde ab `moderate`.
+- Der verbleibende Low-Risk-Upstream-Fund in `deepmerge` betrifft nur die PWA-Buildkette und wird in Issue #170 verfolgt.
+- App 0.32.13 verwendet unverändert Katalog 0.31.7 und Schema 20. Aufgaben, Lernlogik und gespeicherte Profile ändern sich nicht.
+- Umfang und Freigabeweg stehen im [Releasebericht 0.32.13](docs/release-0.32.13.md).
+
 ## Test- und PWA-Werkzeugmigration 0.32.12
 
 - Vitest 5.0.3, jest-dom 7.0.1, jsdom 30.1.2 und vite-plugin-pwa 2.0.0 ersetzen die bisherigen Hauptversionen.
