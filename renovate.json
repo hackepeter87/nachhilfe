@@ -1,0 +1,104 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "docker:pinDigests",
+    "helpers:disableTypesNodeMajor"
+  ],
+  "enabledManagers": [
+    "npm",
+    "nvm",
+    "dockerfile",
+    "docker-compose",
+    "github-actions"
+  ],
+  "timezone": "Europe/Berlin",
+  "schedule": ["before 6am on Monday"],
+  "dependencyDashboard": true,
+  "automerge": false,
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "minimumReleaseAge": "3 days",
+  "ignoreScripts": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on Monday"]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"],
+    "labels": ["security"]
+  },
+  "packageRules": [
+    {
+      "description": "Deployment-Image wird nur durch den manuellen Releaseprozess aktualisiert",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["ghcr.io/hackepeter87/nachhilfe"],
+      "enabled": false
+    },
+    {
+      "description": "Major-Updates einzeln und erst nach Dashboard-Freigabe",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Node und Node-Typen bleiben auf Major 24",
+      "matchPackageNames": ["node", "@types/node"],
+      "allowedVersions": "<25"
+    },
+    {
+      "description": "TypeScript 7 bleibt bis zur Unterstützung durch typescript-eslint gesperrt",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
+      "description": "Runtime-Abhängigkeiten gemeinsam aktualisieren",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "runtime dependencies"
+    },
+    {
+      "description": "Build- und Lint-Werkzeuge gemeinsam aktualisieren",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "/^@eslint/",
+        "/^@vitejs/",
+        "/^eslint/",
+        "typescript",
+        "typescript-eslint",
+        "vite",
+        "vite-plugin-pwa"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "build and lint dependencies"
+    },
+    {
+      "description": "Testwerkzeuge gemeinsam aktualisieren",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "/^@playwright/",
+        "/^@testing-library/",
+        "fake-indexeddb",
+        "jsdom",
+        "vitest"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "test dependencies"
+    },
+    {
+      "description": "GitHub Actions gemeinsam aktualisieren",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Container-Basisimages gemeinsam aktualisieren",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "container base images"
+    }
+  ]
+}

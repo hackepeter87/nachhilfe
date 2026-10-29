@@ -71,12 +71,12 @@ Die Unit- und Komponententests prüfen Generatoren, fachliche Grenzen, Lernstand
 
 Bei Pull Requests und Pushes auf `main` führt `.github/workflows/ci.yml` dieselben Qualitätsbefehle mit Node.js 24 aus. Separate Jobs prüfen das npm-Lockfile verpflichtend mit Trivy, fragen zusätzlich die npm-Advisory-Datenbank ab und testen Chromium/WebKit sowie den gehärteten AMD64-Container. Der Publish-Workflow ruft diese CI für denselben Commit auf und veröffentlicht erst nach erfolgreichen Prüfungen. Sicherheitsfunde und unbekannte Audit-Fehler blockieren; nur ein dreimal eindeutig technisch ausgefallener npm-Dienst wird nach bestandenem Trivy-Lockfile-Scan als Warnung behandelt.
 
-Dependabot eröffnet wöchentliche Wartungs-PRs für npm, Docker und GitHub Actions. Kompatible npm-Updates werden gruppiert, Major-Wechsel getrennt geprüft; automatisches Mergen ist nicht eingerichtet.
+Renovate bereitet nach der Aktivierung wöchentliche Wartungs-PRs für npm, Node, Docker und GitHub Actions vor. Kompatible Updates werden nach ihrem Einsatzgebiet gruppiert, Major-Wechsel benötigen eine Freigabe im Dependency Dashboard und automatisches Mergen ist deaktiviert. Betrieb, Sicherheitsregeln und Deaktivierung stehen in der [Renovate-Dokumentation](docs/renovate.md).
 
 Für die Browser-Tests wird Chromium einmalig installiert:
 
 ```bash
-npx playwright install chromium webkit
+npx --no-install playwright install chromium webkit
 npm run test:e2e
 ```
 
