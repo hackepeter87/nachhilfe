@@ -32,7 +32,7 @@ async function confirmSelectedOption(page: Page) {
 async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => void) {
   const reportedExercises = new Set<string>()
   for (let action = 0; action < 80; action += 1) {
-    if (await page.locator('.summary-page').count() > 0) return
+    if (await page.getByRole('button', { name: 'Neue Runde beginnen' }).isVisible().catch(() => false)) return
     const panel = page.locator('.exercise-panel')
     if (await panel.isVisible().catch(() => false)) {
       const exerciseId = await panel.getAttribute('data-exercise-id').catch(() => null)
