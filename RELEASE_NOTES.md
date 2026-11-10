@@ -1,5 +1,13 @@
 # Mathe-Reise
 
+## Vorhersehbare und unterstützende Lernrunden 0.32.15
+
+- Jede Etappe umfasst verlässlich acht Aufgaben; der Fortschrittszähler und der semantische Fortschrittsbalken bleiben während der Runde stabil.
+- Auswahlaufgaben markieren eine Antwort zunächst und werten sie erst nach „Auswahl prüfen“ aus.
+- Nach zwei Fehlern entscheidet das Kind zwischen einem weiteren eigenen Versuch, einem Tipp und einer gemeinsamen schrittweisen Lösung.
+- Der Abschluss zeigt geübte Bereiche und würdigt auch Lernfortschritt mit Unterstützung. Ein Doppelklick kann eine Aufgabe nicht doppelt verbuchen.
+- App 0.32.15 verwendet unverändert Katalog 0.31.7 und Schema 20. Umfang und Freigabeweg stehen im [Releasebericht 0.32.15](docs/release-0.32.15.md).
+
 ## Automatisierte und gehärtete Wartung 0.32.14
 
 - Renovate erkennt Updates für npm, Node, Docker, Compose und GitHub Actions; Auto-Merge bleibt deaktiviert und Major-Updates benötigen eine Freigabe.
