@@ -1,8 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Check, CircleHelp, Compass, Download, House, Info, Menu, RefreshCw, RotateCcw, ShieldCheck, Sparkles, Trash2, Wifi, WifiOff, X } from 'lucide-react'
+import { ArrowLeft, Check, CircleHelp, Compass, Download, House, Info, MapPin, Menu, RefreshCw, RotateCcw, ShieldCheck, Sparkles, Trash2, Wifi, WifiOff, X } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import {
-  createRemediationExercise,
   createSessionPlan,
   getSkillLabel,
   updateSkillProgress,
@@ -239,7 +238,7 @@ function Home({ profile, progress, sessions, offlineReady, online, catalogMetada
           <Compass aria-hidden="true" />
           <div>
             <h2 id="journey-title">Deine nächste Etappe</h2>
-            <p>Sieben abwechslungsreiche Aufgaben. Ohne Uhr und ohne Stress.</p>
+            <p>Acht abwechslungsreiche Aufgaben. Ohne Uhr und ohne Stress.</p>
           </div>
         </div>
         <button className="primary-button primary-button--wide" type="button" onClick={onStart}>
@@ -256,7 +255,7 @@ function Home({ profile, progress, sessions, offlineReady, online, catalogMetada
           <div><strong>{secure}</strong><span>Bereiche sicher</span></div>
         </div>
         <p className="progress-note">
-          {mostImproved ? `Am sichersten fühlst du dich gerade bei „${getSkillLabel(mostImproved.skillId)}“.` : 'Nach deiner ersten Runde siehst du hier deinen Fortschritt.'}
+          {mostImproved ? `Am sichersten hast du zuletzt bei „${getSkillLabel(mostImproved.skillId)}“ gerechnet.` : 'Nach deiner ersten Runde siehst du hier deinen Fortschritt.'}
         </p>
       </section>
 
@@ -292,7 +291,9 @@ interface SummaryProps {
 }
 
 function Summary({ results, onNewRound, onGoHome, onOpenMenu }: SummaryProps) {
-  const firstTry = results.filter((result) => result.correct).length
+  const firstTry = results.filter((result) => result.correct && result.hintsUsed === 0).length
+  const learnedWithSupport = results.length - firstTry
+  const practicedSkills = [...new Set(results.map((result) => getSkillLabel(result.skillId)))]
   return (
     <main className="page summary-page">
       <header className="summary-navigation">
@@ -306,8 +307,19 @@ function Summary({ results, onNewRound, onGoHome, onOpenMenu }: SummaryProps) {
       </header>
       <div className="summary-mark"><Check aria-hidden="true" /></div>
       <span className="eyebrow">Etappe geschafft</span>
-      <h1>Das war eine gute Runde!</h1>
-      <p>Du hast {results.length} Aufgaben bearbeitet. {firstTry} davon klappten direkt beim ersten Versuch.</p>
+      <h1>Du bist ein Stück weiter!</h1>
+      <p>Du hast alle {results.length} Stationen dieser Etappe erreicht.</p>
+      <section className="learning-summary" aria-labelledby="learning-summary-title">
+        <div>
+          <MapPin aria-hidden="true" />
+          <div>
+            <h2 id="learning-summary-title">Das hast du geübt</h2>
+            <p>{practicedSkills.slice(0, 3).join(', ')}{practicedSkills.length > 3 ? ` und ${practicedSkills.length - 3} weitere Bereiche` : ''}</p>
+          </div>
+        </div>
+        <p><strong>{firstTry}</strong> Aufgaben klappten direkt. {learnedWithSupport > 0 ? `Bei ${learnedWithSupport} ${learnedWithSupport === 1 ? 'Aufgabe bist du' : 'Aufgaben bist du'} mit Nachdenken oder Hilfe weitergekommen.` : 'Du warst heute sehr sicher.'}</p>
+        <small>Die nächste Etappe greift auf, was du heute noch geübt hast.</small>
+      </section>
       <div className="summary-actions">
         <button className="primary-button primary-button--wide" type="button" onClick={onNewRound}>
           <RotateCcw aria-hidden="true" />
@@ -331,7 +343,6 @@ function LearningApp() {
   const [session, setSession] = useState<SessionPlan | null>(null)
   const [exerciseIndex, setExerciseIndex] = useState(0)
   const [results, setResults] = useState<AttemptResult[]>([])
-  const [repeatCount, setRepeatCount] = useState(0)
   const [showInstallHelp, setShowInstallHelp] = useState(false)
   const [offlineReady, setOfflineReady] = useState(false)
   const [online, setOnline] = useState(navigator.onLine)
@@ -414,7 +425,6 @@ function LearningApp() {
     setSession(createSessionPlan(progress, undefined, { completedSessionCount: sessions.length }))
     setResults([])
     setExerciseIndex(0)
-    setRepeatCount(0)
     setScreen('session')
   }
 
@@ -442,7 +452,6 @@ function LearningApp() {
     setSession(null)
     setResults([])
     setExerciseIndex(0)
-    setRepeatCount(0)
   }
 
   const confirmNavigation = async () => {
@@ -484,21 +493,9 @@ function LearningApp() {
     const nextProgressMap = { ...progress, [result.skillId]: nextProgress }
     setProgress(nextProgressMap)
 
-    let nextExercises = session.exercises
-    if (!result.correct && repeatCount < 3 && session.exercises.length < 10) {
-      const repetition = createRemediationExercise(currentExercise, session.seed + session.exercises.length * 211)
-      nextExercises = [
-        ...session.exercises.slice(0, exerciseIndex + 1),
-        repetition,
-        ...session.exercises.slice(exerciseIndex + 1)
-      ]
-      setSession({ ...session, exercises: nextExercises })
-      setRepeatCount((current) => current + 1)
-    }
-
     const nextResults = [...results, result]
     setResults(nextResults)
-    if (exerciseIndex + 1 >= nextExercises.length) {
+    if (exerciseIndex + 1 >= session.exercises.length) {
       const completed: CompletedSession = {
         id: session.id,
         catalogId: session.catalogId,
@@ -586,13 +583,22 @@ function LearningApp() {
           <span>Mathe-Reise</span>
         </button>
         <div className="session-header__actions">
-          <span className="task-count">{exerciseIndex + 1} / {session?.exercises.length ?? 8}</span>
+          <span className="task-count">Etappe {exerciseIndex + 1} von {session?.exercises.length ?? 8}</span>
           <button className="icon-button" type="button" onClick={() => setMenuOpen(true)} aria-label="Navigation öffnen" title="Navigation">
             <Menu aria-hidden="true" />
           </button>
         </div>
       </header>
-      <div className="session-progress" aria-hidden="true"><span style={{ width: `${((exerciseIndex + 1) / (session?.exercises.length ?? 8)) * 100}%` }} /></div>
+      <div
+        className="session-progress"
+        role="progressbar"
+        aria-label="Fortschritt der Mathe-Etappe"
+        aria-valuemin={1}
+        aria-valuemax={session?.exercises.length ?? 8}
+        aria-valuenow={exerciseIndex + 1}
+      >
+        <span style={{ width: `${((exerciseIndex + 1) / (session?.exercises.length ?? 8)) * 100}%` }} />
+      </div>
       {currentExercise && <ExerciseCard key={currentExercise.id} exercise={currentExercise} onComplete={completeExercise} />}
       {navigationOverlays}
     </main>

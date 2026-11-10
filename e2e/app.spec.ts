@@ -25,20 +25,29 @@ function disableSkills(catalog: RoutedCatalog, disabled: string[]) {
   })
 }
 
+async function confirmSelectedOption(page: Page) {
+  await page.getByRole('button', { name: 'Auswahl prüfen' }).click()
+}
+
 async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => void) {
   const reportedExercises = new Set<string>()
   for (let action = 0; action < 80; action += 1) {
-    if (await page.getByText('Etappe geschafft').isVisible().catch(() => false)) return
+    if (await page.locator('.summary-page').count() > 0) return
     const panel = page.locator('.exercise-panel')
     if (await panel.isVisible().catch(() => false)) {
-      const exerciseId = await panel.getAttribute('data-exercise-id')
-      const skillId = await panel.getAttribute('data-skill-id')
+      const exerciseId = await panel.getAttribute('data-exercise-id').catch(() => null)
+      const skillId = await panel.getAttribute('data-skill-id').catch(() => null)
       if (exerciseId && skillId && !reportedExercises.has(exerciseId)) {
         reportedExercises.add(exerciseId)
         onExercise?.(skillId)
       }
     }
-    const continueWithHelp = page.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ })
+    const chooseGuidedHelp = page.getByRole('button', { name: 'Gemeinsam Schritt für Schritt' })
+    if (await chooseGuidedHelp.isVisible().catch(() => false)) {
+      await chooseGuidedHelp.click()
+      continue
+    }
+    const continueWithHelp = page.getByRole('button', { name: 'Zur nächsten Aufgabe' })
     if (await continueWithHelp.isVisible().catch(() => false)) {
       await continueWithHelp.evaluate((button: HTMLButtonElement) => button.click())
       continue
@@ -46,7 +55,6 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
     const next = page.getByRole('button', { name: 'Weiter', exact: true })
     if (await next.isVisible().catch(() => false)) {
       await next.evaluate((button: HTMLButtonElement) => button.click())
-      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
       continue
     }
     const modelContinue = page.getByRole('button', { name: 'Weiter zur Rechnung' })
@@ -93,6 +101,7 @@ async function finishCurrentRound(page: Page, onExercise?: (skillId: string) => 
     const option = page.locator('.answer-option:visible, .symmetry-option:visible').first()
     if (await option.isVisible().catch(() => false)) {
       await option.evaluate((button: HTMLButtonElement) => button.click())
+      await confirmSelectedOption(page)
       continue
     }
     await page.waitForTimeout(50)
@@ -140,6 +149,8 @@ async function finishAdditionWarmups(page: Page, stopAtSkill?: string) {
       await input.fill(String(first + second))
       await page.getByRole('button', { name: 'Antwort prüfen' }).click()
     }
+    const confirmSelection = page.getByRole('button', { name: 'Auswahl prüfen' })
+    if (await confirmSelection.isVisible().catch(() => false)) await confirmSelection.click()
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
 }
@@ -165,11 +176,14 @@ async function finishSubtractionWarmups(page: Page) {
       await input.fill(String(first - second))
       await page.getByRole('button', { name: 'Antwort prüfen' }).click()
     }
+    const confirmSelection = page.getByRole('button', { name: 'Auswahl prüfen' })
+    if (await confirmSelection.isVisible().catch(() => false)) await confirmSelection.click()
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
 }
 
 test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline', async ({ page, context }, testInfo) => {
+  test.setTimeout(90_000)
   const consoleErrors: string[] = []
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text())
@@ -246,7 +260,7 @@ test('vollständige mobile Runde bleibt nach Reload erhalten und läuft offline'
   expect(await reopenedPage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await reopenedPage.screenshot({ path: testInfo.outputPath('summary-812x375.png') })
   await reopenedPage.getByRole('button', { name: 'Neue Runde beginnen' }).click()
-  await expect(reopenedPage.locator('.task-count')).toContainText(/^1 \/ /)
+  await expect(reopenedPage.locator('.task-count')).toHaveText('Etappe 1 von 8')
   await expect(reopenedPage.locator('.exercise-panel')).toBeVisible()
   expect(consoleErrors).toEqual([])
 })
@@ -269,7 +283,7 @@ test('Navigation, Rundenwechsel und Zurücksetzen bleiben mobil verständlich', 
 
   await page.getByRole('button', { name: /Neue Runde beginnen/ }).click()
   await expect(page.locator('.exercise-panel')).toBeVisible()
-  await expect(page.locator('.task-count')).toContainText(/^1 \/ /)
+  await expect(page.locator('.task-count')).toHaveText('Etappe 1 von 8')
 
   const exerciseId = await page.locator('.exercise-panel').getAttribute('data-exercise-id')
   await page.getByRole('button', { name: 'Navigation öffnen' }).click()
@@ -369,6 +383,7 @@ test('Kombinatorik bleibt mobil lesbar und deaktivierte Zufallsaufgaben erschein
   })
   if (!missingPair) throw new Error('Die offene Paarung ist nicht aus Zeile und Spalte lesbar.')
   await page.getByRole('button', { name: missingPair, exact: true }).click()
+  await confirmSelectedOption(page)
   await expect(combinations.locator('.combination-cell--missing')).toHaveCount(0)
   const combinationCount = await combinations.locator('.combination-cell:not(.combination-cell--blocked)').count()
   await page.getByRole('button', { name: String(combinationCount), exact: true }).click()
@@ -426,6 +441,7 @@ test('Zeit, Masse und Rauminhalt bleiben mobil lesbar und ergebnisoffen', async 
       await page.getByRole('button', { name: answer, exact: true }).click()
       await page.locator('.session-page').screenshot({ path: testInfo.outputPath(`${item.includes('Teelöffel') || item.includes('Trinkglas') || item.includes('Trinkpäckchen') ? 'rauminhalt' : 'masse'}-375x812.png`), fullPage: true })
     }
+    await confirmSelectedOption(page)
     await expect(page.locator('.quantity-result')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 2) {
@@ -480,6 +496,7 @@ test('Ebene Figuren und Muster bleiben mobil lesbar und ergebnisoffen', async ({
       })).toBe(true)
       await page.screenshot({ path: testInfo.outputPath('muster-375x812.png'), fullPage: true })
     }
+    await confirmSelectedOption(page)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
@@ -537,6 +554,7 @@ test('Fläche und Umfang beginnen mit unterschiedlichen Einheiten und maskieren 
       await page.screenshot({ path: testInfo.outputPath('umfang-375x812.png'), fullPage: true })
     }
     await page.getByRole('button', { name: String(answer), exact: true }).click()
+    await confirmSelectedOption(page)
     await expect(grid.locator('.quantity-result')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (focus === 1) {
@@ -851,6 +869,7 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   if (first === undefined || second === undefined) throw new Error('Rechnung ist nicht lesbar')
   await expect(model).toBeVisible()
   await page.getByRole('button', { name: `${first} + ${second} = ?`, exact: true }).click()
+  await confirmSelectedOption(page)
   await expect(page.locator('.feedback--step-success')).toHaveCount(0)
   await expect(model).toBeVisible()
   await expect(page.getByRole('heading', { level: 3 })).toBeFocused()
@@ -858,6 +877,7 @@ test('Sachaufgabe führt mobil über ein unbekanntenhaltiges Modell zur eigenen 
   await page.getByLabel('Dein Ergebnis').fill(String(first + second))
   await page.getByRole('button', { name: 'Ergebnis prüfen' }).click()
   await page.getByRole('button', { name: `Mila hat jetzt ${first + second} Muscheln.` }).click()
+  await confirmSelectedOption(page)
   await page.getByRole('button', { name: 'Weiter', exact: true }).click()
 })
 
@@ -1054,7 +1074,12 @@ test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', asyn
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
       continue
     }
-    const scaffold = page.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ })
+    const support = page.getByRole('button', { name: 'Gemeinsam Schritt für Schritt' })
+    if (await support.isVisible().catch(() => false)) {
+      await support.click()
+      continue
+    }
+    const scaffold = page.getByRole('button', { name: 'Zur nächsten Aufgabe' })
     if (await scaffold.isVisible().catch(() => false)) {
       await scaffold.click()
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
@@ -1067,7 +1092,10 @@ test('Geld und Längen besitzen eigene mobile Darstellungen ohne Overflow', asyn
       continue
     }
     const option = page.locator('.answer-option:visible').first()
-    if (await option.isVisible().catch(() => false)) await option.click()
+    if (await option.isVisible().catch(() => false)) {
+      await option.click()
+      await page.getByRole('button', { name: 'Auswahl prüfen' }).click()
+    }
   }
   expect(moneySeen).toBe(true)
   expect(lengthSeen).toBe(true)

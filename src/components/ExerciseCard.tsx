@@ -10,7 +10,7 @@ interface ExerciseCardProps {
   onComplete: (result: AttemptResult) => void
 }
 
-type AnswerState = 'answering' | 'correct' | 'scaffold'
+type AnswerState = 'answering' | 'correct' | 'support-choice' | 'scaffold'
 type MessageKind = 'error' | 'success'
 
 function safeExerciseSteps(exercise: Exercise): ExerciseStep[] | undefined {
@@ -54,6 +54,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const panelRef = useRef<HTMLElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const stepHeadingRef = useRef<HTMLHeadingElement>(null)
+  const completionSubmittedRef = useRef(false)
   const [answer, setAnswer] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>('answering')
   const [checks, setChecks] = useState(0)
@@ -67,6 +68,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const [detectedMisconceptions, setDetectedMisconceptions] = useState<string[]>([])
   const [pairingSelections, setPairingSelections] = useState<string[]>([])
   const [orderSelections, setOrderSelections] = useState<string[]>([])
+  const [selectedChoice, setSelectedChoice] = useState('')
   const steps = safeExerciseSteps(exercise)
 
   useLayoutEffect(() => {
@@ -95,6 +97,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setAnswer('')
     setPairingSelections([])
     setOrderSelections([])
+    setSelectedChoice('')
     setHintsShown(0)
     setMessage('')
     setMessageKind('success')
@@ -110,7 +113,8 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
     setAnswer('')
     setPairingSelections([])
     setOrderSelections([])
-    if (nextChecks >= 2) setAnswerState('scaffold')
+    setSelectedChoice('')
+    if (nextChecks >= 2) setAnswerState('support-choice')
   }
 
   const selectedOption = (value: string) => (currentStep?.options ?? exercise.options ?? []).find((option) => option.value === value)
@@ -160,6 +164,8 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   }
 
   const finish = () => {
+    if (completionSubmittedRef.current) return
+    completionSubmittedRef.current = true
     onComplete({
       exerciseId: exercise.id,
       skillId: exercise.skillId,
@@ -212,6 +218,28 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const submitOrder = () => {
     if (!currentStep || orderSelections.length !== (currentStep.options?.length ?? 0)) return
     checkStepAnswer(orderSelections.join('|'))
+  }
+
+  const submitChoice = () => {
+    if (!selectedChoice) return
+    if (currentStep) checkStepAnswer(selectedChoice)
+    else checkRegularAnswer(selectedChoice)
+  }
+
+  const retryIndependently = () => {
+    setAnswerState('answering')
+    setMessage('Nimm dir Zeit und probiere es noch einmal.')
+    setMessageKind('success')
+  }
+
+  const retryWithHint = () => {
+    setAnswerState('answering')
+    if (visibleHintLimit > 0) {
+      setHintsShown((current) => Math.max(1, current))
+      setHintsUsed((current) => current + 1)
+    }
+    setMessage('Der Tipp bleibt sichtbar. Danach entscheidest du selbst.')
+    setMessageKind('success')
   }
 
   const updatePlaceValueDigit = (index: number, value: string) => {
@@ -290,18 +318,22 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
   const renderOptions = () => {
     const options = currentStep?.options ?? exercise.options ?? []
     return (
-      <div className={options.some((option) => option.representation) ? 'answer-options model-options' : exercise.answerMode === 'symmetry' ? 'symmetry-options' : 'answer-options'}>
-        {options.map((option) => (
-          <button
-            className={option.representation ? 'answer-option model-option' : exercise.answerMode === 'symmetry' ? 'symmetry-option' : 'answer-option'}
-            data-answer-state="idle"
-            key={option.value}
-            type="button"
-            onClick={() => currentStep ? checkStepAnswer(option.value) : checkRegularAnswer(option.value)}
-          >
-            {option.grid ? <GridPicture grid={option.grid} label={option.label} axis={exercise.symmetry?.axis} axisPosition={exercise.symmetry?.axisPosition} /> : option.representation ? <><span>{option.label}</span><MathRepresentation representation={option.representation} /></> : option.label}
-          </button>
-        ))}
+      <div className="choice-answer">
+        <div className={options.some((option) => option.representation) ? 'answer-options model-options' : exercise.answerMode === 'symmetry' ? 'symmetry-options' : 'answer-options'}>
+          {options.map((option) => (
+            <button
+              aria-pressed={selectedChoice === option.value}
+              className={option.representation ? 'answer-option model-option' : exercise.answerMode === 'symmetry' ? 'symmetry-option' : 'answer-option'}
+              data-answer-state={selectedChoice === option.value ? 'selected' : 'idle'}
+              key={option.value}
+              type="button"
+              onClick={() => setSelectedChoice(option.value)}
+            >
+              {option.grid ? <GridPicture grid={option.grid} label={option.label} axis={exercise.symmetry?.axis} axisPosition={exercise.symmetry?.axisPosition} /> : option.representation ? <><span>{option.label}</span><MathRepresentation representation={option.representation} /></> : option.label}
+            </button>
+          ))}
+        </div>
+        <button className="primary-button choice-submit" type="button" disabled={!selectedChoice} onClick={submitChoice}>Auswahl prüfen</button>
       </div>
     )
   }
@@ -482,6 +514,21 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
 
       {message && answerState === 'answering' && <p className={`feedback ${messageKind === 'error' ? 'feedback--try' : 'feedback--step-success'}`} role="status">{message}</p>}
 
+      {answerState === 'support-choice' && (
+        <section className="support-choice" aria-labelledby="support-choice-title">
+          <Lightbulb aria-hidden="true" />
+          <div>
+            <h3 id="support-choice-title">Wie möchtest du weitermachen?</h3>
+            <p>Du entscheidest. Ein Fehler beendet die Aufgabe nicht.</p>
+            <div className="support-actions">
+              <button className="primary-button" type="button" onClick={retryIndependently}>Noch einmal selbst versuchen</button>
+              <button className="quiet-button" type="button" onClick={retryWithHint}>Einen Tipp öffnen</button>
+              <button className="quiet-button" type="button" onClick={() => setAnswerState('scaffold')}>Gemeinsam Schritt für Schritt</button>
+            </div>
+          </div>
+        </section>
+      )}
+
       {answerState === 'scaffold' && (
         <div className="scaffold" role="status">
           <Lightbulb aria-hidden="true" />
@@ -498,9 +545,7 @@ function ExerciseCardState({ exercise, onComplete }: ExerciseCardProps) {
             )}
             <p>{exercise.remediation.strategy}</p>
             <p>{exercise.explanation}</p>
-            <button className="primary-button" type="button" onClick={finish}>
-              {exercise.remediation.helpLevel === 5 ? 'Mit einer Grundlagenaufgabe weiter' : 'Mit einer leichteren Aufgabe weiter'}
-            </button>
+            <button className="primary-button" type="button" onClick={finish}>Zur nächsten Aufgabe</button>
           </div>
         </div>
       )}

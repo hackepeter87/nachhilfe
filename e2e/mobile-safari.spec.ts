@@ -43,6 +43,8 @@ async function finishAdditionWarmups(page: Page) {
       await page.getByLabel('Deine Antwort').fill(String(Number(terms[1]) + Number(terms[2])))
       await page.getByRole('button', { name: 'Antwort prüfen' }).click()
     }
+    const confirmSelection = page.getByRole('button', { name: 'Auswahl prüfen' })
+    if (await confirmSelection.isVisible().catch(() => false)) await confirmSelection.click()
     await page.getByRole('button', { name: 'Weiter', exact: true }).click()
   }
 }

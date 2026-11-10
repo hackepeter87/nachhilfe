@@ -4,7 +4,29 @@ import { describe, expect, it, vi } from 'vitest'
 import { generateExercise, type ExerciseStep } from '../domain'
 import { ExerciseCard } from './ExerciseCard'
 
+async function chooseOption(user: ReturnType<typeof userEvent.setup>, name: string | RegExp) {
+  const matcher = typeof name === 'string'
+    ? new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    : name
+  await user.click(screen.getByRole('button', { name: matcher }))
+  await user.click(screen.getByRole('button', { name: 'Auswahl prüfen' }))
+}
+
 describe('ExerciseCard', () => {
+  it('prüft eine Auswahl erst nach ausdrücklicher Bestätigung', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('body-views', 42, 2)
+    const correct = exercise.options?.find((option) => option.value === exercise.correctAnswer)
+    if (!correct) throw new Error('Richtige Auswahl fehlt')
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: new RegExp(correct.label) }))
+    expect(screen.queryByText(exercise.successFeedback)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Auswahl prüfen' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: 'Auswahl prüfen' }))
+    expect(screen.getByText(exercise.successFeedback)).toBeVisible()
+  })
+
   it('gibt die katalogisierte Einführung erst beim vollständigen Abschluss zurück', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
@@ -48,7 +70,7 @@ describe('ExerciseCard', () => {
     expect(container.querySelector('.combination-cell--missing')).toHaveTextContent('?')
     const correct = pairing.options.find((option) => option.value === pairing.correctAnswer)
     if (!correct) throw new Error('Fehlende Paarung hat keine Antwortoption')
-    await user.click(screen.getByRole('button', { name: correct.label }))
+    await chooseOption(user, correct.label)
     expect(container.querySelector('.combination-cell--missing')).not.toBeInTheDocument()
     expect(screen.getByText(/Wie viele verschiedene Paarungen/)).toBeVisible()
   })
@@ -62,7 +84,7 @@ describe('ExerciseCard', () => {
 
     expect(container.querySelectorAll('.number-line-tick small')).toHaveLength(0)
     expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual(['?', '?'])
-    await user.click(screen.getByRole('button', { name: lower.correctAnswer }))
+    await chooseOption(user, lower.correctAnswer)
     expect(container.querySelectorAll('.number-line-tick small')).toHaveLength(0)
     expect([...container.querySelectorAll('.number-line-labels span')].map((node) => node.textContent)).toEqual([lower.correctAnswer, '?'])
     expect(screen.getByRole('heading', { name: new RegExp(upper.prompt.replace(/[?]/g, '\\?')) })).toBeVisible()
@@ -89,7 +111,7 @@ describe('ExerciseCard', () => {
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     expect(screen.getByRole('img', { name: /Würfel.*Vorne und rechts sind markiert/i })).toBeVisible()
     expect(screen.getAllByRole('img', { name: /Ansicht [ABC]/ })).toHaveLength(3)
-    await user.click(screen.getByRole('button', { name: new RegExp(exercise.options?.find((option) => option.value === exercise.correctAnswer)?.label ?? '') }))
+    await chooseOption(user, new RegExp(exercise.options?.find((option) => option.value === exercise.correctAnswer)?.label ?? ''))
     expect(screen.getByText(exercise.successFeedback)).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'body-views', correct: true }))
@@ -106,7 +128,7 @@ describe('ExerciseCard', () => {
     expect(container.querySelectorAll('.answer-option[data-answer-state="idle"]')).toHaveLength(3)
     const correct = exercise.options?.find((option) => option.value === exercise.correctAnswer)
     if (!correct) throw new Error('Die Rotationsaufgabe enthält keine richtige Antwortoption.')
-    await user.click(screen.getByRole('button', { name: new RegExp(correct.label) }))
+    await chooseOption(user, new RegExp(correct.label))
     expect(screen.getByText(exercise.successFeedback)).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ skillId: 'cube-rotation', subskillId: 'cube-rotation-left', correct: true }))
@@ -119,7 +141,7 @@ describe('ExerciseCard', () => {
     const unchanged = exercise.options?.find((option) => option.misconception === 'not-rotated')
     if (!unchanged) throw new Error('Die Rotationsaufgabe enthält keinen Unverändert-Distraktor.')
 
-    await user.click(screen.getByRole('button', { name: new RegExp(unchanged.label) }))
+    await chooseOption(user, new RegExp(unchanged.label))
     expect(screen.getByText(unchanged.misconceptionFeedback!)).toHaveTextContent(/Lageänderung.*auffällige Ecke/i)
     await user.click(screen.getByRole('button', { name: /Tipp/i }))
     expect(screen.getByText(exercise.hints[0].text)).toHaveTextContent(/auffällige Ecke/i)
@@ -144,7 +166,7 @@ describe('ExerciseCard', () => {
     expect(exercise.correctAnswer).toBe('mirror')
     expect(exercise.prompt).toMatch(/grünen Achse/)
     expect(exercise.prompt).not.toMatch(/Fehler|falschen Achse/)
-    await user.click(screen.getByRole('button', { name: new RegExp(correctOption.label) }))
+    await chooseOption(user, new RegExp(correctOption.label))
     expect(screen.getByText(exercise.successFeedback)).toBeVisible()
   })
 
@@ -162,7 +184,7 @@ describe('ExerciseCard', () => {
     expect(screen.getByText(exercise.errorFeedback)).toBeVisible()
   })
 
-  it('führt nach zwei Fehlern mit einer Erklärung weiter', async () => {
+  it('lässt nach zwei Fehlern die Art der Unterstützung wählen', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
     const exercise = generateExercise('subtraction', 99)
@@ -173,9 +195,45 @@ describe('ExerciseCard', () => {
       await user.type(input, '99')
       fireEvent.submit(input.closest('form')!)
     }
+    expect(screen.getByText('Wie möchtest du weitermachen?')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Noch einmal selbst versuchen' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Einen Tipp öffnen' })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Gemeinsam Schritt für Schritt' }))
     expect(screen.getByText('Wir lösen es gemeinsam.')).toBeVisible()
-    await user.click(screen.getByRole('button', { name: /Mit einer (Grundlagenaufgabe|leichteren Aufgabe) weiter/ }))
+    await user.click(screen.getByRole('button', { name: 'Zur nächsten Aufgabe' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: false }))
+  })
+
+  it('öffnet nach zwei Fehlern auf Wunsch einen Tipp und lässt selbst weiterarbeiten', async () => {
+    const user = userEvent.setup()
+    const exercise = generateExercise('subtraction', 99)
+    render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
+
+    const input = screen.getByLabelText('Deine Antwort')
+    for (let index = 0; index < 2; index += 1) {
+      await user.type(input, '99')
+      fireEvent.submit(input.closest('form')!)
+    }
+    await user.click(screen.getByRole('button', { name: 'Einen Tipp öffnen' }))
+
+    expect(screen.getByText(exercise.hints[0].text)).toBeVisible()
+    expect(screen.getByLabelText('Deine Antwort')).toBeVisible()
+    expect(screen.getByText('Der Tipp bleibt sichtbar. Danach entscheidest du selbst.')).toBeVisible()
+  })
+
+  it('meldet einen Abschluss auch bei schnellem Doppelklick nur einmal', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const exercise = generateExercise('addition', 17, 1)
+    render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
+    await user.type(screen.getByLabelText('Deine Antwort'), exercise.correctAnswer)
+    await user.click(screen.getByRole('button', { name: 'Antwort prüfen' }))
+    const next = screen.getByRole('button', { name: 'Weiter' })
+
+    fireEvent.click(next)
+    fireEvent.click(next)
+
+    expect(onComplete).toHaveBeenCalledTimes(1)
   })
 
   it('meldet eine richtige Antwort als erfolgreich', async () => {
@@ -197,9 +255,9 @@ describe('ExerciseCard', () => {
     const [commutative, inverse] = exercise.steps ?? []
     if (!commutative || !inverse) throw new Error('Transferhandlungen fehlen')
 
-    await user.click(screen.getByRole('button', { name: commutative.correctAnswer }))
+    await chooseOption(user, commutative.correctAnswer)
     expect(screen.getByRole('heading', { name: new RegExp(inverse.prompt) })).toBeVisible()
-    await user.click(screen.getByRole('button', { name: inverse.correctAnswer }))
+    await chooseOption(user, inverse.correctAnswer)
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, subskillId: 'times-7' }))
   })
@@ -213,7 +271,7 @@ describe('ExerciseCard', () => {
     if (!relationship || !result) throw new Error('Divisionsschritte fehlen')
 
     expect(screen.getByRole('img', { name: /vollständig in gleich große Gruppen/ })).toBeVisible()
-    await user.click(screen.getByRole('button', { name: relationship.correctAnswer }))
+    await chooseOption(user, relationship.correctAnswer)
     expect(screen.getByLabelText('Dein Ergebnis')).toHaveValue('')
     await user.type(screen.getByLabelText('Dein Ergebnis'), result.correctAnswer)
     await user.click(screen.getByRole('button', { name: 'Ergebnis prüfen' }))
@@ -243,7 +301,7 @@ describe('ExerciseCard', () => {
     const { container } = render(<ExerciseCard exercise={exercise} onComplete={vi.fn()} />)
 
     expect(container.querySelectorAll('.math-visual')).toHaveLength(1)
-    await user.click(screen.getByRole('button', { name: probe.correctAnswer }))
+    await chooseOption(user, probe.correctAnswer)
     expect(screen.getByRole('heading', { name: new RegExp(inverse.prompt.replace(/[?]/g, '\\?')) })).toBeVisible()
     expect(container.querySelectorAll('.math-visual')).toHaveLength(1)
     expect(container.querySelector(inverse.representation.kind === 'sharing-model' ? '.division-model--sharing' : '.division-model--grouping')).toBeVisible()
@@ -265,7 +323,7 @@ describe('ExerciseCard', () => {
     const firstStep = steps[0]!
     const firstOption = firstStep.options?.find((option) => option.value === firstStep.correctAnswer)
     if (!firstOption) throw new Error('Der größte einfache Anteil fehlt')
-    await user.click(screen.getByRole('button', { name: firstOption.label }))
+    await chooseOption(user, firstOption.label)
     expect(decomposition()).toHaveTextContent(String(exercise.variant.values.easyPart))
 
     for (const step of steps.slice(1)) {
@@ -325,7 +383,7 @@ describe('ExerciseCard', () => {
       } else {
         const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
         if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
-        await user.click(screen.getByRole('button', { name: option.label }))
+        await chooseOption(user, option.label)
       }
     }
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
@@ -341,7 +399,7 @@ describe('ExerciseCard', () => {
     for (const step of exercise.steps?.slice(0, 2) ?? []) {
       const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
       if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
-      await user.click(screen.getByRole('button', { name: option.label }))
+      await chooseOption(user, option.label)
     }
     const resultStep = exercise.steps?.[2]
     if (!resultStep) throw new Error('Rundungsergebnis fehlt')
@@ -423,7 +481,7 @@ describe('ExerciseCard', () => {
     for (const step of exercise.steps ?? []) {
       const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
       if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
-      await user.click(screen.getByRole('button', { name: option.label }))
+      await chooseOption(user, option.label)
     }
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true }))
@@ -585,7 +643,7 @@ describe('ExerciseCard', () => {
       } else {
         const option = step.options?.find((candidate) => candidate.value === step.correctAnswer)
         if (!option) throw new Error(`Richtige Option für ${step.id} fehlt`)
-        await user.click(screen.getByText(option.label))
+        await chooseOption(user, option.label)
       }
     }
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
@@ -602,7 +660,7 @@ describe('ExerciseCard', () => {
         expect(screen.getByRole('img', { name: /unbekannt|offen/i })).toBeVisible()
         const correct = step.options?.find((option) => option.value === step.correctAnswer)
         if (!correct) throw new Error('Passende Rechnung fehlt')
-        await user.click(screen.getByRole('button', { name: correct.label }))
+        await chooseOption(user, correct.label)
         expect(screen.getByText(/Rechne selbst/)).toBeVisible()
         break
       }
@@ -610,7 +668,7 @@ describe('ExerciseCard', () => {
       else {
         const correct = step.options?.find((option) => option.value === step.correctAnswer)
         if (!correct) throw new Error(`Richtige Option für ${step.id} fehlt`)
-        await user.click(screen.getByRole('button', { name: correct.label }))
+        await chooseOption(user, correct.label)
       }
     }
   })
@@ -643,7 +701,7 @@ describe('ExerciseCard', () => {
     if (!equationStep || !correct) throw new Error('Geführte Rechnungswahl fehlt')
     await user.click(screen.getByRole('button', { name: 'Ich brauche einen Tipp' }))
     expect(screen.getByText(equationStep.errorFeedback)).toBeVisible()
-    await user.click(screen.getByRole('button', { name: correct.label }))
+    await chooseOption(user, correct.label)
 
     expect(screen.queryByText(equationStep.successFeedback)).not.toBeInTheDocument()
     expect(screen.queryByText(equationStep.errorFeedback)).not.toBeInTheDocument()
@@ -690,7 +748,7 @@ describe('ExerciseCard', () => {
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
     const option = exercise.options?.find((candidate) => candidate.value === exercise.correctAnswer)
     if (!option) throw new Error('Richtige Größenoption fehlt')
-    await user.click(screen.getByRole('button', { name: option.label }))
+    await chooseOption(user, option.label)
     await user.click(screen.getByRole('button', { name: 'Weiter' }))
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: true, skillId: skill }))
   })
@@ -753,7 +811,7 @@ describe('ExerciseCard', () => {
     const step = exercise.steps?.find((candidate) => candidate.id === 'order-numbers')
     render(<ExerciseCard exercise={exercise} onComplete={onComplete} />)
 
-    await user.click(screen.getByRole('button', { name: compareStep?.correctAnswer }))
+    await chooseOption(user, compareStep?.correctAnswer ?? '')
     expect(screen.getByText('Noch keine Zahl gewählt')).toBeVisible()
     for (const option of step?.options ?? []) expect(screen.getByRole('button', { name: option.label })).toHaveAttribute('aria-pressed', 'false')
     for (const value of step?.expectedSelections ?? []) await user.click(screen.getByRole('button', { name: value }))
@@ -771,7 +829,7 @@ describe('ExerciseCard', () => {
     for (const symbol of ['<', '=', '>']) {
       expect(screen.getByRole('button', { name: symbol })).toHaveAttribute('data-answer-state', 'idle')
     }
-    await user.click(screen.getByRole('button', { name: step?.correctAnswer }))
+    await chooseOption(user, step?.correctAnswer ?? '')
     expect(screen.getByText('Noch keine Zahl gewählt')).toBeVisible()
   })
 })

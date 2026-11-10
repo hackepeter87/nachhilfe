@@ -40,8 +40,20 @@ describe('App-Ablauf', () => {
     await user.type(await screen.findByLabelText('Dein Spitzname'), 'Nova')
     await user.click(screen.getByRole('button', { name: 'Los geht’s' }))
     expect(await screen.findByText('Hallo, Nova!')).toBeVisible()
+    expect(screen.getByText('Acht abwechslungsreiche Aufgaben. Ohne Uhr und ohne Stress.')).toBeVisible()
     expect(screen.getByRole('button', { name: /mathe-runde starten/i })).toBeEnabled()
     await waitFor(() => expect(screen.getByText(/Offline (bereit|wird vorbereitet)/)).toBeVisible())
+  })
+
+  it('zeigt eine feste Etappe mit acht Aufgaben an', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Weiter zur Mathe-Reise' }))
+    await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
+    await user.click(await screen.findByRole('button', { name: /mathe-runde starten/i }))
+
+    expect(await screen.findByText('Etappe 1 von 8')).toBeVisible()
+    expect(screen.getByRole('progressbar', { name: 'Fortschritt der Mathe-Etappe' })).toHaveAttribute('aria-valuemax', '8')
   })
 
   it('zeigt technische Versionen nur auf Abruf', async () => {
@@ -86,7 +98,7 @@ describe('App-Ablauf', () => {
     await user.click(screen.getByRole('button', { name: 'Runde verlassen und zur Startseite' }))
     const dialog = screen.getByRole('alertdialog', { name: 'Zur Startseite?' })
     await user.click(within(dialog).getByRole('button', { name: 'Abbrechen' }))
-    expect(screen.getByText(/1 \/ \d+/)).toBeVisible()
+    expect(screen.getByText('Etappe 1 von 8')).toBeVisible()
 
     await user.click(screen.getByRole('button', { name: 'Runde verlassen und zur Startseite' }))
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Zur Startseite' }))
@@ -105,7 +117,7 @@ describe('App-Ablauf', () => {
     expect(screen.getByRole('alertdialog', { name: 'Neue Runde beginnen?' })).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Neue Runde starten' }))
 
-    expect(await screen.findByText(/1 \/ \d+/)).toBeVisible()
+    expect(await screen.findByText('Etappe 1 von 8')).toBeVisible()
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 

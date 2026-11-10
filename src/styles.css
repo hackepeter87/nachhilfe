@@ -1385,6 +1385,23 @@ p {
   transform: translateY(1px);
 }
 
+.answer-option[aria-pressed="true"],
+.symmetry-option[aria-pressed="true"] {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 28%, transparent);
+}
+
+.choice-answer {
+  display: grid;
+  gap: 14px;
+}
+
+.choice-submit {
+  justify-self: end;
+  min-width: 180px;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .answer-option:hover {
     border-color: var(--blue);
@@ -1422,7 +1439,8 @@ p {
 
 .hint,
 .feedback,
-.scaffold {
+.scaffold,
+.support-choice {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
   gap: 10px;
@@ -1433,7 +1451,8 @@ p {
 
 .hint > *,
 .feedback > *,
-.scaffold > * {
+.scaffold > *,
+.support-choice > * {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -1445,7 +1464,8 @@ p {
 
 .hint p:last-child,
 .feedback p:last-child,
-.scaffold p:last-child {
+.scaffold p:last-child,
+.support-choice p:last-child {
   margin-bottom: 0;
 }
 
@@ -1474,6 +1494,30 @@ p {
 .scaffold {
   color: #654a00;
   background: var(--yellow-soft);
+}
+
+.support-choice {
+  color: var(--green-dark);
+  background: var(--green-soft);
+}
+
+.support-choice h3 {
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+}
+
+.support-actions {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.support-actions .quiet-button {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--line);
+  color: var(--ink);
+  background: var(--white);
 }
 
 .scaffold h3 {
@@ -1646,6 +1690,28 @@ p {
 .summary-page > p {
   color: var(--muted);
 }
+
+.learning-summary {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--green);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.learning-summary > div {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.learning-summary svg { color: var(--coral); }
+.learning-summary h2 { margin: 0 0 4px; font-size: 1.05rem; }
+.learning-summary p { margin: 0; color: var(--ink); }
+.learning-summary small { color: var(--muted); font-weight: 700; }
 
 .summary-actions {
   display: grid;
