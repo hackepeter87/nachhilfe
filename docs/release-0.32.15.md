@@ -15,6 +15,10 @@ Releaseumfang: App 0.32.15, Katalog 0.31.7, Schema 20.
   direkt klappten, von Lernwegen mit Nachdenken oder Hilfe.
 - Ein Abschluss wird auch bei einem schnellen Doppelklick nur einmal gespeichert.
   Der Fortschrittsbalken ist für assistive Technik als Fortschritt ausgezeichnet.
+- Gezielte npm-Overrides heben die ausschließlich zur Entwicklung verwendeten
+  transitiven Abhängigkeiten `glob` auf 14.0.2 und `minimatch` auf 11.0.1. Damit
+  sind `CVE-2026-118773` und `CVE-2026-118764` behoben, ohne die nicht betroffene
+  alte `minimatch`-5-Kette unnötig zu verändern.
 
 Die Änderungen setzen die fünf priorisierten Befunde des versionierten
 Impeccable-Reviews um. Aufgabeninhalte, Katalog, IndexedDB-Struktur und

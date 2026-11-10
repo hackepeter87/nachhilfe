@@ -6,6 +6,7 @@
 - Auswahlaufgaben markieren eine Antwort zunächst und werten sie erst nach „Auswahl prüfen“ aus.
 - Nach zwei Fehlern entscheidet das Kind zwischen einem weiteren eigenen Versuch, einem Tipp und einer gemeinsamen schrittweisen Lösung.
 - Der Abschluss zeigt geübte Bereiche und würdigt auch Lernfortschritt mit Unterstützung. Ein Doppelklick kann eine Aufgabe nicht doppelt verbuchen.
+- Gepinnte transitive Build-Abhängigkeiten aktualisieren `glob` auf 14.0.2 und `minimatch` auf 11.0.1 und beheben damit zwei neue Medium-CVEs.
 - App 0.32.15 verwendet unverändert Katalog 0.31.7 und Schema 20. Umfang und Freigabeweg stehen im [Releasebericht 0.32.15](docs/release-0.32.15.md).
 
 ## Automatisierte und gehärtete Wartung 0.32.14

@@ -196,7 +196,7 @@ Die heuristischen Lernstandsregeln stehen zentral in `src/domain/progress.ts`: r
 
 ## Entwicklungsstand 0.32.15
 
-Version 0.32.15 macht Etappen mit acht Aufgaben verlässlich, trennt Auswahl und Prüfung und lässt Kinder nach wiederholten Fehlern selbst zwischen erneutem Versuch, Tipp und gemeinsamer Lösung wählen. Die Abschlussansicht beschreibt den Lernweg statt nur die Anzahl richtiger Erstversuche. Katalog 0.31.7 und Schema 20 bleiben unverändert. Details stehen im [Releasebericht](docs/release-0.32.15.md).
+Version 0.32.15 macht Etappen mit acht Aufgaben verlässlich, trennt Auswahl und Prüfung und lässt Kinder nach wiederholten Fehlern selbst zwischen erneutem Versuch, Tipp und gemeinsamer Lösung wählen. Die Abschlussansicht beschreibt den Lernweg statt nur die Anzahl richtiger Erstversuche. Gepinnte transitive Build-Abhängigkeiten beheben außerdem `CVE-2026-118764` und `CVE-2026-118773`. Katalog 0.31.7 und Schema 20 bleiben unverändert. Details stehen im [Releasebericht](docs/release-0.32.15.md).
 
 ## Entwicklungsstand 0.32.14
 
